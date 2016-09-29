@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui';
 import {Tabs, Tab} from 'material-ui/Tabs';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import CustomStyle from '../CustomStyle'
 import MyTabTemplate from './tabs/MyTabTemplate'
 
@@ -30,6 +31,7 @@ export default class MainNavigationView extends Component {
   render() {
     const toolbarHeight = CustomStyle.muiTheme.toolbar.height
     return (
+        <MuiThemeProvider muiTheme={CustomStyle.muiTheme}>
           <div style={{height: 'inherit'}}>
             <Toolbar style={{backgroundColor: CustomStyle.muiTheme.palette.primary1Color}}>
               <ToolbarGroup>
@@ -40,14 +42,15 @@ export default class MainNavigationView extends Component {
             <Tabs style={{height: `calc(100% - ${toolbarHeight}px)`}}
             value={this.state.value} onChange={this.handleChange}
             tabTemplate={MyTabTemplate} contentContainerStyle={{height: `inherit`}}>
-              <Tab label={this.props.leftTabName} value={0}>
+              <Tab label={this.props.leftTabName} value={0} >
                 {this.props.leftChild}
               </Tab>
-              <Tab label={this.props.rightTabName} value={1}>
+              <Tab label={this.props.rightTabName} value={1} >
                 {this.props.rightChild}
               </Tab>
             </Tabs>
           </div>
+        </MuiThemeProvider>
         );
   }
 }
