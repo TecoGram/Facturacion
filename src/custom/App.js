@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import MainNavigationView from '../lib/MainNavigationView'
-import FacturarView from '../lib/FacturarView'
+import FacturarView from './FacturarView'
 import ProductosView from './ProductosView'
 
 class App extends Component {
