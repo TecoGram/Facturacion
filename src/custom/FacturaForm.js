@@ -65,7 +65,7 @@ export default class FacturaForm extends Component {
         <IconBox icon={Info}/>
         <TextField
           hintText="Autorización"
-          style={{width:'144px', marginRight: txtMargin}} />
+          style={{width:'144px'}} />
       </div>
     );
   }
