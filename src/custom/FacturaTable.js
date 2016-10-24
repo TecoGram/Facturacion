@@ -29,11 +29,13 @@ export default class FacturaTable extends React.Component {
       <TableRowColumn width={150} style={{padding: '0px'}}>{product.name}</TableRowColumn>
       <TableRowColumn width={60} style={{padding: '0px'}}>{product.lote}</TableRowColumn>
       <TableRowColumn width={40} style={{padding: '0px'}}>
-        <TextField name='countText' style={{width: '28px'}} defaultValue={1}/>
+        <TextField name='countText' style={{width: '28px'}} defaultValue={1}
+        inputStyle={{textAlign: 'right', fontSize: '13px'}}/>
       </TableRowColumn>
       <TableRowColumn width={60} style={{padding: '0px'}}>{product.expDate}</TableRowColumn>
       <TableRowColumn width={60} style={{padding: '0px'}}>
-        <TextField name='countText' style={{width: '50px'}} defaultValue={product.price}/>
+        <TextField name='countText' style={{width: '50px'}} defaultValue={product.price}
+        inputStyle={{textAlign: 'right', fontSize: '13px'}}/>
       </TableRowColumn>
       <TableRowColumn width={40} style={{padding: '0px'}}>${product.price * product.count}</TableRowColumn>
     </TableRow>

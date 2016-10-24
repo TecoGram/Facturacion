@@ -40,7 +40,7 @@ export default class MainNavigationView extends Component {
                 style={{color: "#FFFFFF", fontFamily: 'Roboto'}}/>
               </ToolbarGroup>
             </Toolbar>
-            <Tabs style={{height: `calc(100% - ${toolbarHeight}px)`}}
+            <Tabs style={{backgroundColor: '#ededed', height: `calc(100% - ${toolbarHeight}px)`}}
             value={this.state.value} onChange={this.handleChange}
             tabTemplate={MyTabTemplate} contentContainerStyle={{height: `inherit`}}>
               <Tab label={this.props.leftTabName} value={0} labelWidth={300}>
