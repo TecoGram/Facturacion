@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import PaperContainer from '../lib/PaperContainer'
 import FacturaForm from './FacturaForm'
 import FacturaTable from './FacturaTable'
+import FacturaResults from './FacturaResults'
 
 
 const mockItems = [
@@ -28,12 +29,15 @@ export default class FacturarView extends Component {
 
   render() {
     return (
+      <div style={{height:'100%', overflow:'auto'}} >
       <PaperContainer >
         <div style={{marginTop: '24px', marginLeft: '36px', marginRight: '36px'}}>
           <FacturaForm suggestions={["hello", "bye"]} />
           <FacturaTable items={mockItems}/>
+          <FacturaResults />
         </div>
       </PaperContainer>
+      </div>
     );
   }
 

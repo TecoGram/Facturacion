@@ -12,7 +12,7 @@ export default class PaperContainer extends Component {
   render() {
     const paperStyle = {
       width : 1010,
-      height : '96%',
+      height : 650,
       marginLeft: 'auto',
       marginRight: 'auto',
       marginTop: '20px',
