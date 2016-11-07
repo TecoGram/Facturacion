@@ -1,15 +1,19 @@
 {
-  "name": "facturacion-client",
+  "name": "facturacion",
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
     "babel-eslint": "^6.1.2",
+    "chai": "^3.5.0",
     "eslint": "^3.5.0",
     "eslint-plugin-react": "^6.3.0",
+    "mocha": "^3.1.2",
     "react-scripts": "0.4.3"
   },
   "dependencies": {
+    "express": "^4.14.0",
     "fixed-data-table": "^0.6.3",
+    "knex": "^0.12.6",
     "material-ui": "^0.15.4",
     "react": "^15.3.2",
     "react-container-dimensions": "^1.3.0",
@@ -17,12 +21,14 @@
     "react-redux": "^4.4.5",
     "react-router": "^2.8.1",
     "react-tap-event-plugin": "^1.0.0",
-    "redux": "^3.6.0"
+    "redux": "^3.6.0",
+    "sqlite3": "^3.1.8"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
+    "test-backend": "NODE_ENV=test node backend/scripts/initTestDB.js && NODE_ENV=test mocha",
     "eject": "react-scripts eject"
   }
 }
