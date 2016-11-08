@@ -60,6 +60,7 @@ describe('metodos de dbAdmin.js', function () {
 
     it('persiste una nueva venta en la base y agrega las unidades vendidas a la base',
       function (done) {
+          console.log("insertar venta")
         const productosVendidos = [
           {
             rowid: 1,
