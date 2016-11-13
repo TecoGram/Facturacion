@@ -2,6 +2,7 @@
   "name": "facturacion",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:8192",
   "devDependencies": {
     "babel-eslint": "^6.1.2",
     "chai": "^3.5.0",
@@ -11,6 +12,7 @@
     "react-scripts": "0.4.3"
   },
   "dependencies": {
+    "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "fixed-data-table": "^0.6.3",
     "knex": "^0.12.6",
@@ -28,7 +30,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "test-backend": "NODE_ENV=test node backend/scripts/initTestDB.js && DEBUG=knex:* NODE_ENV=test mocha",
+    "test-backend": "NODE_ENV=test node backend/scripts/initTestDB.js && NODE_ENV=test mocha",
     "eject": "react-scripts eject"
   }
 }

@@ -41,11 +41,13 @@ describe('metodos de dbAdmin.js', function () {
   describe('insertarCliente', function() {
 
     it('persiste varios clientes en la base encadenando con promise', function (done) {
-      db.insertarCliente("0954236576001", "Dr. Juan Perez", "Calle 13", "", "")
+      db.insertarCliente("0954236576001", "Dr. Juan Perez",
+      "Av. Pedro Carbo y Sucre 512", "2645987", "2978504")
       .then(function (ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')
-        return db.insertarCliente("0934233576001", "Carlos Sanchez", "Calle 16", "", "")
+        return db.insertarCliente("0934233576001", "Carlos Sanchez",
+        "Av. Brasil y la del ejercito", "2353477", "2375980")
       }).then(function(ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')
@@ -60,7 +62,6 @@ describe('metodos de dbAdmin.js', function () {
 
     it('persiste una nueva venta en la base y agrega las unidades vendidas a la base',
       function (done) {
-          console.log("insertar venta")
         const productosVendidos = [
           {
             rowid: 1,
