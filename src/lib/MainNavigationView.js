@@ -12,7 +12,9 @@ import { bindActionCreators } from 'redux';
 import { connect, Provider } from 'react-redux'
 
 import ActionCreators from '../ActionCreators'
+import { NUEVO_CLIENTE_DIALOG } from '../DialogTypes'
 import CustomStyle from '../CustomStyle'
+import FormDialog from './FormDialog'
 import MyTabTemplate from './tabs/MyTabTemplate'
 import store from '../Store'
 
@@ -35,6 +37,10 @@ function mapDispatchToProps(dispatch) {
 class MainToolbar extends Component {
 
   render() {
+    const {
+      cambiarDialog,
+    } = this.props
+
     return (
       <Toolbar style={{backgroundColor: CustomStyle.muiTheme.palette.primary1Color}}>
 
@@ -51,7 +57,8 @@ class MainToolbar extends Component {
             targetOrigin={{horizontal: 'right', vertical: 'top'}}
             anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}>
             <MenuItem primaryText="Nuevo Producto" />
-            <MenuItem primaryText="Nuevo Cliente" />
+            <MenuItem primaryText="Nuevo Cliente" onTouchTap={(event) =>
+              cambiarDialog(NUEVO_CLIENTE_DIALOG)}/>
           </IconMenu>
         </ToolbarGroup>
 
@@ -81,6 +88,8 @@ class Main extends Component {
     const toolbarHeight = CustomStyle.muiTheme.toolbar.height
 
     const {
+      cambiarDialog,
+      dialog,
       leftChild,
       leftTabName,
       rightChild,
@@ -90,7 +99,7 @@ class Main extends Component {
 
     return (
       <div style={{height: 'inherit'}}>
-        <MainToolbar title={title} />
+        <MainToolbar title={title} cambiarDialog={cambiarDialog} />
         <Tabs style={{backgroundColor: '#ededed', height: `calc(100% - ${toolbarHeight}px)`}}
         value={this.state.value} onChange={this.handleChange}
         tabTemplate={MyTabTemplate} contentContainerStyle={{height: `inherit`}}>
@@ -101,6 +110,7 @@ class Main extends Component {
             {rightChild}
           </Tab>
         </Tabs>
+        <FormDialog tipoDialog={dialog} cambiarDialog={cambiarDialog}/>
       </div>
     )
   }

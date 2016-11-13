@@ -1,18 +1,22 @@
-const nuevoClienteDialog ="muevoClienteDialog"
-const nuevoProductoDialog ="muevoProductoDialog"
+import { NUEVO_CLIENTE_DIALOG, NUEVO_PRODUCTO_DIALOG } from './DialogTypes'
+import { CAMBIAR_DIALOG_ACTION } from './ActionTypes'
 
 module.exports = {
-  mostrarDialog(tipo) {
-    if(tipo === nuevoClienteDialog)
+  cambiarDialog(tipoDialog) {
+    if(tipoDialog === NUEVO_CLIENTE_DIALOG)
       return {
-        tipo: nuevoClienteDialog,
-        open: true,
+        type: CAMBIAR_DIALOG_ACTION,
+        value: NUEVO_CLIENTE_DIALOG,
       }
-    else if (tipo === nuevoProductoDialog)
+    else if (tipoDialog === NUEVO_PRODUCTO_DIALOG)
       return {
-        tipo: nuevoProductoDialog,
-        open: true,
+        type: CAMBIAR_DIALOG_ACTION,
+        value: NUEVO_PRODUCTO_DIALOG,
       }
-    else throw new Error("Tipo de dialog desconocido: " + tipo)
+    else if (tipoDialog) throw new Error("Tipo de dialog desconocido: " + tipoDialog)
+    else return {//null value hides the dialog
+      type: CAMBIAR_DIALOG_ACTION,
+      value: null,
+    }
   },
 }
