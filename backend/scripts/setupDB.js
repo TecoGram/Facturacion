@@ -14,6 +14,7 @@ knex.schema.createTableIfNotExists('productos', (table) => {
     table.string('ruc', 13).primary()
     table.string('nombre', 50).index()
     table.string('direccion', 60)
+    table.string('email', 10)
     table.string('telefono1', 10)
     table.string('telefono2', 10)
   })

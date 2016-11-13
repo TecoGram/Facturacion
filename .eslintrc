@@ -41,7 +41,7 @@
     "consistent-return": 0,
     "strict": 0,
     "no-cond-assign": ["error", "always"],
-    "no-console": "warn",
+    "no-console": ["warn", { "allow": ["error"] }],
   },
   "parser": "babel-eslint",
   "plugins": [

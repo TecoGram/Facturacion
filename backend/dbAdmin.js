@@ -43,11 +43,12 @@ module.exports = {
     })
   },
 
-  insertarCliente: (ruc, nombre, direccion, telefono1, telefono2) => {
+  insertarCliente: (ruc, nombre, direccion, email, telefono1, telefono2) => {
     return knex.table('clientes').insert({
       ruc: ruc,
       nombre: nombre,
       direccion: direccion,
+      email: email,
       telefono1: telefono1,
       telefono2: telefono2,
     })
