@@ -3,12 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "proxy": "http://localhost:8192",
+  "config": {
+      "blanket": {
+        "pattern": "backend",
+        "data-cover-never": "backend/scripts"
+      }
+    },
   "devDependencies": {
     "babel-eslint": "^6.1.2",
+    "blanket": "^1.2.3",
     "chai": "^3.5.0",
+    "coveralls": "^2.11.15",
     "eslint": "^3.5.0",
     "eslint-plugin-react": "^6.3.0",
     "mocha": "^3.1.2",
+    "mocha-lcov-reporter": "^1.2.0",
     "react-scripts": "0.4.3"
   },
   "dependencies": {
@@ -30,8 +39,10 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "initTestDB": "NODE_ENV=test node backend/scripts/initTestDB.js",
     "test": "react-scripts test --env=jsdom",
-    "test-backend": "NODE_ENV=test node backend/scripts/initTestDB.js && NODE_ENV=test mocha",
+    "test-backend": "npm run initTestDB && NODE_ENV=test mocha",
+    "travis": "npm run initTestDB && NODE_ENV=test YOURPACKAGE_COVERAGE=1 mocha --require blanket --reporter mocha-lcov-reporter | coveralls",
     "eject": "react-scripts eject"
   }
 }

@@ -7,6 +7,6 @@ before_script:
 
 script:
 - "npm test"
-- "npm run test-backend"
+- "npm run travis"
 
 after_script: "killall -f node"

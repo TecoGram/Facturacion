@@ -1,4 +1,5 @@
 /* eslint-env node, mocha */
+require('blanket')
 const api = require('../src/api.js')
 const server = require('../backend/server.js')
 
