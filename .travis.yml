@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+    - "6.9.0"
+
+
+before_script:
+
+script:
+- "npm test"
+- "npm run test-backend"
+
+after_script: "killall -f node"
