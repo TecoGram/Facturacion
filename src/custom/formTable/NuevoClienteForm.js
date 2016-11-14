@@ -12,49 +12,56 @@ export default class NuevoClienteForm extends React.Component {
 
   render() {
     const {
-      data,
+      errors,
+      inputs,
       updateData,
     } = this.props
 
     const rucInput = {
       hintText: "RUC",
       icon: Info,
-      value: data.ruc || '',
+      value: inputs.ruc || '',
+      errorText: errors.ruc,
       onChange: (event) => {updateData('ruc', event.target.value)},
     }
 
     const telf1Input = {
       hintText: "Teléfono 1",
       icon: Phone,
-      value: data.telefono1 || '',
+      value: inputs.telefono1 || '',
+      errorText: errors.telefono1,
       onChange: (event) => {updateData('telefono1', event.target.value)},
     }
 
     const clienteInput = {
       hintText: "Cliente",
       icon: Person,
-      value: data.cliente || '',
-      onChange: (event) => {updateData('cliente', event.target.value)},
+      value: inputs.nombre || '',
+      errorText: errors.nombre,
+      onChange: (event) => {updateData('nombre', event.target.value)},
     }
 
     const telf2Input = {
       hintText: "Teléfono 2",
       icon: Phone,
-      value: data.telefono2 || '',
+      value: inputs.telefono2 || '',
+      errorText: errors.telefono2,
       onChange: (event) => {updateData('telefono2', event.target.value)},
     }
 
     const direccionInput = {
       hintText: "Dirección",
       icon: ActionStore,
-      value: data.direccion || '',
+      value: inputs.direccion || '',
+      errorText: errors.direccion,
       onChange: (event) => {updateData('direccion', event.target.value)},
     }
 
     const emailInput = {
       hintText: "E-mail",
       icon: Email,
-      value: data.email || '',
+      value: inputs.email || '',
+      errorText: errors.email,
       onChange: (event) => {updateData('email', event.target.value)},
     }
 

@@ -28,7 +28,8 @@
     "react-tap-event-plugin": "^1.0.0",
     "redux": "^3.6.0",
     "sqlite3": "^3.1.8",
-    "superagent": "^2.3.0"
+    "superagent": "^2.3.0",
+    "validator": "^6.1.0"
   },
   "scripts": {
     "start": "react-scripts start",

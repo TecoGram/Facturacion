@@ -7,6 +7,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
+import Snackbar from 'material-ui/Snackbar';
 
 import { bindActionCreators } from 'redux';
 import { connect, Provider } from 'react-redux'
@@ -27,6 +28,7 @@ const toolbarTitleStyle = {
 function mapStateToProps(state) {
   return {
     dialog: state.dialog,
+    message: state.message,
   }
 }
 
@@ -89,9 +91,11 @@ class Main extends Component {
 
     const {
       cambiarDialog,
+      cerrarDialogConMsg,
       dialog,
       leftChild,
       leftTabName,
+      message,
       rightChild,
       rightTabName,
       title,
@@ -110,7 +114,10 @@ class Main extends Component {
             {rightChild}
           </Tab>
         </Tabs>
-        <FormDialog tipoDialog={dialog} cambiarDialog={cambiarDialog}/>
+        <FormDialog tipoDialog={dialog} cambiarDialog={cambiarDialog}
+          cerrarDialogConMsg={cerrarDialogConMsg}/>
+        <Snackbar open={Boolean(message)} message={message || ''}
+          autoHideDuration={5000}/>
       </div>
     )
   }

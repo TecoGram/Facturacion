@@ -1,5 +1,5 @@
 import { NUEVO_CLIENTE_DIALOG, NUEVO_PRODUCTO_DIALOG } from './DialogTypes'
-import { CAMBIAR_DIALOG_ACTION } from './ActionTypes'
+import { CAMBIAR_DIALOG_ACTION, CERRAR_DIALOG_CON_MSG_ACTION } from './ActionTypes'
 
 module.exports = {
   cambiarDialog(tipoDialog) {
@@ -19,4 +19,10 @@ module.exports = {
       value: null,
     }
   },
+  cerrarDialogConMsg(msg) {
+    return {
+      type: CERRAR_DIALOG_CON_MSG_ACTION,
+      message: msg,
+    }
+  }
 }

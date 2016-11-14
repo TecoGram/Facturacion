@@ -17,14 +17,14 @@ export default class IconTextFieldRow extends React.Component {
     const secondColumn = leftInput &&
       <td>
         <TextField hintText={leftInput.hintText} onChange={leftInput.onChange}
-        value={leftInput.value}/>
+          errorText={leftInput.errorText} value={leftInput.value}/>
       </td>
     const thirdColumn = rightInput &&
       <td style={secondColStyle}><IconBox icon={rightInput.icon}/></td>
     const fourthColumn = rightInput &&
       <td>
         <TextField hintText={rightInput.hintText} onChange={rightInput.onChange}
-          value={rightInput.value}/>
+          errorText={rightInput.errorText} value={rightInput.value}/>
       </td>
 
     return (

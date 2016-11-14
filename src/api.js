@@ -1,8 +1,9 @@
 const request = require('superagent')
 
+const prefix = process.env.NODE_ENV === 'test' ? 'http://localhost:8192' : ''
 module.exports = {
   insertarCliente: (ruc, nombre, direccion, email, telefono1, telefono2) => {
-    return request.post('http://localhost:8192/cliente/new')
+    return request.post(prefix + '/cliente/new')
       .send({
         ruc: ruc,
         nombre: nombre,
