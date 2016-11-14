@@ -59,6 +59,31 @@ describe('metodos de dbAdmin.js', function () {
 
   })
 
+  describe('findClientes', function () {
+
+    it('retorna un array con todos los clientes existentes si se le pasa un string vacio', function (done) {
+      db.findClientes('')
+      .then(function(clientes) {
+        clientes.should.be.an('array')
+        clientes.should.not.be.empty
+        done()
+      })
+    })
+
+    it('puede buscar clientes por nombre, si se le pasa un string no vacio como argumento', function (done) {
+      db.findClientes('Juan Carlos')
+      .then(function(clientes) {
+        clientes.should.be.an('array')
+        //Esto asume que en el describe anterior se ingresaron unicamente Juan Perez y Carlos Sanchez
+        clientes.length.should.be.equal(2)
+        clientes[0].nombre.should.be.equal('Dr. Juan Perez')
+        clientes[1].nombre.should.be.equal('Carlos Sanchez')
+        done()
+      })
+    })
+
+  })
+
   describe('insertarVenta', function() {
 
     it('persiste una nueva venta en la base y agrega las unidades vendidas a la base',
@@ -84,7 +109,6 @@ describe('metodos de dbAdmin.js', function () {
         .then(function (res) {
           const lasInsertedId = res[0]
           lasInsertedId.should.be.equal(6)
-          db.close()
           done()
         })
       })

@@ -54,6 +54,18 @@ module.exports = {
     })
   },
 
+  findClientes: (queryString) => {
+    const queries = queryString.split(' ')
+    const queryObject = knex.select('*')
+      .from('clientes')
+      .where('nombre', 'like', `%${queries[0]}%`)
+
+    for(let i = 1; i < queries.length; i++)
+      queryObject.orWhere('nombre', 'like', `%${queries[i]}%`)
+
+    return queryObject
+  },
+
   insertarVenta: (codigo, cliente, fecha, subtotal, descuento, iva, total,
       productosVendidos) => {
     return knex.transaction ((trx) => {
