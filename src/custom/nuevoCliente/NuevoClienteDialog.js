@@ -3,12 +3,12 @@ import React from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
-import NuevoClienteForm from '../custom/formTable/NuevoClienteForm'
-import { validarCliente } from '../Validacion'
-import { insertarCliente } from '../api'
-import ServerErrorText from './formTable/ServerErrorText'
+import NuevoClienteForm from './NuevoClienteForm'
+import { validarCliente } from '../../Validacion'
+import { insertarCliente } from '../../api'
+import ServerErrorText from '../../lib/formTable/ServerErrorText'
 
-export default class FormDialog extends React.Component {
+export default class NuevoClienteDialog extends React.Component {
 
   state = {
     inputs: {},
@@ -61,7 +61,11 @@ export default class FormDialog extends React.Component {
       <FlatButton
         label="Cancelar"
         secondary={true}
-        onTouchTap={(event) => cambiarDialog(null)}
+        onTouchTap={(event) => {
+          this.setState({inputs: {}, errors: {}, serverError: null})
+          cambiarDialog(null)
+        }
+      }
       />,
       <FlatButton
         label="Guardar"

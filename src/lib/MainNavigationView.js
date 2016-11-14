@@ -15,7 +15,7 @@ import { connect, Provider } from 'react-redux'
 import ActionCreators from '../ActionCreators'
 import { NUEVO_CLIENTE_DIALOG } from '../DialogTypes'
 import CustomStyle from '../CustomStyle'
-import FormDialog from './FormDialog'
+import NuevoClienteDialog from '../custom/nuevoCliente/NuevoClienteDialog'
 import MyTabTemplate from './tabs/MyTabTemplate'
 import store from '../Store'
 
@@ -114,7 +114,7 @@ class Main extends Component {
             {rightChild}
           </Tab>
         </Tabs>
-        <FormDialog tipoDialog={dialog} cambiarDialog={cambiarDialog}
+        <NuevoClienteDialog tipoDialog={dialog} cambiarDialog={cambiarDialog}
           cerrarDialogConMsg={cerrarDialogConMsg}/>
         <Snackbar open={Boolean(message)} message={message || ''}
           autoHideDuration={5000}/>
