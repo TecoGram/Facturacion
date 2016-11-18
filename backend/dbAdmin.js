@@ -43,6 +43,18 @@ module.exports = {
     })
   },
 
+  findProductos: (queryString) => {
+    const queries = queryString.split(' ')
+    const queryObject = knex.select('*')
+      .from('productos')
+      .where('nombre', 'like', `%${queries[0]}%`)
+
+    for(let i = 1; i < queries.length; i++)
+      queryObject.orWhere('nombre', 'like', `%${queries[i]}%`)
+
+    return queryObject.limit(5)
+  },
+  
   insertarCliente: (ruc, nombre, direccion, email, telefono1, telefono2) => {
     return knex.table('clientes').insert({
       ruc: ruc,

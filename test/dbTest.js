@@ -39,6 +39,32 @@ describe('metodos de dbAdmin.js', function () {
 
   })
 
+  describe('findProductos', function () {
+
+    it('retorna un array con todos los productos existentes si se le pasa un string vacio', function (done) {
+      db.findProductos('')
+      .then(function(productos) {
+        productos.should.be.an('array')
+        productos.should.not.be.empty
+        done()
+      })
+    })
+
+    it('puede buscar prodctos por nombre, si se le pasa un string no vacio como argumento', function (done) {
+      db.findProductos('prod')
+      .then(function(productos) {
+        productos.should.be.an('array')
+        //Esto asume que en el describe anterior se ingresaron unicamente 3 productos
+        productos.length.should.be.equal(3)
+        productos[0].nombre.should.be.equal('producto A')
+        productos[1].nombre.should.be.equal('producto B')
+        productos[2].nombre.should.be.equal('producto C')
+        done()
+      })
+    })
+
+  })
+
   describe('insertarCliente', function() {
 
     it('persiste varios clientes en la base encadenando con promise', function (done) {
