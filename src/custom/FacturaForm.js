@@ -11,6 +11,7 @@ import Person from 'material-ui/svg-icons/social/person';
 import Receipt from 'material-ui/svg-icons/action/receipt';
 import Today from 'material-ui/svg-icons/action/today';
 
+import ClienteAutoComplete from './ClienteAutoComplete'
 import IconBox from '../lib/IconBox'
 
 export default class FacturaForm extends Component {
@@ -23,14 +24,7 @@ export default class FacturaForm extends Component {
         <br />
         <div style={{display: 'block', marginBottom: '8px'}}>
           <IconBox icon={Person}/>
-          <AutoComplete
-            hintText="Cliente"
-            style={{width: autoCompleteWidth, marginRight: '36px'}}
-            textFieldStyle={{width: autoCompleteWidth}}
-            filter={AutoComplete.noFilter}
-            openOnFocus={this.props.suggestions && this.props.suggestions.length > 0}
-            dataSource={this.props.suggestions}
-          />
+          <ClienteAutoComplete />
           <IconBox icon={AddShoppingCart}/>
           <AutoComplete
             hintText="Producto"

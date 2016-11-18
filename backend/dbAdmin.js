@@ -63,7 +63,7 @@ module.exports = {
     for(let i = 1; i < queries.length; i++)
       queryObject.orWhere('nombre', 'like', `%${queries[i]}%`)
 
-    return queryObject
+    return queryObject.limit(5)
   },
 
   insertarVenta: (codigo, cliente, fecha, subtotal, descuento, iva, total,

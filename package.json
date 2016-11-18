@@ -32,6 +32,7 @@
     "validator": "^6.1.0"
   },
   "scripts": {
+    "server": "node backend/server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "istanbul": "NODE_ENV=test node backend/scripts/initTestDB.js && NODE_ENV=test istanbul cover _mocha && cat coverage/lcov.info | coveralls",
