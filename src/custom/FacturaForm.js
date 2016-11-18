@@ -12,19 +12,39 @@ import Receipt from 'material-ui/svg-icons/action/receipt';
 import Today from 'material-ui/svg-icons/action/today';
 
 import ClienteAutoComplete from './ClienteAutoComplete'
+import SelectedClienteChip from './SelectedClienteChip'
 import IconBox from '../lib/IconBox'
+
+const autoCompleteWidth = '425px'
+const txtMargin = '42px'
 
 export default class FacturaForm extends Component {
 
+  renderClienteInput = (props) => {
+    const {
+      cliente,
+      onNewCliente,
+    } = props
+
+    if (cliente)
+      return (
+        <SelectedClienteChip text={cliente.nombre}
+        onRequestDelete={() => {onNewCliente(null)}} />
+      )
+    else
+      return (
+          <ClienteAutoComplete width={autoCompleteWidth}
+          onNewItemSelected={onNewCliente}/>
+      )
+  }
+
   render() {
-    const autoCompleteWidth = '425px'
-    const txtMargin = '42px'
     return (
       <div>
         <br />
         <div style={{display: 'block', marginBottom: '8px'}}>
           <IconBox icon={Person}/>
-          <ClienteAutoComplete />
+          { this.renderClienteInput(this.props) }
           <IconBox icon={AddShoppingCart}/>
           <AutoComplete
             hintText="Producto"

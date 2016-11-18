@@ -27,12 +27,34 @@ const mockItems = [
 
 export default class FacturarView extends Component {
 
+  constructor(props) {
+    super(props)
+    this.state = {
+      cliente: null,
+      codigo: '',
+      fecha: '',
+      descuento: '',
+      autorizacion: '',
+      formaPago: '',
+
+    }
+  }
+
+  onNewCliente = (newCliente) => {
+    this.setState({ cliente: newCliente })
+  }
+
   render() {
+    const {
+      cliente,
+    } = this.state
+
     return (
       <div style={{height:'100%', overflow:'auto'}} >
       <PaperContainer >
         <div style={{marginTop: '24px', marginLeft: '36px', marginRight: '36px'}}>
-          <FacturaForm suggestions={["hello", "bye"]} />
+          <FacturaForm suggestions={["hello", "bye"]} cliente={cliente}
+            onNewCliente={this.onNewCliente}/>
           <FacturaTable items={mockItems}/>
           <FacturaResults />
         </div>
