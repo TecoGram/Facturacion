@@ -36,6 +36,23 @@ app.post('/cliente/new', function (req, res) {
 
 });
 
+app.get('/cliente/find', function (req,res) {
+  const q = req.query.q || ''
+  db.findClientes(q)
+  .then(function(clientes) {
+    if(clientes.length === 0)
+      res.status(404)
+      .send('No existen clientes con esa cadena de caracteres')
+    else
+      res.status(200)
+      .send(clientes)
+  }, function (err) {//ERROR!
+    res.status(500)
+    .send(err)
+  })
+
+});
+
 const server = app.listen(port, function () {
   //eslint-disable-next-line
   console.log('Application listening on  port ' + port);

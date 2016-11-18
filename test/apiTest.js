@@ -7,6 +7,8 @@ const chai = require('chai')
   , expect = chai.expect
   , should = chai.should();
 
+const unexpectedError = Error('Ocurrio algo inesperado');
+
 if(process.env.NODE_ENV !== 'test') {
   //Por el amor de dios solo ejecutar esto en ambiente de prueba
   console.error("QUE CHUCHA CREES QUE HACES?",
@@ -16,7 +18,8 @@ if(process.env.NODE_ENV !== 'test') {
 }
 
 describe('endpoints disponibles para el cliente', function () {
-  describe('insertarCliente', function () {
+
+  describe('/cliente/new', function () {
     const mi_ruc = '0937816882001'
     it('retorna 200 al ingresar datos correctos', function (done) {
       api.insertarCliente(
@@ -43,9 +46,7 @@ describe('endpoints disponibles para el cliente', function () {
         'edu_vc@outlook.com',
         '2854345', '28654768')
       .then(function (resp) {
-        const statusCode = resp.status
-        statusCode.should.not.equal(200)
-        done()
+        throw unexpectedError
       }, function (err) {
         const statusCode = err.status
         const resp = err.response
@@ -53,6 +54,38 @@ describe('endpoints disponibles para el cliente', function () {
         resp.text.should.be.a('string')
         const db_error = JSON.parse(resp.text)
         db_error.code.should.equal('SQLITE_CONSTRAINT')
+        done()
+      })
+    })
+  })
+
+  describe('/cliente/find', function () {
+
+    it('retorna 200 al encontrar clientes', function (done) {
+      api.findClientes('ju')
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        //Esto asume que en el test anterior se inserto un cliente Julio Mendoza
+        const clientes = resp.body
+        clientes.should.be.a('array')
+        clientes.length.should.equal(1)
+        done()
+      }, function (err) {
+        console.error('test fail ' + JSON.stringify(err))
+        done(err)
+      })
+    })
+
+    it('retorna 404 si no encuentra clientes', function (done) {
+      api.findClientes('xyz')
+      .then(function (resp) {
+        throw unexpectedError
+      }, function (err) {
+        const statusCode = err.status
+        const resp = err.response
+        statusCode.should.equal(404)
+        resp.text.should.be.a('string')
         done()
       })
     })

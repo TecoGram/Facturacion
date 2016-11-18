@@ -14,4 +14,9 @@ module.exports = {
       })
       .set('Accept', 'application/json')
   },
+
+  findClientes: (queryString) => {
+    return request.get(prefix + '/cliente/find?q=' + queryString)
+      .send()
+  },
 }
