@@ -92,7 +92,7 @@ describe('endpoints disponibles para el cliente', function () {
   })
 
   describe('/producto/new', function () {
-    const mi_producto = '125F4ed4'
+    const mi_producto = 'TGO 8x50'
     it('retorna 200 al ingresar datos correctos', function (done) {
       api.insertarProducto(
         'rytertg663433g',
@@ -124,6 +124,39 @@ describe('endpoints disponibles para el cliente', function () {
         resp.text.should.be.a('string')
         const db_error = JSON.parse(resp.text)
         db_error.code.should.equal('SQLITE_CONSTRAINT')
+        done()
+      })
+    })
+  })
+
+
+  describe('/producto/find', function () {
+
+    it('retorna 200 al encontrar productos', function (done) {
+      api.findProductos('TG')
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        //Esto asume que en el test anterior se inserto un producto TGO 8x50
+        const productos = resp.body
+        productos.should.be.a('array')
+        productos.length.should.equal(1)
+        done()
+      }, function (err) {
+        console.error('test fail ' + JSON.stringify(err))
+        done(err)
+      })
+    })
+
+    it('retorna 404 si no encuentra productos', function (done) {
+      api.findProductos('xyz')
+      .then(function (resp) {
+        throw unexpectedError
+      }, function (err) {
+        const statusCode = err.status
+        const resp = err.response
+        statusCode.should.equal(404)
+        resp.text.should.be.a('string')
         done()
       })
     })

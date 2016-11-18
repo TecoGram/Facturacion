@@ -72,6 +72,23 @@ app.post('/producto/new', function (req, res) {
   })
 })
 
+app.get('/producto/find', function (req,res) {
+  const q = req.query.q || ''
+  db.findProductos(q)
+  .then(function(productos) {
+    if(productos.length === 0)
+      res.status(404)
+      .send('No existen productos con esa cadena de caracteres')
+    else
+      res.status(200)
+      .send(productos)
+  }, function (err) {//ERROR!
+    res.status(500)
+    .send(err)
+  })
+
+});
+
 const server = app.listen(port, function () {
   //eslint-disable-next-line
   console.log('Application listening on  port ' + port);

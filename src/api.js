@@ -30,4 +30,10 @@ module.exports = {
       })
       .set('Accept', 'application/json')
   },
+
+  findProductos: (queryString) => {
+    return request.get(prefix + '/producto/find?q=' + queryString)
+      .send()
+  },
+
 }
