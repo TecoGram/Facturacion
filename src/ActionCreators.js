@@ -1,28 +1,42 @@
-import { NUEVO_CLIENTE_DIALOG, NUEVO_PRODUCTO_DIALOG } from './DialogTypes'
+import { NUEVO_CLIENTE_DIALOG, NUEVO_PRODUCTO_DIALOG,
+  NUEVO_CLIENTE_DIALOG_CLOSED, NUEVO_PRODUCTO_DIALOG_CLOSED } from './DialogTypes'
 import { CAMBIAR_DIALOG_ACTION, CERRAR_DIALOG_CON_MSG_ACTION } from './ActionTypes'
 
 module.exports = {
   cambiarDialog(tipoDialog) {
-    if(tipoDialog === NUEVO_CLIENTE_DIALOG)
-      return {
-        type: CAMBIAR_DIALOG_ACTION,
-        value: NUEVO_CLIENTE_DIALOG,
-      }
-    else if (tipoDialog === NUEVO_PRODUCTO_DIALOG)
-      return {
-        type: CAMBIAR_DIALOG_ACTION,
-        value: NUEVO_PRODUCTO_DIALOG,
-      }
-    else if (tipoDialog) throw new Error("Tipo de dialog desconocido: " + tipoDialog)
-    else return {//null value hides the dialog
-      type: CAMBIAR_DIALOG_ACTION,
-      value: null,
+    switch (tipoDialog) {
+      case NUEVO_CLIENTE_DIALOG:
+        return {
+          type: CAMBIAR_DIALOG_ACTION,
+          value: NUEVO_CLIENTE_DIALOG,
+        }
+      case NUEVO_PRODUCTO_DIALOG:
+        return {
+          type: CAMBIAR_DIALOG_ACTION,
+          value: NUEVO_PRODUCTO_DIALOG,
+        }
+      case NUEVO_CLIENTE_DIALOG_CLOSED:
+        return {
+          type: CAMBIAR_DIALOG_ACTION,
+          value: NUEVO_CLIENTE_DIALOG_CLOSED,
+        }
+      case NUEVO_PRODUCTO_DIALOG_CLOSED:
+        return {
+          type: CAMBIAR_DIALOG_ACTION,
+          value: NUEVO_PRODUCTO_DIALOG_CLOSED,
+        }
+      default:
+        throw new Error("Tipo de dialog desconocido: " + tipoDialog)
     }
   },
-  cerrarDialogConMsg(msg) {
+  cerrarDialogConMsg(msg, dialogType) {
+    if(dialogType !== NUEVO_PRODUCTO_DIALOG_CLOSED
+      && dialogType !== NUEVO_CLIENTE_DIALOG_CLOSED)
+      throw Error('Para cerrar el dialog es necesario un tipo que termine en _CLOSED')
     return {
       type: CERRAR_DIALOG_CON_MSG_ACTION,
+      dialog: dialogType,
       message: msg,
     }
-  }
+  },
 }

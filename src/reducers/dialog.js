@@ -5,7 +5,7 @@ function dialog (state = [], action) {
     case CAMBIAR_DIALOG_ACTION:
       return action.value
     case CERRAR_DIALOG_CON_MSG_ACTION:
-      return null
+      return action.dialog
     default: {
       return state
     }

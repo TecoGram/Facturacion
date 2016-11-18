@@ -50,7 +50,7 @@ describe('endpoints disponibles para el cliente', function () {
       }, function (err) {
         const statusCode = err.status
         const resp = err.response
-        statusCode.should.equal(500)
+        statusCode.should.equal(422)
         resp.text.should.be.a('string')
         const db_error = JSON.parse(resp.text)
         db_error.code.should.equal('SQLITE_CONSTRAINT')
@@ -120,7 +120,7 @@ describe('endpoints disponibles para el cliente', function () {
       }, function (err) {
         const statusCode = err.status
         const resp = err.response
-        statusCode.should.equal(500)
+        statusCode.should.equal(422)
         resp.text.should.be.a('string')
         const db_error = JSON.parse(resp.text)
         db_error.code.should.equal('SQLITE_CONSTRAINT')

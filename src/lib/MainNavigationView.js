@@ -12,10 +12,15 @@ import Snackbar from 'material-ui/Snackbar';
 import { bindActionCreators } from 'redux';
 import { connect, Provider } from 'react-redux'
 
+import { NUEVO_CLIENTE_DIALOG,
+  NUEVO_PRODUCTO_DIALOG,
+  NUEVO_CLIENTE_DIALOG_CLOSED,
+  NUEVO_PRODUCTO_DIALOG_CLOSED } from '../DialogTypes'
+
 import ActionCreators from '../ActionCreators'
-import { NUEVO_CLIENTE_DIALOG } from '../DialogTypes'
 import CustomStyle from '../CustomStyle'
 import NuevoClienteDialog from '../custom/nuevoCliente/NuevoClienteDialog'
+import NuevoProductoDialog from '../custom/NuevoProducto/NuevoProductoDialog'
 import MyTabTemplate from './tabs/MyTabTemplate'
 import store from '../Store'
 
@@ -58,7 +63,8 @@ class MainToolbar extends Component {
             </IconButton> }
             targetOrigin={{horizontal: 'right', vertical: 'top'}}
             anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}>
-            <MenuItem primaryText="Nuevo Producto" />
+            <MenuItem primaryText="Nuevo Producto" onTouchTap={(event) =>
+              cambiarDialog(NUEVO_PRODUCTO_DIALOG)}/>
             <MenuItem primaryText="Nuevo Cliente" onTouchTap={(event) =>
               cambiarDialog(NUEVO_CLIENTE_DIALOG)}/>
           </IconMenu>
@@ -69,7 +75,33 @@ class MainToolbar extends Component {
   }
 }
 
+class MainDialog extends Component {
+  render() {
+    const {
+      type,
+      cambiarDialog,
+      cerrarDialogConMsg,
+    } = this.props
 
+    if(!type)
+      return (
+        <div />
+      )
+    else if (type === NUEVO_CLIENTE_DIALOG || type === NUEVO_CLIENTE_DIALOG_CLOSED)
+      return (
+        <NuevoClienteDialog open={ type === NUEVO_CLIENTE_DIALOG }
+          cambiarDialog={cambiarDialog}
+          cerrarDialogConMsg={cerrarDialogConMsg} />
+      )
+    else if (type === NUEVO_PRODUCTO_DIALOG || type === NUEVO_PRODUCTO_DIALOG_CLOSED)
+      return (
+        <NuevoProductoDialog open={ type === NUEVO_PRODUCTO_DIALOG }
+          cambiarDialog={cambiarDialog}
+          cerrarDialogConMsg={cerrarDialogConMsg} />
+      )
+    else throw Error('Tipo de dialog desconocido')
+  }
+}
 
 class Main extends Component {
 
@@ -114,7 +146,7 @@ class Main extends Component {
             {rightChild}
           </Tab>
         </Tabs>
-        <NuevoClienteDialog tipoDialog={dialog} cambiarDialog={cambiarDialog}
+        <MainDialog type={dialog} cambiarDialog={cambiarDialog}
           cerrarDialogConMsg={cerrarDialogConMsg}/>
         <Snackbar open={Boolean(message)} message={message || ''}
           autoHideDuration={5000}/>

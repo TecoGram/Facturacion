@@ -72,4 +72,47 @@ module.exports = {
     }
   },
 
+  validarProducto: (formData) => {
+
+    const codigo = formData.codigo || ''
+    const nombre = formData.nombre || ''
+    const precioFab = formData.precioFab || ''
+    const precioVenta = formData.precioVenta || ''
+
+    const errors = {}
+    const inputs = {}
+
+    if(validator.isEmpty(codigo))
+      errors.codigo = campo_obligatorio
+    else
+      inputs.codigo = codigo
+
+    if(validator.isEmpty(nombre))
+      errors.nombre = campo_obligatorio
+    else
+      inputs.nombre = nombre
+
+    const precio_invalido = 'precio inválido'
+    if(!validator.isEmpty(precioFab) && !validator.isDecimal(precioFab))
+      errors.precioFab = precio_invalido
+    else
+      inputs.precioFab = precioFab
+
+    if(validator.isEmpty(precioVenta))
+      errors.precioVenta = campo_obligatorio
+    else if (!validator.isDecimal(precioVenta))
+      errors.precioVenta = precioVenta
+    else
+      inputs.precioVenta = precioVenta
+
+    if(isEmptyObj(errors))
+      return {
+        errors: null,
+        inputs: inputs,
+      }
+    return {
+      errors: errors,
+      inputs: null,
+    }
+  },
 }

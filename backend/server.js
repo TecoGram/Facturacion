@@ -30,7 +30,7 @@ app.post('/cliente/new', function (req, res) {
     .send('OK')
   }, function (err) {//ERROR!
     printError('db error: ' + err)
-    res.status(500)
+    res.status(422)
     .send(err)
   })
 
@@ -67,7 +67,7 @@ app.post('/producto/new', function (req, res) {
     .send(id)
   }, function (err) {//ERROR!
     printError('db error: ' + JSON.stringify(err))
-    res.status(500)
+    res.status(422)
     .send(err)
   })
 })

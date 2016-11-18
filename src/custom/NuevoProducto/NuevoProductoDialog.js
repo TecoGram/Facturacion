@@ -3,14 +3,14 @@ import React from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
-import NuevoClienteForm from './NuevoClienteForm'
-import { validarCliente } from '../../Validacion'
-import { insertarCliente } from '../../api'
+import NuevoProductoForm from './NuevoProductoForm'
+import { validarProducto } from '../../Validacion'
+import { insertarProducto } from '../../api'
 import ServerErrorText from '../../lib/formTable/ServerErrorText'
 
-import { NUEVO_CLIENTE_DIALOG_CLOSED } from '../../DialogTypes'
+import { NUEVO_PRODUCTO_DIALOG_CLOSED } from '../../DialogTypes'
 
-export default class NuevoClienteDialog extends React.Component {
+export default class NuevoProductoDialog extends React.Component {
 
   state = {
     inputs: {},
@@ -20,7 +20,7 @@ export default class NuevoClienteDialog extends React.Component {
 
   cancelarDialog = () => {
     this.setState({inputs: {}, errors: {}, serverError: null})
-    this.props.cambiarDialog(NUEVO_CLIENTE_DIALOG_CLOSED)
+    this.props.cambiarDialog(NUEVO_PRODUCTO_DIALOG_CLOSED)
   };
 
   updateData = (fieldName, newValue) => {
@@ -39,27 +39,28 @@ export default class NuevoClienteDialog extends React.Component {
     else return <div />
   }
 
-  guardarCliente = (inputs, cerrarDialog) => {
+  guardarProducto = (inputs, cerrarDialog) => {
     const {
-      ruc, nombre, direccion, email, telefono1, telefono2,
+      codigo, nombre, precioFab, precioVenta,
     } = inputs
 
-    insertarCliente(ruc, nombre, direccion, email, telefono1, telefono2)
+    insertarProducto(codigo, nombre, precioFab, precioVenta)
     .then((resp) => {
       this.setState({inputs: {}, errors: {}, serverError: null})
-      cerrarDialog(`Nuevo cliente guardado: ${nombre}`, NUEVO_CLIENTE_DIALOG_CLOSED)
+      cerrarDialog(`Nuevo producto guardado: ${nombre}`, NUEVO_PRODUCTO_DIALOG_CLOSED)
     }, (err) => {
       this.setState({ serverError: 'Error al almacenar datos: ' + err.response.text })
     })
   }
 
-  validarDatos = () => {
-    const { errors, inputs } = validarCliente(this.state.inputs)
+
+  validarDatos = (userInputs) => {
+    const { errors, inputs } = validarProducto(this.state.inputs)
     if(errors) {
       this.setState({errors: errors})
     } else {
       this.setState({errors: {}})
-      this.guardarCliente(inputs, this.props.cerrarDialogConMsg)
+      this.guardarProducto(inputs, this.props.cerrarDialogConMsg)
     }
   }
 
@@ -84,12 +85,12 @@ export default class NuevoClienteDialog extends React.Component {
 
     return (
       <Dialog
-        title={'Nuevo Cliente'}
+        title={'Nuevo Producto'}
         actions={actions}
         modal={false}
         open={open}
         onRequestClose={this.handleClose} >
-        <NuevoClienteForm inputs={this.state.inputs} errors={this.state.errors}
+        <NuevoProductoForm inputs={this.state.inputs} errors={this.state.errors}
         updateData={this.updateData}/>
         { this.renderServerError(this.state.serverError) }
       </Dialog>

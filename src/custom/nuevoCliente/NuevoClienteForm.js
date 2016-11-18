@@ -70,13 +70,13 @@ export default class NuevoClienteForm extends React.Component {
         <tbody>
           <IconTextFieldRow
             leftInput={rucInput}
-            rightInput={telf1Input} />
-          <IconTextFieldRow
-            leftInput={clienteInput}
-            rightInput={telf2Input} />
+            rightInput={clienteInput} />
           <IconTextFieldRow
             leftInput={direccionInput}
             rightInput={emailInput} />
+          <IconTextFieldRow
+            leftInput={telf1Input}
+            rightInput={telf2Input} />
         </tbody>
       </table>
     )
