@@ -19,4 +19,15 @@ module.exports = {
     return request.get(prefix + '/cliente/find?q=' + queryString)
       .send()
   },
+
+  insertarProducto: (codigo, nombre, precioDist, precioVenta) => {
+    return request.post(prefix + '/producto/new')
+      .send({
+        codigo: codigo,
+        nombre: nombre,
+        precioDist: precioDist,
+        precioVenta: precioVenta,
+      })
+      .set('Accept', 'application/json')
+  },
 }

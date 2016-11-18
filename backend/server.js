@@ -53,6 +53,25 @@ app.get('/cliente/find', function (req,res) {
 
 });
 
+app.post('/producto/new', function (req, res) {
+  const {
+    codigo,
+    nombre,
+    precioDist,
+    precioVenta,
+  } = req.body
+
+  db.insertarProducto(codigo, nombre, precioDist, precioVenta)
+  .then(function(id) {
+    res.status(200)
+    .send(id)
+  }, function (err) {//ERROR!
+    printError('db error: ' + JSON.stringify(err))
+    res.status(500)
+    .send(err)
+  })
+})
+
 const server = app.listen(port, function () {
   //eslint-disable-next-line
   console.log('Application listening on  port ' + port);

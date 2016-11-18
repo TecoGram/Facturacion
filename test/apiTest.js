@@ -90,4 +90,42 @@ describe('endpoints disponibles para el cliente', function () {
       })
     })
   })
+
+  describe('/producto/new', function () {
+    const mi_producto = '125F4ed4'
+    it('retorna 200 al ingresar datos correctos', function (done) {
+      api.insertarProducto(
+        'rytertg663433g',
+        mi_producto,
+        39.99, 49.99)
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        resp.body.should.be.an('array')
+        resp.body[0].should.equal(1)
+        done()
+      }, function (err) {
+        console.error('test fail ' + JSON.stringify(err))
+        done(err)
+      })
+    })
+
+    it('retorna 500 al ingresar producto con un nombre ya existente', function (done) {
+      api.insertarProducto(
+        '34tger5',
+        mi_producto,
+        39.99, 49.99)
+      .then(function (resp) {
+        throw unexpectedError
+      }, function (err) {
+        const statusCode = err.status
+        const resp = err.response
+        statusCode.should.equal(500)
+        resp.text.should.be.a('string')
+        const db_error = JSON.parse(resp.text)
+        db_error.code.should.equal('SQLITE_CONSTRAINT')
+        done()
+      })
+    })
+  })
 })
