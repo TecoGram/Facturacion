@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import AutoComplete from 'material-ui/AutoComplete';
 import DatePicker from 'material-ui/DatePicker';
 import TextField from 'material-ui/TextField';
 
@@ -11,7 +10,8 @@ import Person from 'material-ui/svg-icons/social/person';
 import Receipt from 'material-ui/svg-icons/action/receipt';
 import Today from 'material-ui/svg-icons/action/today';
 
-import ClienteAutoComplete from './ClienteAutoComplete'
+import ClienteAutoComplete from './AutoComplete/ClienteAutoComplete'
+import ProductoAutoComplete from './AutoComplete/ProductoAutoComplete'
 import SelectedClienteChip from './SelectedClienteChip'
 import IconBox from '../lib/IconBox'
 
@@ -46,14 +46,7 @@ export default class FacturaForm extends Component {
           <IconBox icon={Person}/>
           { this.renderClienteInput(this.props) }
           <IconBox icon={AddShoppingCart}/>
-          <AutoComplete
-            hintText="Producto"
-            style={{width: autoCompleteWidth}}
-            textFieldStyle={{width: autoCompleteWidth}}
-            filter={AutoComplete.noFilter}
-            openOnFocus={this.props.suggestions && this.props.suggestions.length > 0}
-            dataSource={this.props.suggestions}
-          />
+          <ProductoAutoComplete width={autoCompleteWidth}/>
         </div>
 
         <IconBox icon={Receipt}/>
