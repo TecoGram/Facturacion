@@ -1,6 +1,7 @@
 import React from 'react';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import TextField from 'material-ui/TextField'
+import DatePicker from 'material-ui/DatePicker'
 
 const renderTableHeader = () => {
   return (
@@ -8,12 +9,12 @@ const renderTableHeader = () => {
       <TableRow>
         <TableHeaderColumn width={40} style={{padding: '0px'}}>#</TableHeaderColumn>
         <TableHeaderColumn width={80} style={{padding: '0px'}}>Reg. San.</TableHeaderColumn>
-        <TableHeaderColumn width={150} style={{padding: '0px'}}>Nombre</TableHeaderColumn>
+        <TableHeaderColumn width={170} style={{padding: '0px'}}>Nombre</TableHeaderColumn>
         <TableHeaderColumn width={60} style={{padding: '0px'}}>Lote</TableHeaderColumn>
         <TableHeaderColumn width={40} style={{padding: '0px'}}>Cant.</TableHeaderColumn>
-        <TableHeaderColumn width={60} style={{padding: '0px'}}>Fecha Exp.</TableHeaderColumn>
+        <TableHeaderColumn width={70} style={{padding: '0px'}}>Fecha Exp.</TableHeaderColumn>
         <TableHeaderColumn width={60} style={{padding: '0px'}}>Precio</TableHeaderColumn>
-        <TableHeaderColumn width={40} style={{padding: '0px'}}>Importe</TableHeaderColumn>
+        <TableHeaderColumn width={50} style={{padding: '0px'}}>Importe</TableHeaderColumn>
       </TableRow>
     </TableHeader>
   )
@@ -22,22 +23,44 @@ const renderTableHeader = () => {
 export default class FacturaTable extends React.Component {
 
   renderRow = (product, i) => {
+    const onProductChanged = this.props.onProductChanged
     return (
     <TableRow key={i}>
+
       <TableRowColumn width={40} style={{padding: '0px'}}>{i}</TableRowColumn>
-      <TableRowColumn width={80} style={{padding: '0px'}}>{product.regSan}</TableRowColumn>
-      <TableRowColumn width={150} style={{padding: '0px'}}>{product.name}</TableRowColumn>
-      <TableRowColumn width={60} style={{padding: '0px'}}>{product.lote}</TableRowColumn>
-      <TableRowColumn width={40} style={{padding: '0px'}}>
-        <TextField name='countText' style={{width: '28px'}} defaultValue={1}
-        inputStyle={{textAlign: 'right', fontSize: '13px'}}/>
-      </TableRowColumn>
-      <TableRowColumn width={60} style={{padding: '0px'}}>{product.expDate}</TableRowColumn>
+
+      <TableRowColumn width={80} style={{padding: '0px'}}>{product.codigo}</TableRowColumn>
+
+      <TableRowColumn width={170} style={{padding: '0px'}}>{product.nombre}</TableRowColumn>
+
       <TableRowColumn width={60} style={{padding: '0px'}}>
-        <TextField name='countText' style={{width: '50px'}} defaultValue={product.price}
-        inputStyle={{textAlign: 'right', fontSize: '13px'}}/>
+        <TextField value={product.lote} style={{width: '50px'}} name={"lote"}
+          inputStyle={{textAlign: 'right', fontSize: '13px'}}
+          onChange={(event) => { onProductChanged('lote', event.target.value) }}/>
       </TableRowColumn>
-      <TableRowColumn width={40} style={{padding: '0px'}}>${product.price * product.count}</TableRowColumn>
+
+      <TableRowColumn width={40} style={{padding: '0px'}}>
+        <TextField style={{width: '28px'}} value={product.count} name={"count"}
+          inputStyle={{textAlign: 'right', fontSize: '13px'}}
+          onChange={(event) => { onProductChanged('count', event.target.value) }}/>
+          </TableRowColumn>
+
+      <TableRowColumn width={70} style={{padding: '0px'}}>
+        <DatePicker value={product.fechaExp} hintText={"expiración"}
+        textFieldStyle={{width: '70px', fontSize: '13px'}}
+          onChange={(event) => { onProductChanged('fecha', event.target.value) }}/>
+      </TableRowColumn>
+
+      <TableRowColumn width={60} style={{padding: '0px'}}>
+        $<TextField style={{width: '40px'}} name={'precio'} value={product.precioVenta}
+          onChange={(event) => { onProductChanged('precioVenta', event.target.value) }}
+          inputStyle={{textAlign: 'right', fontSize: '13px'}}/>
+      </TableRowColumn>
+
+      <TableRowColumn width={50} style={{padding: '0px', textAlign: 'right'}}>
+        <a style={{marginRight: '24px'}}>${product.precioVenta * product.count}</a>
+      </TableRowColumn>
+
     </TableRow>
   )
   }

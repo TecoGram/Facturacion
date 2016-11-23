@@ -46,7 +46,8 @@ export default class FacturaForm extends Component {
           <IconBox icon={Person}/>
           { this.renderClienteInput(this.props) }
           <IconBox icon={AddShoppingCart}/>
-          <ProductoAutoComplete width={autoCompleteWidth}/>
+          <ProductoAutoComplete width={autoCompleteWidth}
+            onNewItemSelected={this.props.onNewProduct}/>
         </div>
 
         <IconBox icon={Receipt}/>
