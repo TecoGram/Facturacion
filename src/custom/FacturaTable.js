@@ -29,36 +29,36 @@ export default class FacturaTable extends React.Component {
 
       <TableRowColumn width={40} style={{padding: '0px'}}>{i}</TableRowColumn>
 
-      <TableRowColumn width={80} style={{padding: '0px'}}>{product.codigo}</TableRowColumn>
+      <TableRowColumn width={80} style={{padding: '0px'}}>{product.get('codigo')}</TableRowColumn>
 
-      <TableRowColumn width={170} style={{padding: '0px'}}>{product.nombre}</TableRowColumn>
+      <TableRowColumn width={170} style={{padding: '0px'}}>{product.get('nombre')}</TableRowColumn>
 
       <TableRowColumn width={60} style={{padding: '0px'}}>
-        <TextField value={product.lote} style={{width: '50px'}} name={"lote"}
+        <TextField value={product.get('lote')} style={{width: '50px'}} name={"lote"}
           inputStyle={{textAlign: 'right', fontSize: '13px'}}
-          onChange={(event) => { onProductChanged('lote', event.target.value) }}/>
+          onChange={(event) => { onProductChanged(i, 'lote', event.target.value) }}/>
       </TableRowColumn>
 
       <TableRowColumn width={40} style={{padding: '0px'}}>
-        <TextField style={{width: '28px'}} value={product.count} name={"count"}
+        <TextField style={{width: '28px'}} value={product.get('count')} name={"count"}
           inputStyle={{textAlign: 'right', fontSize: '13px'}}
-          onChange={(event) => { onProductChanged('count', event.target.value) }}/>
+          onChange={(event) => { onProductChanged(i, 'count', event.target.value) }}/>
           </TableRowColumn>
 
       <TableRowColumn width={70} style={{padding: '0px'}}>
-        <DatePicker value={product.fechaExp} hintText={"expiración"}
+        <DatePicker value={product.get('fechaExp')} hintText={"expiración"}
         textFieldStyle={{width: '70px', fontSize: '13px'}}
-          onChange={(event) => { onProductChanged('fecha', event.target.value) }}/>
+          onChange={(event, date) => { onProductChanged(i, 'fechaExp', date) }}/>
       </TableRowColumn>
 
       <TableRowColumn width={60} style={{padding: '0px'}}>
-        $<TextField style={{width: '40px'}} name={'precio'} value={product.precioVenta}
-          onChange={(event) => { onProductChanged('precioVenta', event.target.value) }}
+        $<TextField style={{width: '40px'}} name={'precio'} value={product.get('precioVenta')}
+          onChange={(event) => { onProductChanged(i, 'precioVenta', event.target.value) }}
           inputStyle={{textAlign: 'right', fontSize: '13px'}}/>
       </TableRowColumn>
 
       <TableRowColumn width={50} style={{padding: '0px', textAlign: 'right'}}>
-        <a style={{marginRight: '24px'}}>${product.precioVenta * product.count}</a>
+        <a style={{marginRight: '24px'}}>${product.get('precioVenta') * product.get('count')}</a>
       </TableRowColumn>
 
     </TableRow>
