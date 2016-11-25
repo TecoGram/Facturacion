@@ -24,11 +24,13 @@ export default class FacturarView extends Component {
     super(props)
     this.state = {
       cliente: null,
-      codigo: '',
-      fecha: '',
-      descuento: '',
-      autorizacion: '',
-      formaPago: '',
+      facturaData: Immutable.Map({
+        codigo: '',
+        fecha: new Date(),
+        descuento: '',
+        autorizacion: '',
+        formaPago: '',
+      }),
       productos: mockItems,
     }
   }
@@ -46,16 +48,36 @@ export default class FacturarView extends Component {
     this.setState({ productos: this.state.productos.push(immutableProduct) })
   }
 
-  newValueIsAppropiate(key, newValue) {
+  newProductValueIsAppropiate(key, newValue) {
     switch(key) {
       case 'count':
-        return validator.isInt(newValue, {min: 0}) || newValue.length === 0
+        return validator.isNumeric(newValue, {min: 0}) || newValue.length === 0
       case 'precioVenta':
         return validator.isFloat(newValue, {min: 0}) || newValue.length === 0
       default:
         return true
     }
 
+  }
+
+  newValueIsAppropiate(key, newValue) {
+    switch(key) {
+      case 'codigo':
+        return validator.isNumeric(newValue)
+      case 'precioVenta':
+        return validator.isFloat(newValue, {min: 0}) || newValue.length === 0
+      case 'fechaExp':
+        return true
+      default:
+        return true
+    }
+
+  }
+
+  onFacturaDataChanged = (key, newValue) => {
+    if(this.newValueIsAppropiate(key, newValue)) {
+      this.setState({facturaData: this.state.facturaData.update(key, v => newValue)})
+    }
   }
 
   onProductChanged = (index, key, newValue) => {
@@ -69,6 +91,8 @@ export default class FacturarView extends Component {
   render() {
     const {
       cliente,
+      descuento,
+      facturaData,
       productos,
     } = this.state
 
@@ -76,10 +100,11 @@ export default class FacturarView extends Component {
       <div style={{height:'100%', overflow:'auto'}} >
       <PaperContainer >
         <div style={{marginTop: '24px', marginLeft: '36px', marginRight: '36px'}}>
-          <FacturaForm suggestions={["hello", "bye"]} cliente={cliente}
+          <FacturaForm data={facturaData} cliente={cliente}
+            onDataChanged={this.onFacturaDataChanged}
             onNewCliente={this.onNewCliente} onNewProduct={this.onNewProductFromKeyboard}/>
           <FacturaTable items={productos} onProductChanged={this.onProductChanged}/>
-          <FacturaResults />
+          <FacturaResults productos={productos} descuento={descuento}/>
         </div>
       </PaperContainer>
       </div>

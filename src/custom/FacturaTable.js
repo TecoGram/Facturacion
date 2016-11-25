@@ -8,7 +8,7 @@ const renderTableHeader = () => {
     <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
       <TableRow>
         <TableHeaderColumn width={40} style={{padding: '0px'}}>#</TableHeaderColumn>
-        <TableHeaderColumn width={80} style={{padding: '0px'}}>Reg. San.</TableHeaderColumn>
+        <TableHeaderColumn width={80} style={{padding: '0px'}}>Reg. Santario</TableHeaderColumn>
         <TableHeaderColumn width={170} style={{padding: '0px'}}>Nombre</TableHeaderColumn>
         <TableHeaderColumn width={60} style={{padding: '0px'}}>Lote</TableHeaderColumn>
         <TableHeaderColumn width={40} style={{padding: '0px'}}>Cant.</TableHeaderColumn>
@@ -58,7 +58,9 @@ export default class FacturaTable extends React.Component {
       </TableRowColumn>
 
       <TableRowColumn width={50} style={{padding: '0px', textAlign: 'right'}}>
-        <a style={{marginRight: '24px'}}>${product.get('precioVenta') * product.get('count')}</a>
+        <a style={{marginRight: '24px'}}>
+        $ {Number(product.get('precioVenta') * product.get('count')).toFixed(2)}
+        </a>
       </TableRowColumn>
 
     </TableRow>
