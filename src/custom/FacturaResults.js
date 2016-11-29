@@ -1,43 +1,27 @@
 import React from 'react';
 
 import RaisedButton from 'material-ui/RaisedButton'
+import { calcularValores } from './FacturacionUtils'
 
-const iva = 0.14
 const ivaLabel = `IVA 14%: $`
 
 export default class FacturaResults extends React.Component {
 
-  calcularSubtotal = (productos) => {
-    let subtotal = 0
-    const len = productos.size
-    for (let i = 0; i < len; i++) {
-      const product = productos.get(i)
-      subtotal += product.get('precioVenta') * product.get('count')
-    }
-    return subtotal
-  }
-
-  calcularRebaja = (subtotal, descuento) => {
-    if(!descuento || descuento.length === 0)
-      descuento = 0
-    return subtotal * descuento / 100
-  }
-
-  calcularIVA = (subtotal) => {
-    return subtotal * iva
-  }
 
   render() {
     const {
       productos,
       descuento,
       onGuardarClick,
+      guardarButtonDisabled,
     } = this.props
 
-    const subtotal = this.calcularSubtotal(productos)
-    const rebaja = this.calcularRebaja(subtotal, descuento)
-    const valorIVA = this.calcularIVA(subtotal)
-    const total = subtotal - rebaja + valorIVA
+    const {
+      subtotal,
+      rebaja,
+      valorIVA,
+      total,
+    } = calcularValores(productos, descuento)
 
     return (
       <div style={{width: '100%', textAlign: 'right'}}>
@@ -64,10 +48,10 @@ export default class FacturaResults extends React.Component {
           </tbody>
         </table>
         </div>
-      <div style={{ textAlign: 'center' }}>
-        <RaisedButton label="Generar Factura" primary={true}
-        onTouchTap={ onGuardarClick } />
-      </div>
+        <div style={{ textAlign: 'center' }}>
+          <RaisedButton label="Generar Factura" primary={true}
+            onTouchTap={ onGuardarClick } disabled={guardarButtonDisabled}/>
+        </div>
       </div>
     )
   }

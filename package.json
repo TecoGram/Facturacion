@@ -17,6 +17,7 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
+    "fecha": "^2.3.0",
     "fixed-data-table": "^0.6.3",
     "immutable": "^3.8.1",
     "knex": "^0.12.6",
@@ -38,7 +39,8 @@
     "build": "react-scripts build",
     "istanbul": "NODE_ENV=test node backend/scripts/initTestDB.js && NODE_ENV=test istanbul cover _mocha && cat coverage/lcov.info | coveralls",
     "test": "react-scripts test --env=jsdom",
-    "test-backend": "NODE_ENV=test node backend/scripts/initTestDB.js && NODE_ENV=test mocha",
+    "test-backend": "NODE_ENV=test node backend/scripts/initTestDB.js && NODE_ENV=test mocha test/db",
+    "test-utils": "NODE_ENV=test mocha test/util/",
     "eject": "react-scripts eject"
   }
 }

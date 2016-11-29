@@ -23,22 +23,30 @@ export default class FacturaForm extends Component {
   renderClienteInput = (props) => {
     const {
       cliente,
+      errors,
       onNewCliente,
     } = props
 
     if (cliente)
       return (
         <SelectedClienteChip text={cliente.nombre}
-        onRequestDelete={() => {onNewCliente(null)}} />
+          onRequestDelete={() => {onNewCliente(null)}} />
       )
     else
       return (
-          <ClienteAutoComplete width={autoCompleteWidth}
-          onNewItemSelected={onNewCliente}/>
+        <ClienteAutoComplete width={autoCompleteWidth}
+          errorText={errors.get('cliente')} onNewItemSelected={onNewCliente}/>
       )
   }
 
   render() {
+    const {
+      data,
+      errors,
+      onDataChanged,
+    } = this.props
+
+
     return (
       <div>
         <br />
@@ -52,28 +60,37 @@ export default class FacturaForm extends Component {
 
         <IconBox icon={Receipt}/>
         <TextField
-          hintText="Código"
-          style={{width: '140px', marginRight: txtMargin}} />
+          hintText="Código" value={data.get('codigo')} errorText={errors.get('codigo')}
+          onChange={(event) => onDataChanged('codigo', event.target.value)}
+          style={{width: '140px', verticalAlign: 'top', marginRight: txtMargin}} />
 
         <IconBox icon={Today}/>
         <DatePicker
           hintText="Fecha" style={{display: 'inline-block'}}
+          value={data.get('fecha')} errorText={errors.get('fecha')}
+          onChange={(n, date) => onDataChanged('fecha', date)}
           textFieldStyle={{width:'140px', marginRight: txtMargin}} />
 
         <IconBox icon={Loyalty}/>
         <TextField
-          hintText="Desc. %"
+          hintText="Desc. %" value={data.get('descuento')}
+          errorText={errors.get('descuento')}
+          onChange={(event) => onDataChanged('descuento', event.target.value)}
           style={{width:'80px', marginRight: txtMargin}} />
 
         <IconBox icon={Payment}/>
         <TextField
-          hintText="Forma de pago"
+          hintText="Forma de pago" value={data.get('formaPago')}
+          errorText={errors.get('formaPago')}
+          onChange={(event) => onDataChanged('formaPago', event.target.value)}
           style={{width:'140px', marginRight: txtMargin}} />
 
         <IconBox icon={Info}/>
         <TextField
-          hintText="Autorización"
-          style={{width:'144px'}} />
+          hintText="Autorización" value={data.get('autorizacion')}
+          errorText={errors.get('autorizacion')}
+          onChange={(event) => onDataChanged('autorizacion', event.target.value)}
+          style={{ verticalAlign: 'top', width:'144px'}} />
       </div>
     );
   }

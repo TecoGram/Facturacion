@@ -7,7 +7,7 @@ import { primaryColor } from '../CustomStyle'
 const chipStyle = {
   fontSize: '16px',
   width: '425px',
-  height: '48px',
+  height: '39px',
   marginRight: '36px',
   display: 'inline-block',
   lineHeight: '24px',

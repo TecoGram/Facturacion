@@ -1,44 +1,69 @@
+/* eslint-disable no-console */
 const knex = require('../db.js')
 
-knex.schema.createTableIfNotExists('productos', (table) => {
-  console.log('create productos')
-  table.string('codigo', 10)
-  table.string('nombre', 50)
-  table.float('precioDist')
-  table.float('precioVenta')
+knex.schema.hasTable('productos')
+.then((exists) => {
+  if(!exists)
+    return knex.schema.createTable('productos', (table) => {
+      console.log('create productos')
+      table.string('codigo', 10)
+      table.string('nombre', 50)
+      table.float('precioDist')
+      table.float('precioVenta')
 
-  table.unique('nombre')
+      table.unique('nombre')
+    })
+  else return Promise.resolve()
+})
+.then(() => {
+  return knex.schema.hasTable('clientes')
+})
+.then((exists) => {
+  if(!exists)
+    return knex.schema.createTable('clientes', (table) => {
+      console.log('create clientes')
+      table.string('ruc', 13).primary()
+      table.string('nombre', 50).index()
+      table.string('direccion', 60)
+      table.string('email', 10)
+      table.string('telefono1', 10)
+      table.string('telefono2', 10)
+    })
+  else return Promise.resolve()
 }).then(() => {
-  return knex.schema.createTableIfNotExists('clientes', (table) => {
-    console.log('create clientes')
-    table.string('ruc', 13).primary()
-    table.string('nombre', 50).index()
-    table.string('direccion', 60)
-    table.string('email', 10)
-    table.string('telefono1', 10)
-    table.string('telefono2', 10)
-  })
-}).then(() => {
-  return knex.schema.createTableIfNotExists('ventas', (table) => {
-    console.log('create clientes')
-    table.string('codigo')
-    table.integer('cliente').unsigned()
-    table.date('fecha').index()
-    table.float('subtotal')
-    table.float('descuento')
-    table.float('iva')
-    table.float('total')
+  return knex.schema.hasTable('ventas')
+})
+.then((exists) => {
+  if (!exists)
+    return knex.schema.createTable('ventas', (table) => {
+      console.log('create ventas')
+      table.string('codigo')
+      table.string('cliente').unsigned()
+      table.date('fecha').index()
+      table.string('autorizacion')
+      table.string('formaPago')
+      table.float('subtotal')
+      table.float('descuento')
+      table.float('iva')
+      table.float('total')
 
-    table.foreign('cliente').references('clientes.ruc')
-  })
+      table.foreign('cliente').references('clientes.ruc')
+    })
+  else return Promise.resolve()
 }).then(() => {
-  return knex.schema.createTableIfNotExists('unidades', (table) => {
-    console.log('create unidades')
-    table.integer('producto').unsigned().index()
-    table.integer('venta').unsigned()
-    table.date('expiracion')
+  return knex.schema.hasTable('unidades')
+})
+.then((exists) => {
+  if (!exists)
+    return knex.schema.createTable('unidades', (table) => {
+      console.log('create unidades')
+      table.integer('producto').unsigned().index()
+      table.integer('venta').unsigned()
+      table.string('lote')
+      table.date('fechaExp')
 
-    table.foreign('producto').references('productos.rowid')
-    table.foreign('venta').references('ventas.rowid')
-  })
+      table.foreign('producto').references('productos.rowid')
+      table.foreign('venta').references('ventas.rowid')
+    })
+  else return Promise.resolve()
 }).then(() => { knex.destroy()})

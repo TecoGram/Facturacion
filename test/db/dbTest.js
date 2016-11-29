@@ -14,7 +14,7 @@ const chai = require('chai')
   , expect = chai.expect
   , should = chai.should();
 
-const db = require("../backend/dbAdmin.js")
+const db = require("../../backend/dbAdmin.js")
 
 describe('metodos de dbAdmin.js', function () {
 
@@ -116,25 +116,21 @@ describe('metodos de dbAdmin.js', function () {
       function (done) {
         const productosVendidos = [
           {
-            rowid: 1,
-            expiracion: new Date(),
-            cantidad: 1,
+            producto: 1,
+            fechaExp: '2016-11-26',
+            lote: '545f2',
           },
           {
-            rowid: 2,
-            expiracion: new Date(),
-            cantidad: 2,
-          },
-          {
-            rowid: 3,
-            expiracion: new Date(),
-            cantidad: 3,
+            producto: 1,
+            fechaExp: '2016-11-26',
+            lote: '545f2',
           },
         ]
-        db.insertarVenta('gfg5', 1, new Date(), 35.00, 0, 3.12, 38.12, productosVendidos)
+        db.insertarVenta('gfg5', '10954236576001', '2016-11-26', 'fse4', 'VISA',
+        21.00, 3.12, 5.43, 38.12, productosVendidos)
         .then(function (res) {
           const lasInsertedId = res[0]
-          lasInsertedId.should.be.equal(6)
+          lasInsertedId.should.be.equal(2)
           done()
         })
       })

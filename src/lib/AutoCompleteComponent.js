@@ -17,19 +17,27 @@ export default class AutoCompleteComponent extends React.Component {
     super(props)
     this.state = {
       suggestions: [],
+      text: '',
     }
   }
 
   reqNewData = (input) => {
+
     const newDataPromise = this.props.newDataPromise
     if(input.length === 0)
-      this.setState({ suggestions: [] })
-    else
+      this.setState({ text: input, suggestions: [] })
+    else {
+      this.setState({ text: input })
       newDataPromise(input)
       .then(
         (resp) => { this.setState({ suggestions: resp.body }) },
         (err) => { this.setState({ suggestions: [] }) }
       )
+    }
+  }
+
+  clearAutoComplete = () => {
+    this.setState({ text: '', suggestions: []})
   }
 
   onNewItemSelected = (selectedValue, index) => {
@@ -39,10 +47,13 @@ export default class AutoCompleteComponent extends React.Component {
 
     const items = this.state.suggestions
     const totalSuggestions = items.length
-    if(index >= 0 && index < totalSuggestions)
+    if(index >= 0 && index < totalSuggestions) {
+      this.clearAutoComplete()
       onNewItemSelected(items[index])
-    else if (index === -1 && totalSuggestions > 0)
+    } else if (index === -1 && totalSuggestions > 0) {
+      this.clearAutoComplete()
       onNewItemSelected(items[0])
+    }
   }
 
   render() {
@@ -64,6 +75,7 @@ export default class AutoCompleteComponent extends React.Component {
         openOnFocus={false}
         dataSourceConfig={dataSourceConfig}
         dataSource={this.state.suggestions}
+        searchText={this.state.text}
         onUpdateInput={(searchText) => this.reqNewData(searchText) }
         onNewRequest={ this.onNewItemSelected }
       />

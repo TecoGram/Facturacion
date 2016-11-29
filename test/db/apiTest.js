@@ -1,6 +1,6 @@
 /* eslint-env node, mocha */
-const api = require('../src/api.js')
-const server = require('../backend/server.js')
+const api = require('../../src/api.js')
+const server = require('../../backend/server.js')
 
 const assert = require('assert');
 const chai = require('chai')
