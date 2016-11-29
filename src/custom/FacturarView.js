@@ -9,15 +9,6 @@ import FacturaResults from './FacturaResults'
 import { /*crearUnidadesRow,*/ crearVentaRow } from './FacturacionUtils'
 import { validarVentaRow } from '../Validacion'
 
-const mockItems = Immutable.List.of(Immutable.Map({
-  nombre: 'Acido Urico 20x12 ml 240 det. TECO',
-  codigo: 'AD-0493-11-03',
-  lote: 'EDR356',
-  count: 1,
-  precioVenta: 20.00,
-  fechaExp: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-}))
-
 export default class FacturarView extends Component {
 
   constructor(props) {
@@ -36,7 +27,7 @@ export default class FacturarView extends Component {
         autorizacion: '',
         formaPago: '',
       }),
-      productos: mockItems,
+      productos: Immutable.List(),
     }
 
   }
@@ -81,7 +72,6 @@ export default class FacturarView extends Component {
   }
 
   onFacturaDataChanged = (key, newValue) => {
-    console.log('update ', key, newValue)
     if(key === 'descuento' && newValue.length > 0 &&
       !validator.isInt(newValue, {min: 0, max: 100}))
       return;
@@ -105,13 +95,10 @@ export default class FacturarView extends Component {
     } = this.state
 
     const ventaRow = crearVentaRow(cliente, facturaData, productos)
-    console.log('venta ' + JSON.stringify(ventaRow))
     const {
       errors,
       inputs,
     } = validarVentaRow(ventaRow)
-    console.log('errors ' + JSON.stringify(errors))
-    console.log('inputs ' + JSON.stringify(inputs))
     if(errors)
       this.setState({errors: errors})
     else
@@ -142,7 +129,7 @@ export default class FacturarView extends Component {
       <div style={{height:'100%', overflow:'auto'}} >
       <PaperContainer >
         <div style={{marginTop: '24px', marginLeft: '36px', marginRight: '36px'}}>
-          <FacturaForm data={facturaData} errors={errors} cliente={cliente}
+          <FacturaForm data={facturaData.toJS()} errors={errors} cliente={cliente}
             onDataChanged={this.onFacturaDataChanged}
             onNewCliente={this.onNewCliente} onNewProduct={this.onNewProductFromKeyboard}/>
           <FacturaTable items={productos} onProductChanged={this.onProductChanged}/>

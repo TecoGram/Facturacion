@@ -59,62 +59,64 @@ export default class FacturaForm extends Component {
         </div>
 
         <table>
-          <tr>
+          <tbody>
+            <tr>
+              <td>
+                <IconBox icon={Receipt}/>
+              </td>
+              <td>
+                <TextField
+                  hintText="Código" value={data.codigo} errorText={errors.codigo}
+                  onChange={(event) => onDataChanged('codigo', event.target.value)}
+                  style={{width: '142px', verticalAlign: 'top', marginRight: txtMargin}} />
+              </td>
 
-            <td>
-              <IconBox icon={Receipt}/>
-            </td>
-            <td>
-              <TextField
-                hintText="Código" value={data.get('codigo')} errorText={errors.get('codigo')}
-                onChange={(event) => onDataChanged('codigo', event.target.value)}
-                style={{width: '140px', verticalAlign: 'top', marginRight: txtMargin}} />
-            </td>
+              <td>
+                <IconBox icon={Today}/>
+              </td>
+              <td>
+                <DatePicker
+                  hintText="Fecha" style={{display: 'inline-block'}}
+                  value={data.fecha} errorText={errors.fecha}
+                  onChange={(n, date) => onDataChanged('fecha', date)}
+                  textFieldStyle={{width:'140px', marginRight: txtMargin}} />
+              </td>
 
-            <td>
-              <IconBox icon={Today}/>
-            </td>
-            <td>
-              <DatePicker
-                hintText="Fecha" style={{display: 'inline-block'}}
-                value={data.get('fecha')} errorText={errors.get('fecha')}
-                onChange={(n, date) => onDataChanged('fecha', date)}
-                textFieldStyle={{width:'140px', marginRight: txtMargin}} />
-            </td>
+              <td>
+                <IconBox icon={Loyalty}/>
+              </td>
+              <td>
+                <TextField
+                  hintText="Desc." value={data.descuento}
+                  errorText={errors.descuento}
+                  onChange={(event) => onDataChanged('descuento', event.target.value)}
+                  style={{width:'40px'}} inputStyle={{textAlign:'right'}} />
+                <span style={{marginRight: txtMargin}}>%</span>
+              </td>
 
-            <td>
-              <IconBox icon={Loyalty}/>
-            </td>
-            <td>
-              <TextField
-                hintText="Desc. %" value={data.get('descuento')}
-                errorText={errors.get('descuento')}
-                onChange={(event) => onDataChanged('descuento', event.target.value)}
-                style={{width:'80px', marginRight: txtMargin}} />
-            </td>
+              <td>
+                <IconBox icon={Payment}/>
+              </td>
+              <td>
+                <TextField
+                  hintText="Forma de pago" value={data.formaPago}
+                  errorText={errors.formaPago}
+                  onChange={(event) => onDataChanged('formaPago', event.target.value)}
+                  style={{width:'152px', marginRight: txtMargin}} />
+              </td>
 
-            <td>
-              <IconBox icon={Payment}/>
-            </td>
-            <td>
-              <TextField
-                hintText="Forma de pago" value={data.get('formaPago')}
-                errorText={errors.get('formaPago')}
-                onChange={(event) => onDataChanged('formaPago', event.target.value)}
-                style={{width:'140px', marginRight: txtMargin}} />
-            </td>
-
-            <td>
-              <IconBox icon={Info}/>
-            </td>
-            <td>
-              <TextField
-                hintText="Autorización" value={data.get('autorizacion')}
-                errorText={errors.get('autorizacion')}
-                onChange={(event) => onDataChanged('autorizacion', event.target.value)}
-                style={{ verticalAlign: 'top', width:'144px'}} />
-            </td>
-          </tr>
+              <td>
+                <IconBox icon={Info}/>
+              </td>
+              <td>
+                <TextField
+                  hintText="Autorización" value={data.autorizacion}
+                  errorText={errors.autorizacion}
+                  onChange={(event) => onDataChanged('autorizacion', event.target.value)}
+                  style={{ verticalAlign: 'top', width:'156px'}} />
+              </td>
+            </tr>
+          </tbody>
         </table>
       </div>
     );

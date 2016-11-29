@@ -1,5 +1,4 @@
 const validator = require('validator')
-const Immutable = require('immutable')
 const campo_obligatorio = 'Este campo es obligatorio'
 const campo_obligatorio_min = 'obligatorio'
 const invalido = 'inválido'
@@ -128,52 +127,44 @@ module.exports = {
     const formaPago = formData.formaPago || ''
     const cliente = formData.cliente ||''
 
-    const codigoKey = 'codigo'
-    const fechaKey = 'fecha'
-    const descuentoKey = 'descuento'
-    const autorizacionKey = 'autorizacion'
-    const formaPagoKey = 'formaPago'
-    const clienteKey = 'cliente'
-
-    let errors = Immutable.Map()
-    let inputs = Immutable.Map()
+    let errors = {}
+    let inputs = {}
 
     if(validator.isEmpty(codigo))
-      errors = errors.set(codigoKey,campo_obligatorio_min)
+      errors.codigo = campo_obligatorio_min
     else if(!validator.isNumeric(codigo))
-      errors = errors.set(codigoKey, invalido)
+      errors.codigo = invalido
     else
-      inputs = inputs.set(codigoKey, codigo)
+      inputs.codigo = codigo
 
     if(validator.isEmpty(fecha))
-      errors = errors.set(fechaKey, campo_obligatorio_min)
+      errors.fecha = campo_obligatorio_min
     else if(!validator.isDate(fecha))
-      errors = errors.set(fechaKey, invalido)
+      errors.fecha = invalido
     else
-      inputs = inputs.set(fechaKey, fecha)
+      inputs.fecha = fecha
 
-    if(validator.isEmpty(descuento))
-      errors = errors.set(descuentoKey, campo_obligatorio_min)
-    else if(!validator.isInt(descuento,{min: 0, max: 99}))
-      errors = errors.set(descuentoKey, invalido)
+    if(!validator.isEmpty(descuento)
+      && !validator.isInt(descuento, {min: 0, max: 99}))
+      errors.descuento = invalido
     else
-      inputs = inputs.set(descuentoKey, descuento)
+      inputs.descuento = descuento
 
     if(validator.isEmpty(formaPago))
-      errors = errors.set(formaPagoKey, campo_obligatorio_min)
+      errors.formaPago = campo_obligatorio_min
     else
-      inputs = inputs.set(formaPagoKey, formaPago)
+      inputs.formaPago = formaPago
 
     if(validator.isEmpty(cliente))
-      errors = errors.set(clienteKey, campo_obligatorio_min)
+      errors.cliente = campo_obligatorio_min
     else if (!validator.isNumeric(cliente))
-      errors = errors.set(clienteKey, invalido)
+      errors.cliente = invalido
     else
-      inputs = inputs.set(clienteKey, cliente)
+      inputs.cliente = cliente
 
-    inputs = inputs.set(autorizacionKey, autorizacion)
+    inputs.autorizacion = autorizacion
 
-    if(errors.isEmpty())
+    if(isEmptyObj(errors))
       return {
         errors: null,
         inputs: inputs,
