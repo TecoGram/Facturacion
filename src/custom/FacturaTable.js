@@ -24,6 +24,7 @@ export default class FacturaTable extends React.Component {
 
   renderRow = (product, i) => {
     const onProductChanged = this.props.onProductChanged
+    const today = new Date()
     return (
     <TableRow key={i}>
 
@@ -47,7 +48,7 @@ export default class FacturaTable extends React.Component {
 
       <TableRowColumn width={70} style={{padding: '0px'}}>
         <DatePicker value={product.get('fechaExp')} hintText={"expiración"}
-        textFieldStyle={{width: '70px', fontSize: '13px'}}
+        textFieldStyle={{width: '70px', fontSize: '13px'}} minDate={today}
           onChange={(event, date) => { onProductChanged(i, 'fechaExp', date) }}/>
       </TableRowColumn>
 

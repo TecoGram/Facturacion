@@ -59,12 +59,10 @@ export default class FacturarView extends Component {
 
   newValueIsAppropiate(key, newValue) {
     switch(key) {
-      case 'codigo':
-        return validator.isNumeric(newValue)
+      case 'count':
+        return validator.isInt(newValue,{min: 0}) || newValue.length === 0
       case 'precioVenta':
         return validator.isFloat(newValue, {min: 0}) || newValue.length === 0
-      case 'fechaExp':
-        return true
       default:
         return true
     }
