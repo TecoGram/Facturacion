@@ -161,4 +161,29 @@ describe('endpoints disponibles para el cliente', function () {
       })
     })
   })
+
+
+  describe('/venta/new', function () {
+    it('retorna 200 al ingresar datos correctos', function (done) {
+      api.insertarVenta(
+        '003546',
+        1,
+        '2016-11-26',
+        '',
+        'CONTADO',
+        19.99,
+        0,
+        2.00,
+        22.00)
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        done()
+      }, function (err) {
+        console.error('test fail ' + JSON.stringify(err))
+        done(err)
+      })
+    })
+  })
+
 })

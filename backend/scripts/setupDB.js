@@ -57,7 +57,7 @@ knex.schema.hasTable('productos')
   if (!exists)
     return knex.schema.createTable('unidades', (table) => {
       console.log('create unidades')
-      table.integer('producto').unsigned().index()
+      table.integer('producto').unsigned()
       table.integer('venta').unsigned()
       table.string('lote')
       table.date('fechaExp')

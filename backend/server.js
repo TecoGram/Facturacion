@@ -89,6 +89,33 @@ app.get('/producto/find', function (req,res) {
 
 });
 
+
+app.post('/venta/new', function (req, res) {
+  const {
+    codigo,
+    cliente,
+    fecha,
+    autorizacion,
+    formaPago,
+    subtotal,
+    descuento,
+    iva,
+    total,
+  } = req.body
+
+  db.insertarVenta(codigo, cliente, fecha, autorizacion, formaPago, subtotal,
+    descuento, iva, total)
+  .then(function (data) {//OK!
+    res.status(200)
+    .send('OK')
+  }, function (err) {//ERROR!
+    printError('db error: ' + err)
+    res.status(422)
+    .send(err)
+  })
+
+});
+
 const server = app.listen(port, function () {
   //eslint-disable-next-line
   console.log('Application listening on  port ' + port);
