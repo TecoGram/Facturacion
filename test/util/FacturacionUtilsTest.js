@@ -26,17 +26,29 @@ describe('FacturacionUtils', function () {
         fecha: new Date(2016, 10, 26),
       })
 
-      const ventaRow = FacturacionUtils.crearVentaRow(clienteObj, facturaData)
+      const productos = Immutable.List.of(
+        Immutable.Map({
+          count: 1,
+          precioVenta: 10,
+        }),
+        Immutable.Map({
+          count: 2,
+          precioVenta: 20,
+        })
+      )
+      const ventaRow = FacturacionUtils.crearVentaRow(clienteObj, facturaData, productos)
       ventaRow.cliente.should.equal('09455867443001')
       ventaRow.codigo.should.equal('0003235')
-      ventaRow.descuento.should.equal('10')
+      ventaRow.subtotal.should.equal(50)
+      ventaRow.descuento.should.equal(5)
+      expect(ventaRow.iva).to.be.closeTo(7, 0.001)
+      expect(ventaRow.total).to.be.closeTo(52, 0.001)
       ventaRow.autorizacion.should.equal('5962')
       ventaRow.formaPago.should.equal('CONTADO')
       ventaRow.fecha.should.equal('2016-11-26')
 
     })
   })
-
 
   describe('crearUnidadesRows', function () {
     it('Expande la lista de productos facturados para generar ' +
