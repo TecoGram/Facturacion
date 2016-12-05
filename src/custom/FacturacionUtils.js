@@ -6,7 +6,6 @@ const calcularSubtotal = (productos) => {
   const len = productos.size
   for (let i = 0; i < len; i++) {
     const product = productos.get(i)
-    console.log('sub ' + (product.get('precioVenta') * product.get('count')))
     subtotal += product.get('precioVenta') * product.get('count')
   }
   return subtotal

@@ -101,6 +101,8 @@ app.post('/venta/new', function (req, res) {
     descuento,
     iva,
     total,
+
+    productos,
   } = req.body
 
   db.insertarVenta(codigo, cliente, fecha, autorizacion, formaPago, subtotal,

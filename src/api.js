@@ -36,20 +36,9 @@ module.exports = {
       .send()
   },
 
-  insertarVenta: (codigo, cliente, fecha, autorizacion, formaPago, subtotal,
-    descuento, iva, total) => {
+  insertarVenta: (ventaRow, productos) => {
     return request.post(prefix + '/venta/new')
-      .send({
-        codigo: codigo,
-        cliente: cliente,
-        fecha: fecha,
-        autorizacion: autorizacion,
-        formaPago: formaPago,
-        subtotal: subtotal,
-        descuento: descuento,
-        iva: iva,
-        total: total,
-      })
+      .send(Object.assign({productos: productos}, ventaRow))
       .set('Accept', 'application/json')
   },
 

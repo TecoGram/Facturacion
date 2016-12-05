@@ -8,6 +8,7 @@ import FacturaTable from './FacturaTable'
 import FacturaResults from './FacturaResults'
 import { /*crearUnidadesRow,*/ crearVentaRow } from './FacturacionUtils'
 import { validarVentaRow } from '../Validacion'
+import { insertarVenta } from '../api'
 
 export default class FacturarView extends Component {
 
@@ -93,14 +94,18 @@ export default class FacturarView extends Component {
     } = this.state
 
     const ventaRow = crearVentaRow(cliente, facturaData, productos)
+    const productosVendidos = productos.toJS()
     const {
       errors,
       inputs,
     } = validarVentaRow(ventaRow)
     if(errors)
       this.setState({errors: errors})
-    else
-      this.setState(this.getDefaultState())
+    else {
+      insertarVenta(ventaRow, productosVendidos)
+      .then((resp) => this.setState(this.getDefaultState()),
+        (err) => console.log(err))
+    }
   }
 
   guardarFacturaDisabled = () => {

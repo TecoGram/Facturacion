@@ -165,16 +165,20 @@ describe('endpoints disponibles para el cliente', function () {
 
   describe('/venta/new', function () {
     it('retorna 200 al ingresar datos correctos', function (done) {
-      api.insertarVenta(
-        '003546',
-        1,
-        '2016-11-26',
-        '',
-        'CONTADO',
-        19.99,
-        0,
-        2.00,
-        22.00)
+      const ventaRow = {
+        codigo: '003546',
+        cliente: '1',
+        fecha: '2016-11-26',
+        autorizacion: '',
+        formaPago: 'CONTADO',
+        subtotal: 19.99,
+        descuento: 0,
+        iva: 2.00,
+        total: 22.00,
+      }
+
+      productos = []
+      api.insertarVenta(ventaRow, productos)
       .then(function (resp) {
         const statusCode = resp.status
         statusCode.should.equal(200)
