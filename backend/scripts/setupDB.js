@@ -47,6 +47,7 @@ knex.schema.hasTable('productos')
       table.float('iva')
       table.float('total')
 
+      table.unique('codigo', 'fecha')
       table.foreign('cliente').references('clientes.ruc')
     })
   else return Promise.resolve()
