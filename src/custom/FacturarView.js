@@ -94,7 +94,6 @@ export default class FacturarView extends Component {
     } = this.state
 
     const ventaRow = crearVentaRow(cliente, facturaData, productos)
-    const productosVendidos = productos.toJS()
     const {
       errors,
       inputs,
@@ -102,7 +101,7 @@ export default class FacturarView extends Component {
     if(errors)
       this.setState({errors: errors})
     else {
-      insertarVenta(ventaRow, productosVendidos)
+      insertarVenta(ventaRow)
       .then((resp) => this.setState(this.getDefaultState()),
         (err) => console.log(err))
     }

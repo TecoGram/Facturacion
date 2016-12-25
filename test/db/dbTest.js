@@ -114,11 +114,23 @@ describe('metodos de dbAdmin.js', function () {
 
     it('persiste una nueva venta en la base y agrega las unidades vendidas a la base',
       function (done) {
+        const productosVendidos = [
+          {
+            producto: 1,
+            fechaExp: '2016-11-26',
+            lote: '545f2',
+          },
+          {
+            producto: 1,
+            fechaExp: '2016-11-26',
+            lote: '545f2',
+          },
+        ]
         db.insertarVenta('gfg5', '10954236576001', '2016-11-26', 'fse4', 'VISA',
-        21.00, 3.12, 5.43, 38.12)
-        .then(function (ids) {
-          ids.should.not.be.empty
-          ids[0].should.be.a('number')
+        21.00, 3.12, 5.43, 38.12, productosVendidos)
+        .then(function (res) {
+          const lasInsertedId = res[0]
+          lasInsertedId.should.be.equal(3)
           done()
         })
       })

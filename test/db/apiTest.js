@@ -175,10 +175,14 @@ describe('endpoints disponibles para el cliente', function () {
         descuento: 0,
         iva: 2.00,
         total: 22.00,
+        unidades: [{
+          producto: 1,
+          lote: 'ert3',
+          fechaExp: '2017-04-04',
+        }],
       }
 
-      productos = []
-      api.insertarVenta(ventaRow, productos)
+      api.insertarVenta(ventaRow)
       .then(function (resp) {
         const statusCode = resp.status
         statusCode.should.equal(200)

@@ -6,6 +6,25 @@ const colocarVentaID = (unidades, ventaId) => {
     unidades[i].venta = ventaId
 }
 
+const insertarVenta = (builder, codigo, cliente, fecha, autorizacion, formaPago,
+    subtotal, descuento, iva, total) => {
+  return builder.table('ventas').insert({
+    codigo: codigo,
+    cliente: cliente,
+    fecha: fecha,
+    autorizacion: autorizacion,
+    formaPago: formaPago,
+    subtotal: subtotal,
+    descuento: descuento,
+    iva: iva,
+    total: total,
+  })
+}
+
+const insertarNuevasUnidades = (builder, listaDeUnidades) => {
+  return builder.table('unidades').insert(listaDeUnidades)
+}
+
 module.exports = {
   close: () => { knex.destroy() },
   insertarProducto: (codigo, nombre, precioDist, precioVenta) => {
@@ -53,19 +72,16 @@ module.exports = {
   },
 
   insertarVenta: (codigo, cliente, fecha, autorizacion, formaPago,
-    subtotal, descuento, iva, total) => {
-    return knex.table('ventas').insert({
-      codigo: codigo,
-      cliente: cliente,
-      fecha: fecha,
-      autorizacion: autorizacion,
-      formaPago: formaPago,
-      subtotal: subtotal,
-      descuento: descuento,
-      iva: iva,
-      total: total,
+    subtotal, descuento, iva, total, unidades) => {
+    return knex.transaction ((trx) => {
+      return insertarVenta(trx, codigo, cliente, fecha, autorizacion, formaPago,
+    subtotal, descuento, iva, total)
+      .then((ids) => {
+        const ventaId = ids[0]
+        colocarVentaID(unidades, ventaId)
+        return insertarNuevasUnidades(trx, unidades)
+      })
     })
   },
-
 
 }

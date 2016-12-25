@@ -52,6 +52,20 @@ knex.schema.hasTable('productos')
     })
   else return Promise.resolve()
 }).then(() => {
+  return knex.schema.hasTable('stock')
+})
+.then((exists) => {
+  if (!exists)
+    return knex.schema.createTable('stock', (table) => {
+      console.log('create stock')
+      table.integer('producto').unsigned().index()
+      table.string('lote')
+      table.date('fechaExp')
+
+      table.foreign('producto').references('productos.rowid')
+    })
+  else return Promise.resolve()
+}).then(() => {
   return knex.schema.hasTable('unidades')
 })
 .then((exists) => {
@@ -59,7 +73,7 @@ knex.schema.hasTable('productos')
     return knex.schema.createTable('unidades', (table) => {
       console.log('create unidades')
       table.integer('producto').unsigned()
-      table.integer('venta').unsigned()
+      table.integer('venta').unsigned().index()
       table.string('lote')
       table.date('fechaExp')
 
