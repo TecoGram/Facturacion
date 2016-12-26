@@ -101,12 +101,12 @@ app.post('/venta/new', function (req, res) {
     descuento,
     iva,
     total,
-    unidades,
+    productos,
 
   } = req.body
 
   db.insertarVenta(codigo, cliente, fecha, autorizacion, formaPago, subtotal,
-    descuento, iva, total, unidades)
+    descuento, iva, total, productos)
   .then(function (data) {//OK!
     res.status(200)
     .send('OK')

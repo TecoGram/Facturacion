@@ -119,17 +119,22 @@ describe('metodos de dbAdmin.js', function () {
             producto: 1,
             fechaExp: '2016-11-26',
             lote: '545f2',
+            count: 1,
+            precioVenta: 10,
           },
           {
-            producto: 1,
+            producto: 2,
             fechaExp: '2016-11-26',
-            lote: '545f2',
+            lote: '5453s',
+            count: 2,
+            precioVenta: 7,
           },
         ]
         db.insertarVenta('gfg5', '10954236576001', '2016-11-26', 'fse4', 'VISA',
         21.00, 3.12, 5.43, 38.12, productosVendidos)
         .then(function (res) {
           const lasInsertedId = res[0]
+          //test api ya inserto una unidad, mas estas dos, la nueva debe de ser 3
           lasInsertedId.should.be.equal(3)
           done()
         })

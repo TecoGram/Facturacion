@@ -175,10 +175,12 @@ describe('endpoints disponibles para el cliente', function () {
         descuento: 0,
         iva: 2.00,
         total: 22.00,
-        unidades: [{
+        productos: [{
           producto: 1,
           lote: 'ert3',
           fechaExp: '2017-04-04',
+          count: 1,
+          precioVenta: 11,
         }],
       }
 

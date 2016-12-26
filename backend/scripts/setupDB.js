@@ -75,6 +75,8 @@ knex.schema.hasTable('productos')
       table.integer('producto').unsigned()
       table.integer('venta').unsigned().index()
       table.string('lote')
+      table.float('precioVenta')
+      table.integer('count')
       table.date('fechaExp')
 
       table.foreign('producto').references('productos.rowid')

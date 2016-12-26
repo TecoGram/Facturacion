@@ -53,26 +53,22 @@ describe('FacturacionUtils', function () {
       ventaRow.formaPago.should.equal('CONTADO')
       ventaRow.fecha.should.equal('2016-11-26')
 
-      const unidades = ventaRow.unidades
-      unidades.length.should.equal(3)
+      const unidades = ventaRow.productos
+      unidades.length.should.equal(2)
 
       const primerItem = unidades[0]
       primerItem.producto.should.equal(1)
       primerItem.lote.should.equal('asd3')
       primerItem.fechaExp.should.equal('2017-02-02')
+      primerItem.precioVenta.should.equal(10)
+      primerItem.count.should.equal(1)
 
       const segundoItem = unidades[1]
       segundoItem.producto.should.equal(2)
       segundoItem.lote.should.equal('asd5')
       segundoItem.fechaExp.should.equal('2017-02-02')
-
-
-      const tercerItem = unidades[2]
-      tercerItem.producto.should.equal(2)
-      tercerItem.lote.should.equal('asd5')
-      tercerItem.fechaExp.should.equal('2017-02-02')
-
-
+      segundoItem.precioVenta.should.equal(20)
+      segundoItem.count.should.equal(2)
     })
   })
 

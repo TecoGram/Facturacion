@@ -29,6 +29,22 @@ const calcularValores = (productos, descuento) => {
   })
 }
 
+const crearProductosVendidosRows = (productos) => {
+  const len = productos.size
+  const unidades = []
+  for (let i = 0; i < len; i++) {
+    const producto = productos.get(i)
+    unidades.push({
+      producto: producto.get('rowid'),
+      lote: producto.get('lote'),
+      fechaExp: producto.get('fechaExp'),
+      count: producto.get('count'),
+      precioVenta: producto.get('precioVenta'),
+    })
+  }
+  return unidades
+}
+
 const crearUnidadesRows = (productos) => {
   const len = productos.size
   const unidades = []
@@ -48,7 +64,7 @@ const crearUnidadesRows = (productos) => {
 
 module.exports = {
   crearUnidadesRows: crearUnidadesRows,
-  
+
   crearVentaRow: (clienteObj, facturaData, productos) => {
 
     const desc = facturaData.get('descuento')
@@ -69,7 +85,7 @@ module.exports = {
       iva: valorIVA,
       subtotal: subtotal,
       total: total,
-      unidades: crearUnidadesRows(productos),
+      productos: crearProductosVendidosRows(productos),
     }
   },
 
