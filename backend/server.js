@@ -1,10 +1,18 @@
 
 const Express = require('express')
 const bodyParser = require('body-parser');
+const PDFWriter = require('./pdf/PDFWriter.js')
+const pdfutils = require('./pdf/pdfutils.js')
+const facturaTemplates = require('./pdf/templates.js')
+const fs = require('fs')
 
 const db = require('./dbAdmin.js')
 
 const port = process.env.PORT || 8192
+//crear directorio donde almacenar facturas en pdf.
+const facturaDir = pdfutils.createPDFDir('facturas/')
+
+
 
 const printError = (errorString) => {
   //don't print errors in tests. Tests should print errors from the response
@@ -104,16 +112,20 @@ app.post('/venta/new', function (req, res) {
     productos,
 
   } = req.body
+  let facturaFileName = codigo + fecha + '.pdf'
 
   db.insertarVenta(codigo, cliente, fecha, autorizacion, formaPago, subtotal,
     descuento, iva, total, productos)
-  .then(function (data) {//OK!
-    res.status(200)
-    .send('OK')
+  .then(function () {//OK!
+    const writeFunc = facturaTemplates.biocled(req.body)
+    return new PDFWriter(facturaDir + facturaFileName, writeFunc)
   }, function (err) {//ERROR!
     printError('db error: ' + err)
     res.status(422)
     .send(err)
+  }).then(function (data) {  //OK!
+    res.status(200)
+    .send(facturaFileName)
   })
 
 });

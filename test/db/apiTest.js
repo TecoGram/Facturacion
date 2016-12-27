@@ -1,6 +1,7 @@
 /* eslint-env node, mocha */
 const api = require('../../src/api.js')
 const server = require('../../backend/server.js')
+const fs = require('fs')
 
 const assert = require('assert');
 const chai = require('chai')
@@ -8,6 +9,7 @@ const chai = require('chai')
   , should = chai.should();
 
 const unexpectedError = Error('Ocurrio algo inesperado');
+const facturaDir = './backend/pdf/facturas/'
 
 if(process.env.NODE_ENV !== 'test') {
   //Por el amor de dios solo ejecutar esto en ambiente de prueba
@@ -16,6 +18,13 @@ if(process.env.NODE_ENV !== 'test') {
   "DEBES DE EJECUTAR ESTO CON NODE_ENV=test")
   process.exit(1)
 }
+
+describe('server.js', function () {
+  it ('crea el directorio backend/pdf/facturas/ durante startup', function () {
+    //se asume que el test se ejecuta en la raiz del proyecto
+    fs.existsSync(facturaDir).should.equal(true)
+  })
+})
 
 describe('endpoints disponibles para el cliente', function () {
 
@@ -166,7 +175,7 @@ describe('endpoints disponibles para el cliente', function () {
   describe('/venta/new', function () {
     it('retorna 200 al ingresar datos correctos', function (done) {
       const ventaRow = {
-        codigo: '003546',
+        codigo: '9999999',
         cliente: '1',
         fecha: '2016-11-26',
         autorizacion: '',
@@ -188,6 +197,9 @@ describe('endpoints disponibles para el cliente', function () {
       .then(function (resp) {
         const statusCode = resp.status
         statusCode.should.equal(200)
+        resp.text.should.equal(ventaRow.codigo + ventaRow.fecha + '.pdf')
+        fs.existsSync(facturaDir + resp.text).should.equal(true)
+        fs.unlinkSync(facturaDir + resp.text)
         done()
       }, function (err) {
         console.error('test fail ' + JSON.stringify(err))

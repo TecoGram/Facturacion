@@ -1,3 +1,5 @@
+const fs = require('fs')
+
 const billetesPalabras = (billetes) => {
   if (billetes === 0)
     return "CERO";
@@ -102,8 +104,20 @@ const valorPalabras = (valor) => {
 
 }
 
+const createPDFDir = (dirname) => {
+  const facturaDir = __dirname + '/' + dirname
+  try {
+    fs.mkdirSync(facturaDir)
+  } catch (err) {
+    if (err.code !== 'EEXIST')
+      throw err
+  }
+  return facturaDir
+}
+
 
 module.exports = {
   billetesPalabras: billetesPalabras,
   valorPalabras: valorPalabras,
+  createPDFDir: createPDFDir,
 }
