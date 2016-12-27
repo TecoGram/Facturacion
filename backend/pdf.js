@@ -27,6 +27,6 @@ const writeFunc = biocled({
       precioTotal: '2005.11',
     },
   ],
-}, 'MIL DOSCIENTOS CINCUENTA Y CUATRO CON 51/100 DOLARES')
+})
 const prom = new PDFWriter('./pdf/facturas/test.pdf', writeFunc)
 prom.then(() => console.log('es6'))

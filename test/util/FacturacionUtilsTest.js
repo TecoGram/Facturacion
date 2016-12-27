@@ -118,7 +118,7 @@ describe('FacturacionUtils', function () {
             count: 2,
             precioVenta: '17.99',
           })
-      )
+        )
 
       const {
         subtotal,

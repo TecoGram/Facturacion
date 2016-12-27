@@ -1,5 +1,6 @@
+const valorPalabras =require('../pdf/pdfutils.js').valorPalabras
 module.exports = {
-  biocled: (ventaRow, valorPalabras) => {
+  biocled: (ventaRow) => {
     const writeFunc = (doc) => {
 
       const {
@@ -54,7 +55,7 @@ module.exports = {
 
       const palabrasLinePos = firstLinePos + 340
       const palabrasLeftMargin = 85
-      doc.text(valorPalabras, palabrasLeftMargin, palabrasLinePos, {width: 280})
+      doc.text(valorPalabras(total), palabrasLeftMargin, palabrasLinePos, {width: 280})
 
       const valoresLinePos = firstLinePos + 335
       const valoresLeftMargin = 510
