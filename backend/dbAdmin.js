@@ -1,9 +1,11 @@
 const knex = require('./db.js')
 
-const colocarVentaID = (unidades, ventaId) => {
+const colocarVentaID = (unidades, fecha, codigo) => {
   const len = unidades.length
-  for (let i = 0; i < len; i++)
-    unidades[i].venta = ventaId
+  for (let i = 0; i < len; i++) {
+    unidades[i].codigo = codigo
+    unidades[i].fecha = fecha
+  }
 }
 
 const insertarVenta = (builder, codigo, cliente, fecha, autorizacion, formaPago,
@@ -24,16 +26,16 @@ const insertarVenta = (builder, codigo, cliente, fecha, autorizacion, formaPago,
 const insertarNuevasUnidades = (builder, listaDeUnidades) => {
   return builder.table('unidades').insert(listaDeUnidades)
 }
-const getVenta = (codigo, fecha) => {
+const getVenta = (fecha, codigo) => {
   return knex.select('*')
   .from('ventas')
-  .where({codigo: codigo, fecha: fecha})
+  .where({fecha: fecha, codigo: codigo})
 }
 
-const getUnidadesVenta = (ventaKey) => {
+const getUnidadesVenta = (fecha, codigo) => {
   return knex.select('*')
   .from('unidades')
-  .where({venta: ventaKey})
+  .where({fecha: fecha, codigo})
 }
 
 module.exports = {
@@ -89,19 +91,21 @@ module.exports = {
     subtotal, descuento, iva, total)
       .then((ids) => {
         const ventaId = ids[0]
-        colocarVentaID(unidades, ventaId)
+        colocarVentaID(unidades, fecha, codigo)
         return insertarNuevasUnidades(trx, unidades)
+      }, (err) => {
+        return Promise.reject(err)
       })
     })
   },
 
-  getFacturaData: (codigo, fecha) => {
+  getFacturaData: (fecha, codigo) => {
     let ventaRow;
-    return getVenta(codigo, fecha)
+    return getVenta(fecha, codigo)
     .then((ventas) => {
       if (ventas.length > 0) {
         ventaRow = ventas[0]
-        return getUnidadesVenta(ventaRow.rowid)
+        return getUnidadesVenta(fecha, codigo)
       } else {
         return Promise.reject(404)
       }

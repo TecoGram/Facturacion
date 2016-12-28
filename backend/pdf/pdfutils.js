@@ -115,7 +115,6 @@ const createTemporaryDir = (dirname) => {
   return tempDir
 }
 
-
 module.exports = {
   billetesPalabras: billetesPalabras,
   valorPalabras: valorPalabras,

@@ -98,7 +98,30 @@ app.get('/producto/find', function (req,res) {
 });
 
 app.get('/venta/ver/:fecha/:codigo', function (req, res) {
+  const {
+    fecha,
+    codigo,
+  } = req.params
+  const facturaFileName = codigo + fecha + '.pdf'
+  db.getFacturaData(fecha, codigo)
+    .then(function (ventaRow) {//OK!!
+      const writeFunc = facturaTemplates.biocled(ventaRow)
+      return new PDFWriter(facturaDir + facturaFileName, writeFunc)
+    }, function (errorCode) { //ERROR!
+      return Promise.reject({errorCode: errorCode, text: "Factura no encontrada"})
+    })
+    .then(function () {
+      res.status(200)
+      .sendFile(facturaDir + facturaFileName)
+    }, function (error) {
+      if(error && error.errorCode === 404)
+        res.status(404)
+        .send(error.text)
+      else //unhandled error
+        res.status(500)
+        .send("Error en el servidor al escribir archivo PDF")
 
+    })
 })
 
 
@@ -120,19 +143,14 @@ app.post('/venta/new', function (req, res) {
 
   db.insertarVenta(codigo, cliente, fecha, autorizacion, formaPago, subtotal,
     descuento, iva, total, productos)
-  .then(function () {//OK!
-    const writeFunc = facturaTemplates.biocled(req.body)
-    return new PDFWriter(facturaDir + facturaFileName, writeFunc)
-  }, function (err) {//ERROR!
-    printError('db error: ' + err)
-    res.status(422)
-    .send(err)
-  }).then(function (data) {  //OK!
+  .then(function (data) {  //OK!
     res.status(200)
-    .send(facturaFileName)
+    .send("OK")
+  }, function (error) {//ERROR!
+    res.status(500)
+    res.send(error)
   })
-
-});
+})
 
 const server = app.listen(port, function () {
   //eslint-disable-next-line

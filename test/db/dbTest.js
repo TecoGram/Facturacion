@@ -159,8 +159,8 @@ describe('metodos de dbAdmin.js', function () {
           descuento, iva, total, productos)
         .then(function (res) {
           const lasInsertedId = res[0]
-          //test api ya inserto una unidad, mas estas dos, la nueva debe de ser 3
-          lasInsertedId.should.be.equal(3)
+          //test api ya inserto 2 unidades, mas estas 2, la nueva debe de ser 4
+          lasInsertedId.should.be.equal(4)
           done()
         })
       })
@@ -182,7 +182,7 @@ describe('metodos de dbAdmin.js', function () {
         productos,
       } = ventaInsertada
 
-      db.getFacturaData(codigo, fecha) //datos del test anterior 'insertarVenta'
+      db.getFacturaData(fecha, codigo) //datos del test anterior 'insertarVenta'
       .then (function (ventaRow) {
         ventaRow.formaPago.should.equal('VISA')
         ventaRow.cliente.should.equal(ruc)
@@ -202,21 +202,12 @@ describe('metodos de dbAdmin.js', function () {
     })
 
     it ('rechaza la promesa si no encuentra la factura', function () {
-      db.getFacturaData('0000', '2016-11-03') //inexistente
-      .then( function () {},
+      db.getFacturaData('2016-11-03', '0000') //inexistente
+      .then( function () {throw new Error("Unexpected error")},
         function (errorCode) {
           errorCode.should.equal(404)
         })
     })
-
-    it ('rechaza la promesa si los parametros son invalidos', function () {
-      db.getFacturaData('0000', 'corrupted') //inexistente
-      .then( function () {},
-        function (errorCode) {
-          errorCode.should.equal(505)
-        })
-    })
-
   })
 
 })

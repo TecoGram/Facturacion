@@ -2,6 +2,7 @@
 const api = require('../../src/api.js')
 const server = require('../../backend/server.js')
 const fs = require('fs')
+const request = require('superagent')
 
 const assert = require('assert');
 const chai = require('chai')
@@ -172,40 +173,84 @@ describe('endpoints disponibles para el cliente', function () {
   })
 
 
+  const newVentaRow = {
+    codigo: '9999999',
+    cliente: '1',
+    fecha: '2016-11-26',
+    autorizacion: '',
+    formaPago: 'CONTADO',
+    subtotal: 19.99,
+    descuento: 0,
+    iva: 2.00,
+    total: 22.00,
+    productos: [{
+      producto: 1,
+      lote: 'ert3',
+      fechaExp: '2017-04-04',
+      count: 1,
+      precioVenta: 11,
+    }],
+  }
   describe('/venta/new', function () {
     it('retorna 200 al ingresar datos correctos', function (done) {
-      const ventaRow = {
-        codigo: '9999999',
-        cliente: '1',
-        fecha: '2016-11-26',
-        autorizacion: '',
-        formaPago: 'CONTADO',
-        subtotal: 19.99,
-        descuento: 0,
-        iva: 2.00,
-        total: 22.00,
-        productos: [{
-          producto: 1,
-          lote: 'ert3',
-          fechaExp: '2017-04-04',
-          count: 1,
-          precioVenta: 11,
-        }],
-      }
 
-      api.insertarVenta(ventaRow)
+      api.insertarVenta(newVentaRow)
       .then(function (resp) {
         const statusCode = resp.status
         statusCode.should.equal(200)
-        resp.text.should.equal(ventaRow.codigo + ventaRow.fecha + '.pdf')
-        fs.existsSync(facturaDir + resp.text).should.equal(true)
-        fs.unlinkSync(facturaDir + resp.text)
         done()
       }, function (err) {
         console.error('test fail ' + JSON.stringify(err))
         done(err)
       })
     })
+
+    it('permite ingresar 2 facturas con mismo codigo pero diferente fecha', function (done) {
+      const ventaRowCopy = Object.assign({}, newVentaRow)
+      ventaRowCopy.fecha = '2016-11-27'
+      api.insertarVenta(ventaRowCopy)
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        done()
+      }, function (err) {
+        console.error('test fail ' + JSON.stringify(err))
+        done(err)
+      })
+    })
+
+    it('retorna 500 al ingresar datos duplicados', function (done) {
+      api.insertarVenta(newVentaRow)
+      .then(function (resp) {
+        console.error('test fail ' + JSON.stringify(resp))
+        done(resp)
+      }, function (err) {
+        const statusCode = err.status
+        statusCode.should.equal(500)
+        done()
+      })
+    })
+  })
+
+  describe('/venta/ver/:fecha/:codigo', function () {
+    it('descarga el pdf de una factura existente', function(done) {
+      request.get(`localhost:8192/venta/ver/${newVentaRow.fecha}/${newVentaRow.codigo}`)
+      .end(function (err, res) {
+        res.status.should.equal(200)
+        res.header['content-type'].should.equal('application/pdf')
+        done()
+      })
+    })
+
+    it('retorna 404 si la factura solicitada no existe', function (done) {
+      request.get(`localhost:8192/venta/ver/2016-12-15/000123`)
+      .end(function (err, res) {
+        res.status.should.equal(404)
+        res.text.should.equal('Factura no encontrada')
+        done()
+      })
+    })
+    
   })
 
 })
