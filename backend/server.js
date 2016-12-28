@@ -97,6 +97,10 @@ app.get('/producto/find', function (req,res) {
 
 });
 
+app.get('/venta/ver/:fecha/:codigo', function (req, res) {
+
+})
+
 
 app.post('/venta/new', function (req, res) {
   const {

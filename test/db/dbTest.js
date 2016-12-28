@@ -110,28 +110,53 @@ describe('metodos de dbAdmin.js', function () {
 
   })
 
+  const ventaInsertada = {
+    codigo: '0009993',
+    ruc: '10954236576001',
+    fecha: '2016-11-26',
+    autorizacion: 'fse4',
+    formaPago: 'VISA',
+    subtotal: 21.00,
+    descuento: 3.12,
+    iva: 5.43,
+    total: 38.12,
+    productos: [
+      {
+        producto: 1,
+        fechaExp: '2016-11-26',
+        lote: '545f2',
+        count: 1,
+        precioVenta: 10,
+      },
+      {
+        producto: 2,
+        fechaExp: '2016-11-26',
+        lote: '5453s',
+        count: 2,
+        precioVenta: 7,
+      },
+    ],
+  }
+
   describe('insertarVenta', function() {
+
+    const {
+      codigo,
+      ruc,
+      fecha,
+      autorizacion,
+      formaPago,
+      subtotal,
+      descuento,
+      iva,
+      total,
+      productos,
+    } = ventaInsertada
 
     it('persiste una nueva venta en la base y agrega las unidades vendidas a la base',
       function (done) {
-        const productosVendidos = [
-          {
-            producto: 1,
-            fechaExp: '2016-11-26',
-            lote: '545f2',
-            count: 1,
-            precioVenta: 10,
-          },
-          {
-            producto: 2,
-            fechaExp: '2016-11-26',
-            lote: '5453s',
-            count: 2,
-            precioVenta: 7,
-          },
-        ]
-        db.insertarVenta('gfg5', '10954236576001', '2016-11-26', 'fse4', 'VISA',
-        21.00, 3.12, 5.43, 38.12, productosVendidos)
+        db.insertarVenta(codigo, ruc, fecha, autorizacion, formaPago, subtotal,
+          descuento, iva, total, productos)
         .then(function (res) {
           const lasInsertedId = res[0]
           //test api ya inserto una unidad, mas estas dos, la nueva debe de ser 3
@@ -139,6 +164,59 @@ describe('metodos de dbAdmin.js', function () {
           done()
         })
       })
+  })
+
+  describe('getFacturaData', function () {
+    it('busca en la base de datos la fila de la venta, y los productos vendidos',
+    function (done) {
+      const {
+        codigo,
+        ruc,
+        fecha,
+        autorizacion,
+        formaPago,
+        subtotal,
+        descuento,
+        iva,
+        total,
+        productos,
+      } = ventaInsertada
+
+      db.getFacturaData(codigo, fecha) //datos del test anterior 'insertarVenta'
+      .then (function (ventaRow) {
+        ventaRow.formaPago.should.equal('VISA')
+        ventaRow.cliente.should.equal(ruc)
+        ventaRow.total.should.equal(total)
+        ventaRow.productos.length.should.equal(2)
+
+        const producto1 = ventaRow.productos[0]
+        const producto2 = ventaRow.productos[1]
+
+        producto1.producto.should.equal(1)
+        producto1.precioVenta.should.equal(10)
+        producto2.producto.should.equal(2)
+        producto2.precioVenta.should.equal(7)
+        done()
+      })
+
+    })
+
+    it ('rechaza la promesa si no encuentra la factura', function () {
+      db.getFacturaData('0000', '2016-11-03') //inexistente
+      .then( function () {},
+        function (errorCode) {
+          errorCode.should.equal(404)
+        })
+    })
+
+    it ('rechaza la promesa si los parametros son invalidos', function () {
+      db.getFacturaData('0000', 'corrupted') //inexistente
+      .then( function () {},
+        function (errorCode) {
+          errorCode.should.equal(505)
+        })
+    })
+
   })
 
 })

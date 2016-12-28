@@ -24,6 +24,17 @@ const insertarVenta = (builder, codigo, cliente, fecha, autorizacion, formaPago,
 const insertarNuevasUnidades = (builder, listaDeUnidades) => {
   return builder.table('unidades').insert(listaDeUnidades)
 }
+const getVenta = (codigo, fecha) => {
+  return knex.select('*')
+  .from('ventas')
+  .where({codigo: codigo, fecha: fecha})
+}
+
+const getUnidadesVenta = (ventaKey) => {
+  return knex.select('*')
+  .from('unidades')
+  .where({venta: ventaKey})
+}
 
 module.exports = {
   close: () => { knex.destroy() },
@@ -84,4 +95,24 @@ module.exports = {
     })
   },
 
+  getFacturaData: (codigo, fecha) => {
+    let ventaRow;
+    return getVenta(codigo, fecha)
+    .then((ventas) => {
+      if (ventas.length > 0) {
+        ventaRow = ventas[0]
+        return getUnidadesVenta(ventaRow.rowid)
+      } else {
+        return Promise.reject(404)
+      }
+    }, (err) => {
+      return Promise.reject(500)
+    })
+    .then ((productos) => {
+      ventaRow.productos = productos
+      return Promise.resolve(ventaRow)
+    }, (errorCode) => {
+      return Promise.reject(errorCode)
+    })
+  },
 }
