@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 
 import Add from 'material-ui/svg-icons/content/add';
 import {Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui';
-import {Tabs, Tab} from 'material-ui/Tabs';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
@@ -21,7 +20,6 @@ import ActionCreators from '../ActionCreators'
 import CustomStyle from '../CustomStyle'
 import NuevoClienteDialog from '../custom/nuevoCliente/NuevoClienteDialog'
 import NuevoProductoDialog from '../custom/NuevoProducto/NuevoProductoDialog'
-import MyTabTemplate from './tabs/MyTabTemplate'
 import store from '../Store'
 
 const toolbarTextColor = '#FFFFFF'
@@ -119,33 +117,19 @@ class Main extends Component {
   };
 
   render() {
-    const toolbarHeight = CustomStyle.muiTheme.toolbar.height
-
     const {
       cambiarDialog,
       cerrarDialogConMsg,
       dialog,
-      leftChild,
-      leftTabName,
       message,
-      rightChild,
-      rightTabName,
+      selectedPage,
       title,
     } = this.props
 
     return (
-      <div style={{height: 'inherit'}}>
+      <div style={{backgroundColor: '#ededed', height: 'inherit'}}>
         <MainToolbar title={title} cambiarDialog={cambiarDialog} />
-        <Tabs style={{backgroundColor: '#ededed', height: `calc(100% - ${toolbarHeight}px)`}}
-        value={this.state.value} onChange={this.handleChange}
-        tabTemplate={MyTabTemplate} contentContainerStyle={{height: `inherit`}}>
-          <Tab label={leftTabName} value={0} labelWidth={300}>
-            {leftChild}
-          </Tab>
-          <Tab label={rightTabName} value={1} labelWidth={300}>
-            {rightChild}
-          </Tab>
-        </Tabs>
+        {selectedPage}
         <MainDialog type={dialog} cambiarDialog={cambiarDialog}
           cerrarDialogConMsg={cerrarDialogConMsg}/>
         <Snackbar open={Boolean(message)} message={message || ''}
@@ -167,10 +151,7 @@ export default class MainNavigationView extends Component {
 
   render() {
     const {
-      leftChild,
-      leftTabName,
-      rightChild,
-      rightTabName,
+      selectedPage,
       title,
     } = this.props
 
@@ -180,8 +161,7 @@ export default class MainNavigationView extends Component {
       <MuiThemeProvider muiTheme={CustomStyle.muiTheme}>
         <Provider store={store} >
           <MainComponent
-            title={title} leftTabName={leftTabName} leftChild={leftChild}
-            rightChild={rightChild} rightTabName={rightTabName} />
+            title={title} selectedPage={selectedPage} />
         </Provider>
       </MuiThemeProvider>
     );

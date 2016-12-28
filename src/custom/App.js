@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import MainNavigationView from '../lib/MainNavigationView'
 import FacturarView from './FacturarView'
-import ProductosView from './ProductosView'
 
 class App extends Component {
   render() {
     return (
-        <MainNavigationView leftChild={<FacturarView />} rightChild={<ProductosView />}
-          title={"TecoGram S.A."} leftTabName={"Facturación"} rightTabName={"Inventario"}/>
+        <MainNavigationView selectedPage={<FacturarView />} title={"TecoGram S.A."}/>
       );
   }
 }

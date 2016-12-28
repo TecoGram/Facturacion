@@ -96,7 +96,6 @@ export default class FacturarView extends Component {
     const ventaRow = crearVentaRow(cliente, facturaData, productos)
     const {
       errors,
-      inputs,
     } = validarVentaRow(ventaRow)
     if(errors)
       this.setState({errors: errors})
