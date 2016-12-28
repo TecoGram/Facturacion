@@ -104,20 +104,20 @@ const valorPalabras = (valor) => {
 
 }
 
-const createPDFDir = (dirname) => {
-  const facturaDir = __dirname + '/' + dirname
+const createTemporaryDir = (dirname) => {
+  const tempDir = '/tmp/' + dirname
   try {
-    fs.mkdirSync(facturaDir)
+    fs.mkdirSync(tempDir)
   } catch (err) {
     if (err.code !== 'EEXIST')
       throw err
   }
-  return facturaDir
+  return tempDir
 }
 
 
 module.exports = {
   billetesPalabras: billetesPalabras,
   valorPalabras: valorPalabras,
-  createPDFDir: createPDFDir,
+  createTemporaryDir: createTemporaryDir,
 }

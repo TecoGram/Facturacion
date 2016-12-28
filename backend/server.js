@@ -10,7 +10,7 @@ const db = require('./dbAdmin.js')
 
 const port = process.env.PORT || 8192
 //crear directorio donde almacenar facturas en pdf.
-const facturaDir = pdfutils.createPDFDir('facturas/')
+const facturaDir = pdfutils.createTemporaryDir('facturas/')
 
 
 

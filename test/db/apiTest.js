@@ -9,7 +9,7 @@ const chai = require('chai')
   , should = chai.should();
 
 const unexpectedError = Error('Ocurrio algo inesperado');
-const facturaDir = './backend/pdf/facturas/'
+const facturaDir = '/tmp/facturas/'
 
 if(process.env.NODE_ENV !== 'test') {
   //Por el amor de dios solo ejecutar esto en ambiente de prueba
@@ -20,7 +20,7 @@ if(process.env.NODE_ENV !== 'test') {
 }
 
 describe('server.js', function () {
-  it ('crea el directorio backend/pdf/facturas/ durante startup', function () {
+  it ('crea el directorio /tmp/facturas/ durante startup', function () {
     //se asume que el test se ejecuta en la raiz del proyecto
     fs.existsSync(facturaDir).should.equal(true)
   })
