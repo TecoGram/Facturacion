@@ -1,12 +1,15 @@
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 
 import Add from 'material-ui/svg-icons/content/add';
+import Drawer from 'material-ui/Drawer';
 import {Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import Snackbar from 'material-ui/Snackbar';
+import NavigationMenu from 'material-ui/svg-icons/navigation/menu';
+
 
 import { bindActionCreators } from 'redux';
 import { connect, Provider } from 'react-redux'
@@ -39,25 +42,93 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(ActionCreators, dispatch);
 }
 
-class MainToolbar extends Component {
+
+class MainDrawer extends Component {
+
+  onItemClicked = () => {
+    this.props.handleChange(false)
+  }
 
   render() {
+    return (
+      <Drawer
+          docked={false}
+          width={200}
+          open={this.props.open}
+          onRequestChange={this.props.handleChange}
+        >
+          <MenuItem onTouchTap={this.onItemClicked}>Menu Item</MenuItem>
+          <MenuItem onTouchTap={this.onItemClicked}>Menu Item 2</MenuItem>
+        </Drawer>
+    )
+  }
+}
+
+class MainToolbar extends Component {
+
+  getIconStyles(props, context) {
+    const {
+      appBar,
+      toolbar,
+      button: {
+        iconButtonSize,
+      },
+    } = context.muiTheme;
+    console.log(toolbar.height)
+
+    const flatButtonSize = 36;
+
+    const styles = {
+      iconButtonStyle: {
+        marginTop: (toolbar.height - iconButtonSize) / 2,
+        marginRight: 8,
+        marginLeft: -16,
+      },
+      iconButtonIconStyle: {
+        fill: appBar.textColor,
+        color: appBar.textColor,
+      },
+      flatButton: {
+        color: appBar.textColor,
+        marginTop: (iconButtonSize - flatButtonSize) / 2 + 1,
+      },
+    };
+
+    return styles;
+  }
+
+  static contextTypes = {
+    muiTheme: PropTypes.object.isRequired,
+  };
+
+  render() {
+
+    const {
+      iconButtonStyle,
+      iconButtonIconStyle,
+    } = this.getIconStyles(this.props, this.context)
+
     const {
       cambiarDialog,
+      onLeftButtonClicked,
     } = this.props
 
     return (
       <Toolbar style={{backgroundColor: CustomStyle.muiTheme.palette.primary1Color}}>
 
         <ToolbarGroup>
+          <IconButton style={iconButtonStyle} iconStyle={iconButtonIconStyle}
+            onTouchTap={onLeftButtonClicked}>
+            <NavigationMenu />
+          </IconButton>
           <ToolbarTitle text={this.props.title}
           style={toolbarTitleStyle}/>
         </ToolbarGroup>
 
         <ToolbarGroup>
           <IconMenu iconButtonElement={
-            <IconButton touch={true}>
-              <Add color={toolbarTextColor}/>
+            <IconButton touch={true} style={iconButtonStyle} iconStyle={iconButtonIconStyle}>
+              <Add />
             </IconButton> }
             targetOrigin={{horizontal: 'right', vertical: 'top'}}
             anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}>
@@ -106,13 +177,13 @@ class Main extends Component {
   constructor(props, context) {
     super(props);
     this.state = {
-      value: 0,
+      drawerOpen: false,
     };
   }
 
-  handleChange = (value) => {
+  handleDrawerChange = (value) => {
     this.setState({
-      value: value,
+      drawerOpen: value,
     });
   };
 
@@ -128,8 +199,10 @@ class Main extends Component {
 
     return (
       <div style={{backgroundColor: '#ededed', height: 'inherit'}}>
-        <MainToolbar title={title} cambiarDialog={cambiarDialog} />
+        <MainToolbar title={title} cambiarDialog={cambiarDialog}
+        onLeftButtonClicked={() => this.handleDrawerChange(true)}/>
         {selectedPage}
+        <MainDrawer open={this.state.drawerOpen} handleChange={this.handleDrawerChange} />
         <MainDialog type={dialog} cambiarDialog={cambiarDialog}
           cerrarDialogConMsg={cerrarDialogConMsg}/>
         <Snackbar open={Boolean(message)} message={message || ''}

@@ -3,6 +3,9 @@ import {blue500, blue100, blue700, blue800} from 'material-ui/styles/colors';
 
 
 const myTheme = getMuiTheme({
+  appBar: {
+    textColor: '#FFFFFF',
+  },
   palette: {
     primary1Color: blue500,
   },
