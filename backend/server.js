@@ -105,24 +105,26 @@ app.get('/venta/ver/:fecha/:codigo', function (req, res) {
   } = req.params
   const facturaFileName = codigo + fecha + '.pdf'
   db.getFacturaData(fecha, codigo)
-    .then(function (ventaRow) {//OK!!
-      const writeFunc = facturaTemplates.biocled(ventaRow)
+    .then(function (resp) {//OK!!
+      const {
+        ventaRow,
+        cliente,
+      } = resp
+
+      const writeFunc = facturaTemplates.biocled(ventaRow, cliente)
       return new PDFWriter(facturaDir + facturaFileName, writeFunc)
-    }, function (errorCode) { //ERROR!
-      return Promise.reject({errorCode: errorCode, text: "Factura no encontrada"})
+    }, function (error) { //ERROR!
+      return Promise.reject(error)
     })
     .then(function () {
       fs.readFile(facturaDir + facturaFileName, function (err, data) {
+        JSON.stringify(err)
         res.contentType("application/pdf")
         res.send(data)
       })
     }, function (error) {
-      if(error && error.errorCode === 404)
-        res.status(404)
-        .send(error.text)
-      else //unhandled error
-        res.status(500)
-        .send("Error en el servidor al escribir archivo PDF")
+      res.status(error.errorCode)
+      .send(error.text)
 
     })
 })

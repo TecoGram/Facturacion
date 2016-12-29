@@ -27,17 +27,24 @@ describe('server.js', function () {
   })
 })
 
+const cliente1 = {
+  ruc: '0937816882001',
+  nombre: 'Dr. Julio Mendoza',
+  direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
+  correo: 'julio_mendoza@yahoo.com.ec',
+  telefono1: '2645422', telefono2: '2876357',
+}
+
 describe('endpoints disponibles para el cliente', function () {
 
   describe('/cliente/new', function () {
-    const mi_ruc = '0937816882001'
     it('retorna 200 al ingresar datos correctos', function (done) {
       api.insertarCliente(
-        mi_ruc,
-        'Dr. Julio Mendoza',
-        'Avenida Juan Tanca Marengo y Gomez Gould',
-        'julio_mendoza@yahoo.com.ec',
-        '2645422', '2876357')
+        cliente1.ruc,
+        cliente1.nombre,
+        cliente1.direccion,
+        cliente1.correo,
+        cliente1.telefono1, cliente1.telefono2)
       .then(function (resp) {
         const statusCode = resp.status
         statusCode.should.equal(200)
@@ -50,7 +57,7 @@ describe('endpoints disponibles para el cliente', function () {
 
     it('retorna 500 al ingresar cliente con un ruc ya existente', function (done) {
       api.insertarCliente(
-        mi_ruc,
+        cliente1.ruc,
         'Eduardo Villacreses',
         'Via a Samborondon km. 7.5 Urbanizacion Tornasol mz. 5 villa 20',
         'edu_vc@outlook.com',
@@ -175,7 +182,7 @@ describe('endpoints disponibles para el cliente', function () {
 
   const newVentaRow = {
     codigo: '9999999',
-    cliente: '1',
+    cliente: cliente1.ruc,
     fecha: '2016-11-26',
     autorizacion: '',
     formaPago: 'CONTADO',
@@ -246,11 +253,11 @@ describe('endpoints disponibles para el cliente', function () {
       request.get(`localhost:8192/venta/ver/2016-12-15/000123`)
       .end(function (err, res) {
         res.status.should.equal(404)
-        res.text.should.equal('Factura no encontrada')
+        res.text.should.equal('factura no encontrada')
         done()
       })
     })
-    
+
   })
 
 })

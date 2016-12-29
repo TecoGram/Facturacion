@@ -65,16 +65,26 @@ describe('metodos de dbAdmin.js', function () {
 
   })
 
+  const cliente1 = {
+    ruc: "0954236576001",
+    nombre: "Dr. Juan Perez",
+    email: "jperez@gmail.com",
+    direccion:  "Av. Pedro Carbo y Sucre 512",
+    telefono1: "2645987",
+    telefono2: "2978504",
+  }
+
   describe('insertarCliente', function() {
 
+
     it('persiste varios clientes en la base encadenando con promise', function (done) {
-      db.insertarCliente("0954236576001", "Dr. Juan Perez", "jperez@gmail.com",
-      "Av. Pedro Carbo y Sucre 512", "2645987", "2978504")
+      db.insertarCliente(cliente1.ruc, cliente1.nombre, cliente1.direccion,
+        cliente1.email, cliente1.telefono1, cliente1.telefono2)
       .then(function (ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')
         return db.insertarCliente("0934233576001", "Carlos Sanchez",
-        "carlos-sanchez84@live.com", "Av. Brasil y la del ejercito", "2353477", "2375980")
+        "Av. Brasil y la del ejercito", "carlos-sanchez84@live.com", "2353477", "2375980")
       }).then(function(ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')
@@ -112,7 +122,7 @@ describe('metodos de dbAdmin.js', function () {
 
   const ventaInsertada = {
     codigo: '0009993',
-    ruc: '10954236576001',
+    ruc: cliente1.ruc,
     fecha: '2016-11-26',
     autorizacion: 'fse4',
     formaPago: 'VISA',
@@ -183,29 +193,42 @@ describe('metodos de dbAdmin.js', function () {
       } = ventaInsertada
 
       db.getFacturaData(fecha, codigo) //datos del test anterior 'insertarVenta'
-      .then (function (ventaRow) {
+      .then (function (resp) {
+        const {
+          ventaRow,
+          cliente,
+        } = resp
+
         ventaRow.formaPago.should.equal('VISA')
         ventaRow.cliente.should.equal(ruc)
         ventaRow.total.should.equal(total)
         ventaRow.productos.length.should.equal(2)
 
+        cliente.nombre.should.equal(cliente1.nombre)
+        cliente.direccion.should.equal(cliente1.direccion)
+        cliente.telefono1.should.equal(cliente1.telefono1)
+
         const producto1 = ventaRow.productos[0]
         const producto2 = ventaRow.productos[1]
 
-        producto1.producto.should.equal(1)
         producto1.precioVenta.should.equal(10)
-        producto2.producto.should.equal(2)
+        producto1.count.should.equal(1)
+        producto1.fechaExp.should.equal('2016-11-26')
         producto2.precioVenta.should.equal(7)
+        producto2.count.should.equal(2)
+        producto2.fechaExp.should.equal('2016-11-26')
         done()
       })
 
     })
 
-    it ('rechaza la promesa si no encuentra la factura', function () {
+    it ('rechaza la promesa si no encuentra la factura', function (done) {
       db.getFacturaData('2016-11-03', '0000') //inexistente
       .then( function () {throw new Error("Unexpected error")},
-        function (errorCode) {
-          errorCode.should.equal(404)
+        function (error) {
+          error.errorCode.should.equal(404)
+          error.text.should.equal("factura no encontrada")
+          done()
         })
     })
   })

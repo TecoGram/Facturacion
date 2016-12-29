@@ -1,20 +1,23 @@
 const valorPalabras =require('../pdf/pdfutils.js').valorPalabras
 module.exports = {
-  biocled: (ventaRow) => {
+  biocled: (ventaRow, cliente) => {
     const writeFunc = (doc) => {
 
       const {
         fecha,
-        nombre,
-        direccion,
-        telefono,
-        cliente,
         iva,
         subtotal,
         total,
         descuento,
         productos,
       } = ventaRow
+
+      const {
+        nombre,
+        telefono1,
+        direccion,
+        ruc,
+      } = cliente
 
       const topTableStart = {x: 115, y: 185}
 
@@ -27,8 +30,8 @@ module.exports = {
 
       const RUCPhoneLinePos = doc.y + spaceBetweenLines
 
-      doc.text(telefono, doc.x, RUCPhoneLinePos, {width:100})
-      doc.text(cliente, doc.x + RUCLeftMargin, RUCPhoneLinePos, {width: 120})
+      doc.text(telefono1, doc.x, RUCPhoneLinePos, {width:100})
+      doc.text(ruc, doc.x + RUCLeftMargin, RUCPhoneLinePos, {width: 120})
 
       const productTableLeftMargin = 65
       const productTableTopMargin = 50
@@ -44,12 +47,13 @@ module.exports = {
 
       for (let i = 0; i < productos.length; i++) {
         const product = productos[i]
-        doc.text(product.i, productTableLeftMargin, linePos, {align: 'right', width: 10})
+        doc.text(i + 1, productTableLeftMargin, linePos, {align: 'right', width: 10})
         doc.text(product.count, countColPosition, linePos, {align: 'right', width: 15})
         doc.text(product.nombre, nameColPosition, linePos, {width: productNameWidth})
         const nextLinePos = doc.y
         doc.text(product.precioVenta, precioColPosition, linePos, {align: 'right', width: 40})
-        doc.text(product.precioTotal, valoresColPosition, linePos, {align: 'right', width: 50})
+        const precioTotal = Number(product.count * product.precioVenta).toFixed(2)
+        doc.text(precioTotal, valoresColPosition, linePos, {align: 'right', width: 50})
         linePos = nextLinePos + spaceBetweenLines
       }
 

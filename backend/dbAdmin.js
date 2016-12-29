@@ -3,8 +3,8 @@ const knex = require('./db.js')
 const colocarVentaID = (unidades, fecha, codigo) => {
   const len = unidades.length
   for (let i = 0; i < len; i++) {
-    unidades[i].codigo = codigo
-    unidades[i].fecha = fecha
+    unidades[i].codigoVenta = codigo
+    unidades[i].fechaVenta = fecha
   }
 }
 
@@ -32,10 +32,19 @@ const getVenta = (fecha, codigo) => {
   .where({fecha: fecha, codigo: codigo})
 }
 
-const getUnidadesVenta = (fecha, codigo) => {
+const getCliente = (ruc) => {
   return knex.select('*')
+  .from('clientes')
+  .where('ruc', ruc)
+}
+
+const getUnidadesVenta = (fecha, codigo) => {
+  const q = knex.select('productos.nombre', 'unidades.count',
+  'unidades.precioVenta', 'unidades.lote', 'unidades.fechaExp')
   .from('unidades')
-  .where({fecha: fecha, codigo})
+  .join('productos', {'unidades.producto' : 'productos.rowid' })
+  .where({fechaVenta: fecha, codigoVenta: codigo})
+  return q
 }
 
 module.exports = {
@@ -100,23 +109,38 @@ module.exports = {
   },
 
   getFacturaData: (fecha, codigo) => {
-    let ventaRow;
+    let ventaRow, cliente;
     return getVenta(fecha, codigo)
     .then((ventas) => {
       if (ventas.length > 0) {
         ventaRow = ventas[0]
+        return getCliente(ventaRow.cliente)
+      } else {
+        return Promise.reject({errorCode: 404, text:"factura no encontrada"})
+      }
+    }, () => {
+      return Promise.reject({errorCode: 500,
+        text: "error de base de datos al buscar factura"})
+    })
+    .then((clientes) => {
+      if (clientes.length > 0) {
+        cliente = clientes[0]
         return getUnidadesVenta(fecha, codigo)
       } else {
-        return Promise.reject(404)
+        return Promise.reject({errorCode: 404, text: "cliente no encontrado"})
       }
-    }, (err) => {
-      return Promise.reject(500)
+    }, (error) => {
+      if(error)
+        return Promise.reject(error)
+      else
+        return Promise.reject({errorCode: 500,
+          text: "error de base de datos al buscar cliente"})
     })
     .then ((productos) => {
       ventaRow.productos = productos
-      return Promise.resolve(ventaRow)
-    }, (errorCode) => {
-      return Promise.reject(errorCode)
+      return Promise.resolve({ventaRow: ventaRow, cliente: cliente})
+    }, (error) => {
+      return Promise.reject(error)
     })
   },
 }
