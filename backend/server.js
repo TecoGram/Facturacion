@@ -5,6 +5,7 @@ const PDFWriter = require('./pdf/PDFWriter.js')
 const pdfutils = require('./pdf/pdfutils.js')
 const facturaTemplates = require('./pdf/templates.js')
 const fs = require('fs')
+const util = require('util')
 
 const db = require('./dbAdmin.js')
 
@@ -111,8 +112,10 @@ app.get('/venta/ver/:fecha/:codigo', function (req, res) {
       return Promise.reject({errorCode: errorCode, text: "Factura no encontrada"})
     })
     .then(function () {
-      res.status(200)
-      .sendFile(facturaDir + facturaFileName)
+      fs.readFile(facturaDir + facturaFileName, function (err, data) {
+        res.contentType("application/pdf")
+        res.send(data)
+      })
     }, function (error) {
       if(error && error.errorCode === 404)
         res.status(404)

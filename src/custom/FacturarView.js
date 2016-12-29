@@ -101,7 +101,10 @@ export default class FacturarView extends Component {
       this.setState({errors: errors})
     else {
       insertarVenta(ventaRow)
-      .then((resp) => this.setState(this.getDefaultState()),
+      .then((resp) => {
+        this.setState(this.getDefaultState())
+        window.open(`http://localhost:8192/venta/ver/${ventaRow.fecha}/${ventaRow.codigo}`)
+      },
         (err) => console.log(err))
     }
   }

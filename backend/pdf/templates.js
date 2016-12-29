@@ -8,7 +8,7 @@ module.exports = {
         nombre,
         direccion,
         telefono,
-        RUC,
+        cliente,
         iva,
         subtotal,
         total,
@@ -28,7 +28,7 @@ module.exports = {
       const RUCPhoneLinePos = doc.y + spaceBetweenLines
 
       doc.text(telefono, doc.x, RUCPhoneLinePos, {width:100})
-      doc.text(RUC, doc.x + RUCLeftMargin, RUCPhoneLinePos, {width: 120})
+      doc.text(cliente, doc.x + RUCLeftMargin, RUCPhoneLinePos, {width: 120})
 
       const productTableLeftMargin = 65
       const productTableTopMargin = 50
