@@ -103,7 +103,9 @@ export default class FacturarView extends Component {
       insertarVenta(ventaRow)
       .then((resp) => {
         this.setState(this.getDefaultState())
-        window.open(`http://localhost:8192/venta/ver/${ventaRow.fecha}/${ventaRow.codigo}`)
+        const pdfLink = `http://localhost:8192/venta/ver/${ventaRow.fecha}/${ventaRow.codigo}`
+        window.open(pdfLink)
+        this.props.abrirLinkConSnackbar('La factura se generó exitosamente.', pdfLink)
       },
         (err) => console.log(err))
     }

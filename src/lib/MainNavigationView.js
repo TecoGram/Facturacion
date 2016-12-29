@@ -21,6 +21,7 @@ import { NUEVO_CLIENTE_DIALOG,
 
 import ActionCreators from '../ActionCreators'
 import CustomStyle from '../CustomStyle'
+import FacturaView from '../custom/FacturarView'
 import NuevoClienteDialog from '../custom/nuevoCliente/NuevoClienteDialog'
 import NuevoProductoDialog from '../custom/NuevoProducto/NuevoProductoDialog'
 import store from '../Store'
@@ -34,7 +35,7 @@ const toolbarTitleStyle = {
 function mapStateToProps(state) {
   return {
     dialog: state.dialog,
-    message: state.message,
+    snackbar: state.snackbar,
   }
 }
 
@@ -60,6 +61,29 @@ class MainDrawer extends Component {
           <MenuItem onTouchTap={this.onItemClicked}>Menu Item</MenuItem>
           <MenuItem onTouchTap={this.onItemClicked}>Menu Item 2</MenuItem>
         </Drawer>
+    )
+  }
+}
+
+class MainSnackbar extends Component {
+  render() {
+    const data = this.props.data
+    let action, message, open, onActionTouchTap
+    if (data) {
+      open = true
+      message = data.message
+      if (data.link) {
+        action = "ABRIR"
+        onActionTouchTap = (ev) => window.open(data.link)
+      }
+    } else {
+      open = false
+      message = ''
+    }
+
+    return (
+      <Snackbar open={open} message={message} action={action}
+      onActionTouchTap={onActionTouchTap} autoHideDuration={12000}/>
     )
   }
 }
@@ -189,11 +213,11 @@ class Main extends Component {
 
   render() {
     const {
+      abrirLinkConSnackbar,
       cambiarDialog,
       cerrarDialogConMsg,
       dialog,
-      message,
-      selectedPage,
+      snackbar,
       title,
     } = this.props
 
@@ -201,12 +225,11 @@ class Main extends Component {
       <div style={{backgroundColor: '#ededed', height: 'inherit'}}>
         <MainToolbar title={title} cambiarDialog={cambiarDialog}
         onLeftButtonClicked={() => this.handleDrawerChange(true)}/>
-        {selectedPage}
+        <FacturaView abrirLinkConSnackbar={abrirLinkConSnackbar}/>
         <MainDrawer open={this.state.drawerOpen} handleChange={this.handleDrawerChange} />
         <MainDialog type={dialog} cambiarDialog={cambiarDialog}
           cerrarDialogConMsg={cerrarDialogConMsg}/>
-        <Snackbar open={Boolean(message)} message={message || ''}
-          autoHideDuration={5000}/>
+        <MainSnackbar data={snackbar}/>
       </div>
     )
   }
@@ -224,7 +247,6 @@ export default class MainNavigationView extends Component {
 
   render() {
     const {
-      selectedPage,
       title,
     } = this.props
 
@@ -233,8 +255,7 @@ export default class MainNavigationView extends Component {
     return (
       <MuiThemeProvider muiTheme={CustomStyle.muiTheme}>
         <Provider store={store} >
-          <MainComponent
-            title={title} selectedPage={selectedPage} />
+          <MainComponent title={title} />
         </Provider>
       </MuiThemeProvider>
     );

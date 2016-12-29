@@ -1,6 +1,7 @@
 import { NUEVO_CLIENTE_DIALOG, NUEVO_PRODUCTO_DIALOG,
   NUEVO_CLIENTE_DIALOG_CLOSED, NUEVO_PRODUCTO_DIALOG_CLOSED } from './DialogTypes'
-import { CAMBIAR_DIALOG_ACTION, CERRAR_DIALOG_CON_MSG_ACTION } from './ActionTypes'
+import { CAMBIAR_DIALOG_ACTION, CERRAR_DIALOG_CON_MSG_ACTION,
+  ABRIR_LINK_CON_SNACKBAR } from './ActionTypes'
 
 module.exports = {
   cambiarDialog(tipoDialog) {
@@ -29,6 +30,7 @@ module.exports = {
         throw new Error("Tipo de dialog desconocido: " + tipoDialog)
     }
   },
+  
   cerrarDialogConMsg(msg, dialogType) {
     if(dialogType !== NUEVO_PRODUCTO_DIALOG_CLOSED
       && dialogType !== NUEVO_CLIENTE_DIALOG_CLOSED)
@@ -37,6 +39,14 @@ module.exports = {
       type: CERRAR_DIALOG_CON_MSG_ACTION,
       dialog: dialogType,
       message: msg,
+    }
+  },
+
+  abrirLinkConSnackbar(msg, link) {
+    return {
+      type: ABRIR_LINK_CON_SNACKBAR,
+      message: msg,
+      link: link,
     }
   },
 }

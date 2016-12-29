@@ -1,4 +1,4 @@
 module.exports = {
   dialog : null,
-  message: null,
+  snackbar: null,
 }
