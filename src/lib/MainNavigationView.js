@@ -24,6 +24,7 @@ import CustomStyle from '../CustomStyle'
 import FacturaView from '../custom/FacturarView'
 import NuevoClienteDialog from '../custom/nuevoCliente/NuevoClienteDialog'
 import NuevoProductoDialog from '../custom/NuevoProducto/NuevoProductoDialog'
+import FacturasListView from '../custom/FacturasListView'
 import store from '../Store'
 
 const toolbarTextColor = '#FFFFFF'
@@ -98,7 +99,6 @@ class MainToolbar extends Component {
         iconButtonSize,
       },
     } = context.muiTheme;
-    console.log(toolbar.height)
 
     const flatButtonSize = 36;
 
@@ -225,7 +225,7 @@ class Main extends Component {
       <div style={{backgroundColor: '#ededed', height: 'inherit'}}>
         <MainToolbar title={title} cambiarDialog={cambiarDialog}
         onLeftButtonClicked={() => this.handleDrawerChange(true)}/>
-        <FacturaView abrirLinkConSnackbar={abrirLinkConSnackbar}/>
+        <FacturasListView abrirLinkConSnackbar={abrirLinkConSnackbar} />
         <MainDrawer open={this.state.drawerOpen} handleChange={this.handleDrawerChange} />
         <MainDialog type={dialog} cambiarDialog={cambiarDialog}
           cerrarDialogConMsg={cerrarDialogConMsg}/>
