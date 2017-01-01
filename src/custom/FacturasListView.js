@@ -33,7 +33,7 @@ export default class FacturasListView extends React.Component {
       },
     ]
     return (
-      <MaterialTable columns={columns} keys={keys} rows={rows}
+      <MaterialTable columns={columns} keys={keys} rows={rows} searchHint='Buscar facturas...'
         onEditItem={() => {}} onDeleteItem={() => {}} enableCheckbox={false}/>
     )
   }

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {grey700} from 'material-ui/styles/colors';
+
+const black54p = '#757575'
 
 export default class IconBox extends Component {
   render() {
@@ -12,7 +13,7 @@ export default class IconBox extends Component {
       transform: 'translate(-50%, -50%)',
     }
 
-    const iconObject = new this.props.icon({color: grey700, style: iconStyle})
+    const iconObject = new this.props.icon({color: black54p, style: iconStyle})
 
     const containerStyle = {
       display: 'inline',

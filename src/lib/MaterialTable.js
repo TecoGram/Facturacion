@@ -1,10 +1,12 @@
 import React from 'react';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow,
   TableRowColumn} from 'material-ui/Table';
-import PaperContainer from './PaperContainer.js'
+import PaperContainer from './PaperContainer'
+import IconTextFieldRow from './formTable/IconTextFieldRow'
 import IconButton from 'material-ui/IconButton';
 import ModeEdit from 'material-ui/svg-icons/editor/mode-edit';
 import Clear from 'material-ui/svg-icons/content/clear';
+import Search from 'material-ui/svg-icons/action/search';
 
 const black54p = '#757575'
 
@@ -42,6 +44,32 @@ const ButtonsColumn = (index, onEditItem, onDeleteItem) => {
   return buttons
 }
 
+const SearchBox = (hint, requestFunc) => {
+  const inlineStyle = {
+    display: 'inline-block',
+  }
+
+  const input = {
+    icon: Search,
+    hintText: hint,
+    onChange: requestFunc,
+  }
+
+  const tableStyle = {
+    width: 'auto',
+    marginLeft: 'auto',
+    marginRight: '0px',
+  }
+
+  return (
+    <table style={tableStyle}>
+      <tbody >
+        <IconTextFieldRow leftInput={input} inverted={true}/>
+      </tbody>
+    </table>
+  )
+}
+
 export default class MaterialTable extends React.Component {
 
   render() {
@@ -54,6 +82,7 @@ export default class MaterialTable extends React.Component {
       onEditItem,
       onDeleteItem,
       rows,
+      searchHint,
     } = this.props
 
     if (onEditItem || onDeleteItem)
@@ -62,6 +91,7 @@ export default class MaterialTable extends React.Component {
     return (
       <div style={{height:'100%', overflow:'auto'}} >
         <PaperContainer padding={'15px'}>
+          { SearchBox(searchHint) }
           <Table selectable={enableCheckbox}>
              <TableHeader displaySelectAll={enableCheckbox}
                adjustForCheckbox={enableCheckbox}>

@@ -3,6 +3,7 @@ import TextField from 'material-ui/TextField';
 import IconBox from '../IconBox'
 
 const secondColStyle = { paddingLeft: '30px' }
+const secondInvColStyle = { paddingRight: '15px' }
 
 export default class IconTextFieldRow extends React.Component {
   render() {
@@ -10,30 +11,41 @@ export default class IconTextFieldRow extends React.Component {
     const {
       leftInput,
       rightInput,
+      inverted,
     } = this.props
 
-    const firstColumn = leftInput &&
+    const firstIconColumn = leftInput &&
       <td><IconBox icon={leftInput.icon}/></td>
-    const secondColumn = leftInput &&
-      <td>
+    const firstTextColumn = leftInput &&
+      <td style={inverted ? secondInvColStyle : undefined}>
         <TextField hintText={leftInput.hintText} onChange={leftInput.onChange}
           errorText={leftInput.errorText} value={leftInput.value}/>
       </td>
-    const thirdColumn = rightInput &&
-      <td style={secondColStyle}><IconBox icon={rightInput.icon}/></td>
-    const fourthColumn = rightInput &&
+    const secondIconColumn = rightInput &&
+      <td style={inverted ? undefined : secondColStyle}><IconBox icon={rightInput.icon}/></td>
+    const secondTextColumn = rightInput &&
       <td>
         <TextField hintText={rightInput.hintText} onChange={rightInput.onChange}
           errorText={rightInput.errorText} value={rightInput.value}/>
       </td>
 
-    return (
-      <tr>
-        { firstColumn }
-        { secondColumn }
-        { thirdColumn }
-        { fourthColumn }
-      </tr>
-    )
+    if (inverted)
+      return (
+        <tr>
+          { firstTextColumn }
+          { firstIconColumn }
+          { secondTextColumn }
+          { secondIconColumn }
+        </tr>
+      )
+    else
+      return (
+        <tr>
+          { firstIconColumn }
+          { firstTextColumn }
+          { secondIconColumn }
+          { secondTextColumn }
+        </tr>
+      )
   }
 }
