@@ -39,7 +39,7 @@ knex.schema.hasTable('productos')
     return knex.schema.createTable('ventas', (table) => {
       console.log('create ventas')
       table.string('codigo')
-      table.string('cliente').unsigned()
+      table.string('cliente')
       table.date('fecha').index()
       table.string('autorizacion')
       table.string('formaPago')

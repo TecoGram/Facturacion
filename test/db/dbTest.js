@@ -123,7 +123,7 @@ describe('metodos de dbAdmin.js', function () {
   const ventaInsertada = {
     codigo: '0009993',
     ruc: cliente1.ruc,
-    fecha: '2016-11-26',
+    fecha: '2017-01-01',
     autorizacion: 'fse4',
     formaPago: 'VISA',
     subtotal: 21.00,
@@ -174,6 +174,46 @@ describe('metodos de dbAdmin.js', function () {
           done()
         })
       })
+  })
+
+  describe('findVentas', function () {
+    it ('devuelve las ultimas ventas si se le pasa un string vacio', function (done) {
+      db.findVentas('')
+        .then(function (results) {
+          results.length.should.be.equal(3)
+
+          const ultimaVenta = results[0]
+          ultimaVenta.codigo.should.be.equal(ventaInsertada.codigo)
+          ultimaVenta.total.should.be.equal(ventaInsertada.total)
+          ultimaVenta.fecha.should.be.equal(ventaInsertada.fecha)
+          ultimaVenta.ruc.should.be.equal(cliente1.ruc)
+          ultimaVenta.nombre.should.be.equal(cliente1.nombre)
+          done()
+        })
+    })
+
+    it ('devuelve las ultimas ventas cuyo nombre de cliente coincide con el string pasado como argumento', function (done) {
+      db.findVentas('Juan P')
+        .then(function (results) {
+          results.length.should.be.equal(1)
+
+          const ultimaVenta = results[0]
+          ultimaVenta.codigo.should.be.equal(ventaInsertada.codigo)
+          ultimaVenta.total.should.be.equal(ventaInsertada.total)
+          ultimaVenta.fecha.should.be.equal(ventaInsertada.fecha)
+          ultimaVenta.ruc.should.be.equal(cliente1.ruc)
+          ultimaVenta.nombre.should.be.equal(cliente1.nombre)
+          done()
+        })
+    })
+
+    it ('devuelve array vacio si no encuentra ventas con ese cliente', function (done) {
+      db.findVentas('xxyz')
+        .then(function (results) {
+          results.length.should.be.equal(0)
+          done()
+        })
+    })
   })
 
   describe('getFacturaData', function () {

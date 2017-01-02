@@ -26,10 +26,20 @@ const insertarVenta = (builder, codigo, cliente, fecha, autorizacion, formaPago,
 const insertarNuevasUnidades = (builder, listaDeUnidades) => {
   return builder.table('unidades').insert(listaDeUnidades)
 }
+
 const getVenta = (fecha, codigo) => {
   return knex.select('*')
   .from('ventas')
   .where({fecha: fecha, codigo: codigo})
+}
+
+const findVentas = (nombreCliente) => {
+  return knex.select('codigo', 'fecha', 'ruc', 'nombre', 'total')
+    .from('ventas')
+    .join('clientes', {'ventas.cliente' : 'clientes.ruc' })
+    .where('nombre', 'like', `%${nombreCliente}%`)
+    .orderBy('fecha', 'desc')
+    .limit(20)
 }
 
 const getCliente = (ruc) => {
@@ -143,4 +153,7 @@ module.exports = {
       return Promise.reject(error)
     })
   },
+
+  findVentas: findVentas,
+
 }
