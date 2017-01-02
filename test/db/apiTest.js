@@ -260,4 +260,35 @@ describe('endpoints disponibles para el cliente', function () {
 
   })
 
+  describe('/venta/find', function () {
+    it('retorna 200 al encontrar facturas', function (done) {
+      api.findVentas('Jul')
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        //Esto asume que en el test anterior se insertaron 2 ventas
+        const ventas = resp.body
+        ventas.should.be.an('array')
+        ventas.length.should.equal(2)
+        done()
+      }, function (err) {
+        console.error('test fail ' + JSON.stringify(err))
+        done(err)
+      })
+    })
+
+    it('retorna 404 si no encuentra ventas', function (done) {
+      api.findVentas('xyz')
+      .then(function (resp) {
+        throw unexpectedError
+      }, function (err) {
+        const statusCode = err.status
+        const resp = err.response
+        statusCode.should.equal(404)
+        resp.text.should.be.a('string')
+        done()
+      })
+    })
+  })
+
 })

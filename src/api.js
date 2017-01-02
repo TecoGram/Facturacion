@@ -42,4 +42,10 @@ module.exports = {
       .set('Accept', 'application/json')
   },
 
+  findVentas: (queryString) => {
+    return request.get(prefix + '/venta/find?q=' + queryString)
+      .send()
+  },
+
+
 }

@@ -129,6 +129,21 @@ app.get('/venta/ver/:fecha/:codigo', function (req, res) {
     })
 })
 
+app.get('/venta/find', function (req,res) {
+  const q = req.query.q || ''
+  db.findVentas(q)
+  .then(function(ventas) {
+    if(ventas.length === 0)
+      res.status(404)
+      .send('No existen facturas con esa cadena de caracteres')
+    else
+      res.status(200)
+      .send(ventas)
+  }, function (err) {//ERROR!
+    res.status(500)
+    .send(err)
+  })
+});
 
 app.post('/venta/new', function (req, res) {
   const {
