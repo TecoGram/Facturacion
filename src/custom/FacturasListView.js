@@ -1,40 +1,42 @@
 import React from 'react'
 import MaterialTable from '../lib/MaterialTable'
+import api from '../api'
+
+const columns = ['Código', 'Fecha', 'RUC', 'Cliente', 'Total']
+const keys = ['codigo', 'fecha', 'ruc', 'nombre', 'total']
+const searchHint = 'Buscar facturas...'
 
 export default class FacturasListView extends React.Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      rows: [],
+    }
+  }
+
+  requestData = (input) => {
+    api.findVentas(input)
+      .then((resp) => {
+        const ventas = resp.body
+        this.setState({rows: ventas})
+      }, (err) => {
+        if (err.status === 404) {
+          this.setState({rows: []})
+        } else
+          console.error('findVentas error: ' + JSON.stringify(err))})
+  }
+
+  componentDidMount() {
+    this.requestData('')
+  }
+
   render () {
-    const columns = ['ID', 'Name', 'Status']
-    const keys = ['id', 'name', 'status']
-    const rows = [
-      {
-        id: 1,
-        name: 'John Smith',
-        status: 'Employed',
-      },
-      {
-        id: 2,
-        name: 'Randal White',
-        status: 'Unemployed',
-      },
-      {
-        id: 3,
-        name: 'Stephanie Sanders',
-        status: 'Employed',
-      },
-      {
-        id: 4,
-        name: 'Walter Johnson',
-        status: 'Employed',
-      },
-      {
-        id: 4,
-        name: 'Steve Brown',
-        status: 'Unemployed',
-      },
-    ]
+    const rows = this.state.rows
     return (
-      <MaterialTable columns={columns} keys={keys} rows={rows} searchHint='Buscar facturas...'
-        onEditItem={() => {}} onDeleteItem={() => {}} enableCheckbox={false}/>
+      <MaterialTable columns={columns} keys={keys} rows={rows}
+        searchHint={searchHint} onEditItem={() => {}} onDeleteItem={() => {}}
+        enableCheckbox={false} onQueryChanged={this.requestData}/>
     )
   }
 

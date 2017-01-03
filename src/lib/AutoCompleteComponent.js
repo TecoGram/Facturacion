@@ -2,6 +2,25 @@ import React from 'react';
 
 import AutoComplete from 'material-ui/AutoComplete'
 
+/**
+* Componente para AutoComplete. Cada vez que el usario escribe en el TextField,
+* se hace un query al servidor para tratar de completar lo que ingreso el usuario
+*
+* El metod asincrono para hacer el query tiene que ser provisto con el prop
+* 'newDataPromise'. Este prop tiene que ser una funcion que devuelva un promise
+* que en el then pase un arreglo con las sugenrencias. Las sugenrencias son objetos,
+* pero solo un atributo es usado para pintar el string mostrado al usuario. Para
+* determinar ese atributo se usa el prop 'dataSourceConfig' que es el que usa
+* material-ui en su componente AutoComplete.
+*
+* Los resultados de la consulta y el texto de la consulta son parte del estado
+* de este componente. Cuando el usuario selecciona una sugerenncia
+* 'onNewItemSelected' es ejecutado. Este prop tambien se ejecuta cuuando el usuario
+* presiona Enter sin seleccionar nada, se asume que el primer elemento de la lista
+* de sugenrencias es el escogido.
+* onNewItemSelected tiene la forma (item) => {}. Se pasa como argumento el objeto
+* completo que devolvio el servidor como sugerencia.
+*/
 export default class AutoCompleteComponent extends React.Component {
 
   static propTypes = {

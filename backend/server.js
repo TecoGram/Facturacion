@@ -8,6 +8,7 @@ const fs = require('fs')
 const util = require('util')
 
 const db = require('./dbAdmin.js')
+const formatter = require('./responseFormatter.js')
 
 const port = process.env.PORT || 8192
 //crear directorio donde almacenar facturas en pdf.
@@ -138,7 +139,7 @@ app.get('/venta/find', function (req,res) {
       .send('No existen facturas con esa cadena de caracteres')
     else
       res.status(200)
-      .send(ventas)
+      .send(formatter.formatFindVentas(ventas))
   }, function (err) {//ERROR!
     res.status(500)
     .send(err)

@@ -44,54 +44,106 @@ const ButtonsColumn = (index, onEditItem, onDeleteItem) => {
   return buttons
 }
 
-const SearchBox = (hint, requestFunc) => {
-  const inlineStyle = {
-    display: 'inline-block',
+class SearchBox extends React.Component {
+
+  static propTypes = {
+    hint: React.PropTypes.string.isRequired,
+    onQueryChanged: React.PropTypes.func.isRequired,
   }
 
-  const input = {
-    icon: Search,
-    hintText: hint,
-    onChange: requestFunc,
+  constructor (props) {
+    super(props)
+    this.state = {
+      queryText: '',
+    }
   }
 
-  const tableStyle = {
-    width: 'auto',
-    marginLeft: 'auto',
-    marginRight: '0px',
+  newQuery = (e) => {
+    const newValue = e.target.value
+    this.setState({queryText: newValue})
+    this.props.onQueryChanged(newValue)
   }
 
-  return (
-    <table style={tableStyle}>
-      <tbody >
-        <IconTextFieldRow leftInput={input} inverted={true}/>
-      </tbody>
-    </table>
-  )
+  render () {
+    const input = {
+      icon: Search,
+      hintText: this.props.hint,
+      onChange: this.newQuery,
+      value: this.state.queryText,
+    }
+
+    const tableStyle = {
+      width: 'auto',
+      marginLeft: 'auto',
+      marginRight: '0px',
+    }
+
+    return (
+      <table style={tableStyle}>
+        <tbody >
+          <IconTextFieldRow leftInput={input} inverted={true}/>
+        </tbody>
+      </table>
+    )
+  }
+
 }
 
+/**
+* Renderiza una tabla dentro de un Paper. En la esquina superior dereche se coloca
+* un TextField para hacer busquedas que filtren el contenido de la tabla.
+*
+* Es necesario pasar 3 arrays: rows, columns y keys. rows son las filas de la tabla,
+* tienen que ser objetos. columns tiene las etiquetas de cada columna y keys tiene
+* el nombre del atributo con la data de la columna.
+*
+* Con el prop searchHint se pone el 'hint' para filtrar el contenido de la tabla.
+*
+* El prop onQueryChanged es un callback a ejecutar cada vez que el usario escribe
+* en el textField para filtrar datos, es una funcion tipo (query) => { }, donde
+* query es el texto ingresado.
+*
+* onEditItem y onDeleteItem son callbacks opcionales. Si se pasa onEditItem,
+* se agrega una columna a la tabla para editar la fila. Si se pasa onDeleteItem,
+* se agrega una columna a la tabla para eliminar la fila. Ambos tienen la forma
+* (item) => { } donde item es la fila con la cual se origino el click.
+*
+* Esto usa el componente Table de material-ui, el cual no recicla views, por lo
+* tanto hay que tener cuidado con no renderizar muchas filas
+*/
 export default class MaterialTable extends React.Component {
 
+  static propTypes = {
+    columns: React.PropTypes.array.isRequired,
+    rows: React.PropTypes.array.isRequired,
+    keys: React.PropTypes.array.isRequired,
+    searchHint: React.PropTypes.string.isRequired,
+    onQueryChanged: React.PropTypes.func.isRequired,
+    onEditItem: React.PropTypes.func,
+    onDeleteItem: React.PropTypes.func,
+    enableCheckbox: React.PropTypes.bool,
+  }
+
   render() {
-
-
     const {
-      columns,
       enableCheckbox,
       keys,
       onEditItem,
       onDeleteItem,
+      onQueryChanged,
       rows,
       searchHint,
     } = this.props
 
-    if (onEditItem || onDeleteItem)
-      columns.push('')
+    let columns = this.props.columns
+    if (onEditItem || onDeleteItem) {
+      columns = [...columns, '']
+    }
 
     return (
       <div style={{height:'100%', overflow:'auto'}} >
         <PaperContainer padding={'15px'}>
-          { SearchBox(searchHint) }
+          <SearchBox hint={searchHint} onQueryChanged={onQueryChanged} />
           <Table selectable={enableCheckbox}>
              <TableHeader displaySelectAll={enableCheckbox}
                adjustForCheckbox={enableCheckbox}>
