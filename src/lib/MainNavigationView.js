@@ -18,6 +18,7 @@ import { NUEVO_CLIENTE_DIALOG,
   NUEVO_PRODUCTO_DIALOG,
   NUEVO_CLIENTE_DIALOG_CLOSED,
   NUEVO_PRODUCTO_DIALOG_CLOSED } from '../DialogTypes'
+import { NEW_FACTURA_PAGE, FACTURA_LIST_PAGE } from '../PageTypes'
 
 import ActionCreators from '../ActionCreators'
 import CustomStyle from '../CustomStyle'
@@ -37,6 +38,7 @@ function mapStateToProps(state) {
   return {
     dialog: state.dialog,
     snackbar: state.snackbar,
+    page: state.page,
   }
 }
 
@@ -45,48 +47,43 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class MainDrawer extends Component {
+const MainDrawer = (props) => {
 
-  onItemClicked = () => {
-    this.props.handleChange(false)
+  const cp = (page) => {
+    props.onPageSelected(page)
   }
 
-  render() {
-    return (
-      <Drawer
-          docked={false}
-          width={200}
-          open={this.props.open}
-          onRequestChange={this.props.handleChange}
-        >
-          <MenuItem onTouchTap={this.onItemClicked}>Menu Item</MenuItem>
-          <MenuItem onTouchTap={this.onItemClicked}>Menu Item 2</MenuItem>
-        </Drawer>
-    )
-  }
+  return (
+    <Drawer
+      docked={false}
+      width={200}
+      open={props.open}
+      onRequestChange={props.handleChange}>
+      <MenuItem onTouchTap={() => cp(NEW_FACTURA_PAGE)}>Nueva Factura</MenuItem>
+      <MenuItem onTouchTap={() => cp(FACTURA_LIST_PAGE)}>Ver Facturas</MenuItem>
+    </Drawer>
+  )
 }
 
-class MainSnackbar extends Component {
-  render() {
-    const data = this.props.data
-    let action, message, open, onActionTouchTap
-    if (data) {
-      open = true
-      message = data.message
-      if (data.link) {
-        action = "ABRIR"
-        onActionTouchTap = (ev) => window.open(data.link)
-      }
-    } else {
-      open = false
-      message = ''
+const MainSnackbar = (props) => {
+  const data = props.data
+  let action, message, open, onActionTouchTap
+  if (data) {
+    open = true
+    message = data.message
+    if (data.link) {
+      action = "ABRIR"
+      onActionTouchTap = (ev) => window.open(data.link)
     }
-
-    return (
-      <Snackbar open={open} message={message} action={action}
-      onActionTouchTap={onActionTouchTap} autoHideDuration={12000}/>
-    )
+  } else {
+    open = false
+    message = ''
   }
+
+  return (
+    <Snackbar open={open} message={message} action={action}
+    onActionTouchTap={onActionTouchTap} autoHideDuration={12000}/>
+  )
 }
 
 class MainToolbar extends Component {
@@ -196,6 +193,22 @@ class MainDialog extends Component {
   }
 }
 
+const SelectedPage = (props) => {
+  const {
+    abrirLinkConSnackbar,
+    page,
+  } = props
+
+  switch (page) {
+    case NEW_FACTURA_PAGE:
+      return <FacturaView abrirLinkConSnackbar={abrirLinkConSnackbar}/>
+    case FACTURA_LIST_PAGE:
+      return <FacturasListView />
+    default:
+      return null
+  }
+}
+
 class Main extends Component {
 
   constructor(props, context) {
@@ -211,6 +224,13 @@ class Main extends Component {
     });
   };
 
+  onPageSelected = (newPage) => {
+    this.setState({
+      drawerOpen: false,
+    })
+    this.props.cambiarPagina(newPage)
+  }
+
   render() {
     const {
       abrirLinkConSnackbar,
@@ -218,6 +238,7 @@ class Main extends Component {
       cerrarDialogConMsg,
       dialog,
       snackbar,
+      page,
       title,
     } = this.props
 
@@ -225,8 +246,9 @@ class Main extends Component {
       <div style={{backgroundColor: '#ededed', height: 'inherit'}}>
         <MainToolbar title={title} cambiarDialog={cambiarDialog}
         onLeftButtonClicked={() => this.handleDrawerChange(true)}/>
-        <FacturasListView abrirLinkConSnackbar={abrirLinkConSnackbar} />
-        <MainDrawer open={this.state.drawerOpen} handleChange={this.handleDrawerChange} />
+        <SelectedPage page={page} abrirLinkConSnackbar={abrirLinkConSnackbar}/>
+        <MainDrawer open={this.state.drawerOpen} handleChange={this.handleDrawerChange}
+          onPageSelected={this.onPageSelected}/>
         <MainDialog type={dialog} cambiarDialog={cambiarDialog}
           cerrarDialogConMsg={cerrarDialogConMsg}/>
         <MainSnackbar data={snackbar}/>

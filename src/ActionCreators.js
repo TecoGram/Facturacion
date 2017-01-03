@@ -1,6 +1,7 @@
 import { NUEVO_CLIENTE_DIALOG, NUEVO_PRODUCTO_DIALOG,
   NUEVO_CLIENTE_DIALOG_CLOSED, NUEVO_PRODUCTO_DIALOG_CLOSED } from './DialogTypes'
-import { CAMBIAR_DIALOG_ACTION, CERRAR_DIALOG_CON_MSG_ACTION,
+import { NEW_FACTURA_PAGE, FACTURA_LIST_PAGE } from './PageTypes'
+import { CAMBIAR_DIALOG_ACTION, CAMBIAR_PAGE_ACTION, CERRAR_DIALOG_CON_MSG_ACTION,
   ABRIR_LINK_CON_SNACKBAR } from './ActionTypes'
 
 module.exports = {
@@ -30,7 +31,24 @@ module.exports = {
         throw new Error("Tipo de dialog desconocido: " + tipoDialog)
     }
   },
-  
+
+  cambiarPagina(tipoPagina) {
+    switch (tipoPagina) {
+      case NEW_FACTURA_PAGE:
+        return {
+          type: CAMBIAR_PAGE_ACTION,
+          value: NEW_FACTURA_PAGE,
+        }
+      case FACTURA_LIST_PAGE:
+        return {
+          type: CAMBIAR_PAGE_ACTION,
+          value: FACTURA_LIST_PAGE,
+        }
+      default:
+        throw new Error("Tipo de pagina desconocida: " + tipoPagina)
+    }
+  },
+
   cerrarDialogConMsg(msg, dialogType) {
     if(dialogType !== NUEVO_PRODUCTO_DIALOG_CLOSED
       && dialogType !== NUEVO_CLIENTE_DIALOG_CLOSED)
