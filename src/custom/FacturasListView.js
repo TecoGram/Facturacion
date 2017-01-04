@@ -1,6 +1,6 @@
 import React from 'react'
 import MaterialTable from '../lib/MaterialTable'
-import api from '../api'
+import { getFacturaURL, findVentas } from '../api'
 
 const columns = ['Código', 'Fecha', 'RUC', 'Cliente', 'Total']
 const keys = ['codigo', 'fecha', 'ruc', 'nombre', 'total']
@@ -15,8 +15,14 @@ export default class FacturasListView extends React.Component {
     }
   }
 
+  openFacturaInNewTab = (index) => {
+    const { fecha, codigo } = this.state.rows[index]
+    window.open(getFacturaURL(codigo, fecha))
+
+  }
+
   requestData = (input) => {
-    api.findVentas(input)
+    findVentas(input)
       .then((resp) => {
         const ventas = resp.body
         this.setState({rows: ventas})
@@ -35,7 +41,7 @@ export default class FacturasListView extends React.Component {
     const rows = this.state.rows
     return (
       <MaterialTable columns={columns} keys={keys} rows={rows}
-        searchHint={searchHint} onEditItem={() => {}} onDeleteItem={() => {}}
+        searchHint={searchHint} onOpenItem={this.openFacturaInNewTab} onDeleteItem={() => {}}
         enableCheckbox={false} onQueryChanged={this.requestData}/>
     )
   }

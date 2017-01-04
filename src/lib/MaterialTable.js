@@ -7,16 +7,18 @@ import IconButton from 'material-ui/IconButton';
 import ModeEdit from 'material-ui/svg-icons/editor/mode-edit';
 import Clear from 'material-ui/svg-icons/content/clear';
 import Search from 'material-ui/svg-icons/action/search';
+import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 
 const black54p = '#757575'
 
-const ButtonsColumn = (index, onEditItem, onDeleteItem) => {
+const ButtonsColumn = (index, onEditItem, onDeleteItem, onOpenItem) => {
   const iconStyle = {
     display: 'inline-block',
   }
 
   let editCol = null
   let deleteCol = null
+  let openCol = null
   if (onDeleteItem) {
     deleteCol =
       <IconButton style={iconStyle} onTouchTap={() => onDeleteItem(index)}>
@@ -29,12 +31,19 @@ const ButtonsColumn = (index, onEditItem, onDeleteItem) => {
         <ModeEdit color={black54p}/>
       </IconButton>
   }
+  if (onOpenItem) {
+    openCol =
+      <IconButton style={iconStyle} onTouchTap={() => onOpenItem(index)}>
+        <OpenInNew color={black54p}/>
+      </IconButton>
+  }
 
   let buttons = null
-  if (editCol || deleteCol) {
+  if (editCol || deleteCol || openCol) {
     buttons =
       <TableRowColumn>
         <div>
+          {openCol}
           {editCol}
           {deleteCol}
         </div>
@@ -103,10 +112,12 @@ class SearchBox extends React.Component {
 * en el textField para filtrar datos, es una funcion tipo (query) => { }, donde
 * query es el texto ingresado.
 *
-* onEditItem y onDeleteItem son callbacks opcionales. Si se pasa onEditItem,
-* se agrega una columna a la tabla para editar la fila. Si se pasa onDeleteItem,
-* se agrega una columna a la tabla para eliminar la fila. Ambos tienen la forma
-* (item) => { } donde item es la fila con la cual se origino el click.
+* onEditItem, onDeleteItem y onOpenItem son callbacks opcionales.
+* Si se pasa onEditItem, se agrega una columna a la tabla para editar la fila.
+* Si se pasa onDeleteItem, se agrega una columna a la tabla para eliminar la fila.
+* Si se pasa onOpenItem, se agrega una columna a la tabla para ver detalle de la fila.
+* Todos tienen la forma (item) => { } donde item es el indice de la fila con la
+* cual se origino el click.
 *
 * Esto usa el componente Table de material-ui, el cual no recicla views, por lo
 * tanto hay que tener cuidado con no renderizar muchas filas
@@ -121,6 +132,7 @@ export default class MaterialTable extends React.Component {
     onQueryChanged: React.PropTypes.func.isRequired,
     onEditItem: React.PropTypes.func,
     onDeleteItem: React.PropTypes.func,
+    onOpenItem: React.PropTypes.func,
     enableCheckbox: React.PropTypes.bool,
   }
 
@@ -130,6 +142,7 @@ export default class MaterialTable extends React.Component {
       keys,
       onEditItem,
       onDeleteItem,
+      onOpenItem,
       onQueryChanged,
       rows,
       searchHint,
@@ -162,7 +175,7 @@ export default class MaterialTable extends React.Component {
                     { keys.map((propName, j) => {
                       return <TableRowColumn key={j}>{row[propName]}</TableRowColumn>
                     })}
-                    { ButtonsColumn(i, onEditItem, onDeleteItem) }
+                    { ButtonsColumn(i, onEditItem, onDeleteItem, onOpenItem) }
                   </TableRow>
                 )
                 })

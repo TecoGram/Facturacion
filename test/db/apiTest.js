@@ -241,7 +241,8 @@ describe('endpoints disponibles para el cliente', function () {
 
   describe('/venta/ver/:fecha/:codigo', function () {
     it('descarga el pdf de una factura existente', function(done) {
-      request.get(`localhost:8192/venta/ver/${newVentaRow.fecha}/${newVentaRow.codigo}`)
+      const url = api.getFacturaURL(newVentaRow.codigo, newVentaRow.fecha)
+      request.get(url)
       .end(function (err, res) {
         res.status.should.equal(200)
         res.header['content-type'].should.equal('application/pdf')

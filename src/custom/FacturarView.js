@@ -8,7 +8,7 @@ import FacturaTable from './FacturaTable'
 import FacturaResults from './FacturaResults'
 import { /*crearUnidadesRow,*/ crearVentaRow } from './FacturacionUtils'
 import { validarVentaRow } from '../Validacion'
-import { insertarVenta } from '../api'
+import { insertarVenta, getFacturaURL } from '../api'
 
 export default class FacturarView extends Component {
 
@@ -103,7 +103,7 @@ export default class FacturarView extends Component {
       insertarVenta(ventaRow)
       .then((resp) => {
         this.setState(this.getDefaultState())
-        const pdfLink = `http://localhost:8192/venta/ver/${ventaRow.fecha}/${ventaRow.codigo}`
+        const pdfLink = getFacturaURL(ventaRow.fecha, ventaRow.codigo)
         window.open(pdfLink)
         this.props.abrirLinkConSnackbar('La factura se generó exitosamente.', pdfLink)
       },

@@ -47,5 +47,8 @@ module.exports = {
       .send()
   },
 
+  getFacturaURL: (codigo, fecha) => {
+    return `http://localhost:8192/venta/ver/${fecha}/${codigo}`
+  },
 
 }
