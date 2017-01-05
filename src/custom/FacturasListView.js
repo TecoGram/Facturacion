@@ -16,9 +16,14 @@ export default class FacturasListView extends React.Component {
   }
 
   openFacturaInNewTab = (index) => {
-    const { fecha, codigo } = this.state.rows[index]
+    const { codigo, fecha } = this.state.rows[index]
     window.open(getFacturaURL(codigo, fecha))
 
+  }
+
+  openEditorPage = (index) => {
+    const { codigo, fecha } = this.state.rows[index]
+    this.props.editarFactura(codigo, fecha)
   }
 
   requestData = (input) => {
@@ -29,8 +34,8 @@ export default class FacturasListView extends React.Component {
       }, (err) => {
         if (err.status === 404) {
           this.setState({rows: []})
-        } else
-          console.error('findVentas error: ' + JSON.stringify(err))})
+        }
+      })
   }
 
   componentDidMount() {
@@ -41,7 +46,7 @@ export default class FacturasListView extends React.Component {
     const rows = this.state.rows
     return (
       <MaterialTable columns={columns} keys={keys} rows={rows}
-        searchHint={searchHint} onOpenItem={this.openFacturaInNewTab} onDeleteItem={() => {}}
+        searchHint={searchHint} onOpenItem={this.openFacturaInNewTab} onEditItem={this.openEditorPage}
         enableCheckbox={false} onQueryChanged={this.requestData}/>
     )
   }

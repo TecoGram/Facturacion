@@ -18,7 +18,7 @@ import { NUEVO_CLIENTE_DIALOG,
   NUEVO_PRODUCTO_DIALOG,
   NUEVO_CLIENTE_DIALOG_CLOSED,
   NUEVO_PRODUCTO_DIALOG_CLOSED } from '../DialogTypes'
-import { NEW_FACTURA_PAGE, FACTURA_LIST_PAGE } from '../PageTypes'
+import { NEW_FACTURA_PAGE, EDITAR_FACTURA_PAGE, FACTURA_LIST_PAGE } from '../PageTypes'
 
 import ActionCreators from '../ActionCreators'
 import CustomStyle from '../CustomStyle'
@@ -197,13 +197,16 @@ const SelectedPage = (props) => {
   const {
     abrirLinkConSnackbar,
     page,
+    editarFactura,
   } = props
 
-  switch (page) {
+  switch (page.type) {
     case NEW_FACTURA_PAGE:
-      return <FacturaView abrirLinkConSnackbar={abrirLinkConSnackbar}/>
+      return <FacturaView abrirLinkConSnackbar={abrirLinkConSnackbar} {...page.props}/>
+    case EDITAR_FACTURA_PAGE:
+      return <FacturaView abrirLinkConSnackbar={abrirLinkConSnackbar} {...page.props}/>
     case FACTURA_LIST_PAGE:
-      return <FacturasListView />
+      return <FacturasListView editarFactura={editarFactura} {...page.props}/>
     default:
       return null
   }
@@ -228,12 +231,13 @@ class Main extends Component {
     this.setState({
       drawerOpen: false,
     })
-    this.props.cambiarPagina(newPage)
+    this.props.cambiarPagina(newPage, {})
   }
 
   render() {
     const {
       abrirLinkConSnackbar,
+      editarFactura,
       cambiarDialog,
       cerrarDialogConMsg,
       dialog,
@@ -246,7 +250,7 @@ class Main extends Component {
       <div style={{backgroundColor: '#ededed', height: 'inherit'}}>
         <MainToolbar title={title} cambiarDialog={cambiarDialog}
         onLeftButtonClicked={() => this.handleDrawerChange(true)}/>
-        <SelectedPage page={page} abrirLinkConSnackbar={abrirLinkConSnackbar}/>
+        <SelectedPage page={page} editarFactura={editarFactura} abrirLinkConSnackbar={abrirLinkConSnackbar}/>
         <MainDrawer open={this.state.drawerOpen} handleChange={this.handleDrawerChange}
           onPageSelected={this.onPageSelected}/>
         <MainDialog type={dialog} cambiarDialog={cambiarDialog}

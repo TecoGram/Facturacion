@@ -1,5 +1,5 @@
 module.exports = {
-  formatFindVentas: (ventas) => {
+  findVentas: (ventas) => {
     if (ventas.length > 0) {
       const newVentas = []
       let i
@@ -12,5 +12,28 @@ module.exports = {
       return newVentas
     }
     return ventas
+  },
+
+  verVenta: (ventaQueryResp) => {
+    const {
+      codigo,
+      fecha,
+      descuento,
+      autorizacion,
+      formaPago,
+      productos,
+    } = ventaQueryResp.ventaRow
+
+    return {
+      cliente: Object.assign({}, ventaQueryResp.cliente),
+      facturaData: {
+        codigo: codigo,
+        fecha: fecha,
+        descuento: descuento,
+        autorizacion: autorizacion,
+        formaPago: formaPago,
+      },
+      productos: productos.slice(),
+    }
   },
 }

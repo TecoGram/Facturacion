@@ -47,6 +47,12 @@ module.exports = {
       .send()
   },
 
+  verVenta: (codigo, fecha) => {
+    return request.get(prefix + `/venta/ver/${fecha}/${codigo}`)
+      .send()
+      .set('Accept', 'application/json')
+  },
+
   getFacturaURL: (codigo, fecha) => {
     return `http://localhost:8192/venta/ver/${fecha}/${codigo}`
   },

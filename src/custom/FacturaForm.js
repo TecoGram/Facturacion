@@ -17,27 +17,84 @@ import IconBox from '../lib/IconBox'
 
 const autoCompleteWidth = '425px'
 const txtMargin = '35px'
+const codigoTextStyle = {width: '142px', verticalAlign: 'top', marginRight: txtMargin}
+
+const fechaStyle={display: 'inline-block'}
+const fechaTextStyle = {width:'139px', marginRight: txtMargin}
+
+const CodigoText = (props) => {
+  const {
+    ventaKey,
+    data,
+    errors,
+    onDataChanged,
+  } = props
+
+  const myProps = {
+    hintText: 'Código',
+    style: codigoTextStyle,
+  }
+
+  if (ventaKey) {
+    myProps.disabled = true
+    myProps.value = ventaKey.codigo
+  } else {
+    myProps.value = data.codigo
+    myProps.errorText = errors.codigo
+    myProps.onChange = (event) => onDataChanged('codigo', event.target.value)
+  }
+
+  return <TextField {...myProps} />
+}
+
+
+const FechaText = (props) => {
+  const {
+    ventaKey,
+    data,
+    errors,
+    onDataChanged,
+  } = props
+
+  const myProps = {
+    hintText: 'Fecha',
+    style: fechaStyle,
+    textFieldStyle: fechaTextStyle,
+  }
+
+  if (ventaKey) {
+    myProps.disabled = true
+    myProps.value = ventaKey.fecha
+  } else {
+    myProps.value = data.fecha
+    myProps.errorText = errors.fecha
+    myProps.onChange = (n, date) => onDataChanged('fecha', date)
+  }
+
+  return <DatePicker {...myProps} />
+}
+
+const ClienteInput = (props) => {
+  const {
+    cliente,
+    errors,
+    onNewCliente,
+  } = props
+
+  if (cliente)
+    return (
+      <SelectedClienteChip text={cliente.nombre}
+        onRequestDelete={() => {onNewCliente(null)}} />
+    )
+  else
+    return (
+      <ClienteAutoComplete width={autoCompleteWidth}
+        errorText={errors.get('cliente')} onNewItemSelected={onNewCliente}/>
+    )
+}
 
 export default class FacturaForm extends Component {
 
-  renderClienteInput = (props) => {
-    const {
-      cliente,
-      errors,
-      onNewCliente,
-    } = props
-
-    if (cliente)
-      return (
-        <SelectedClienteChip text={cliente.nombre}
-          onRequestDelete={() => {onNewCliente(null)}} />
-      )
-    else
-      return (
-        <ClienteAutoComplete width={autoCompleteWidth}
-          errorText={errors.get('cliente')} onNewItemSelected={onNewCliente}/>
-      )
-  }
 
   render() {
     const {
@@ -52,7 +109,7 @@ export default class FacturaForm extends Component {
         <br />
         <div style={{display: 'block', marginBottom: '8px'}}>
           <IconBox icon={Person}/>
-          { this.renderClienteInput(this.props) }
+          <ClienteInput {...this.props} />
           <IconBox icon={AddShoppingCart}/>
           <ProductoAutoComplete width={autoCompleteWidth}
             onNewItemSelected={this.props.onNewProduct}/>
@@ -65,21 +122,14 @@ export default class FacturaForm extends Component {
                 <IconBox icon={Receipt}/>
               </td>
               <td>
-                <TextField
-                  hintText="Código" value={data.codigo} errorText={errors.codigo}
-                  onChange={(event) => onDataChanged('codigo', event.target.value)}
-                  style={{width: '142px', verticalAlign: 'top', marginRight: txtMargin}} />
+                <CodigoText {...this.props} />
               </td>
 
               <td>
                 <IconBox icon={Today}/>
               </td>
               <td>
-                <DatePicker
-                  hintText="Fecha" style={{display: 'inline-block'}}
-                  value={data.fecha} errorText={errors.fecha}
-                  onChange={(n, date) => onDataChanged('fecha', date)}
-                  textFieldStyle={{width:'140px', marginRight: txtMargin}} />
+                <FechaText {...this.props} />
               </td>
 
               <td>

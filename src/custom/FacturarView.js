@@ -8,7 +8,8 @@ import FacturaTable from './FacturaTable'
 import FacturaResults from './FacturaResults'
 import { /*crearUnidadesRow,*/ crearVentaRow } from './FacturacionUtils'
 import { validarVentaRow } from '../Validacion'
-import { insertarVenta, getFacturaURL } from '../api'
+import { insertarVenta, getFacturaURL, verVenta } from '../api'
+import DateParser from '../DateParser'
 
 export default class FacturarView extends Component {
 
@@ -44,18 +45,6 @@ export default class FacturarView extends Component {
     newProduct.fechaExp = new Date(new Date().setFullYear(new Date().getFullYear() + 1))
     const immutableProduct = Immutable.Map(newProduct)
     this.setState({ productos: this.state.productos.push(immutableProduct) })
-  }
-
-  newProductValueIsAppropiate(key, newValue) {
-    switch(key) {
-      case 'count':
-        return validator.isNumeric(newValue, {min: 0}) || newValue.length === 0
-      case 'precioVenta':
-        return validator.isFloat(newValue, {min: 0}) || newValue.length === 0
-      default:
-        return true
-    }
-
   }
 
   newValueIsAppropiate(key, newValue) {
@@ -106,8 +95,7 @@ export default class FacturarView extends Component {
         const pdfLink = getFacturaURL(ventaRow.fecha, ventaRow.codigo)
         window.open(pdfLink)
         this.props.abrirLinkConSnackbar('La factura se generó exitosamente.', pdfLink)
-      },
-        (err) => console.log(err))
+      })
     }
   }
 
@@ -121,6 +109,21 @@ export default class FacturarView extends Component {
     return false
   }
 
+  componentDidMount() {
+    const v = this.props.ventaKey
+    if (v)
+      verVenta(v.codigo, v.fechaString)
+        .then((respStr) => {
+          const resp = DateParser.verVenta(respStr.body)
+          this.setState({
+            cliente: resp.cliente,
+            facturaData: Immutable.fromJS(resp.facturaData),
+            productos: Immutable.fromJS(resp.productos),
+          })
+        })
+
+  }
+
   render() {
     const {
       cliente,
@@ -129,6 +132,8 @@ export default class FacturarView extends Component {
       productos,
     } = this.state
 
+    const ventaKey = this.props.ventaKey
+
     const descuento = facturaData.get('descuento')
 
     return (
@@ -136,11 +141,11 @@ export default class FacturarView extends Component {
       <PaperContainer >
         <div style={{marginTop: '24px', marginLeft: '36px', marginRight: '36px'}}>
           <FacturaForm data={facturaData.toJS()} errors={errors} cliente={cliente}
-            onDataChanged={this.onFacturaDataChanged}
+            onDataChanged={this.onFacturaDataChanged} ventaKey={ventaKey}
             onNewCliente={this.onNewCliente} onNewProduct={this.onNewProductFromKeyboard}/>
           <FacturaTable items={productos} onProductChanged={this.onProductChanged}/>
-          <FacturaResults productos={productos} descuento={descuento}
-            onGuardarClick={this.onGenerarFacturaClick}
+          <FacturaResults productos={productos} descuento={Number(descuento)}
+            onGuardarClick={this.onGenerarFacturaClick} nuevo={!ventaKey}
             guardarButtonDisabled={this.guardarFacturaDisabled()}/>
         </div>
       </PaperContainer>
@@ -148,4 +153,17 @@ export default class FacturarView extends Component {
     );
   }
 
+}
+
+FacturarView.propTypes = {
+  abrirLinkConSnackbar: React.PropTypes.func.isRequired,
+  ventaKey: React.PropTypes.shape({
+    codigo: React.PropTypes.string.isRequired,
+    fecha: React.PropTypes.object.isRequired,
+    fechaString: React.PropTypes.string.isRequired,
+  }),
+}
+
+FacturarView.defaultProps = {
+  nuevo: true,
 }

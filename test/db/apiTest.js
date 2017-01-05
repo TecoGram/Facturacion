@@ -250,6 +250,25 @@ describe('endpoints disponibles para el cliente', function () {
       })
     })
 
+    it('retorna json si el header \'Accept\' es igual a \'application/json\'', function (done) {
+      api.verVenta(newVentaRow.codigo, newVentaRow.fecha)
+        .then(function (resp) {
+          const { facturaData, productos, cliente } = resp.body
+          facturaData.codigo.should.equal(newVentaRow.codigo)
+          facturaData.fecha.should.equal(newVentaRow.fecha)
+          facturaData.formaPago.should.equal(newVentaRow.formaPago)
+
+          productos.length.should.equal(newVentaRow.productos.length)
+
+          cliente.ruc.should.equal(cliente1.ruc)
+          cliente.nombre.should.equal(cliente1.nombre)
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+    })
+
     it('retorna 404 si la factura solicitada no existe', function (done) {
       request.get(`localhost:8192/venta/ver/2016-12-15/000123`)
       .end(function (err, res) {

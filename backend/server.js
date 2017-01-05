@@ -105,29 +105,40 @@ app.get('/venta/ver/:fecha/:codigo', function (req, res) {
     codigo,
   } = req.params
   const facturaFileName = codigo + fecha + '.pdf'
-  db.getFacturaData(fecha, codigo)
-    .then(function (resp) {//OK!!
-      const {
-        ventaRow,
-        cliente,
-      } = resp
 
-      const writeFunc = facturaTemplates.biocled(ventaRow, cliente)
-      return new PDFWriter(facturaDir + facturaFileName, writeFunc)
-    }, function (error) { //ERROR!
-      return Promise.reject(error)
-    })
-    .then(function () {
-      fs.readFile(facturaDir + facturaFileName, function (err, data) {
-        JSON.stringify(err)
-        res.contentType("application/pdf")
-        res.send(data)
+  if (req.headers.accept === 'application/json') //send json
+    db.getFacturaData(fecha, codigo)
+      .then(function (resp) {//OK!!
+        res.status(200)
+        .send(formatter.verVenta(resp))
+      }, function (error) { //ERROR!
+        res.status(error.errorCode)
+        .send(error.text)
       })
-    }, function (error) {
-      res.status(error.errorCode)
-      .send(error.text)
+  else //send pdf
+    db.getFacturaData(fecha, codigo)
+      .then(function (resp) {//OK!!
+        const {
+          ventaRow,
+          cliente,
+        } = resp
 
-    })
+        const writeFunc = facturaTemplates.biocled(ventaRow, cliente)
+        return new PDFWriter(facturaDir + facturaFileName, writeFunc)
+      }, function (error) { //ERROR!
+        return Promise.reject(error)
+      })
+      .then(function () {
+        fs.readFile(facturaDir + facturaFileName, function (err, data) {
+          JSON.stringify(err)
+          res.contentType("application/pdf")
+          res.send(data)
+        })
+      }, function (error) {
+        res.status(error.errorCode)
+        .send(error.text)
+
+      })
 })
 
 app.get('/venta/find', function (req,res) {
@@ -139,7 +150,7 @@ app.get('/venta/find', function (req,res) {
       .send('No existen facturas con esa cadena de caracteres')
     else
       res.status(200)
-      .send(formatter.formatFindVentas(ventas))
+      .send(formatter.findVentas(ventas))
   }, function (err) {//ERROR!
     res.status(500)
     .send(err)
