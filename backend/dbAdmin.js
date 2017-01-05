@@ -23,6 +23,28 @@ const insertarVenta = (builder, codigo, cliente, fecha, autorizacion, formaPago,
   })
 }
 
+const updateVenta = (builder, codigo, cliente, fecha, autorizacion, formaPago,
+    subtotal, descuento, iva, total) => {
+  return builder('ventas')
+    .where({codigo, fecha}).update({
+      codigo: codigo,
+      cliente: cliente,
+      fecha: fecha,
+      autorizacion: autorizacion,
+      formaPago: formaPago,
+      subtotal: subtotal,
+      descuento: descuento,
+      iva: iva,
+      total: total,
+    })
+}
+
+const deleteUnidadesVenta = (builder, codigo, fecha) => {
+  return builder('unidades')
+    .where({ codigoVenta: codigo, fechaVenta: fecha})
+    .del()
+}
+
 const insertarNuevasUnidades = (builder, listaDeUnidades) => {
   return builder.table('unidades').insert(listaDeUnidades)
 }
@@ -114,6 +136,22 @@ module.exports = {
         return insertarNuevasUnidades(trx, unidades)
       }, (err) => {
         return Promise.reject(err)
+      })
+    })
+  },
+
+  updateVenta: (codigo, cliente, fecha, autorizacion, formaPago,
+    subtotal, descuento, iva, total, unidades) => {
+    return knex.transaction ((trx) => {
+      return updateVenta(trx, codigo, cliente, fecha, autorizacion, formaPago,
+    subtotal, descuento, iva, total)
+      .then((ids) => {
+        return deleteUnidadesVenta(trx, codigo, fecha)
+      })
+      .then((ids) => {
+        const ventaId = ids[0]
+        colocarVentaID(unidades, fecha, codigo)
+        return insertarNuevasUnidades(trx, unidades)
       })
     })
   },

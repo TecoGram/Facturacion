@@ -273,4 +273,45 @@ describe('metodos de dbAdmin.js', function () {
     })
   })
 
+
+  describe('updateVenta', function() {
+
+    const {
+      codigo,
+      ruc,
+      fecha,
+      autorizacion,
+      formaPago,
+      subtotal,
+      descuento,
+      iva,
+      total,
+      productos,
+    } = ventaInsertada
+
+    const formaPagoUpdated = 'CHEQUE'
+    const autorizacionUpdated ="qwe4"
+
+    it('actualiza una venta y las unidades vendidas en la base',
+      function (done) {
+        db.updateVenta(codigo, ruc, fecha, autorizacionUpdated, formaPagoUpdated,
+          subtotal, descuento, iva, total, productos)
+        .then(function (res) {
+          const lasInsertedId = res[0]
+          //test api ya inserto 2 unidades, mas estas 2, la nueva debe de ser 4
+          lasInsertedId.should.be.equal(4)
+          return db.getFacturaData(fecha, codigo)
+        })
+        .then(function (resp) {
+          const { ventaRow, cliente } = resp
+          ventaRow.formaPago.should.be.equal(formaPagoUpdated)
+          ventaRow.autorizacion.should.be.equal(autorizacionUpdated)
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+      })
+  })
+
 })
