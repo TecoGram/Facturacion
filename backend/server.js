@@ -171,7 +171,6 @@ app.post('/venta/new', function (req, res) {
     productos,
 
   } = req.body
-  let facturaFileName = codigo + fecha + '.pdf'
 
   db.insertarVenta(codigo, cliente, fecha, autorizacion, formaPago, subtotal,
     descuento, iva, total, productos)
@@ -184,6 +183,31 @@ app.post('/venta/new', function (req, res) {
   })
 })
 
+app.post('/venta/update', function (req, res) {
+  const {
+    codigo,
+    cliente,
+    fecha,
+    autorizacion,
+    formaPago,
+    subtotal,
+    descuento,
+    iva,
+    total,
+    productos,
+
+  } = req.body
+
+  db.updateVenta(codigo, cliente, fecha, autorizacion, formaPago, subtotal,
+    descuento, iva, total, productos)
+  .then(function (data) {  //OK!
+    res.status(200)
+    .send("OK")
+  }, function (error) {//ERROR!
+    res.status(500)
+    res.send(error)
+  })
+})
 const server = app.listen(port, function () {
   //eslint-disable-next-line
   console.log('Application listening on  port ' + port);

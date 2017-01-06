@@ -198,6 +198,7 @@ describe('endpoints disponibles para el cliente', function () {
       precioVenta: 11,
     }],
   }
+
   describe('/venta/new', function () {
     it('retorna 200 al ingresar datos correctos', function (done) {
 
@@ -239,6 +240,24 @@ describe('endpoints disponibles para el cliente', function () {
     })
   })
 
+  const formaPagoUpdated = 'VISA'
+  describe('/venta/update', function () {
+    it('retorna 200 al ingresar datos correctos', function (done) {
+      const editedVenta = Object.assign({}, newVentaRow)
+      const autorizacionUpdated = "1235"
+      editedVenta.autorizacion = autorizacionUpdated
+      editedVenta.formaPago = formaPagoUpdated
+      api.updateVenta(editedVenta)
+        .then(function (resp) {
+          const statusCode = resp.status
+          statusCode.should.equal(200)
+          done()
+        }, function (err) {
+          done(err)
+        })
+    })
+  })
+
   describe('/venta/ver/:fecha/:codigo', function () {
     it('descarga el pdf de una factura existente', function(done) {
       const url = api.getFacturaURL(newVentaRow.codigo, newVentaRow.fecha)
@@ -256,7 +275,7 @@ describe('endpoints disponibles para el cliente', function () {
           const { facturaData, productos, cliente } = resp.body
           facturaData.codigo.should.equal(newVentaRow.codigo)
           facturaData.fecha.should.equal(newVentaRow.fecha)
-          facturaData.formaPago.should.equal(newVentaRow.formaPago)
+          facturaData.formaPago.should.equal(formaPagoUpdated)
 
           productos.length.should.equal(newVentaRow.productos.length)
 

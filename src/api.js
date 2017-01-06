@@ -42,6 +42,12 @@ module.exports = {
       .set('Accept', 'application/json')
   },
 
+  updateVenta: (ventaRow) => {
+    return request.post(prefix + '/venta/update')
+      .send(ventaRow)
+      .set('Accept', 'application/json')
+  },
+
   findVentas: (queryString) => {
     return request.get(prefix + '/venta/find?q=' + queryString)
       .send()

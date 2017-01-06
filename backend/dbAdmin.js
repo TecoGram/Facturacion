@@ -131,7 +131,6 @@ module.exports = {
       return insertarVenta(trx, codigo, cliente, fecha, autorizacion, formaPago,
     subtotal, descuento, iva, total)
       .then((ids) => {
-        const ventaId = ids[0]
         colocarVentaID(unidades, fecha, codigo)
         return insertarNuevasUnidades(trx, unidades)
       }, (err) => {
@@ -149,7 +148,6 @@ module.exports = {
         return deleteUnidadesVenta(trx, codigo, fecha)
       })
       .then((ids) => {
-        const ventaId = ids[0]
         colocarVentaID(unidades, fecha, codigo)
         return insertarNuevasUnidades(trx, unidades)
       })
