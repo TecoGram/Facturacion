@@ -1,4 +1,4 @@
-const format = require('fecha').format
+const { oneYearFromToday, toReadableDate } = require('../DateParser.js')
 const iva = 0.14
 
 const calcularSubtotal = (productos) => {
@@ -35,9 +35,9 @@ const crearProductosVendidosRows = (productos) => {
   for (let i = 0; i < len; i++) {
     const producto = productos.get(i)
     unidades.push({
-      producto: producto.get('rowid'),
+      producto: producto.get('producto'),
       lote: producto.get('lote'),
-      fechaExp: producto.get('fechaExp'),
+      fechaExp: toReadableDate(producto.get('fechaExp')),
       count: producto.get('count'),
       precioVenta: producto.get('precioVenta'),
     })
@@ -65,6 +65,18 @@ const crearUnidadesRows = (productos) => {
 module.exports = {
   crearUnidadesRows: crearUnidadesRows,
 
+  productoAUnidad: (producto) => {
+    const unidad = Object.assign({}, producto)
+    unidad.producto = producto.rowid
+    delete unidad.rowid
+    delete unidad.codigo
+    delete unidad.precioDist
+    unidad.lote = ''
+    unidad.count = 1
+    unidad.fechaExp = oneYearFromToday()
+    return unidad
+  },
+
   crearVentaRow: (clienteObj, facturaData, productos) => {
 
     const desc = facturaData.get('descuento')
@@ -81,7 +93,7 @@ module.exports = {
       descuento: rebaja,
       autorizacion: facturaData.get('autorizacion'),
       formaPago: facturaData.get('formaPago'),
-      fecha: format(facturaData.get('fecha'), 'YYYY-MM-DD'),
+      fecha: toReadableDate(facturaData.get('fecha')),
       iva: valorIVA,
       subtotal: subtotal,
       total: total,

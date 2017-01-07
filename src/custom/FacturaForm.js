@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import DatePicker from 'material-ui/DatePicker';
 import TextField from 'material-ui/TextField';
 
 import AddShoppingCart from 'material-ui/svg-icons/action/add-shopping-cart';
@@ -13,6 +12,7 @@ import Today from 'material-ui/svg-icons/action/today';
 import ClienteAutoComplete from './AutoComplete/ClienteAutoComplete'
 import ProductoAutoComplete from './AutoComplete/ProductoAutoComplete'
 import SelectedClienteChip from './SelectedClienteChip'
+import FormattedDatePicker from '../lib/FormattedDatePicker';
 import IconBox from '../lib/IconBox'
 
 const autoCompleteWidth = '425px'
@@ -71,7 +71,7 @@ const FechaText = (props) => {
     myProps.onChange = (n, date) => onDataChanged('fecha', date)
   }
 
-  return <DatePicker {...myProps} />
+  return <FormattedDatePicker {...myProps} />
 }
 
 const ClienteInput = (props) => {

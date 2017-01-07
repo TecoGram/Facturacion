@@ -6,9 +6,9 @@ import PaperContainer from '../lib/PaperContainer'
 import FacturaForm from './FacturaForm'
 import FacturaTable from './FacturaTable'
 import FacturaResults from './FacturaResults'
-import { /*crearUnidadesRow,*/ crearVentaRow } from './FacturacionUtils'
+import { crearVentaRow, productoAUnidad } from './FacturacionUtils'
 import { validarVentaRow } from '../Validacion'
-import { insertarVenta, getFacturaURL, verVenta } from '../api'
+import { insertarVenta, updateVenta, getFacturaURL, verVenta } from '../api'
 import DateParser from '../DateParser'
 
 export default class FacturarView extends Component {
@@ -39,12 +39,10 @@ export default class FacturarView extends Component {
   }
 
   onNewProductFromKeyboard = (newProduct) => {
-    newProduct.lote = ''
-    newProduct.count = 1
-    //fecha de expiracion: dentro de un año
-    newProduct.fechaExp = new Date(new Date().setFullYear(new Date().getFullYear() + 1))
-    const immutableProduct = Immutable.Map(newProduct)
-    this.setState({ productos: this.state.productos.push(immutableProduct) })
+    this.setState((prevState) => {
+      const unidad = Immutable.Map(productoAUnidad(newProduct))
+      return { productos: prevState.productos.push(unidad) }
+    })
   }
 
   newValueIsAppropiate(key, newValue) {
@@ -56,7 +54,6 @@ export default class FacturarView extends Component {
       default:
         return true
     }
-
   }
 
   onFacturaDataChanged = (key, newValue) => {
@@ -89,12 +86,22 @@ export default class FacturarView extends Component {
     if(errors)
       this.setState({errors: errors})
     else {
-      insertarVenta(ventaRow)
-      .then((resp) => {
+      let msg, prom
+      if (this.props.ventaKey) {
+        prom = updateVenta(ventaRow)
+        msg = 'La factura se editó exitosamente.'
+      } else {
+        prom = insertarVenta(ventaRow)
+        msg = 'La factura se generó exitosamente.'
+      }
+      prom.then((resp) => {
         this.setState(this.getDefaultState())
-        const pdfLink = getFacturaURL(ventaRow.fecha, ventaRow.codigo)
+        const pdfLink = getFacturaURL(ventaRow.codigo, ventaRow.fecha)
         window.open(pdfLink)
-        this.props.abrirLinkConSnackbar('La factura se generó exitosamente.', pdfLink)
+        this.props.abrirLinkConSnackbar(msg, pdfLink)
+      })
+      .catch((err) => {
+        console.error(err)
       })
     }
   }
@@ -121,7 +128,6 @@ export default class FacturarView extends Component {
             productos: Immutable.fromJS(resp.productos),
           })
         })
-
   }
 
   render() {

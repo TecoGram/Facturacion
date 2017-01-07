@@ -171,7 +171,6 @@ app.post('/venta/new', function (req, res) {
     productos,
 
   } = req.body
-
   db.insertarVenta(codigo, cliente, fecha, autorizacion, formaPago, subtotal,
     descuento, iva, total, productos)
   .then(function (data) {  //OK!
@@ -203,7 +202,8 @@ app.post('/venta/update', function (req, res) {
   .then(function (data) {  //OK!
     res.status(200)
     .send("OK")
-  }, function (error) {//ERROR!
+  })
+  .catch(function (error) {//ERROR!
     res.status(500)
     res.send(error)
   })

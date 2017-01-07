@@ -254,9 +254,11 @@ describe('metodos de dbAdmin.js', function () {
         const producto2 = ventaRow.productos[1]
 
         producto1.precioVenta.should.equal(10)
+        producto1.producto.should.equal(1)
         producto1.count.should.equal(1)
         producto1.fechaExp.should.equal('2016-11-26')
         producto2.precioVenta.should.equal(7)
+        producto2.producto.should.equal(2)
         producto2.count.should.equal(2)
         producto2.fechaExp.should.equal('2016-11-26')
         done()
@@ -308,6 +310,38 @@ describe('metodos de dbAdmin.js', function () {
           const { ventaRow, cliente } = resp
           ventaRow.formaPago.should.be.equal(formaPagoUpdated)
           ventaRow.autorizacion.should.be.equal(autorizacionUpdated)
+          ventaRow.productos.length.should.be.equal(2)
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+      })
+
+    it('Permite modificar la lista de productos vendidos',
+      function (done) {
+        const productosUpdated = [
+          {
+            producto: 1,
+            fechaExp: '2016-11-26',
+            lote: '545f2',
+            count: 1,
+            precioVenta: 10,
+          },
+        ]
+        db.updateVenta(codigo, ruc, fecha, autorizacionUpdated, formaPagoUpdated,
+          subtotal, descuento, iva, total, productosUpdated)
+        .then(function (res) {
+          const lasInsertedId = res[0]
+          lasInsertedId.should.be.a('number')
+          return db.getFacturaData(fecha, codigo)
+        })
+        .then(function (resp) {
+          const { ventaRow, cliente } = resp
+          ventaRow.formaPago.should.be.equal(formaPagoUpdated)
+          ventaRow.autorizacion.should.be.equal(autorizacionUpdated)
+          ventaRow.productos.length.should.be.equal(1)
+
           done()
         })
         .catch(function (err) {

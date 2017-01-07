@@ -4,30 +4,32 @@ import { NEW_FACTURA_PAGE, FACTURA_LIST_PAGE, EDITAR_FACTURA_PAGE } from './Page
 import { CAMBIAR_DIALOG_ACTION, CAMBIAR_PAGE_ACTION, CERRAR_DIALOG_CON_MSG_ACTION,
   ABRIR_LINK_CON_SNACKBAR } from './ActionTypes'
 
-  const cambiarPagina = (tipoPagina, props) => {
-    switch (tipoPagina) {
-      case NEW_FACTURA_PAGE:
-        return {
-          type: CAMBIAR_PAGE_ACTION,
-          value: NEW_FACTURA_PAGE,
-          props: props,
-        }
-      case FACTURA_LIST_PAGE:
-        return {
-          type: CAMBIAR_PAGE_ACTION,
-          value: FACTURA_LIST_PAGE,
-          props: props,
-        }
-      case EDITAR_FACTURA_PAGE:
-        return {
-          type: CAMBIAR_PAGE_ACTION,
-          value: EDITAR_FACTURA_PAGE,
-          props: props,
-        }
-      default:
-        throw new Error("Tipo de pagina desconocida: " + tipoPagina)
-    }
+import { parseDBDate } from './DateParser'
+
+const cambiarPagina = (tipoPagina, props) => {
+  switch (tipoPagina) {
+    case NEW_FACTURA_PAGE:
+      return {
+        type: CAMBIAR_PAGE_ACTION,
+        value: NEW_FACTURA_PAGE,
+        props: props,
+      }
+    case FACTURA_LIST_PAGE:
+      return {
+        type: CAMBIAR_PAGE_ACTION,
+        value: FACTURA_LIST_PAGE,
+        props: props,
+      }
+    case EDITAR_FACTURA_PAGE:
+      return {
+        type: CAMBIAR_PAGE_ACTION,
+        value: EDITAR_FACTURA_PAGE,
+        props: props,
+      }
+    default:
+      throw new Error("Tipo de pagina desconocida: " + tipoPagina)
   }
+}
 
 module.exports = {
   cambiarDialog(tipoDialog) {
@@ -61,7 +63,7 @@ module.exports = {
       ventaKey: {
         codigo: codigo,
         fechaString: fechaString,
-        fecha: new Date(fechaString),
+        fecha: parseDBDate(fechaString),
       },
     })
   },

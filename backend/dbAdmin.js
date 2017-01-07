@@ -71,7 +71,7 @@ const getCliente = (ruc) => {
 }
 
 const getUnidadesVenta = (fecha, codigo) => {
-  const q = knex.select('productos.nombre', 'unidades.count',
+  const q = knex.select('productos.nombre', 'unidades.producto', 'unidades.count',
   'unidades.precioVenta', 'unidades.lote', 'unidades.fechaExp')
   .from('unidades')
   .join('productos', {'unidades.producto' : 'productos.rowid' })

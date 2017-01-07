@@ -7,6 +7,7 @@ const chai = require('chai')
   , should = chai.should();
 
 const FacturacionUtils = require('../../src/custom/FacturacionUtils.js')
+const DateParser = require('../../src/DateParser.js')
 
 const unexpectedError = Error('Ocurrio algo inesperado');
 
@@ -28,16 +29,16 @@ describe('FacturacionUtils', function () {
 
       const productos = Immutable.List.of(
         Immutable.Map({
-          rowid: 1,
+          producto: 1,
           lote: 'asd3',
-          fechaExp: '2017-02-02',
+          fechaExp: DateParser.parseDBDate('2017-02-02'), //Fecha como la pone la DB
           count: 1,
           precioVenta: 10,
         }),
         Immutable.Map({
-          rowid: 2,
+          producto: 2,
           lote: 'asd5',
-          fechaExp: '2017-02-02',
+          fechaExp: DateParser.oneYearFromToday(), //fecha como la pone FacturarView por default
           count: 2,
           precioVenta: 20,
         })
@@ -66,7 +67,10 @@ describe('FacturacionUtils', function () {
       const segundoItem = unidades[1]
       segundoItem.producto.should.equal(2)
       segundoItem.lote.should.equal('asd5')
-      segundoItem.fechaExp.should.equal('2017-02-02')
+      segundoItem.fechaExp.length.should.be.equal(10)
+      segundoItem.fechaExp.should.contain('-')
+      segundoItem.fechaExp.should.not.contain('/')
+      segundoItem.fechaExp.should.not.contain(' ')
       segundoItem.precioVenta.should.equal(20)
       segundoItem.count.should.equal(2)
     })
@@ -132,6 +136,30 @@ describe('FacturacionUtils', function () {
       expect(valorIVA).to.be.closeTo(15.953, 0.001)
       expect(total).to.be.closeTo(129.90, 0.005)
     })
+  })
+
+  describe('productoAUnidad', function() {
+    it('convierte una fila de producto a una fila de unidad con valores por defecto', function () {
+      const producto = {
+        rowid: 14,
+        nombre: 'Acido Urico',
+        precioDist: 19.99,
+        precioVenta: 29.99,
+        codigo: 'asdf',
+      }
+
+      const unidad = FacturacionUtils.productoAUnidad(producto)
+
+      unidad.should.have.property('producto', producto.rowid)
+      unidad.should.not.have.property('rowid')
+      unidad.should.not.have.property('precioDist')
+      unidad.should.not.have.property('codigo')
+      unidad.should.have.property('precioVenta', producto.precioVenta)
+      unidad.should.have.property('fechaExp')
+      unidad.should.have.property('count', 1)
+      unidad.should.have.property('lote', '')
+    })
+
   })
 
 })
