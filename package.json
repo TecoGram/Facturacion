@@ -38,11 +38,11 @@
     "server": "node backend/server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "istanbul": "NODE_ENV=test istanbul cover _mocha test/db/ test/util/ && cat coverage/lcov.info | coveralls",
+    "istanbul": "NODE_ENV=test istanbul cover _mocha test/backend/ test/util/ && cat coverage/lcov.info | coveralls",
     "test": "react-scripts test --env=jsdom",
-    "test-db": "NODE_ENV=test mocha test/dbTest.js",
-    "test-api": "NODE_ENV=test mocha test/apiTest.js",
-    "test-backend": "NODE_ENV=test mocha test/db",
+    "test-db": "NODE_ENV=test mocha test/backend/dbTest.js",
+    "test-api": "NODE_ENV=test mocha test/backend/apiTest.js",
+    "test-backend": "NODE_ENV=test mocha test/backend",
     "test-utils": "NODE_ENV=test mocha test/util/",
     "eject": "react-scripts eject"
   }

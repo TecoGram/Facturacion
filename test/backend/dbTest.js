@@ -20,7 +20,6 @@ const setup = require('../../backend/scripts/setupDB.js')
 describe('metodos de dbAdmin.js', function () {
 
   before('borrar base de datos de prueba', function (done) {
-    console.log('wipe  db')
     setup().then(() => done())
   })
 

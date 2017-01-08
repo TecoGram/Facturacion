@@ -3,7 +3,6 @@ const knex = require('../db.js')
 module.exports = () => {
   return knex.schema.hasTable('productos')
   .then((exists) => {
-    console.log('setup start')
     if(!exists)
       return knex.schema.createTable('productos', (table) => {
         table.integer('rowid').primary()

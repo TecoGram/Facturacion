@@ -25,7 +25,6 @@ if(process.env.NODE_ENV !== 'test') {
 describe('server.js', function () {
 
   before('borrar base de datos de prueba', function (done) {
-    console.log('wipe api')
     setup().then(() => done())
   })
 
