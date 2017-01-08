@@ -71,6 +71,10 @@ export default class FacturarView extends Component {
     }
   }
 
+  onProductDeleted = (index) => {
+    this.setState({productos: this.state.productos.remove(index)})
+  }
+
   onGenerarFacturaClick = () => {
 
     const {
@@ -149,7 +153,8 @@ export default class FacturarView extends Component {
           <FacturaForm data={facturaData.toJS()} errors={errors} cliente={cliente}
             onDataChanged={this.onFacturaDataChanged} ventaKey={ventaKey}
             onNewCliente={this.onNewCliente} onNewProduct={this.onNewProductFromKeyboard}/>
-          <FacturaTable items={productos} onProductChanged={this.onProductChanged}/>
+          <FacturaTable items={productos} onProductChanged={this.onProductChanged}
+            onProductDeleted={this.onProductDeleted}/>
           <FacturaResults productos={productos} descuento={Number(descuento)}
             onGuardarClick={this.onGenerarFacturaClick} nuevo={!ventaKey}
             guardarButtonDisabled={this.guardarFacturaDisabled()}/>

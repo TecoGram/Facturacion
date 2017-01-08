@@ -1,8 +1,11 @@
 import React from 'react';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import TextField from 'material-ui/TextField'
+import IconButton from 'material-ui/IconButton';
+import Clear from 'material-ui/svg-icons/content/clear';
 import FormattedDatePicker from '../../lib/FormattedDatePicker'
 
+const black54p = '#757575'
 const noPaddingStyle = {padding: '0px'}
 const renderTableHeader = () => {
   return (
@@ -16,6 +19,7 @@ const renderTableHeader = () => {
         <TableHeaderColumn width={70} style={noPaddingStyle}>Fecha Exp.</TableHeaderColumn>
         <TableHeaderColumn width={60} style={noPaddingStyle}>Precio</TableHeaderColumn>
         <TableHeaderColumn width={50} style={noPaddingStyle}>Importe</TableHeaderColumn>
+        <TableHeaderColumn width={30} style={noPaddingStyle}></TableHeaderColumn>
       </TableRow>
     </TableHeader>
   )
@@ -23,8 +27,17 @@ const renderTableHeader = () => {
 
 export default class FacturaTable extends React.Component {
 
+  static propTypes = {
+    items: React.PropTypes.object.isRequired,
+    onProductChanged: React.PropTypes.func.isRequired,
+    onProductDeleted: React.PropTypes.func.isRequired,
+  }
+
   renderRow = (product, i) => {
-    const onProductChanged = this.props.onProductChanged
+    const {
+      onProductChanged,
+      onProductDeleted,
+    } = this.props
     const today = new Date()
     return (
     <TableRow key={i}>
@@ -59,14 +72,20 @@ export default class FacturaTable extends React.Component {
           inputStyle={{textAlign: 'right', fontSize: '13px'}}/>
       </TableRowColumn>
 
-      <TableRowColumn width={50} style={{padding: '0px', textAlign: 'right'}}>
-        <a style={{marginRight: '24px'}}>
+      <TableRowColumn width={50} style={{padding: '0px', textAlign: 'right', textOverflow: 'clip'}}>
+        <a style={{marginRight: '34px'}}>
         $ {Number(product.get('precioVenta') * product.get('count')).toFixed(2)}
         </a>
       </TableRowColumn>
 
+      <TableRowColumn width={30} style={{padding: '0px', textAlign: 'right'}} >
+                <IconButton onTouchTap={() => onProductDeleted(i)}>
+                  <Clear color={black54p}/>
+                </IconButton>
+      </TableRowColumn>
+
     </TableRow>
-  )
+    )
   }
 
   render() {
