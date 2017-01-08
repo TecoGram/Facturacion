@@ -141,6 +141,25 @@ app.get('/venta/ver/:fecha/:codigo', function (req, res) {
       })
 })
 
+app.get('/venta/delete/:fecha/:codigo', function (req,res) {
+  const {
+    fecha,
+    codigo,
+  } = req.params
+  db.deleteVenta(codigo, fecha)
+  .then(function(deletions) {
+    if (deletions === 0)
+      res.status(404)
+      .send(`Factura con codigo: ${codigo} y fecha: ${fecha} no encontrada}`)
+    else
+      res.status(200)
+      .send('OK')
+  }, function (err) {//ERROR!
+    res.status(500)
+    .send(err)
+  })
+});
+
 app.get('/venta/find', function (req,res) {
   const q = req.query.q || ''
   db.findVentas(q)

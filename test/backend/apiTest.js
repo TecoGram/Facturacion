@@ -335,4 +335,31 @@ describe('endpoints disponibles para el cliente', function () {
     })
   })
 
+  describe('/venta/delete', function () {
+    it('retorna 200 al borrar factura exitosamente', function (done) {
+      api.deleteVenta(newVentaRow.codigo, newVentaRow.fecha)
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        return api.findVentas('')
+      })
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        resp.body.should.have.lengthOf(1)
+        done()
+      })
+      .catch(done)
+    })
+
+    it('retorna 404 al intentar borrar una factura no encontrada', function (done) {
+      api.deleteVenta('111', '2017-02-02')
+      .then(undefined, function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(404)
+        done()
+      })
+      .catch(done)
+    })
+  })
 })

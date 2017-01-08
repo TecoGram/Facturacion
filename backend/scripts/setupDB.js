@@ -58,3 +58,6 @@ module.exports = () => {
       .then(() => {return knex('clientes').truncate() })
   })
 }
+
+if (require.main === module)
+  module.exports().then(() => { knex.destroy() })

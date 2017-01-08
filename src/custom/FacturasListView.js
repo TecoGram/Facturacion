@@ -1,6 +1,6 @@
 import React from 'react'
 import MaterialTable from '../lib/MaterialTable'
-import { getFacturaURL, findVentas } from '../api'
+import { getFacturaURL, findVentas, deleteVenta } from '../api'
 
 const columns = ['Código', 'Fecha', 'RUC', 'Cliente', 'Total']
 const keys = ['codigo', 'fecha', 'ruc', 'nombre', 'total']
@@ -26,6 +26,15 @@ export default class FacturasListView extends React.Component {
     this.props.editarFactura(codigo, fecha)
   }
 
+  deleteRow = (index) => {
+    const { codigo, fecha } = this.state.rows[index]
+    deleteVenta(codigo, fecha)
+    .then(() => {
+      if (this.state.rows.length === 1)
+        this.setState({rows: this.state.rows.filter((item, i) => i !== index)})
+    })
+  }
+
   requestData = (input) => {
     findVentas(input)
       .then((resp) => {
@@ -47,7 +56,7 @@ export default class FacturasListView extends React.Component {
     return (
       <MaterialTable columns={columns} keys={keys} rows={rows}
         searchHint={searchHint} onOpenItem={this.openFacturaInNewTab} onEditItem={this.openEditorPage}
-        enableCheckbox={false} onQueryChanged={this.requestData}/>
+        onDeleteItem={this.deleteRow} enableCheckbox={false} onQueryChanged={this.requestData}/>
     )
   }
 

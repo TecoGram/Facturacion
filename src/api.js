@@ -59,6 +59,12 @@ module.exports = {
       .set('Accept', 'application/json')
   },
 
+  deleteVenta: (codigo, fecha) => {
+    return request.get(prefix + `/venta/delete/${fecha}/${codigo}`)
+      .send()
+      .set('Accept', 'application/json')
+  },
+
   getFacturaURL: (codigo, fecha) => {
     return `http://localhost:8192/venta/ver/${fecha}/${codigo}`
   },
