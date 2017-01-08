@@ -97,8 +97,9 @@ const billetesPalabras = (billetes) => {
     return billetesPalabras(Math.trunc(billetes / 1000)) + " MIL " + billetesPalabras(billetes % 1000);
 }
 
-const valorPalabras = (valor) => {
-  const decimales = Number(valor % 1).toFixed(2) * 100
+const valorPalabras = (valorRaw) => {
+  const valor = Number(valorRaw).toFixed(2)
+  const decimales = valor.split('.')[1]
   const billetes = Math.trunc(valor)
   return `${billetesPalabras(billetes)} CON ${decimales}/100 DÓLARES`
 

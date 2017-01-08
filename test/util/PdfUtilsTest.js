@@ -39,15 +39,27 @@ describe('pdfutils', function () {
   })
 
   it('valorPalabras convierte numeros de punto flotante a cadenas de caracteres legibles', function () {
-    valorPalabras(1).should.equal('UN CON 0/100 DÓLARES')
-    valorPalabras(11).should.equal('ONCE CON 0/100 DÓLARES')
-    valorPalabras(12.02).should.equal('DOCE CON 2/100 DÓLARES')
+    valorPalabras(1).should.equal('UN CON 00/100 DÓLARES')
+    valorPalabras(11).should.equal('ONCE CON 00/100 DÓLARES')
+    valorPalabras(12.02).should.equal('DOCE CON 02/100 DÓLARES')
     valorPalabras(13.78).should.equal('TRECE CON 78/100 DÓLARES')
     valorPalabras(27.90).should.equal('VEINTISIETE CON 90/100 DÓLARES')
     valorPalabras(60.54).should.equal('SESENTA CON 54/100 DÓLARES')
-    valorPalabras(70.00).should.equal('SETENTA CON 0/100 DÓLARES')
-    valorPalabras(80.01).should.equal('OCHENTA CON 1/100 DÓLARES')
+    valorPalabras(70.00).should.equal('SETENTA CON 00/100 DÓLARES')
+    valorPalabras(80.01).should.equal('OCHENTA CON 01/100 DÓLARES')
     valorPalabras(90.99).should.equal('NOVENTA CON 99/100 DÓLARES')
     valorPalabras(1000.45).should.equal('MIL CON 45/100 DÓLARES')
+  })
+
+  it('valorPalabras redondea correctamente los centavos', function () {
+    valorPalabras(54.999999).should.equal('CINCUENTA Y CINCO CON 00/100 DÓLARES')
+    valorPalabras(45.4899999999).should.equal('CUARENTA Y CINCO CON 49/100 DÓLARES')
+    valorPalabras(45.5772).should.equal('CUARENTA Y CINCO CON 58/100 DÓLARES')
+    valorPalabras(32.0772).should.equal('TREINTA Y DOS CON 08/100 DÓLARES')
+  })
+
+  it('valorPalabras tambien acepta strings como argumento', function () {
+    valorPalabras('54.999999').should.equal('CINCUENTA Y CINCO CON 00/100 DÓLARES')
+    valorPalabras('45.4899999999').should.equal('CUARENTA Y CINCO CON 49/100 DÓLARES')
   })
 })
