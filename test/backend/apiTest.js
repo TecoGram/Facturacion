@@ -115,6 +115,76 @@ describe('endpoints disponibles para el cliente', function () {
     })
   })
 
+  const medico1 = {
+    nombre: 'Dr. Juan Coronel',
+    direccion: 'Avenida Leopoldo Carrera Calvo 493',
+    correo: 'jcoronel23@yahoo.com.ec', comision: 20,
+    telefono1: '2448272', telefono2: '2885685',
+  }
+  describe('/medico/new', function () {
+    it('retorna 200 al ingresar datos correctos', function (done) {
+      api.insertarMedico(
+        medico1.nombre,
+        medico1.direccion,
+        medico1.correo, medico1.comision,
+        medico1.telefono1, medico1.telefono2)
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        done()
+      }, function (err) {
+        console.error('test fail ' + JSON.stringify(err))
+        done(err)
+      })
+    })
+
+    it('retorna 500 al ingresar medico con un nombre ya existente', function (done) {
+      api.insertarMedico(
+        medico1.nombre,
+        'Via a Samborondon km. 7.5 Urbanizacion Tornasol mz. 5 villa 20',
+        'edu_vc@outlook.com', 10,
+        '2854345', '28654768')
+      .then(undefined, function (err) {
+        const statusCode = err.status
+        const resp = err.response
+        statusCode.should.equal(422)
+        resp.text.should.be.a('string')
+        const db_error = JSON.parse(resp.text)
+        db_error.code.should.equal('SQLITE_CONSTRAINT')
+        done()
+      })
+    })
+  })
+
+  describe('/medico/find', function () {
+
+    it('retorna 200 al encontrar medicos', function (done) {
+      api.findMedicos('ju')
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        const clientes = resp.body
+        clientes.should.be.a('array')
+        clientes.length.should.equal(1)
+        done()
+      }, function (err) {
+        console.error('test fail ' + JSON.stringify(err))
+        done(err)
+      })
+    })
+
+    it('retorna 404 si no encuentra medicos', function (done) {
+      api.findMedicos('xyz')
+      .then(undefined, function (err) {
+        const statusCode = err.status
+        const resp = err.response
+        statusCode.should.equal(404)
+        resp.text.should.be.a('string')
+        done()
+      })
+    })
+  })
+
   const mi_producto = 'TGO 8x50'
   describe('/producto/new', function () {
     it('retorna 200 al ingresar datos correctos', function (done) {

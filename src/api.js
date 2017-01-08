@@ -20,6 +20,24 @@ module.exports = {
       .send()
   },
 
+  insertarMedico: (nombre, direccion, comision, email, telefono1, telefono2) => {
+    return request.post(prefix + '/medico/new')
+      .send({
+        nombre: nombre,
+        direccion: direccion,
+        email: email,
+        comision,
+        telefono1: telefono1,
+        telefono2: telefono2,
+      })
+      .set('Accept', 'application/json')
+  },
+
+  findMedicos: (queryString) => {
+    return request.get(prefix + '/medico/find?q=' + queryString)
+      .send()
+  },
+
   insertarProducto: (codigo, nombre, precioDist, precioVenta) => {
     return request.post(prefix + '/producto/new')
       .send({

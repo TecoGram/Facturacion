@@ -149,7 +149,6 @@ describe('metodos de dbAdmin.js', function () {
         ids[0].should.be.a('number')
         done()
       })
-
     })
 
   })

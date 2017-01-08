@@ -63,6 +63,46 @@ app.get('/cliente/find', function (req,res) {
 
 });
 
+
+app.post('/medico/new', function (req, res) {
+  const {
+    nombre,
+    direccion,
+    email,
+    comision,
+    telefono1,
+    telefono2,
+  } = req.body
+
+  db.insertarMedico(nombre, email, direccion, comision, telefono1, telefono2)
+  .then(function (data) {//OK!
+    res.status(200)
+    .send('OK')
+  }, function (err) {//ERROR!
+    printError('db error: ' + err)
+    res.status(422)
+    .send(err)
+  })
+
+});
+
+app.get('/medico/find', function (req,res) {
+  const q = req.query.q || ''
+  db.findMedicos(q)
+  .then(function(medicos) {
+    if(medicos.length === 0)
+      res.status(404)
+      .send('No existen clientes con esa cadena de caracteres')
+    else
+      res.status(200)
+      .send(medicos)
+  }, function (err) {//ERROR!
+    res.status(500)
+    .send(err)
+  })
+
+});
+
 app.post('/producto/new', function (req, res) {
   const {
     codigo,
