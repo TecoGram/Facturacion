@@ -21,6 +21,17 @@ module.exports = () => {
         table.string('telefono1', 10)
         table.string('telefono2', 10)
       })
+      .createTable('medicos', (table) => {
+        table.integer('rowid').primary()
+        table.string('nombre', 50)
+        table.string('direccion', 60)
+        table.string('email', 10)
+        table.integer('comision')
+        table.string('telefono1', 10)
+        table.string('telefono2', 10)
+        
+        table.unique('nombre')
+      })
       .createTable('ventas', (table) => {
         table.string('codigo')
         table.string('cliente')

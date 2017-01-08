@@ -125,6 +125,58 @@ describe('metodos de dbAdmin.js', function () {
 
   })
 
+  const medico1 = {
+    nombre: "Dr. William Hurtado",
+    email: "whurtado@gmail.com",
+    direccion:  "Av. Boyaca y 10 de Agosto 332",
+    comision:  10,
+    telefono1: "2434566",
+    telefono2: "2885855",
+  }
+
+  describe('insertarMedico', function() {
+
+    it('inserta una nueva fila a la tabla medicos', function (done) {
+      db.insertarMedico(medico1.nombre, medico1.direccion, medico1.email,
+        medico1.comision, medico1.telefono1, medico1.telefono2)
+      .then(function (ids) {
+        ids.should.not.be.empty
+        ids[0].should.be.a('number')
+        return db.insertarMedico("Dr. Carlos Jaramillo", "Av. Brasil 546",
+        "carlos-jm@live.com", 5, "2353477", "2375980")
+      }).then(function(ids) {
+        ids.should.not.be.empty
+        ids[0].should.be.a('number')
+        done()
+      })
+
+    })
+
+  })
+
+  describe('findMedicos', function () {
+
+    it('retorna un array con todos los medicos existentes si se le pasa un string vacio', function (done) {
+      db.findMedicos('')
+      .then(function(medicos) {
+        medicos.should.be.an('array')
+        medicos.should.have.lengthOf(2)
+        done()
+      })
+    })
+
+    it('puede buscar clientes por nombre, si se le pasa un string no vacio como argumento', function (done) {
+      db.findMedicos('William Hu')
+      .then(function(medicos) {
+        medicos.should.be.an('array')
+        medicos.should.have.lengthOf(1)
+        medicos[0].nombre.should.be.equal('Dr. William Hurtado')
+        done()
+      })
+    })
+
+  })
+
   const ventaInsertada = {
     codigo: '0009993',
     ruc: cliente1.ruc,

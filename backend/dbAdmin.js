@@ -131,6 +131,29 @@ module.exports = {
     return queryObject.limit(5)
   },
 
+  insertarMedico: (nombre, direccion, email, comision, telefono1, telefono2) => {
+    return knex.table('medicos').insert({
+      nombre: nombre,
+      direccion: direccion,
+      email: email,
+      comision: comision,
+      telefono1: telefono1,
+      telefono2: telefono2,
+    })
+  },
+
+  findMedicos: (queryString) => {
+    const queries = queryString.split(' ')
+    const queryObject = knex.select('*')
+      .from('medicos')
+      .where('nombre', 'like', `%${queries[0]}%`)
+
+    for(let i = 1; i < queries.length; i++)
+      queryObject.orWhere('nombre', 'like', `%${queries[i]}%`)
+
+    return queryObject.limit(5)
+  },
+
   insertarVenta: (codigo, cliente, fecha, autorizacion, formaPago,
     subtotal, descuento, iva, total, unidades) => {
     return knex.transaction ((trx) => {
