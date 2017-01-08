@@ -15,8 +15,14 @@ const chai = require('chai')
   , should = chai.should();
 
 const db = require("../../backend/dbAdmin.js")
+const setup = require('../../backend/scripts/setupDB.js')
 
 describe('metodos de dbAdmin.js', function () {
+
+  before('borrar base de datos de prueba', function (done) {
+    console.log('wipe  db')
+    setup().then(() => done())
+  })
 
   describe('insertarProducto', function () {
 
@@ -182,7 +188,7 @@ describe('metodos de dbAdmin.js', function () {
     it ('devuelve las ultimas ventas si se le pasa un string vacio', function (done) {
       db.findVentas('')
         .then(function (results) {
-          results.length.should.be.equal(3)
+          results.length.should.be.equal(1)
 
           const ultimaVenta = results[0]
           ultimaVenta.codigo.should.be.equal(ventaInsertada.codigo)
@@ -348,6 +354,30 @@ describe('metodos de dbAdmin.js', function () {
           done(err)
         })
       })
+  })
+
+  describe('deleteVenta', function () {
+    it('borra una venta de la db y todas las unidades asociadas', function (done) {
+      db.getUnidadesVenta(ventaInsertada.fecha, ventaInsertada.codigo)
+        .then(function (rows) {
+          rows.should.have.lengthOf(1)
+          return db.deleteVenta(ventaInsertada.codigo, ventaInsertada.fecha)
+        })
+        .then(function () {
+          return db.getFacturaData(ventaInsertada.fecha, ventaInsertada.codigo)
+        })
+        .then(undefined, function (err) {
+          err.errorCode.should.be.equal(404)
+          return db.getUnidadesVenta(ventaInsertada.fecha, ventaInsertada.codigo)
+        })
+        .then(function (rows) {
+          rows.should.be.empty
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+    })
   })
 
 })

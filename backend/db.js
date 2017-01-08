@@ -5,5 +5,11 @@ module.exports = require('knex')({
   connection: {
     filename: __dirname + dbFile,
   },
+  pool: {
+    afterCreate: (conn, cb) => {
+      conn.run('PRAGMA foreign_keys = ON', cb)
+    },
+  },
+  // debug: true,
   acquireConnectionTimeout: 10000,
 });

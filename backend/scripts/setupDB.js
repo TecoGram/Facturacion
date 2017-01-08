@@ -1,89 +1,61 @@
 /* eslint-disable no-console */
 const knex = require('../db.js')
+module.exports = () => {
+  return knex.schema.hasTable('productos')
+  .then((exists) => {
+    console.log('setup start')
+    if(!exists)
+      return knex.schema.createTable('productos', (table) => {
+        table.integer('rowid').primary()
+        table.string('codigo', 10)
+        table.string('nombre', 50)
+        table.float('precioDist')
+        table.float('precioVenta')
 
-knex.schema.hasTable('productos')
-.then((exists) => {
-  if(!exists)
-    return knex.schema.createTable('productos', (table) => {
-      console.log('create productos')
-      table.integer('rowid').primary()
-      table.string('codigo', 10)
-      table.string('nombre', 50)
-      table.float('precioDist')
-      table.float('precioVenta')
+        table.unique('nombre')
+      })
+      .createTable('clientes', (table) => {
+        table.string('ruc', 13).primary()
+        table.string('nombre', 50).index()
+        table.string('direccion', 60)
+        table.string('email', 10)
+        table.string('telefono1', 10)
+        table.string('telefono2', 10)
+      })
+      .createTable('ventas', (table) => {
+        table.string('codigo')
+        table.string('cliente')
+        table.date('fecha').index()
+        table.string('autorizacion')
+        table.string('formaPago')
+        table.float('subtotal')
+        table.float('descuento')
+        table.float('iva')
+        table.float('total')
 
-      table.unique('nombre')
-    })
-  else return Promise.resolve()
-})
-.then(() => {
-  return knex.schema.hasTable('clientes')
-})
-.then((exists) => {
-  if(!exists)
-    return knex.schema.createTable('clientes', (table) => {
-      console.log('create clientes')
-      table.string('ruc', 13).primary()
-      table.string('nombre', 50).index()
-      table.string('direccion', 60)
-      table.string('email', 10)
-      table.string('telefono1', 10)
-      table.string('telefono2', 10)
-    })
-  else return Promise.resolve()
-}).then(() => {
-  return knex.schema.hasTable('ventas')
-})
-.then((exists) => {
-  if (!exists)
-    return knex.schema.createTable('ventas', (table) => {
-      console.log('create ventas')
-      table.string('codigo')
-      table.string('cliente')
-      table.date('fecha').index()
-      table.string('autorizacion')
-      table.string('formaPago')
-      table.float('subtotal')
-      table.float('descuento')
-      table.float('iva')
-      table.float('total')
+        table.primary('fecha', 'codigo')
+        table.foreign('cliente').references('clientes.ruc')
+      })
+      .createTable('stock', (table) => {
+        table.integer('producto').unsigned().index()
+        table.string('lote')
+        table.date('fechaExp')
 
-      table.primary('codigo', 'fecha')
-      table.foreign('cliente').references('clientes.ruc')
-    })
-  else return Promise.resolve()
-}).then(() => {
-  return knex.schema.hasTable('stock')
-})
-.then((exists) => {
-  if (!exists)
-    return knex.schema.createTable('stock', (table) => {
-      console.log('create stock')
-      table.integer('producto').unsigned().index()
-      table.string('lote')
-      table.date('fechaExp')
-
-      table.foreign('producto').references('productos.rowid')
-    })
-  else return Promise.resolve()
-}).then(() => {
-  return knex.schema.hasTable('unidades')
-})
-.then((exists) => {
-  if (!exists)
-    return knex.schema.createTable('unidades', (table) => {
-      console.log('create unidades')
-      table.integer('rowid').primary()
-      table.integer('producto').unsigned()
-      table.date('fechaVenta').index()
-      table.string('codigoVenta').index()
-      table.string('lote')
-      table.float('precioVenta')
-      table.integer('count')
-      table.date('fechaExp')
-
-      table.foreign('producto').references('productos.rowid')
-      table.foreign('fechaVenta', 'codigoVenta').references('ventas.fecha', 'ventas.codigo')
-    })
-  else return Promise.resolve()
-}).then(() => { knex.destroy()})
+        table.foreign('producto').references('productos.rowid')
+      })
+    else return Promise.reject()
+  })
+  .then(() => {
+    return knex.raw('create table "unidades" ("rowid" integer, "producto" integer, '
+      + '"fechaVenta" date, "codigoVenta" varchar(255), "lote" varchar(255), '
+      + '"precioVenta" float, "count" integer, "fechaExp" date, foreign key("producto") '
+      + 'references "productos"("rowid"), foreign key("fechaVenta", "codigoVenta") '
+      + 'references "ventas"("fecha", "codigo") on delete CASCADE, primary key ("rowid"))')
+  }, () => {//rejection, clear tables instead
+    return knex('unidades').truncate()
+      .then(() => {return knex('stock').truncate() })
+      .then(() => {return knex('ventas').truncate() })
+      .then(() => {return knex('productos').truncate() })
+      .then(() => {return knex('clientes').truncate() })
+  })
+}

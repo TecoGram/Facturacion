@@ -9,6 +9,8 @@ const chai = require('chai')
   , expect = chai.expect
   , should = chai.should();
 
+const setup = require('../../backend/scripts/setupDB.js')
+const FacturacionUtils = require('../../src/custom/FacturacionUtils')
 const unexpectedError = Error('Ocurrio algo inesperado');
 const facturaDir = '/tmp/facturas/'
 
@@ -21,6 +23,12 @@ if(process.env.NODE_ENV !== 'test') {
 }
 
 describe('server.js', function () {
+
+  before('borrar base de datos de prueba', function (done) {
+    console.log('wipe api')
+    setup().then(() => done())
+  })
+
   it ('crea el directorio /tmp/facturas/ durante startup', function () {
     //se asume que el test se ejecuta en la raiz del proyecto
     fs.existsSync(facturaDir).should.equal(true)
@@ -108,8 +116,8 @@ describe('endpoints disponibles para el cliente', function () {
     })
   })
 
+  const mi_producto = 'TGO 8x50'
   describe('/producto/new', function () {
-    const mi_producto = 'TGO 8x50'
     it('retorna 200 al ingresar datos correctos', function (done) {
       api.insertarProducto(
         'rytertg663433g',
@@ -190,27 +198,26 @@ describe('endpoints disponibles para el cliente', function () {
     descuento: 0,
     iva: 2.00,
     total: 22.00,
-    productos: [{
-      producto: 1,
-      lote: 'ert3',
-      fechaExp: '2017-04-04',
-      count: 1,
-      precioVenta: 11,
-    }],
   }
 
   describe('/venta/new', function () {
     it('retorna 200 al ingresar datos correctos', function (done) {
 
-      api.insertarVenta(newVentaRow)
-      .then(function (resp) {
-        const statusCode = resp.status
-        statusCode.should.equal(200)
-        done()
-      }, function (err) {
-        console.error('test fail ' + JSON.stringify(err))
-        done(err)
-      })
+      api.findProductos('TGO 8x50')
+        .then(function (resp) {
+          const products = resp.body
+          const unidades = [ FacturacionUtils.productoAUnidad(products[0]) ]
+          newVentaRow.productos = unidades
+          return api.insertarVenta(newVentaRow)
+        })
+        .then(function (resp) {
+          const statusCode = resp.status
+          statusCode.should.equal(200)
+          done()
+        }, function (err) {
+          console.error('test fail ' + JSON.stringify(err))
+          done(err)
+        })
     })
 
     it('permite ingresar 2 facturas con mismo codigo pero diferente fecha', function (done) {
@@ -222,7 +229,6 @@ describe('endpoints disponibles para el cliente', function () {
         statusCode.should.equal(200)
         done()
       }, function (err) {
-        console.error('test fail ' + JSON.stringify(err))
         done(err)
       })
     })

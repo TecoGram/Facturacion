@@ -39,6 +39,13 @@ const updateVenta = (builder, codigo, cliente, fecha, autorizacion, formaPago,
     })
 }
 
+const deleteVenta = (codigo, fecha) => {
+  return knex('ventas')
+    .where({codigo, fecha})
+    .del()
+}
+
+
 const deleteUnidadesVenta = (builder, codigo, fecha) => {
   return builder('unidades')
     .where({ codigoVenta: codigo, fechaVenta: fecha})
@@ -71,12 +78,11 @@ const getCliente = (ruc) => {
 }
 
 const getUnidadesVenta = (fecha, codigo) => {
-  const q = knex.select('productos.nombre', 'unidades.producto', 'unidades.count',
+  return knex.select('productos.nombre', 'unidades.producto', 'unidades.count',
   'unidades.precioVenta', 'unidades.lote', 'unidades.fechaExp')
   .from('unidades')
   .join('productos', {'unidades.producto' : 'productos.rowid' })
   .where({fechaVenta: fecha, codigoVenta: codigo})
-  return q
 }
 
 module.exports = {
@@ -190,6 +196,8 @@ module.exports = {
     })
   },
 
-  findVentas: findVentas,
+  findVentas,
+  deleteVenta,
+  getUnidadesVenta,
 
 }

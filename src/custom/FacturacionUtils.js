@@ -71,6 +71,7 @@ module.exports = {
     delete unidad.rowid
     delete unidad.codigo
     delete unidad.precioDist
+    delete unidad.nombre
     unidad.lote = ''
     unidad.count = 1
     unidad.fechaExp = oneYearFromToday()
