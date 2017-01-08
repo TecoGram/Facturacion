@@ -69,9 +69,7 @@ module.exports = {
     const unidad = Object.assign({}, producto)
     unidad.producto = producto.rowid
     delete unidad.rowid
-    delete unidad.codigo
     delete unidad.precioDist
-    delete unidad.nombre
     unidad.lote = ''
     unidad.count = 1
     unidad.fechaExp = oneYearFromToday()

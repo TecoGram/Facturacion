@@ -206,6 +206,9 @@ describe('endpoints disponibles para el cliente', function () {
         .then(function (resp) {
           const products = resp.body
           const unidades = [ FacturacionUtils.productoAUnidad(products[0]) ]
+          //knex.js no acepta keys que no corresponden a columnas de la tabla. borralas
+          delete unidades[0].nombre
+          delete unidades[0].codigo
           newVentaRow.productos = unidades
           return api.insertarVenta(newVentaRow)
         })
