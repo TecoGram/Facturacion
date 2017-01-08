@@ -65,25 +65,33 @@ const MainDrawer = (props) => {
   )
 }
 
-const MainSnackbar = (props) => {
-  const data = props.data
-  let action, message, open, onActionTouchTap
-  if (data) {
-    open = true
-    message = data.message
-    if (data.link) {
-      action = "ABRIR"
-      onActionTouchTap = (ev) => window.open(data.link)
-    }
-  } else {
-    open = false
-    message = ''
+class MainSnackbar extends React.Component {
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.data !== nextProps.data) return true
+    return false
   }
 
-  return (
-    <Snackbar open={open} message={message} action={action}
-    onActionTouchTap={onActionTouchTap} autoHideDuration={12000}/>
-  )
+  render () {
+    const data = this.props.data
+    let action, message, open, onActionTouchTap
+    if (data) {
+      open = true
+      message = data.message
+      if (data.link) {
+        action = "ABRIR"
+        onActionTouchTap = (ev) => window.open(data.link)
+      }
+    } else {
+      open = false
+      message = ''
+    }
+
+    return (
+      <Snackbar open={open} message={message} action={action}
+      onActionTouchTap={onActionTouchTap} autoHideDuration={12000}/>
+    )
+  }
 }
 
 class MainToolbar extends Component {
