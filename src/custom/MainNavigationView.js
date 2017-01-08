@@ -22,10 +22,10 @@ import { NEW_FACTURA_PAGE, EDITAR_FACTURA_PAGE, FACTURA_LIST_PAGE } from '../Pag
 
 import ActionCreators from '../ActionCreators'
 import CustomStyle from '../CustomStyle'
-import FacturaView from '../custom/FacturarView'
-import NuevoClienteDialog from '../custom/nuevoCliente/NuevoClienteDialog'
-import NuevoProductoDialog from '../custom/NuevoProducto/NuevoProductoDialog'
-import FacturasListView from '../custom/FacturasListView'
+import FacturaView from './Factura/FacturaEditorView'
+import NuevoClienteDialog from './NuevoCliente/NuevoClienteDialog'
+import NuevoProductoDialog from './NuevoProducto/NuevoProductoDialog'
+import FacturasListView from './FacturasListView'
 import store from '../Store'
 
 const toolbarTextColor = '#FFFFFF'

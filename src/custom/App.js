@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import MainNavigationView from '../lib/MainNavigationView'
+import MainNavigationView from './MainNavigationView'
 
 class App extends Component {
   render() {

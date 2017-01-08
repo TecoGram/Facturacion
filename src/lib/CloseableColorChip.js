@@ -13,7 +13,12 @@ const chipStyle = {
   lineHeight: '24px',
 }
 
-export default class SelectedClienteChip extends React.Component {
+export default class CloseableColorChip extends React.Component {
+
+  static propTypes = {
+    text: React.PropTypes.string.isRequired,
+    onRequestDelete: React.PropTypes.func,
+  }
 
   render() {
     const {

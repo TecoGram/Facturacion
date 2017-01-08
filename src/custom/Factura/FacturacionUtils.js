@@ -1,4 +1,4 @@
-const { oneYearFromToday, toReadableDate } = require('../DateParser.js')
+const { oneYearFromToday, toReadableDate } = require('../../DateParser.js')
 const iva = 0.14
 
 const calcularSubtotal = (productos) => {

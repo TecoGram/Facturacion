@@ -6,7 +6,7 @@ const chai = require('chai')
   , expect = chai.expect
   , should = chai.should();
 
-const FacturacionUtils = require('../../src/custom/FacturacionUtils.js')
+const FacturacionUtils = require('../../src/custom/Factura/FacturacionUtils.js')
 const DateParser = require('../../src/DateParser.js')
 
 const unexpectedError = Error('Ocurrio algo inesperado');

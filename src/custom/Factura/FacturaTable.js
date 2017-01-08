@@ -1,7 +1,7 @@
 import React from 'react';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import TextField from 'material-ui/TextField'
-import FormattedDatePicker from '../lib/FormattedDatePicker'
+import FormattedDatePicker from '../../lib/FormattedDatePicker'
 
 const noPaddingStyle = {padding: '0px'}
 const renderTableHeader = () => {

@@ -2,14 +2,14 @@ import React, {Component} from 'react';
 
 import validator from 'validator'
 import Immutable from 'immutable'
-import PaperContainer from '../lib/PaperContainer'
+import PaperContainer from '../../lib/PaperContainer'
 import FacturaForm from './FacturaForm'
 import FacturaTable from './FacturaTable'
 import FacturaResults from './FacturaResults'
 import { crearVentaRow, productoAUnidad } from './FacturacionUtils'
-import { validarVentaRow } from '../Validacion'
-import { insertarVenta, updateVenta, getFacturaURL, verVenta } from '../api'
-import DateParser from '../DateParser'
+import { validarVentaRow } from '../../Validacion'
+import { insertarVenta, updateVenta, getFacturaURL, verVenta } from '../../api'
+import DateParser from '../../DateParser'
 
 export default class FacturarView extends Component {
 
