@@ -2,21 +2,32 @@ import React from 'react';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import TextField from 'material-ui/TextField'
 import IconButton from 'material-ui/IconButton';
-import Clear from 'material-ui/svg-icons/content/clear';
+import Delete from 'material-ui/svg-icons/action/delete';
 import FormattedDatePicker from '../../lib/FormattedDatePicker'
 
 const black54p = '#757575'
 const noPaddingStyle = {padding: '0px'}
-const renderTableHeader = () => {
+
+const RenderTableHeader = (props) => {
+  let regSanCol = <TableHeaderColumn width={80} style={noPaddingStyle}>Reg. Santario</TableHeaderColumn>
+  let loteCol = <TableHeaderColumn width={60} style={noPaddingStyle}>Lote</TableHeaderColumn>
+  let fechaExpCol = <TableHeaderColumn width={70} style={noPaddingStyle}>Fecha Exp.</TableHeaderColumn>
+
+  if (props.isExamen) { //ocultar columnas que no se usan en examenes
+    regSanCol = null
+    loteCol = null
+    fechaExpCol = null
+  }
+
   return (
     <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
       <TableRow>
         <TableHeaderColumn width={40} style={noPaddingStyle}>#</TableHeaderColumn>
-        <TableHeaderColumn width={80} style={noPaddingStyle}>Reg. Santario</TableHeaderColumn>
+        { regSanCol }
         <TableHeaderColumn width={170} style={noPaddingStyle}>Nombre</TableHeaderColumn>
-        <TableHeaderColumn width={60} style={noPaddingStyle}>Lote</TableHeaderColumn>
+        { loteCol }
         <TableHeaderColumn width={40} style={noPaddingStyle}>Cant.</TableHeaderColumn>
-        <TableHeaderColumn width={70} style={noPaddingStyle}>Fecha Exp.</TableHeaderColumn>
+        { fechaExpCol }
         <TableHeaderColumn width={60} style={noPaddingStyle}>Precio</TableHeaderColumn>
         <TableHeaderColumn width={50} style={noPaddingStyle}>Importe</TableHeaderColumn>
         <TableHeaderColumn width={30} style={noPaddingStyle}></TableHeaderColumn>
@@ -28,31 +39,57 @@ const renderTableHeader = () => {
 export default class FacturaTable extends React.Component {
 
   static propTypes = {
+    isExamen: React.PropTypes.bool,
     items: React.PropTypes.object.isRequired,
     onProductChanged: React.PropTypes.func.isRequired,
     onProductDeleted: React.PropTypes.func.isRequired,
   }
 
+  static defaultProps = {
+    isExamen: false,
+  }
+
   renderRow = (product, i) => {
     const {
+      isExamen,
       onProductChanged,
       onProductDeleted,
     } = this.props
     const today = new Date()
-    return (
-    <TableRow key={i}>
 
-      <TableRowColumn width={40} style={noPaddingStyle}>{i}</TableRowColumn>
-
-      <TableRowColumn width={80} style={noPaddingStyle}>{product.get('codigo')}</TableRowColumn>
-
-      <TableRowColumn width={170} style={noPaddingStyle}>{product.get('nombre')}</TableRowColumn>
-
+    let regSanCol =
+      <TableRowColumn width={80} style={noPaddingStyle}>
+        {product.get('codigo')}
+      </TableRowColumn>
+    let loteCol =
       <TableRowColumn width={60} style={noPaddingStyle}>
         <TextField value={product.get('lote')} style={{width: '50px'}} name={"lote"}
           inputStyle={{textAlign: 'right', fontSize: '13px'}}
           onChange={(event) => { onProductChanged(i, 'lote', event.target.value) }}/>
       </TableRowColumn>
+    let fechaExpCol =
+      <TableRowColumn width={70} style={noPaddingStyle}>
+        <FormattedDatePicker value={product.get('fechaExp')} hintText={"expiración"}
+        textFieldStyle={{width: '70px', fontSize: '13px'}} minDate={today}
+          onChange={(event, date) => { onProductChanged(i, 'fechaExp', date) }}/>
+      </TableRowColumn>
+
+    if (isExamen) { //ocultar columnas que no se usan en examenes
+      regSanCol = null
+      loteCol = null
+      fechaExpCol = null
+    }
+
+    return (
+    <TableRow key={i}>
+
+      <TableRowColumn width={40} style={noPaddingStyle}>{i}</TableRowColumn>
+
+      { regSanCol }
+
+      <TableRowColumn width={170} style={noPaddingStyle}>{product.get('nombre')}</TableRowColumn>
+
+      { loteCol }
 
       <TableRowColumn width={40} style={noPaddingStyle}>
         <TextField style={{width: '28px'}} value={product.get('count')} name={"count"}
@@ -60,19 +97,15 @@ export default class FacturaTable extends React.Component {
           onChange={(event) => { onProductChanged(i, 'count', event.target.value) }}/>
           </TableRowColumn>
 
-      <TableRowColumn width={70} style={noPaddingStyle}>
-        <FormattedDatePicker value={product.get('fechaExp')} hintText={"expiración"}
-        textFieldStyle={{width: '70px', fontSize: '13px'}} minDate={today}
-          onChange={(event, date) => { onProductChanged(i, 'fechaExp', date) }}/>
-      </TableRowColumn>
+      { fechaExpCol }
 
       <TableRowColumn width={60} style={noPaddingStyle}>
-        $<TextField style={{width: '40px'}} name={'precio'} value={product.get('precioVenta')}
+        $ <TextField style={{width: '50px'}} name={'precio'} value={product.get('precioVenta')}
           onChange={(event) => { onProductChanged(i, 'precioVenta', event.target.value) }}
-          inputStyle={{textAlign: 'right', fontSize: '13px'}}/>
+          inputStyle={{fontSize: '13px'}}/>
       </TableRowColumn>
 
-      <TableRowColumn width={50} style={{padding: '0px', textAlign: 'right', textOverflow: 'clip'}}>
+      <TableRowColumn width={50} style={{padding: '0px', textOverflow: 'clip'}}>
         <a style={{marginRight: '34px'}}>
         $ {Number(product.get('precioVenta') * product.get('count')).toFixed(2)}
         </a>
@@ -80,7 +113,7 @@ export default class FacturaTable extends React.Component {
 
       <TableRowColumn width={30} style={{padding: '0px', textAlign: 'right'}} >
                 <IconButton onTouchTap={() => onProductDeleted(i)}>
-                  <Clear color={black54p}/>
+                  <Delete color={black54p}/>
                 </IconButton>
       </TableRowColumn>
 
@@ -91,7 +124,7 @@ export default class FacturaTable extends React.Component {
   render() {
     return (
     <Table height={'300px'} selectable={false}>
-      { renderTableHeader() }
+      { RenderTableHeader(this.props) }
       <TableBody displayRowCheckbox={false}>
         { this.props.items.map(this.renderRow) }
       </TableBody>

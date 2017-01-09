@@ -11,6 +11,7 @@ export default class FacturaResults extends React.Component {
 
   render() {
     const {
+      isExamen,
       productos,
       descuento,
       onGuardarClick,
@@ -27,6 +28,13 @@ export default class FacturaResults extends React.Component {
 
     const label = nuevo ? nuevoLabel : editarLabel
 
+    const ivaRow = isExamen ? null :
+      <tr>
+        <td><strong>{ivaLabel}</strong></td>
+        <td>{Number(valorIVA).toFixed(2)}</td>
+      </tr>
+
+
     return (
       <div style={{width: '100%', textAlign: 'right'}}>
         <br />
@@ -37,10 +45,7 @@ export default class FacturaResults extends React.Component {
               <td><strong>Subtotal: $</strong></td>
               <td style={{paddingLeft:'20px'}}>{Number(subtotal).toFixed(2)}</td>
             </tr>
-            <tr>
-              <td><strong>{ivaLabel}</strong></td>
-              <td>{Number(valorIVA).toFixed(2)}</td>
-            </tr>
+            { ivaRow }
             <tr>
               <td><strong>Descuento: $</strong></td>
               <td>{Number(rebaja).toFixed(2)}</td>
@@ -62,8 +67,13 @@ export default class FacturaResults extends React.Component {
 }
 
 FacturaResults.propTypes = {
+  isExamen: React.PropTypes.bool,
   productos: React.PropTypes.object.isRequired, //Immutable.js list
   descuento: React.PropTypes.number.isRequired,
   onGuardarClick: React.PropTypes.func,
   nuevo: React.PropTypes.bool.isRequired,
+}
+
+FacturaResults.defaultProps = {
+  isExamen: false,
 }

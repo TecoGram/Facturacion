@@ -24,7 +24,7 @@ import { NEW_FACTURA_PAGE, EDITAR_FACTURA_PAGE, FACTURA_LIST_PAGE } from '../Pag
 
 import ActionCreators from '../ActionCreators'
 import CustomStyle from '../CustomStyle'
-import FacturaView from './Factura/FacturaEditorView'
+import FacturaEditorView from './Factura/FacturaEditorView'
 import NuevoClienteDialog from './NuevoCliente/NuevoClienteDialog'
 import NuevoProductoDialog from './NuevoProducto/NuevoProductoDialog'
 import NuevoMedicoDialog from './NuevoMedico/NuevoMedicoDialog'
@@ -221,9 +221,9 @@ const SelectedPage = (props) => {
 
   switch (page.type) {
     case NEW_FACTURA_PAGE:
-      return <FacturaView abrirLinkConSnackbar={abrirLinkConSnackbar} {...page.props}/>
+      return <FacturaEditorView abrirLinkConSnackbar={abrirLinkConSnackbar} isExamen={true} {...page.props}/>
     case EDITAR_FACTURA_PAGE:
-      return <FacturaView abrirLinkConSnackbar={abrirLinkConSnackbar} {...page.props}/>
+      return <FacturaEditorView abrirLinkConSnackbar={abrirLinkConSnackbar} {...page.props}/>
     case FACTURA_LIST_PAGE:
       return <FacturasListView editarFactura={editarFactura} {...page.props}/>
     default:

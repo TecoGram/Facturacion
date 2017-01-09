@@ -154,13 +154,13 @@ export default class FacturaForm extends Component {
       data,
       errors,
       onDataChanged,
-      examen,
+      isExamen,
     } = this.props
 
     let formHeight = '130px'
     let pacienteRow = null
 
-    if (examen) { //renderizar cosas especificas para examenes
+    if (isExamen) { //renderizar cosas especificas para examenes
       formHeight = '170px'
       pacienteRow = <PacienteDataRow {...this.props} />
     }
@@ -232,9 +232,9 @@ FacturaForm.propTypes = {
   data: React.PropTypes.object.isRequired,
   errors: React.PropTypes.object.isRequired,
   onDataChanged: React.PropTypes.func.isRequired,
-  examen: React.PropTypes.bool,
+  isExamen: React.PropTypes.bool,
 }
 
 FacturaForm.defaultProps = {
-  examen: false,
+  isExamen: false,
 }

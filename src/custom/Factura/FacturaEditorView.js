@@ -11,7 +11,7 @@ import { validarVentaRow } from '../../Validacion'
 import { insertarVenta, updateVenta, getFacturaURL, verVenta } from '../../api'
 import DateParser from '../../DateParser'
 
-export default class FacturarView extends Component {
+export default class FacturaEditorView extends Component {
 
   constructor(props) {
     super(props)
@@ -148,7 +148,10 @@ export default class FacturarView extends Component {
       productos,
     } = this.state
 
-    const ventaKey = this.props.ventaKey
+    const {
+      isExamen,
+      ventaKey,
+    } = this.props
 
     const descuento = facturaData.get('descuento')
 
@@ -159,12 +162,12 @@ export default class FacturarView extends Component {
           <FacturaForm data={facturaData.toJS()} errors={errors} cliente={cliente}
             medico={medico} onDataChanged={this.onFacturaDataChanged} ventaKey={ventaKey}
             onNewMedico={this.onNewMedico} onNewCliente={this.onNewCliente}
-            onNewProduct={this.onNewProductFromKeyboard}/>
+            onNewProduct={this.onNewProductFromKeyboard} isExamen={isExamen} />
           <FacturaTable items={productos} onProductChanged={this.onProductChanged}
-            onProductDeleted={this.onProductDeleted}/>
+            onProductDeleted={this.onProductDeleted} isExamen={isExamen} />
           <FacturaResults productos={productos} descuento={Number(descuento)}
             onGuardarClick={this.onGenerarFacturaClick} nuevo={!ventaKey}
-            guardarButtonDisabled={this.guardarFacturaDisabled()}/>
+            guardarButtonDisabled={this.guardarFacturaDisabled()} isExamen={isExamen} />
         </div>
       </PaperContainer>
       </div>
@@ -173,8 +176,9 @@ export default class FacturarView extends Component {
 
 }
 
-FacturarView.propTypes = {
+FacturaEditorView.propTypes = {
   abrirLinkConSnackbar: React.PropTypes.func.isRequired,
+  isExamen: React.PropTypes.bool,
   ventaKey: React.PropTypes.shape({
     codigo: React.PropTypes.string.isRequired,
     fecha: React.PropTypes.object.isRequired,
@@ -182,6 +186,6 @@ FacturarView.propTypes = {
   }),
 }
 
-FacturarView.defaultProps = {
-  nuevo: true,
+FacturaEditorView.defaultProps = {
+  isExamen: false,
 }
