@@ -74,6 +74,55 @@ module.exports = {
     }
   },
 
+  validarMedico: (formData) => {
+
+    const nombre = formData.nombre || ''
+    const email = formData.email || ''
+    const comision = formData.comision || '0'
+    const telefono1 = formData.telefono1 || ''
+    const telefono2 = formData.telefono2 || ''
+
+    const errors = {}
+    const inputs = {}
+
+    if(!validator.isInt(comision))
+      errors.comision = 'comision inválida'
+    else
+      inputs.comision = comision
+
+    if(validator.isEmpty(nombre))
+      errors.nombre = campo_obligatorio
+    else
+      inputs.nombre = nombre
+
+    if(!validator.isEmpty(email) && !validator.isEmail(email))
+      errors.email = 'e-mail inválido'
+    else
+      inputs.email = email
+
+    const invalidPhoneChar1 = usesCharset(telefono1, phoneCharset)
+    if(invalidPhoneChar1)
+      errors.telefono1 = 'caracter inválido: ' + invalidPhoneChar1
+    else
+      inputs.telefono1 = telefono1
+
+    const invalidPhoneChar2 = usesCharset(telefono2, phoneCharset)
+    if(invalidPhoneChar2)
+      errors.telefono2 = 'caracter inválido: ' + invalidPhoneChar2
+    else
+      inputs.telefono2 = telefono2
+
+    if(isEmptyObj(errors))
+      return {
+        errors: null,
+        inputs: inputs,
+      }
+    return {
+      errors: errors,
+      inputs: null,
+    }
+  },
+
   validarProducto: (formData) => {
 
     const codigo = formData.codigo || ''

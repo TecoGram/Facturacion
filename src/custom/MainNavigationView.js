@@ -16,7 +16,9 @@ import { connect, Provider } from 'react-redux'
 
 import { NUEVO_CLIENTE_DIALOG,
   NUEVO_PRODUCTO_DIALOG,
+  NUEVO_MEDICO_DIALOG,
   NUEVO_CLIENTE_DIALOG_CLOSED,
+  NUEVO_MEDICO_DIALOG_CLOSED,
   NUEVO_PRODUCTO_DIALOG_CLOSED } from '../DialogTypes'
 import { NEW_FACTURA_PAGE, EDITAR_FACTURA_PAGE, FACTURA_LIST_PAGE } from '../PageTypes'
 
@@ -25,6 +27,7 @@ import CustomStyle from '../CustomStyle'
 import FacturaView from './Factura/FacturaEditorView'
 import NuevoClienteDialog from './NuevoCliente/NuevoClienteDialog'
 import NuevoProductoDialog from './NuevoProducto/NuevoProductoDialog'
+import NuevoMedicoDialog from './NuevoMedico/NuevoMedicoDialog'
 import FacturasListView from './FacturasListView'
 import store from '../Store'
 
@@ -165,6 +168,8 @@ class MainToolbar extends Component {
               cambiarDialog(NUEVO_PRODUCTO_DIALOG)}/>
             <MenuItem primaryText="Nuevo Cliente" onTouchTap={(event) =>
               cambiarDialog(NUEVO_CLIENTE_DIALOG)}/>
+            <MenuItem primaryText="Nuevo Medico" onTouchTap={(event) =>
+              cambiarDialog(NUEVO_MEDICO_DIALOG)}/>
           </IconMenu>
         </ToolbarGroup>
 
@@ -194,6 +199,12 @@ class MainDialog extends Component {
     else if (type === NUEVO_PRODUCTO_DIALOG || type === NUEVO_PRODUCTO_DIALOG_CLOSED)
       return (
         <NuevoProductoDialog open={ type === NUEVO_PRODUCTO_DIALOG }
+          cambiarDialog={cambiarDialog}
+          cerrarDialogConMsg={cerrarDialogConMsg} />
+      )
+    else if (type === NUEVO_MEDICO_DIALOG || type === NUEVO_MEDICO_DIALOG_CLOSED)
+      return (
+        <NuevoMedicoDialog open={ type === NUEVO_MEDICO_DIALOG }
           cambiarDialog={cambiarDialog}
           cerrarDialogConMsg={cerrarDialogConMsg} />
       )

@@ -21,6 +21,7 @@ export default class FacturarView extends Component {
   getDefaultState = () => {
     return {
       cliente: null,
+      medico: null,
       errors: Immutable.Map(),
       facturaData: Immutable.Map({
         codigo: '',
@@ -36,6 +37,10 @@ export default class FacturarView extends Component {
 
   onNewCliente = (newCliente) => {
     this.setState({ cliente: newCliente })
+  }
+
+  onNewMedico = (newMedico) => {
+    this.setState({ medico: newMedico })
   }
 
   onNewProductFromKeyboard = (newProduct) => {
@@ -137,6 +142,7 @@ export default class FacturarView extends Component {
   render() {
     const {
       cliente,
+      medico,
       errors,
       facturaData,
       productos,
@@ -151,8 +157,9 @@ export default class FacturarView extends Component {
       <PaperContainer >
         <div style={{marginTop: '24px', marginLeft: '36px', marginRight: '36px'}}>
           <FacturaForm data={facturaData.toJS()} errors={errors} cliente={cliente}
-            onDataChanged={this.onFacturaDataChanged} ventaKey={ventaKey}
-            onNewCliente={this.onNewCliente} onNewProduct={this.onNewProductFromKeyboard}/>
+            medico={medico} onDataChanged={this.onFacturaDataChanged} ventaKey={ventaKey}
+            onNewMedico={this.onNewMedico} onNewCliente={this.onNewCliente}
+            onNewProduct={this.onNewProductFromKeyboard}/>
           <FacturaTable items={productos} onProductChanged={this.onProductChanged}
             onProductDeleted={this.onProductDeleted}/>
           <FacturaResults productos={productos} descuento={Number(descuento)}

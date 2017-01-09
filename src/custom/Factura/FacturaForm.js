@@ -8,9 +8,12 @@ import Payment from 'material-ui/svg-icons/action/payment';
 import Person from 'material-ui/svg-icons/social/person';
 import Receipt from 'material-ui/svg-icons/action/receipt';
 import Today from 'material-ui/svg-icons/action/today';
+import LocalHospital from 'material-ui/svg-icons/maps/local-hospital';
+import AirlineSeatReclineNormal from 'material-ui/svg-icons/notification/airline-seat-recline-normal';
 
 import ClienteAutoComplete from '../AutoComplete/ClienteAutoComplete'
 import ProductoAutoComplete from '../AutoComplete/ProductoAutoComplete'
+import MedicoAutoComplete from '../AutoComplete/MedicoAutoComplete'
 import CloseableColorChip from '../../lib/CloseableColorChip'
 import FormattedDatePicker from '../../lib/FormattedDatePicker';
 import IconBox from '../../lib/IconBox'
@@ -79,42 +82,94 @@ const ClienteInput = (props) => {
     cliente,
     errors,
     onNewCliente,
+    width,
   } = props
 
   if (cliente)
     return (
-      <CloseableColorChip text={cliente.nombre}
+      <CloseableColorChip text={cliente.nombre} width={width} icon={Person}
         onRequestDelete={() => {onNewCliente(null)}} />
     )
   else
     return (
-      <ClienteAutoComplete width={autoCompleteWidth}
+      <ClienteAutoComplete width={width}
         errorText={errors.get('cliente')} onNewItemSelected={onNewCliente}/>
     )
 }
 
-export default class FacturaForm extends Component {
+const MedicoInput = (props) => {
+  const {
+    medico,
+    errors,
+    onNewMedico,
+    width,
+  } = props
 
+  if (medico)
+    return (
+      <CloseableColorChip text={medico.nombre} width={width} icon={LocalHospital}
+        onRequestDelete={() => {onNewMedico(null)}} />
+    )
+  else
+    return (
+      <MedicoAutoComplete width={width}
+        errorText={errors.get('medico')} onNewItemSelected={onNewMedico}/>
+    )
+}
+
+const ClienteDataRow = (props) => {
+  let width = autoCompleteWidth
+
+  return (
+    <div style={{display: 'block'}}>
+      <IconBox icon={Person}/>
+      <ClienteInput cliente={props.cliente} errors={props.errors}
+      onNewCliente={props.onNewCliente} width={width} />
+      <IconBox icon={AddShoppingCart}/>
+      <ProductoAutoComplete width={width}
+        onNewItemSelected={props.onNewProduct}/>
+    </div>
+  )
+
+}
+
+const PacienteDataRow = (props) => {
+  let width = autoCompleteWidth
+
+  return (
+    <div style={{display: 'block'}}>
+      <IconBox icon={LocalHospital} />
+      <MedicoInput medico={props.medico} errors={props.errors}
+        onNewMedico={props.onNewMedico} width={width} />
+      <IconBox icon={AirlineSeatReclineNormal} />
+      <TextField hintText='Paciente' style={{width: width}} />
+    </div>
+  )
+}
+
+export default class FacturaForm extends Component {
 
   render() {
     const {
       data,
       errors,
       onDataChanged,
+      examen,
     } = this.props
 
+    let formHeight = '130px'
+    let pacienteRow = null
+
+    if (examen) { //renderizar cosas especificas para examenes
+      formHeight = '170px'
+      pacienteRow = <PacienteDataRow {...this.props} />
+    }
 
     return (
-      <div style={{height: '130px'}}>
+      <div style={{height: formHeight}}>
         <br />
-        <div style={{display: 'block', marginBottom: '8px'}}>
-          <IconBox icon={Person}/>
-          <ClienteInput {...this.props} />
-          <IconBox icon={AddShoppingCart}/>
-          <ProductoAutoComplete width={autoCompleteWidth}
-            onNewItemSelected={this.props.onNewProduct}/>
-        </div>
-
+        <ClienteDataRow {...this.props} />
+        { pacienteRow }
         <table>
           <tbody>
             <tr>
@@ -174,5 +229,12 @@ export default class FacturaForm extends Component {
 }
 
 FacturaForm.propTypes = {
-  icon: React.PropTypes.element,
+  data: React.PropTypes.object.isRequired,
+  errors: React.PropTypes.object.isRequired,
+  onDataChanged: React.PropTypes.func.isRequired,
+  examen: React.PropTypes.bool,
+}
+
+FacturaForm.defaultProps = {
+  examen: false,
 }

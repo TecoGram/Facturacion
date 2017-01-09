@@ -18,16 +18,18 @@ export default class CloseableColorChip extends React.Component {
   static propTypes = {
     text: React.PropTypes.string.isRequired,
     onRequestDelete: React.PropTypes.func,
+    width: React.PropTypes.string,
   }
 
   render() {
     const {
+      width,
       text,
       onRequestDelete,
     } = this.props
 
     return (
-      <div style={chipStyle}>
+      <div style={{...chipStyle, width}}>
         <Chip
           backgroundColor={primaryColor}
           labelStyle={{color: 'white'}}

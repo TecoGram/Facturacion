@@ -1,5 +1,6 @@
-import { NUEVO_CLIENTE_DIALOG, NUEVO_PRODUCTO_DIALOG,
-  NUEVO_CLIENTE_DIALOG_CLOSED, NUEVO_PRODUCTO_DIALOG_CLOSED } from './DialogTypes'
+import { NUEVO_CLIENTE_DIALOG, NUEVO_PRODUCTO_DIALOG, NUEVO_MEDICO_DIALOG,
+  NUEVO_CLIENTE_DIALOG_CLOSED, NUEVO_PRODUCTO_DIALOG_CLOSED,
+  NUEVO_MEDICO_DIALOG_CLOSED } from './DialogTypes'
 import { NEW_FACTURA_PAGE, FACTURA_LIST_PAGE, EDITAR_FACTURA_PAGE } from './PageTypes'
 import { CAMBIAR_DIALOG_ACTION, CAMBIAR_PAGE_ACTION, CERRAR_DIALOG_CON_MSG_ACTION,
   ABRIR_LINK_CON_SNACKBAR } from './ActionTypes'
@@ -39,6 +40,11 @@ module.exports = {
           type: CAMBIAR_DIALOG_ACTION,
           value: NUEVO_CLIENTE_DIALOG,
         }
+      case NUEVO_MEDICO_DIALOG:
+        return {
+          type: CAMBIAR_DIALOG_ACTION,
+          value: NUEVO_MEDICO_DIALOG,
+        }
       case NUEVO_PRODUCTO_DIALOG:
         return {
           type: CAMBIAR_DIALOG_ACTION, value: NUEVO_PRODUCTO_DIALOG,
@@ -47,6 +53,11 @@ module.exports = {
         return {
           type: CAMBIAR_DIALOG_ACTION,
           value: NUEVO_CLIENTE_DIALOG_CLOSED,
+        }
+      case NUEVO_MEDICO_DIALOG_CLOSED:
+        return {
+          type: CAMBIAR_DIALOG_ACTION,
+          value: NUEVO_MEDICO_DIALOG_CLOSED,
         }
       case NUEVO_PRODUCTO_DIALOG_CLOSED:
         return {
@@ -72,7 +83,7 @@ module.exports = {
 
   cerrarDialogConMsg(msg, dialogType) {
     if(dialogType !== NUEVO_PRODUCTO_DIALOG_CLOSED
-      && dialogType !== NUEVO_CLIENTE_DIALOG_CLOSED)
+      && dialogType !== NUEVO_CLIENTE_DIALOG_CLOSED && dialogType !== NUEVO_MEDICO_DIALOG_CLOSED)
       throw Error('Para cerrar el dialog es necesario un tipo que termine en _CLOSED')
     return {
       type: CERRAR_DIALOG_CON_MSG_ACTION,
