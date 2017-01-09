@@ -29,7 +29,7 @@ module.exports = () => {
         table.integer('comision')
         table.string('telefono1', 10)
         table.string('telefono2', 10)
-        
+
         table.unique('nombre')
       })
       .createTable('ventas', (table) => {
@@ -67,6 +67,7 @@ module.exports = () => {
       .then(() => {return knex('ventas').truncate() })
       .then(() => {return knex('productos').truncate() })
       .then(() => {return knex('clientes').truncate() })
+      .then(() => {return knex('medicos').truncate() })
   })
 }
 
