@@ -1,7 +1,8 @@
 import { NUEVO_CLIENTE_DIALOG, NUEVO_PRODUCTO_DIALOG, NUEVO_MEDICO_DIALOG,
   NUEVO_CLIENTE_DIALOG_CLOSED, NUEVO_PRODUCTO_DIALOG_CLOSED,
   NUEVO_MEDICO_DIALOG_CLOSED } from './DialogTypes'
-import { NEW_FACTURA_PAGE, FACTURA_LIST_PAGE, EDITAR_FACTURA_PAGE } from './PageTypes'
+import { NEW_FACTURA_PAGE, FACTURA_LIST_PAGE, EDITAR_FACTURA_PAGE,
+  NEW_FACTURA_EXAMEN_PAGE, EDITAR_FACTURA_EXAMEN_PAGE } from './PageTypes'
 import { CAMBIAR_DIALOG_ACTION, CAMBIAR_PAGE_ACTION, CERRAR_DIALOG_CON_MSG_ACTION,
   ABRIR_LINK_CON_SNACKBAR } from './ActionTypes'
 
@@ -9,22 +10,34 @@ import { parseDBDate } from './DateParser'
 
 const cambiarPagina = (tipoPagina, props) => {
   switch (tipoPagina) {
-    case NEW_FACTURA_PAGE:
-      return {
-        type: CAMBIAR_PAGE_ACTION,
-        value: NEW_FACTURA_PAGE,
-        props: props,
-      }
     case FACTURA_LIST_PAGE:
       return {
         type: CAMBIAR_PAGE_ACTION,
         value: FACTURA_LIST_PAGE,
         props: props,
       }
+    case NEW_FACTURA_PAGE:
+      return {
+        type: CAMBIAR_PAGE_ACTION,
+        value: NEW_FACTURA_PAGE,
+        props: props,
+      }
     case EDITAR_FACTURA_PAGE:
       return {
         type: CAMBIAR_PAGE_ACTION,
         value: EDITAR_FACTURA_PAGE,
+        props: props,
+      }
+    case NEW_FACTURA_EXAMEN_PAGE:
+      return {
+        type: CAMBIAR_PAGE_ACTION,
+        value: NEW_FACTURA_EXAMEN_PAGE,
+        props: props,
+      }
+    case EDITAR_FACTURA_EXAMEN_PAGE:
+      return {
+        type: CAMBIAR_PAGE_ACTION,
+        value: EDITAR_FACTURA_EXAMEN_PAGE,
         props: props,
       }
     default:

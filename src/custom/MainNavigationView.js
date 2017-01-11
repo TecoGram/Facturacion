@@ -20,11 +20,13 @@ import { NUEVO_CLIENTE_DIALOG,
   NUEVO_CLIENTE_DIALOG_CLOSED,
   NUEVO_MEDICO_DIALOG_CLOSED,
   NUEVO_PRODUCTO_DIALOG_CLOSED } from '../DialogTypes'
-import { NEW_FACTURA_PAGE, EDITAR_FACTURA_PAGE, FACTURA_LIST_PAGE } from '../PageTypes'
+import { NEW_FACTURA_PAGE, EDITAR_FACTURA_PAGE, NEW_FACTURA_EXAMEN_PAGE,
+  EDITAR_FACTURA_EXAMEN_PAGE, FACTURA_LIST_PAGE } from '../PageTypes'
 
 import ActionCreators from '../ActionCreators'
 import CustomStyle from '../CustomStyle'
-import FacturaEditorView from './Factura/FacturaEditorView'
+import {NuevaFacturaPage, EditarFacturaPage, NuevaFacturaExamenPage,
+  EditarFacturaExamenPage} from './Factura/Variantes'
 import NuevoClienteDialog from './NuevoCliente/NuevoClienteDialog'
 import NuevoProductoDialog from './NuevoProducto/NuevoProductoDialog'
 import NuevoMedicoDialog from './NuevoMedico/NuevoMedicoDialog'
@@ -63,6 +65,7 @@ const MainDrawer = (props) => {
       open={props.open}
       onRequestChange={props.handleChange}>
       <MenuItem onTouchTap={() => cp(NEW_FACTURA_PAGE)}>Nueva Factura</MenuItem>
+      <MenuItem onTouchTap={() => cp(NEW_FACTURA_EXAMEN_PAGE)}>Nueva Factura Examenes</MenuItem>
       <MenuItem onTouchTap={() => cp(FACTURA_LIST_PAGE)}>Ver Facturas</MenuItem>
     </Drawer>
   )
@@ -221,9 +224,13 @@ const SelectedPage = (props) => {
 
   switch (page.type) {
     case NEW_FACTURA_PAGE:
-      return <FacturaEditorView abrirLinkConSnackbar={abrirLinkConSnackbar} isExamen={true} {...page.props}/>
+      return <NuevaFacturaPage abrirLinkConSnackbar={abrirLinkConSnackbar} {...page.props}/>
     case EDITAR_FACTURA_PAGE:
-      return <FacturaEditorView abrirLinkConSnackbar={abrirLinkConSnackbar} {...page.props}/>
+      return <EditarFacturaPage abrirLinkConSnackbar={abrirLinkConSnackbar} {...page.props}/>
+    case NEW_FACTURA_EXAMEN_PAGE:
+      return <NuevaFacturaExamenPage abrirLinkConSnackbar={abrirLinkConSnackbar} {...page.props}/>
+    case EDITAR_FACTURA_EXAMEN_PAGE:
+      return <EditarFacturaExamenPage abrirLinkConSnackbar={abrirLinkConSnackbar} {...page.props}/>
     case FACTURA_LIST_PAGE:
       return <FacturasListView editarFactura={editarFactura} {...page.props}/>
     default:
