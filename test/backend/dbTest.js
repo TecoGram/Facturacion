@@ -20,7 +20,9 @@ const setup = require('../../backend/scripts/setupDB.js')
 describe('metodos de dbAdmin.js', function () {
 
   before('borrar base de datos de prueba', function (done) {
+    this.timeout(5000)
     setup().then(() => done())
+    .catch((err) => done(err))
   })
 
   describe('insertarProducto', function () {
@@ -176,6 +178,60 @@ describe('metodos de dbAdmin.js', function () {
 
   })
 
+  const ventaExInsertada = {
+    codigo: '0009991',
+    ruc: cliente1.ruc,
+    medico: medico1.nombre,
+    paciente: 'Fabricio Encarnacion',
+    fecha: '2017-01-01',
+    autorizacion: 'fse4',
+    formaPago: 'VISA',
+    subtotal: 21.00,
+    descuento: 3.12,
+    total: 38.12,
+    productos: [
+      {
+        producto: 1,
+        fechaExp: '2016-11-26',
+        lote: '545f2',
+        count: 1,
+        precioVenta: 10,
+      },
+    ],
+  }
+
+  describe('insertarVentaExamen', function() {
+
+    const {
+      codigo,
+      ruc,
+      fecha,
+      autorizacion,
+      formaPago,
+      subtotal,
+      descuento,
+      total,
+      productos,
+      medico,
+      paciente,
+    } = ventaExInsertada
+
+    it('persiste una nueva venta en la base y agrega las unidades vendidas a la base',
+      function (done) {
+        db.insertarVentaExamen(codigo, ruc, fecha, autorizacion, formaPago, subtotal,
+          descuento, total, productos, medico, paciente)
+        .then(function (res) {
+          const lasInsertedId = res[0]
+          lasInsertedId.should.be.a('number')
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+      })
+  })
+
+
   const ventaInsertada = {
     codigo: '0009993',
     ruc: cliente1.ruc,
@@ -234,6 +290,7 @@ describe('metodos de dbAdmin.js', function () {
       })
   })
 
+
   describe('findVentas', function () {
     it ('devuelve las ultimas ventas si se le pasa un string vacio', function (done) {
       db.findVentas('')
@@ -247,6 +304,9 @@ describe('metodos de dbAdmin.js', function () {
           ultimaVenta.ruc.should.be.equal(cliente1.ruc)
           ultimaVenta.nombre.should.be.equal(cliente1.nombre)
           done()
+        })
+        .catch(function (err) {
+          done(err)
         })
     })
 
@@ -262,6 +322,9 @@ describe('metodos de dbAdmin.js', function () {
           ultimaVenta.ruc.should.be.equal(cliente1.ruc)
           ultimaVenta.nombre.should.be.equal(cliente1.nombre)
           done()
+        })
+        .catch(function (err) {
+          done(err)
         })
     })
 
