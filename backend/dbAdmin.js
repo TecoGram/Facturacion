@@ -1,17 +1,19 @@
 const knex = require('./db.js')
+const empresaExamenes = 'TECOGRAM'
 
-const colocarVentaID = (unidades, fecha, codigo) => {
+const colocarVentaID = (unidades, codigo, empresa) => {
   const len = unidades.length
   for (let i = 0; i < len; i++) {
     unidades[i].codigoVenta = codigo
-    unidades[i].fechaVenta = fecha
+    unidades[i].empresaVenta = empresa
   }
 }
 
-const insertarVentaBase = (builder, codigo, cliente, fecha, autorizacion, formaPago,
-    tipo, subtotal, descuento, iva, total) => {
+const insertarVentaBase = (builder, codigo, empresa, cliente, fecha, autorizacion,
+  formaPago, tipo, descuento, iva, subtotal) => {
   return builder.table('ventas').insert({
     codigo: codigo,
+    empresa: empresa,
     cliente: cliente,
     fecha: fecha,
     autorizacion: autorizacion,
@@ -20,60 +22,56 @@ const insertarVentaBase = (builder, codigo, cliente, fecha, autorizacion, formaP
     subtotal: subtotal,
     descuento: descuento,
     iva: iva,
-    total: total,
   })
 }
 
-const updateVenta = (builder, codigo, cliente, fecha, autorizacion, formaPago,
-    subtotal, descuento, iva, total) => {
+const updateVenta = (builder, codigo, empresa, cliente, fecha, autorizacion,
+    formaPago, descuento, iva, subtotal) => {
   return builder('ventas')
-    .where({codigo, fecha}).update({
+    .where({codigo, empresa}).update({
       cliente: cliente,
+      fecha: fecha,
       autorizacion: autorizacion,
       formaPago: formaPago,
-      subtotal: subtotal,
       descuento: descuento,
       iva: iva,
-      total: total,
+      subtotal: subtotal,
     })
 }
 
 const updateVentaExamen = (builder, codigo, cliente, fecha, autorizacion, formaPago,
-    subtotal, descuento, total) => {
-  return builder('ventas')
-    .where({codigo, fecha}).update({
-      cliente: cliente,
-      autorizacion: autorizacion,
-      formaPago: formaPago,
-      subtotal: subtotal,
-      descuento: descuento,
-      total: total,
-    })
+    descuento, subtotal) => {
+  return updateVenta(builder, codigo, empresaExamenes, cliente, fecha, autorizacion,
+    formaPago, descuento, 0, subtotal)
 }
 
-const updateExamenInfo = (builder, medico, paciente, codigo, fecha) => {
+const updateExamenInfo = (builder, medico, paciente, codigo) => {
   return builder('examen_info')
-    .where({codigoVenta: codigo, fechaVenta: fecha}).update({
+    .where({codigoVenta: codigo, empresaVenta: empresaExamenes}).update({
       medico_id: medico,
       paciente: paciente,
     })
 }
 
-const getExamenInfo = (codigo, fecha) => {
+const getExamenInfo = (codigo) => {
   return knex.select('*')
     .from('examen_info')
-    .where({codigo, fecha})
+    .where({codigoVenta: codigo})
 }
 
-const deleteVenta = (codigo, fecha) => {
+const deleteVenta = (codigo, empresa) => {
   return knex('ventas')
-    .where({codigo, fecha})
+    .where({codigo, empresa})
     .del()
 }
 
-const deleteUnidadesVenta = (builder, codigo, fecha) => {
+const deleteVentaExamen = (codigo) => {
+  return deleteVenta(codigo,  empresaExamenes)
+}
+
+const deleteUnidadesVenta = (builder, codigo, empresa) => {
   return builder('unidades')
-    .where({ codigoVenta: codigo, fechaVenta: fecha})
+    .where({ codigoVenta: codigo, empresaVenta: empresa})
     .del()
 }
 
@@ -81,29 +79,30 @@ const insertarNuevasUnidades = (builder, listaDeUnidades) => {
   return builder.table('unidades').insert(listaDeUnidades)
 }
 
-const insertarExamenInfo = (builder, medico, paciente, fecha, codigo) => {
+const insertarExamenInfo = (builder, medico, paciente, codigo) => {
   return builder.table('examen_info').insert({
     medico_id: medico,
     paciente: paciente,
-    fechaVenta: fecha,
     codigoVenta: codigo,
+    empresaVenta: empresaExamenes,
   })
 }
 
-const getVenta = (fecha, codigo) => {
+const getVenta = (codigo, empresa) => {
   return knex.select('*')
   .from('ventas')
-  .where({fecha: fecha, codigo: codigo, tipo: 0})
+  .where({codigo: codigo, empresa: empresa, tipo: 0})
 }
 
-const getVentaExamen = (fecha, codigo) => {
+const getVentaExamen = (codigo) => {
   return knex.select('*')
   .from('ventas')
-  .where({fecha: fecha, codigo: codigo, tipo: 1})
+  .where({empresa: empresaExamenes, codigo: codigo, tipo: 1})
 }
 
 const findVentas = (nombreCliente) => {
-  return knex.select('codigo', 'fecha', 'ruc', 'nombre', 'total')
+  return knex.select('codigo', 'empresa', 'fecha', 'ruc', 'nombre', 'iva',
+    'descuento', 'subtotal')
     .from('ventas')
     .join('clientes', {'ventas.cliente' : 'clientes.ruc' })
     .where('nombre', 'like', `%${nombreCliente}%`)
@@ -113,12 +112,13 @@ const findVentas = (nombreCliente) => {
 }
 
 const findVentasExamen = (nombre) => {
-  return knex.select('codigo', 'fecha', 'ruc', 'nombre', 'total', 'paciente')
+  return knex.select('codigo', 'fecha', 'ruc', 'nombre', 'subtotal',
+    'descuento', 'iva', 'paciente', 'medico_id')
     .from('ventas')
     .join('clientes', {'ventas.cliente' : 'clientes.ruc' })
     .join('examen_info', {
       'ventas.codigo' : 'examen_info.codigoVenta',
-      'ventas.fecha' : 'examen_info.fechaVenta',
+      'ventas.empresa' : 'examen_info.empresaVenta',
     })
     .where('nombre', 'like', `%${nombre}%`)
     .orWhere('paciente', 'like', `%${nombre}%`)
@@ -133,28 +133,32 @@ const getCliente = (ruc) => {
   .where('ruc', ruc)
 }
 
-const getUnidadesVenta = (fecha, codigo) => {
+const getUnidadesVenta = (codigo, empresa) => {
   return knex.select('productos.nombre', 'unidades.producto', 'unidades.count',
   'unidades.precioVenta', 'unidades.lote', 'unidades.fechaExp')
   .from('unidades')
   .join('productos', {'unidades.producto' : 'productos.rowid' })
-  .where({fechaVenta: fecha, codigoVenta: codigo})
+  .where({codigoVenta: codigo, empresaVenta: empresa})
 }
 
-const getVentaPorTipo = (fecha, codigo, tipo) => {
+const getUnidadesVentaExamen = (codigo) => {
+  return getUnidadesVenta(codigo, empresaExamenes)
+}
+
+const getVentaPorTipo = (codigo, empresa, tipo) => {
   switch (tipo) {
     case 0:
-      return getVenta(fecha, codigo)
+      return getVenta(codigo, empresa)
     case 1:
-      return getVentaExamen(fecha, codigo)
+      return getVentaExamen(codigo)
     default:
       throw Error('Tipo de venta desconocido')
   }
 }
 
-const getFacturaData = (fecha, codigo, tipo) => {
+const getFacturaData = (codigo, empresa, tipo) => {
   let ventaRow, cliente;
-  return getVentaPorTipo(fecha, codigo, tipo)
+  return getVentaPorTipo(codigo, empresa, tipo)
   .then((ventas) => {
     if (ventas.length > 0) {
       ventaRow = ventas[0]
@@ -162,29 +166,18 @@ const getFacturaData = (fecha, codigo, tipo) => {
     } else {
       return Promise.reject({errorCode: 404, text:"factura no encontrada"})
     }
-  }, () => {
-    return Promise.reject({errorCode: 500,
-      text: "error de base de datos al buscar factura"})
   })
   .then((clientes) => {
     if (clientes.length > 0) {
       cliente = clientes[0]
-      return getUnidadesVenta(fecha, codigo)
+      return getUnidadesVenta(codigo, empresa)
     } else {
       return Promise.reject({errorCode: 404, text: "cliente no encontrado"})
     }
-  }, (error) => {
-    if(error)
-      return Promise.reject(error)
-    else
-      return Promise.reject({errorCode: 500,
-        text: "error de base de datos al buscar cliente"})
   })
   .then ((productos) => {
     ventaRow.productos = productos
     return Promise.resolve({ventaRow: ventaRow, cliente: cliente})
-  }, (error) => {
-    return Promise.reject(error)
   })
 }
 
@@ -257,13 +250,13 @@ module.exports = {
     return queryObject.limit(5)
   },
 
-  insertarVenta: (codigo, cliente, fecha, autorizacion, formaPago,
-    subtotal, descuento, iva, total, unidades) => {
+  insertarVenta: (codigo, empresa, cliente, fecha, autorizacion, formaPago,
+    descuento, iva, subtotal, unidades) => {
     return knex.transaction ((trx) => {
-      return insertarVentaBase(trx, codigo, cliente, fecha, autorizacion,
-        formaPago, 0, subtotal, descuento, iva, total)
+      return insertarVentaBase(trx, codigo, empresa, cliente, fecha, autorizacion,
+        formaPago, 0, descuento, iva, subtotal)
       .then(() => {
-        colocarVentaID(unidades, fecha, codigo)
+        colocarVentaID(unidades, codigo, empresa)
         return insertarNuevasUnidades(trx, unidades)
       }, (err) => {
         return Promise.reject(err)
@@ -272,66 +265,68 @@ module.exports = {
   },
 
   insertarVentaExamen: (codigo, cliente, fecha, autorizacion, formaPago,
-    subtotal, descuento, total, unidades, medico, paciente) => {
+    descuento, subtotal, unidades, medico, paciente) => {
     return knex.transaction ((trx) => {
-      return insertarVentaBase(trx, codigo, cliente, fecha, autorizacion, formaPago,
-      1, subtotal, descuento, 0, total)
+      return insertarVentaBase(trx, codigo, empresaExamenes, cliente, fecha,
+        autorizacion, formaPago, 1, descuento, 0, subtotal)
       .then(() => {
-        return insertarExamenInfo(trx, medico, paciente, fecha, codigo)
+        return insertarExamenInfo(trx, medico, paciente, codigo)
       })
       .then(() => {
-        colocarVentaID(unidades, fecha, codigo)
+        colocarVentaID(unidades, codigo, empresaExamenes)
         return insertarNuevasUnidades(trx, unidades)
       })
     })
   },
 
 
-  updateVenta: (codigo, cliente, fecha, autorizacion, formaPago,
-    subtotal, descuento, iva, total, unidades) => {
+  updateVenta: (codigo, empresa, cliente, fecha, autorizacion, formaPago,
+    descuento, iva, subtotal, unidades) => {
     return knex.transaction ((trx) => {
-      return updateVenta(trx, codigo, cliente, fecha, autorizacion, formaPago,
-    subtotal, descuento, iva, total)
+      return updateVenta(trx, codigo, empresa, cliente, fecha, autorizacion,
+        formaPago, descuento, iva, subtotal)
       .then((ids) => {
-        return deleteUnidadesVenta(trx, codigo, fecha)
+        return deleteUnidadesVenta(trx, codigo, empresa)
       })
       .then((ids) => {
-        colocarVentaID(unidades, fecha, codigo)
+        colocarVentaID(unidades, codigo, empresa)
         return insertarNuevasUnidades(trx, unidades)
       })
     })
   },
 
   updateVentaExamen: (codigo, cliente, fecha, autorizacion, formaPago,
-    subtotal, descuento, total, unidades, medico, paciente) => {
+    descuento, subtotal, unidades, medico, paciente) => {
     return knex.transaction ((trx) => {
       return updateVentaExamen(trx, codigo, cliente, fecha, autorizacion, formaPago,
-    subtotal, descuento, total)
+        descuento, subtotal)
       .then((ids) => {
-        return deleteUnidadesVenta(trx, codigo, fecha)
+        return deleteUnidadesVenta(trx, codigo, empresaExamenes)
       })
       .then((ids) => {
-        return updateExamenInfo(trx, medico, paciente, codigo, fecha)
+        return updateExamenInfo(trx, medico, paciente, codigo)
       })
       .then((ids) => {
-        colocarVentaID(unidades, fecha, codigo)
+        colocarVentaID(unidades, codigo, empresaExamenes)
         return insertarNuevasUnidades(trx, unidades)
       })
     })
   },
 
-  getFacturaData: (fecha, codigo) => {
-    return getFacturaData(fecha, codigo, 0)
+  getFacturaData: (codigo, empresa) => {
+    return getFacturaData(codigo, empresa, 0)
   },
 
-  getFacturaExamenData: (fecha, codigo) => {
-    return getFacturaData(fecha, codigo, 1)
+  getFacturaExamenData: (codigo) => {
+    return getFacturaData(codigo, empresaExamenes, 1)
   },
 
   getExamenInfo,
   findVentas,
   findVentasExamen,
   deleteVenta,
+  deleteVentaExamen,
   getUnidadesVenta,
+  getUnidadesVentaExamen,
 
 }

@@ -187,8 +187,7 @@ describe('metodos de dbAdmin.js', function () {
     autorizacion: 'fse4',
     formaPago: 'VISA',
     subtotal: 21.00,
-    descuento: 3.12,
-    total: 38.12,
+    descuento: 3,
     productos: [
       {
         producto: 1,
@@ -210,7 +209,6 @@ describe('metodos de dbAdmin.js', function () {
       formaPago,
       subtotal,
       descuento,
-      total,
       productos,
       medico,
       paciente,
@@ -218,8 +216,8 @@ describe('metodos de dbAdmin.js', function () {
 
     it('persiste una nueva venta en la base y agrega las unidades vendidas a la base',
       function (done) {
-        db.insertarVentaExamen(codigo, ruc, fecha, autorizacion, formaPago, subtotal,
-          descuento, total, productos, medico, paciente)
+        db.insertarVentaExamen(codigo, ruc, fecha, autorizacion, formaPago,
+          descuento, subtotal, productos, medico, paciente)
         .then(function (res) {
           const lasInsertedId = res[0]
           lasInsertedId.should.be.a('number')
@@ -234,14 +232,14 @@ describe('metodos de dbAdmin.js', function () {
 
   const ventaInsertada = {
     codigo: '0009993',
+    empresa: 'TECOGRAM',
     ruc: cliente1.ruc,
     fecha: '2017-01-01',
     autorizacion: 'fse4',
     formaPago: 'VISA',
     subtotal: 21.00,
-    descuento: 3.12,
-    iva: 5.43,
-    total: 38.12,
+    descuento: 3,
+    iva: 12,
     productos: [
       {
         producto: 1,
@@ -264,6 +262,7 @@ describe('metodos de dbAdmin.js', function () {
 
     const {
       codigo,
+      empresa,
       ruc,
       fecha,
       autorizacion,
@@ -271,14 +270,13 @@ describe('metodos de dbAdmin.js', function () {
       subtotal,
       descuento,
       iva,
-      total,
       productos,
     } = ventaInsertada
 
     it('persiste una nueva venta en la base y agrega las unidades vendidas a la base',
       function (done) {
-        db.insertarVenta(codigo, ruc, fecha, autorizacion, formaPago, subtotal,
-          descuento, iva, total, productos)
+        db.insertarVenta(codigo, empresa, ruc, fecha, autorizacion, formaPago,
+          descuento, iva, subtotal, productos)
         .then(function (res) {
           const lasInsertedId = res[0]
           lasInsertedId.should.be.a('number')
@@ -299,7 +297,8 @@ describe('metodos de dbAdmin.js', function () {
 
           const ultimaVenta = results[0]
           ultimaVenta.codigo.should.be.equal(ventaInsertada.codigo)
-          ultimaVenta.total.should.be.equal(ventaInsertada.total)
+          ultimaVenta.empresa.should.be.equal(ventaInsertada.empresa)
+          ultimaVenta.subtotal.should.be.equal(ventaInsertada.subtotal)
           ultimaVenta.fecha.should.be.equal(ventaInsertada.fecha)
           ultimaVenta.ruc.should.be.equal(cliente1.ruc)
           ultimaVenta.nombre.should.be.equal(cliente1.nombre)
@@ -317,7 +316,8 @@ describe('metodos de dbAdmin.js', function () {
 
           const ultimaVenta = results[0]
           ultimaVenta.codigo.should.be.equal(ventaInsertada.codigo)
-          ultimaVenta.total.should.be.equal(ventaInsertada.total)
+          ultimaVenta.empresa.should.be.equal(ventaInsertada.empresa)
+          ultimaVenta.subtotal.should.be.equal(ventaInsertada.subtotal)
           ultimaVenta.fecha.should.be.equal(ventaInsertada.fecha)
           ultimaVenta.ruc.should.be.equal(cliente1.ruc)
           ultimaVenta.nombre.should.be.equal(cliente1.nombre)
@@ -345,7 +345,7 @@ describe('metodos de dbAdmin.js', function () {
 
           const ultimaVentaEx = results[0]
           ultimaVentaEx.codigo.should.be.equal(ventaExInsertada.codigo)
-          ultimaVentaEx.total.should.be.equal(ventaExInsertada.total)
+          ultimaVentaEx.subtotal.should.be.equal(ventaExInsertada.subtotal)
           ultimaVentaEx.fecha.should.be.equal(ventaExInsertada.fecha)
           ultimaVentaEx.paciente.should.be.equal(ventaExInsertada.paciente)
           ultimaVentaEx.ruc.should.be.equal(cliente1.ruc)
@@ -364,7 +364,7 @@ describe('metodos de dbAdmin.js', function () {
 
           const ultimaVentaEx = results[0]
           ultimaVentaEx.codigo.should.be.equal(ventaExInsertada.codigo)
-          ultimaVentaEx.total.should.be.equal(ventaExInsertada.total)
+          ultimaVentaEx.subtotal.should.be.equal(ventaExInsertada.subtotal)
           ultimaVentaEx.fecha.should.be.equal(ventaExInsertada.fecha)
           ultimaVentaEx.paciente.should.be.equal(ventaExInsertada.paciente)
           ultimaVentaEx.ruc.should.be.equal(cliente1.ruc)
@@ -383,7 +383,7 @@ describe('metodos de dbAdmin.js', function () {
 
           const ultimaVentaEx = results[0]
           ultimaVentaEx.codigo.should.be.equal(ventaExInsertada.codigo)
-          ultimaVentaEx.total.should.be.equal(ventaExInsertada.total)
+          ultimaVentaEx.subtotal.should.be.equal(ventaExInsertada.subtotal)
           ultimaVentaEx.fecha.should.be.equal(ventaExInsertada.fecha)
           ultimaVentaEx.paciente.should.be.equal(ventaExInsertada.paciente)
           ultimaVentaEx.ruc.should.be.equal(cliente1.ruc)
@@ -408,6 +408,7 @@ describe('metodos de dbAdmin.js', function () {
     function (done) {
       const {
         codigo,
+        empresa,
         ruc,
         fecha,
         autorizacion,
@@ -415,11 +416,10 @@ describe('metodos de dbAdmin.js', function () {
         subtotal,
         descuento,
         iva,
-        total,
         productos,
       } = ventaInsertada
 
-      db.getFacturaData(fecha, codigo) //datos del test anterior 'insertarVenta'
+      db.getFacturaData(codigo, empresa) //datos del test anterior 'insertarVenta'
       .then (function (resp) {
         const {
           ventaRow,
@@ -428,7 +428,7 @@ describe('metodos de dbAdmin.js', function () {
 
         ventaRow.formaPago.should.equal('VISA')
         ventaRow.cliente.should.equal(ruc)
-        ventaRow.total.should.equal(total)
+        ventaRow.subtotal.should.equal(subtotal)
         ventaRow.productos.length.should.equal(2)
 
         cliente.nombre.should.equal(cliente1.nombre)
@@ -448,17 +448,17 @@ describe('metodos de dbAdmin.js', function () {
         producto2.fechaExp.should.equal('2016-11-26')
         done()
       })
+      .catch(done)
 
     })
 
     it ('rechaza la promesa si no encuentra la factura', function (done) {
-      db.getFacturaData('2016-11-03', '0000') //inexistente
-      .then( function () {throw new Error("Unexpected error")},
-        function (error) {
-          error.errorCode.should.equal(404)
-          error.text.should.equal("factura no encontrada")
-          done()
-        })
+      db.getFacturaData('2016-11-03', 'VER') //inexistente
+      .then( undefined, function (error) {
+        error.errorCode.should.equal(404)
+        error.text.should.equal("factura no encontrada")
+        done()
+      })
     })
   })
 
@@ -467,6 +467,7 @@ describe('metodos de dbAdmin.js', function () {
 
     const {
       codigo,
+      empresa,
       ruc,
       fecha,
       autorizacion,
@@ -474,7 +475,6 @@ describe('metodos de dbAdmin.js', function () {
       subtotal,
       descuento,
       iva,
-      total,
       productos,
     } = ventaInsertada
 
@@ -483,13 +483,13 @@ describe('metodos de dbAdmin.js', function () {
 
     it('actualiza una venta y las unidades vendidas en la base',
       function (done) {
-        db.updateVenta(codigo, ruc, fecha, autorizacionUpdated, formaPagoUpdated,
-          subtotal, descuento, iva, total, productos)
+        db.updateVenta(codigo, empresa, ruc, fecha, autorizacionUpdated,
+          formaPagoUpdated, descuento, iva, subtotal, productos)
         .then(function (res) {
           const lasInsertedId = res[0]
           //test api ya inserto 2 unidades, mas estas 2, la nueva debe de ser 4
           lasInsertedId.should.be.a('number')
-          return db.getFacturaData(fecha, codigo)
+          return db.getFacturaData(codigo, empresa)
         })
         .then(function (resp) {
           const { ventaRow, cliente } = resp
@@ -514,12 +514,12 @@ describe('metodos de dbAdmin.js', function () {
             precioVenta: 10,
           },
         ]
-        db.updateVenta(codigo, ruc, fecha, autorizacionUpdated, formaPagoUpdated,
-          subtotal, descuento, iva, total, productosUpdated)
+        db.updateVenta(codigo, empresa, ruc, fecha, autorizacionUpdated, formaPagoUpdated,
+          descuento, iva, subtotal, productosUpdated)
         .then(function (res) {
           const lasInsertedId = res[0]
           lasInsertedId.should.be.a('number')
-          return db.getFacturaData(fecha, codigo)
+          return db.getFacturaData(codigo, empresa)
         })
         .then(function (resp) {
           const { ventaRow, cliente } = resp
@@ -529,9 +529,7 @@ describe('metodos de dbAdmin.js', function () {
 
           done()
         })
-        .catch(function (err) {
-          done(err)
-        })
+        .catch(done)
       })
   })
 
@@ -545,7 +543,6 @@ describe('metodos de dbAdmin.js', function () {
       formaPago,
       subtotal,
       descuento,
-      total,
       medico,
       paciente,
       productos,
@@ -557,11 +554,11 @@ describe('metodos de dbAdmin.js', function () {
     it('actualiza una venta y las unidades vendidas en la base',
       function (done) {
         db.updateVentaExamen(codigo, ruc, fecha, autorizacion, formaPagoUpdated,
-          subtotal, descuento, total, productos, medico, pacienteUpdated)
+          descuento, subtotal, productos, medico, pacienteUpdated)
         .then(function (res) {
           const lasInsertedId = res[0]
           lasInsertedId.should.be.a('number')
-          return db.getFacturaExamenData(fecha, codigo)
+          return db.getFacturaExamenData(codigo)
         })
         .then(function (resp) {
           const { ventaRow, cliente } = resp
@@ -598,11 +595,11 @@ describe('metodos de dbAdmin.js', function () {
           },
         ]
         db.updateVentaExamen(codigo, ruc, fecha, autorizacion, formaPagoUpdated,
-          subtotal, descuento, total, productosUpdated, medico, pacienteUpdated)
+          descuento, subtotal, productosUpdated, medico, pacienteUpdated)
         .then(function (res) {
           const lasInsertedId = res[0]
           lasInsertedId.should.be.a('number')
-          return db.getFacturaExamenData(fecha, codigo)
+          return db.getFacturaExamenData(codigo)
         })
         .then(function (resp) {
           const { ventaRow, cliente } = resp
@@ -618,17 +615,17 @@ describe('metodos de dbAdmin.js', function () {
 
   describe('deleteVenta', function () {
     it('borra una venta de la db y todas las unidades asociadas', function (done) {
-      db.getUnidadesVenta(ventaInsertada.fecha, ventaInsertada.codigo)
+      db.getUnidadesVenta(ventaInsertada.codigo, ventaInsertada.empresa)
         .then(function (rows) {
           rows.should.have.lengthOf(1)
-          return db.deleteVenta(ventaInsertada.codigo, ventaInsertada.fecha)
+          return db.deleteVenta(ventaInsertada.codigo, ventaInsertada.empresa)
         })
         .then(function () {
-          return db.getFacturaData(ventaInsertada.fecha, ventaInsertada.codigo)
+          return db.getFacturaData(ventaInsertada.codigo, ventaInsertada.empresa)
         })
         .then(undefined, function (err) {
           err.errorCode.should.be.equal(404)
-          return db.getUnidadesVenta(ventaInsertada.fecha, ventaInsertada.codigo)
+          return db.getUnidadesVenta(ventaInsertada.codigo, ventaInsertada.empresa)
         })
         .then(function (rows) {
           rows.should.be.empty
@@ -642,21 +639,21 @@ describe('metodos de dbAdmin.js', function () {
 
   describe('deleteVentaExamen', function () {
     it('borra una venta examen de la db y todas las unidades asociadas', function (done) {
-      db.getUnidadesVenta(ventaExInsertada.fecha, ventaExInsertada.codigo)
+      db.getUnidadesVentaExamen(ventaExInsertada.codigo)
         .then(function (rows) {
           rows.should.have.lengthOf(2)
-          return db.deleteVenta(ventaExInsertada.codigo, ventaExInsertada.fecha)
+          return db.deleteVentaExamen(ventaExInsertada.codigo)
         })
         .then(function () {
-          return db.getFacturaExamenData(ventaExInsertada.fecha, ventaExInsertada.codigo)
+          return db.getFacturaExamenData(ventaExInsertada.codigo)
         })
         .then(undefined, function (err) {
           err.errorCode.should.be.equal(404)
-          return db.getUnidadesVenta(ventaExInsertada.fecha, ventaExInsertada.codigo)
+          return db.getUnidadesVentaExamen(ventaExInsertada.fecha, ventaExInsertada.codigo)
         })
         .then(function (rows) {
           rows.should.be.empty
-          return db.getExamenInfo(ventaExInsertada.codigo, ventaExInsertada.fecha)
+          return db.getExamenInfo(ventaExInsertada.codigo)
         })
         .then(function (rows) {
           rows.should.be.empty

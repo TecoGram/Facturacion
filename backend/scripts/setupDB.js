@@ -28,23 +28,21 @@ module.exports = () => {
         table.integer('comision')
         table.string('telefono1', 10)
         table.string('telefono2', 10)
-
-        table.unique('nombre')
       })
       .createTable('ventas', (table) => {
-        table.string('codigo', 8)
+        table.string('codigo', 10)
+        table.string('empresa', 10)
         table.string('cliente', 13)
         table.date('fecha').index()
         table.string('autorizacion', 10)
         table.string('formaPago', 10)
         //tipo 0 para productos, 1 para examenes
         table.integer('tipo')
+        table.integer('descuento')
+        table.integer('iva')
         table.float('subtotal')
-        table.float('descuento')
-        table.float('iva')
-        table.float('total')
 
-        table.primary('fecha', 'codigo')
+        table.primary('codigo', 'empresa')
         table.foreign('cliente').references('clientes.ruc')
       })
       .createTable('stock', (table) => {
@@ -57,19 +55,18 @@ module.exports = () => {
     else return Promise.reject()
   })
   .then(() => {//Knex no soporta composite foreign keys. Raw queries SMH
-    console.log('examen info')
-    return knex.raw('create table "examen_info" ("rowid" integer, "medico_id" integer, '
-      + '"fechaVenta" date, "codigoVenta" varchar(10), "paciente" varchar(50), foreign '
-      + 'key("fechaVenta", "codigoVenta") references "ventas"("fecha", "codigo") '
-      + 'on delete CASCADE, primary key ("rowid"))')
+    return knex.raw('create table "examen_info" ("rowid" integer, "medico_id" varchar(50), '
+      + '"codigoVenta" varchar(10), "empresaVenta" varchar(10), "paciente" '
+      + 'varchar(50), foreign key("medico_id") references "medicos"("nombre"), '
+      + 'foreign key("codigoVenta", "empresaVenta") references "ventas"("codigo", '
+      + '"empresa") on delete CASCADE, primary key ("rowid"))')
   }, (err) => Promise.reject(err))
   .then(() => {
-    console.log('unidades info')
     return knex.raw('create table "unidades" ("rowid" integer, "producto" integer, '
-      + '"fechaVenta" date, "codigoVenta" varchar(8), "lote" varchar(10), '
+      + '"codigoVenta" varchar(10), "empresaVenta" varchar(10), "lote" varchar(10), '
       + '"precioVenta" float, "count" integer, "fechaExp" date, foreign key("producto") '
-      + 'references "productos"("rowid"), foreign key("fechaVenta", "codigoVenta") '
-      + 'references "ventas"("fecha", "codigo") on delete CASCADE, primary key ("rowid"))')
+      + 'references "productos"("rowid"), foreign key("codigoVenta", "empresaVenta") '
+      + 'references "ventas"("codigo", "empresa") on delete CASCADE, primary key ("rowid"))')
   }, () => {//rejection, clear tables instead
     return knex('unidades').truncate()
       .then(() => {return knex('examen_info').truncate() })
