@@ -337,6 +337,72 @@ describe('metodos de dbAdmin.js', function () {
     })
   })
 
+  describe('findVentasExamen', function () {
+    it ('devuelve las ultimas ventas de examen si se le pasa un string vacio', function (done) {
+      db.findVentasExamen('')
+        .then(function (results) {
+          results.length.should.be.equal(1)
+
+          const ultimaVentaEx = results[0]
+          ultimaVentaEx.codigo.should.be.equal(ventaExInsertada.codigo)
+          ultimaVentaEx.total.should.be.equal(ventaExInsertada.total)
+          ultimaVentaEx.fecha.should.be.equal(ventaExInsertada.fecha)
+          ultimaVentaEx.paciente.should.be.equal(ventaExInsertada.paciente)
+          ultimaVentaEx.ruc.should.be.equal(cliente1.ruc)
+          ultimaVentaEx.nombre.should.be.equal(cliente1.nombre)
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+    })
+
+    it ('devuelve las ultimas ventas examen cuyo nombre de cliente coincide con el string pasado como argumento', function (done) {
+      db.findVentasExamen('Juan P')
+        .then(function (results) {
+          results.length.should.be.equal(1)
+
+          const ultimaVentaEx = results[0]
+          ultimaVentaEx.codigo.should.be.equal(ventaExInsertada.codigo)
+          ultimaVentaEx.total.should.be.equal(ventaExInsertada.total)
+          ultimaVentaEx.fecha.should.be.equal(ventaExInsertada.fecha)
+          ultimaVentaEx.paciente.should.be.equal(ventaExInsertada.paciente)
+          ultimaVentaEx.ruc.should.be.equal(cliente1.ruc)
+          ultimaVentaEx.nombre.should.be.equal(cliente1.nombre)
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+    })
+
+    it ('devuelve las ultimas ventas examen cuyo nombre de paciente coincide con el string pasado como argumento', function (done) {
+      db.findVentasExamen('Fabri')
+        .then(function (results) {
+          results.length.should.be.equal(1)
+
+          const ultimaVentaEx = results[0]
+          ultimaVentaEx.codigo.should.be.equal(ventaExInsertada.codigo)
+          ultimaVentaEx.total.should.be.equal(ventaExInsertada.total)
+          ultimaVentaEx.fecha.should.be.equal(ventaExInsertada.fecha)
+          ultimaVentaEx.paciente.should.be.equal(ventaExInsertada.paciente)
+          ultimaVentaEx.ruc.should.be.equal(cliente1.ruc)
+          ultimaVentaEx.nombre.should.be.equal(cliente1.nombre)
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+    })
+    it ('devuelve array vacio si no encuentra ventas examen con ese cliente', function (done) {
+      db.findVentas('xxyz')
+        .then(function (results) {
+          results.length.should.be.equal(0)
+          done()
+        })
+    })
+  })
+
   describe('getFacturaData', function () {
     it('busca en la base de datos la fila de la venta, y los productos vendidos',
     function (done) {
@@ -469,6 +535,87 @@ describe('metodos de dbAdmin.js', function () {
       })
   })
 
+  describe('updateVentaExamen', function() {
+
+    const {
+      codigo,
+      ruc,
+      fecha,
+      autorizacion,
+      formaPago,
+      subtotal,
+      descuento,
+      total,
+      medico,
+      paciente,
+      productos,
+    } = ventaExInsertada
+
+    const formaPagoUpdated = 'EXPRESS'
+    const pacienteUpdated = "Julio Fuentes"
+
+    it('actualiza una venta y las unidades vendidas en la base',
+      function (done) {
+        db.updateVentaExamen(codigo, ruc, fecha, autorizacion, formaPagoUpdated,
+          subtotal, descuento, total, productos, medico, pacienteUpdated)
+        .then(function (res) {
+          const lasInsertedId = res[0]
+          lasInsertedId.should.be.a('number')
+          return db.getFacturaExamenData(fecha, codigo)
+        })
+        .then(function (resp) {
+          const { ventaRow, cliente } = resp
+          ventaRow.formaPago.should.be.equal(formaPagoUpdated)
+          ventaRow.productos.length.should.be.equal(1)
+          return db.findVentasExamen(pacienteUpdated)
+        })
+        .then(function (resp) {
+          resp.should.be.an('array')
+          resp.length.should.be.equal(1)
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+      })
+
+    it('Permite modificar la lista de productos vendidos',
+      function (done) {
+        const productosUpdated = [
+          {
+            producto: 1,
+            fechaExp: '2016-11-26',
+            lote: '545f2',
+            count: 1,
+            precioVenta: 10,
+          },
+          {
+            producto: 2,
+            fechaExp: '2016-11-26',
+            lote: '545f2',
+            count: 1,
+            precioVenta: 20,
+          },
+        ]
+        db.updateVentaExamen(codigo, ruc, fecha, autorizacion, formaPagoUpdated,
+          subtotal, descuento, total, productosUpdated, medico, pacienteUpdated)
+        .then(function (res) {
+          const lasInsertedId = res[0]
+          lasInsertedId.should.be.a('number')
+          return db.getFacturaExamenData(fecha, codigo)
+        })
+        .then(function (resp) {
+          const { ventaRow, cliente } = resp
+          ventaRow.formaPago.should.be.equal(formaPagoUpdated)
+          ventaRow.productos.length.should.be.equal(2)
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+      })
+  })
+
   describe('deleteVenta', function () {
     it('borra una venta de la db y todas las unidades asociadas', function (done) {
       db.getUnidadesVenta(ventaInsertada.fecha, ventaInsertada.codigo)
@@ -482,6 +629,34 @@ describe('metodos de dbAdmin.js', function () {
         .then(undefined, function (err) {
           err.errorCode.should.be.equal(404)
           return db.getUnidadesVenta(ventaInsertada.fecha, ventaInsertada.codigo)
+        })
+        .then(function (rows) {
+          rows.should.be.empty
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+    })
+  })
+
+  describe('deleteVentaExamen', function () {
+    it('borra una venta examen de la db y todas las unidades asociadas', function (done) {
+      db.getUnidadesVenta(ventaExInsertada.fecha, ventaExInsertada.codigo)
+        .then(function (rows) {
+          rows.should.have.lengthOf(2)
+          return db.deleteVenta(ventaExInsertada.codigo, ventaExInsertada.fecha)
+        })
+        .then(function () {
+          return db.getFacturaExamenData(ventaExInsertada.fecha, ventaExInsertada.codigo)
+        })
+        .then(undefined, function (err) {
+          err.errorCode.should.be.equal(404)
+          return db.getUnidadesVenta(ventaExInsertada.fecha, ventaExInsertada.codigo)
+        })
+        .then(function (rows) {
+          rows.should.be.empty
+          return db.getExamenInfo(ventaExInsertada.codigo, ventaExInsertada.fecha)
         })
         .then(function (rows) {
           rows.should.be.empty

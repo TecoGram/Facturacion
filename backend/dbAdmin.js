@@ -28,9 +28,7 @@ const updateVenta = (builder, codigo, cliente, fecha, autorizacion, formaPago,
     subtotal, descuento, iva, total) => {
   return builder('ventas')
     .where({codigo, fecha}).update({
-      codigo: codigo,
       cliente: cliente,
-      fecha: fecha,
       autorizacion: autorizacion,
       formaPago: formaPago,
       subtotal: subtotal,
@@ -40,12 +38,38 @@ const updateVenta = (builder, codigo, cliente, fecha, autorizacion, formaPago,
     })
 }
 
+const updateVentaExamen = (builder, codigo, cliente, fecha, autorizacion, formaPago,
+    subtotal, descuento, total) => {
+  return builder('ventas')
+    .where({codigo, fecha}).update({
+      cliente: cliente,
+      autorizacion: autorizacion,
+      formaPago: formaPago,
+      subtotal: subtotal,
+      descuento: descuento,
+      total: total,
+    })
+}
+
+const updateExamenInfo = (builder, medico, paciente, codigo, fecha) => {
+  return builder('examen_info')
+    .where({codigoVenta: codigo, fechaVenta: fecha}).update({
+      medico_id: medico,
+      paciente: paciente,
+    })
+}
+
+const getExamenInfo = (codigo, fecha) => {
+  return knex.select('*')
+    .from('examen_info')
+    .where({codigo, fecha})
+}
+
 const deleteVenta = (codigo, fecha) => {
   return knex('ventas')
     .where({codigo, fecha})
     .del()
 }
-
 
 const deleteUnidadesVenta = (builder, codigo, fecha) => {
   return builder('unidades')
@@ -72,12 +96,33 @@ const getVenta = (fecha, codigo) => {
   .where({fecha: fecha, codigo: codigo, tipo: 0})
 }
 
+const getVentaExamen = (fecha, codigo) => {
+  return knex.select('*')
+  .from('ventas')
+  .where({fecha: fecha, codigo: codigo, tipo: 1})
+}
+
 const findVentas = (nombreCliente) => {
   return knex.select('codigo', 'fecha', 'ruc', 'nombre', 'total')
     .from('ventas')
     .join('clientes', {'ventas.cliente' : 'clientes.ruc' })
     .where('nombre', 'like', `%${nombreCliente}%`)
     .where('tipo', 0)
+    .orderBy('fecha', 'desc')
+    .limit(20)
+}
+
+const findVentasExamen = (nombre) => {
+  return knex.select('codigo', 'fecha', 'ruc', 'nombre', 'total', 'paciente')
+    .from('ventas')
+    .join('clientes', {'ventas.cliente' : 'clientes.ruc' })
+    .join('examen_info', {
+      'ventas.codigo' : 'examen_info.codigoVenta',
+      'ventas.fecha' : 'examen_info.fechaVenta',
+    })
+    .where('nombre', 'like', `%${nombre}%`)
+    .orWhere('paciente', 'like', `%${nombre}%`)
+    .where('tipo', 1)
     .orderBy('fecha', 'desc')
     .limit(20)
 }
@@ -94,6 +139,53 @@ const getUnidadesVenta = (fecha, codigo) => {
   .from('unidades')
   .join('productos', {'unidades.producto' : 'productos.rowid' })
   .where({fechaVenta: fecha, codigoVenta: codigo})
+}
+
+const getVentaPorTipo = (fecha, codigo, tipo) => {
+  switch (tipo) {
+    case 0:
+      return getVenta(fecha, codigo)
+    case 1:
+      return getVentaExamen(fecha, codigo)
+    default:
+      throw Error('Tipo de venta desconocido')
+  }
+}
+
+const getFacturaData = (fecha, codigo, tipo) => {
+  let ventaRow, cliente;
+  return getVentaPorTipo(fecha, codigo, tipo)
+  .then((ventas) => {
+    if (ventas.length > 0) {
+      ventaRow = ventas[0]
+      return getCliente(ventaRow.cliente)
+    } else {
+      return Promise.reject({errorCode: 404, text:"factura no encontrada"})
+    }
+  }, () => {
+    return Promise.reject({errorCode: 500,
+      text: "error de base de datos al buscar factura"})
+  })
+  .then((clientes) => {
+    if (clientes.length > 0) {
+      cliente = clientes[0]
+      return getUnidadesVenta(fecha, codigo)
+    } else {
+      return Promise.reject({errorCode: 404, text: "cliente no encontrado"})
+    }
+  }, (error) => {
+    if(error)
+      return Promise.reject(error)
+    else
+      return Promise.reject({errorCode: 500,
+        text: "error de base de datos al buscar cliente"})
+  })
+  .then ((productos) => {
+    ventaRow.productos = productos
+    return Promise.resolve({ventaRow: ventaRow, cliente: cliente})
+  }, (error) => {
+    return Promise.reject(error)
+  })
 }
 
 module.exports = {
@@ -210,43 +302,35 @@ module.exports = {
     })
   },
 
-  getFacturaData: (fecha, codigo) => {
-    let ventaRow, cliente;
-    return getVenta(fecha, codigo)
-    .then((ventas) => {
-      if (ventas.length > 0) {
-        ventaRow = ventas[0]
-        return getCliente(ventaRow.cliente)
-      } else {
-        return Promise.reject({errorCode: 404, text:"factura no encontrada"})
-      }
-    }, () => {
-      return Promise.reject({errorCode: 500,
-        text: "error de base de datos al buscar factura"})
-    })
-    .then((clientes) => {
-      if (clientes.length > 0) {
-        cliente = clientes[0]
-        return getUnidadesVenta(fecha, codigo)
-      } else {
-        return Promise.reject({errorCode: 404, text: "cliente no encontrado"})
-      }
-    }, (error) => {
-      if(error)
-        return Promise.reject(error)
-      else
-        return Promise.reject({errorCode: 500,
-          text: "error de base de datos al buscar cliente"})
-    })
-    .then ((productos) => {
-      ventaRow.productos = productos
-      return Promise.resolve({ventaRow: ventaRow, cliente: cliente})
-    }, (error) => {
-      return Promise.reject(error)
+  updateVentaExamen: (codigo, cliente, fecha, autorizacion, formaPago,
+    subtotal, descuento, total, unidades, medico, paciente) => {
+    return knex.transaction ((trx) => {
+      return updateVentaExamen(trx, codigo, cliente, fecha, autorizacion, formaPago,
+    subtotal, descuento, total)
+      .then((ids) => {
+        return deleteUnidadesVenta(trx, codigo, fecha)
+      })
+      .then((ids) => {
+        return updateExamenInfo(trx, medico, paciente, codigo, fecha)
+      })
+      .then((ids) => {
+        colocarVentaID(unidades, fecha, codigo)
+        return insertarNuevasUnidades(trx, unidades)
+      })
     })
   },
 
+  getFacturaData: (fecha, codigo) => {
+    return getFacturaData(fecha, codigo, 0)
+  },
+
+  getFacturaExamenData: (fecha, codigo) => {
+    return getFacturaData(fecha, codigo, 1)
+  },
+
+  getExamenInfo,
   findVentas,
+  findVentasExamen,
   deleteVenta,
   getUnidadesVenta,
 
