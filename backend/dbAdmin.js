@@ -59,14 +59,11 @@ const getExamenInfo = (codigo) => {
     .where({codigoVenta: codigo})
 }
 
-const deleteVenta = (codigo, empresa) => {
+const deleteVenta = (codigo, empresa, tipo) => {
+  if (tipo !== 0) empresa = empresaExamenes
   return knex('ventas')
     .where({codigo, empresa})
     .del()
-}
-
-const deleteVentaExamen = (codigo) => {
-  return deleteVenta(codigo,  empresaExamenes)
 }
 
 const deleteUnidadesVenta = (builder, codigo, empresa) => {
@@ -158,7 +155,8 @@ const getVentaPorTipo = (codigo, empresa, tipo) => {
 
 const getFacturaData = (codigo, empresa, tipo) => {
   let ventaRow, cliente;
-  return getVentaPorTipo(codigo, empresa, tipo)
+  if (tipo !== 0) empresa = empresaExamenes
+  const p = getVentaPorTipo(codigo, empresa, tipo)
   .then((ventas) => {
     if (ventas.length > 0) {
       ventaRow = ventas[0]
@@ -175,10 +173,27 @@ const getFacturaData = (codigo, empresa, tipo) => {
       return Promise.reject({errorCode: 404, text: "cliente no encontrado"})
     }
   })
-  .then ((productos) => {
-    ventaRow.productos = productos
-    return Promise.resolve({ventaRow: ventaRow, cliente: cliente})
-  })
+
+  if (tipo === 0)
+    return p.then ((productos) => {
+      ventaRow.productos = productos
+      return Promise.resolve({ventaRow: ventaRow, cliente: cliente})
+    })
+  else
+    return p.then((productos) => {
+      ventaRow.productos = productos
+      return getExamenInfo(codigo)
+    })
+    .then((rows) => {
+      if (rows.length > 0) {
+        const exInfo = rows[0]
+        ventaRow.medico = exInfo.medico_id
+        ventaRow.paciente = exInfo.paciente
+        return Promise.resolve({ventaRow: ventaRow, cliente: cliente})
+      } else {
+        return Promise.reject({errorCode: 404, text: 'examen no encontrado'})
+      }
+    })
 }
 
 module.exports = {
@@ -313,19 +328,17 @@ module.exports = {
     })
   },
 
-  getFacturaData: (codigo, empresa) => {
-    return getFacturaData(codigo, empresa, 0)
+  findVentas: (keywords, tipo) => {
+    if (tipo === 0)
+      return findVentas(keywords)
+    else
+      return findVentasExamen(keywords)
   },
 
-  getFacturaExamenData: (codigo) => {
-    return getFacturaData(codigo, empresaExamenes, 1)
-  },
+  getFacturaData,
 
   getExamenInfo,
-  findVentas,
-  findVentasExamen,
   deleteVenta,
-  deleteVentaExamen,
   getUnidadesVenta,
   getUnidadesVentaExamen,
 

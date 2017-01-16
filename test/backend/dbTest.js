@@ -291,7 +291,7 @@ describe('metodos de dbAdmin.js', function () {
 
   describe('findVentas', function () {
     it ('devuelve las ultimas ventas si se le pasa un string vacio', function (done) {
-      db.findVentas('')
+      db.findVentas('', 0)
         .then(function (results) {
           results.length.should.be.equal(1)
 
@@ -310,7 +310,7 @@ describe('metodos de dbAdmin.js', function () {
     })
 
     it ('devuelve las ultimas ventas cuyo nombre de cliente coincide con el string pasado como argumento', function (done) {
-      db.findVentas('Juan P')
+      db.findVentas('Juan P', 0)
         .then(function (results) {
           results.length.should.be.equal(1)
 
@@ -329,7 +329,7 @@ describe('metodos de dbAdmin.js', function () {
     })
 
     it ('devuelve array vacio si no encuentra ventas con ese cliente', function (done) {
-      db.findVentas('xxyz')
+      db.findVentas('xxyz', 0)
         .then(function (results) {
           results.length.should.be.equal(0)
           done()
@@ -339,7 +339,7 @@ describe('metodos de dbAdmin.js', function () {
 
   describe('findVentasExamen', function () {
     it ('devuelve las ultimas ventas de examen si se le pasa un string vacio', function (done) {
-      db.findVentasExamen('')
+      db.findVentas('', 1)
         .then(function (results) {
           results.length.should.be.equal(1)
 
@@ -358,7 +358,7 @@ describe('metodos de dbAdmin.js', function () {
     })
 
     it ('devuelve las ultimas ventas examen cuyo nombre de cliente coincide con el string pasado como argumento', function (done) {
-      db.findVentasExamen('Juan P')
+      db.findVentas('Juan P', 1)
         .then(function (results) {
           results.length.should.be.equal(1)
 
@@ -377,7 +377,7 @@ describe('metodos de dbAdmin.js', function () {
     })
 
     it ('devuelve las ultimas ventas examen cuyo nombre de paciente coincide con el string pasado como argumento', function (done) {
-      db.findVentasExamen('Fabri')
+      db.findVentas('Fabri', 1)
         .then(function (results) {
           results.length.should.be.equal(1)
 
@@ -394,8 +394,8 @@ describe('metodos de dbAdmin.js', function () {
           done(err)
         })
     })
-    it ('devuelve array vacio si no encuentra ventas examen con ese cliente', function (done) {
-      db.findVentas('xxyz')
+    it ('devuelve array vacio si no encuentra ventas examen con ese paciente', function (done) {
+      db.findVentas('xxyz', 1)
         .then(function (results) {
           results.length.should.be.equal(0)
           done()
@@ -419,7 +419,7 @@ describe('metodos de dbAdmin.js', function () {
         productos,
       } = ventaInsertada
 
-      db.getFacturaData(codigo, empresa) //datos del test anterior 'insertarVenta'
+      db.getFacturaData(codigo, empresa, 0) //datos del test anterior 'insertarVenta'
       .then (function (resp) {
         const {
           ventaRow,
@@ -453,7 +453,7 @@ describe('metodos de dbAdmin.js', function () {
     })
 
     it ('rechaza la promesa si no encuentra la factura', function (done) {
-      db.getFacturaData('2016-11-03', 'VER') //inexistente
+      db.getFacturaData('2016-11-03', 'VER', 0) //inexistente
       .then( undefined, function (error) {
         error.errorCode.should.equal(404)
         error.text.should.equal("factura no encontrada")
@@ -489,7 +489,7 @@ describe('metodos de dbAdmin.js', function () {
           const lasInsertedId = res[0]
           //test api ya inserto 2 unidades, mas estas 2, la nueva debe de ser 4
           lasInsertedId.should.be.a('number')
-          return db.getFacturaData(codigo, empresa)
+          return db.getFacturaData(codigo, empresa, 0)
         })
         .then(function (resp) {
           const { ventaRow, cliente } = resp
@@ -519,7 +519,7 @@ describe('metodos de dbAdmin.js', function () {
         .then(function (res) {
           const lasInsertedId = res[0]
           lasInsertedId.should.be.a('number')
-          return db.getFacturaData(codigo, empresa)
+          return db.getFacturaData(codigo, empresa, 0)
         })
         .then(function (resp) {
           const { ventaRow, cliente } = resp
@@ -558,13 +558,13 @@ describe('metodos de dbAdmin.js', function () {
         .then(function (res) {
           const lasInsertedId = res[0]
           lasInsertedId.should.be.a('number')
-          return db.getFacturaExamenData(codigo)
+          return db.getFacturaData(codigo, null, 1)
         })
         .then(function (resp) {
           const { ventaRow, cliente } = resp
           ventaRow.formaPago.should.be.equal(formaPagoUpdated)
           ventaRow.productos.length.should.be.equal(1)
-          return db.findVentasExamen(pacienteUpdated)
+          return db.findVentas(pacienteUpdated, 1)
         })
         .then(function (resp) {
           resp.should.be.an('array')
@@ -599,7 +599,7 @@ describe('metodos de dbAdmin.js', function () {
         .then(function (res) {
           const lasInsertedId = res[0]
           lasInsertedId.should.be.a('number')
-          return db.getFacturaExamenData(codigo)
+          return db.getFacturaData(codigo, null, 1)
         })
         .then(function (resp) {
           const { ventaRow, cliente } = resp
@@ -618,10 +618,10 @@ describe('metodos de dbAdmin.js', function () {
       db.getUnidadesVenta(ventaInsertada.codigo, ventaInsertada.empresa)
         .then(function (rows) {
           rows.should.have.lengthOf(1)
-          return db.deleteVenta(ventaInsertada.codigo, ventaInsertada.empresa)
+          return db.deleteVenta(ventaInsertada.codigo, ventaInsertada.empresa, 0)
         })
         .then(function () {
-          return db.getFacturaData(ventaInsertada.codigo, ventaInsertada.empresa)
+          return db.getFacturaData(ventaInsertada.codigo, ventaInsertada.empresa, 0)
         })
         .then(undefined, function (err) {
           err.errorCode.should.be.equal(404)
@@ -642,10 +642,10 @@ describe('metodos de dbAdmin.js', function () {
       db.getUnidadesVentaExamen(ventaExInsertada.codigo)
         .then(function (rows) {
           rows.should.have.lengthOf(2)
-          return db.deleteVentaExamen(ventaExInsertada.codigo)
+          return db.deleteVenta(ventaExInsertada.codigo, null, 1)
         })
         .then(function () {
-          return db.getFacturaExamenData(ventaExInsertada.codigo)
+          return db.getFacturaData(ventaExInsertada.codigo, null, 1)
         })
         .then(undefined, function (err) {
           err.errorCode.should.be.equal(404)

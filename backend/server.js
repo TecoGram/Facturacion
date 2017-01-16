@@ -139,15 +139,15 @@ app.get('/producto/find', function (req,res) {
 
 });
 
-app.get('/venta/ver/:fecha/:codigo', function (req, res) {
+function verVenta(req, res, tipo) {
   const {
-    fecha,
     codigo,
+    empresa,
   } = req.params
-  const facturaFileName = codigo + fecha + '.pdf'
+  const facturaFileName = codigo + empresa + '.pdf'
 
   if (req.headers.accept === 'application/json') //send json
-    db.getFacturaData(fecha, codigo)
+    db.getFacturaData(codigo, empresa, tipo)
       .then(function (resp) {//OK!!
         res.status(200)
         .send(formatter.verVenta(resp))
@@ -156,7 +156,7 @@ app.get('/venta/ver/:fecha/:codigo', function (req, res) {
         .send(error.text)
       })
   else //send pdf
-    db.getFacturaData(fecha, codigo)
+    db.getFacturaData(codigo, empresa, tipo)
       .then(function (resp) {//OK!!
         const {
           ventaRow,
@@ -179,30 +179,46 @@ app.get('/venta/ver/:fecha/:codigo', function (req, res) {
         .send(error.text)
 
       })
+}
+
+app.get('/venta/ver/:empresa/:codigo', function (req, res) {
+  verVenta(req, res, 0)
 })
 
-app.get('/venta/delete/:fecha/:codigo', function (req,res) {
+app.get('/venta_ex/ver/:empresa/:codigo', function (req, res) {
+  verVenta(req, res, 1)
+})
+
+function deleteVenta(req, res, tipo) {
   const {
-    fecha,
     codigo,
+    empresa,
   } = req.params
-  db.deleteVenta(codigo, fecha)
+
+  db.deleteVenta(codigo, empresa, tipo)
   .then(function(deletions) {
     if (deletions === 0)
       res.status(404)
-      .send(`Factura con codigo: ${codigo} y fecha: ${fecha} no encontrada}`)
+      .send(`Factura con codigo: ${codigo} y empresa: ${empresa} no encontrada}`)
     else
       res.status(200)
       .send('OK')
   }, function (err) {//ERROR!
     res.status(500)
     .send(err)
-  })
+  })}
+
+app.get('/venta/delete/:empresa/:codigo', function (req, res) {
+  deleteVenta(req, res, 0)
 });
 
-app.get('/venta/find', function (req,res) {
+app.get('/venta_ex/delete/:empresa/:codigo', function (req, res) {
+  deleteVenta(req, res, 1)
+});
+
+function findVentas (req, res, tipo) {
   const q = req.query.q || ''
-  db.findVentas(q)
+  db.findVentas(q, tipo)
   .then(function(ventas) {
     if(ventas.length === 0)
       res.status(404)
@@ -214,9 +230,42 @@ app.get('/venta/find', function (req,res) {
     res.status(500)
     .send(err)
   })
+}
+
+app.get('/venta/find', function (req, res) {
+  findVentas(req, res, 0)
+});
+
+app.get('/venta_ex/find', function (req, res) {
+  findVentas(req, res, 1)
 });
 
 app.post('/venta/new', function (req, res) {
+  const {
+    codigo,
+    cliente,
+    empresa,
+    fecha,
+    autorizacion,
+    formaPago,
+    subtotal,
+    descuento,
+    iva,
+    productos,
+
+  } = req.body
+  db.insertarVenta(codigo, empresa, cliente, fecha, autorizacion, formaPago,
+    descuento, iva, subtotal, productos)
+  .then(function (data) {  //OK!
+    res.status(200)
+    .send("OK")
+  }, function (error) {//ERROR!
+    res.status(500)
+    res.send(error)
+  })
+})
+
+app.post('/venta_ex/new', function (req, res) {
   const {
     codigo,
     cliente,
@@ -225,13 +274,14 @@ app.post('/venta/new', function (req, res) {
     formaPago,
     subtotal,
     descuento,
-    iva,
     total,
     productos,
+    medico,
+    paciente,
 
   } = req.body
-  db.insertarVenta(codigo, cliente, fecha, autorizacion, formaPago, subtotal,
-    descuento, iva, total, productos)
+  db.insertarVentaExamen(codigo, cliente, fecha, autorizacion, formaPago,
+    descuento, subtotal, productos, medico, paciente)
   .then(function (data) {  //OK!
     res.status(200)
     .send("OK")
@@ -244,6 +294,7 @@ app.post('/venta/new', function (req, res) {
 app.post('/venta/update', function (req, res) {
   const {
     codigo,
+    empresa,
     cliente,
     fecha,
     autorizacion,
@@ -251,13 +302,39 @@ app.post('/venta/update', function (req, res) {
     subtotal,
     descuento,
     iva,
-    total,
     productos,
 
   } = req.body
 
-  db.updateVenta(codigo, cliente, fecha, autorizacion, formaPago, subtotal,
-    descuento, iva, total, productos)
+  db.updateVenta(codigo, empresa, cliente, fecha, autorizacion, formaPago,
+    descuento, iva, subtotal, productos)
+  .then(function (data) {  //OK!
+    res.status(200)
+    .send("OK")
+  })
+  .catch(function (error) {//ERROR!
+    res.status(500)
+    res.send(error)
+  })
+})
+
+app.post('/venta_ex/update', function (req, res) {
+  const {
+    codigo,
+    cliente,
+    fecha,
+    autorizacion,
+    formaPago,
+    subtotal,
+    descuento,
+    productos,
+    medico,
+    paciente,
+
+  } = req.body
+
+  db.updateVentaExamen(codigo, cliente, fecha, autorizacion, formaPago,
+    descuento, subtotal, productos, medico, paciente)
   .then(function (data) {  //OK!
     res.status(200)
     .send("OK")
@@ -271,10 +348,5 @@ const server = app.listen(port, function () {
   //eslint-disable-next-line
   console.log('Application listening on  port ' + port);
 });
-
-server.good_night = function () {
-  db.close()
-  server.close()
-}
 
 module.exports = server

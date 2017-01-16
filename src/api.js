@@ -60,8 +60,20 @@ module.exports = {
       .set('Accept', 'application/json')
   },
 
+  insertarVentaExamen: (ventaRow) => {
+    return request.post(prefix + '/venta_ex/new')
+      .send(ventaRow)
+      .set('Accept', 'application/json')
+  },
+
   updateVenta: (ventaRow) => {
     return request.post(prefix + '/venta/update')
+      .send(ventaRow)
+      .set('Accept', 'application/json')
+  },
+
+  updateVentaExamen: (ventaRow) => {
+    return request.post(prefix + '/venta_ex/update')
       .send(ventaRow)
       .set('Accept', 'application/json')
   },
@@ -71,20 +83,41 @@ module.exports = {
       .send()
   },
 
-  verVenta: (codigo, fecha) => {
-    return request.get(prefix + `/venta/ver/${fecha}/${codigo}`)
+  findVentasExamen: (queryString) => {
+    return request.get(prefix + '/venta_ex/find?q=' + queryString)
+      .send()
+  },
+
+  verVenta: (codigo, empresa) => {
+    return request.get(prefix + `/venta/ver/${empresa}/${codigo}`)
       .send()
       .set('Accept', 'application/json')
   },
 
-  deleteVenta: (codigo, fecha) => {
-    return request.get(prefix + `/venta/delete/${fecha}/${codigo}`)
+  verVentaExamen: (codigo, empresa) => {
+    return request.get(prefix + `/venta_ex/ver/${empresa}/${codigo}`)
       .send()
       .set('Accept', 'application/json')
   },
 
-  getFacturaURL: (codigo, fecha) => {
-    return `http://localhost:8192/venta/ver/${fecha}/${codigo}`
+  deleteVenta: (codigo, empresa) => {
+    return request.get(prefix + `/venta/delete/${empresa}/${codigo}`)
+      .send()
+      .set('Accept', 'application/json')
+  },
+
+  deleteVentaExamen: (codigo, empresa) => {
+    return request.get(prefix + `/venta_ex/delete/${empresa}/${codigo}`)
+      .send()
+      .set('Accept', 'application/json')
+  },
+
+  getFacturaURL: (codigo, empresa) => {
+    return `http://localhost:8192/venta/ver/${empresa}/${codigo}`
+  },
+
+  getFacturaExamenURL: (codigo, empresa) => {
+    return `http://localhost:8192/venta_ex/ver/${empresa}/${codigo}`
   },
 
 }

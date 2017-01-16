@@ -17,9 +17,13 @@ module.exports = {
   verVenta: (ventaQueryResp) => {
     const {
       codigo,
+      empresa,
       fecha,
       descuento,
       autorizacion,
+      paciente,
+      medico,
+      subtotal,
       formaPago,
       productos,
     } = ventaQueryResp.ventaRow
@@ -28,8 +32,12 @@ module.exports = {
       cliente: Object.assign({}, ventaQueryResp.cliente),
       facturaData: {
         codigo: codigo,
+        empresa: empresa,
+        paciente: paciente,
+        medico: medico,
         fecha: fecha,
         descuento: descuento,
+        subtotal: subtotal,
         autorizacion: autorizacion,
         formaPago: formaPago,
       },
