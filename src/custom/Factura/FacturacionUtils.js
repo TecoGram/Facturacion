@@ -1,24 +1,23 @@
 const { oneYearFromToday, toReadableDate } = require('../../DateParser.js')
 const iva = 0.14
 
-const calcularSubtotal = (productos) => {
+const calcularSubtotalIVA = (productos) => {
   let subtotal = 0
+  let valorIVA = 0
   const len = productos.size
   for (let i = 0; i < len; i++) {
     const product = productos.get(i)
-    subtotal += product.get('precioVenta') * product.get('count')
+    const recargo = product.get('precioVenta') * product.get('count')
+    subtotal += recargo
+    if (product.get('pagaIva'))
+      valorIVA += recargo * iva
   }
-  return subtotal
-}
-
-const calcularIVA = (subtotal) => {
-  return subtotal * iva
+  return { subtotal, valorIVA }
 }
 
 const calcularValores = (productos, descuento) => {
-  const subtotal = calcularSubtotal(productos)
+  const { subtotal, valorIVA } = calcularSubtotalIVA(productos)
   const rebaja = subtotal * descuento / 100
-  const valorIVA = calcularIVA(subtotal)
   const total = subtotal - rebaja + valorIVA
 
   return Object.freeze({
@@ -70,6 +69,7 @@ module.exports = {
     unidad.producto = producto.rowid
     delete unidad.rowid
     delete unidad.precioDist
+    delete unidad.pagaIva
     unidad.lote = ''
     unidad.count = 1
     unidad.fechaExp = oneYearFromToday()

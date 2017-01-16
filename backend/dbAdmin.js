@@ -198,12 +198,13 @@ const getFacturaData = (codigo, empresa, tipo) => {
 
 module.exports = {
   close: () => { knex.destroy() },
-  insertarProducto: (codigo, nombre, precioDist, precioVenta) => {
+  insertarProducto: (codigo, nombre, precioDist, precioVenta, pagaIva) => {
     return knex.table('productos').insert({
       codigo: codigo,
       nombre: nombre,
       precioDist: precioDist,
       precioVenta: precioVenta,
+      pagaIva: pagaIva,
     })
   },
 
@@ -219,7 +220,7 @@ module.exports = {
     return queryObject.limit(5)
   },
 
-  insertarCliente: (ruc, nombre, direccion, email, telefono1, telefono2) => {
+  insertarCliente: (ruc, nombre, direccion, email, telefono1, telefono2, descDefault) => {
     return knex.table('clientes').insert({
       ruc: ruc,
       nombre: nombre,
@@ -227,6 +228,7 @@ module.exports = {
       email: email,
       telefono1: telefono1,
       telefono2: telefono2,
+      descDefault: descDefault,
     })
   },
 

@@ -2,7 +2,7 @@ const request = require('superagent')
 
 const prefix = process.env.NODE_ENV === 'test' ? 'http://localhost:8192' : ''
 module.exports = {
-  insertarCliente: (ruc, nombre, direccion, email, telefono1, telefono2) => {
+  insertarCliente: (ruc, nombre, direccion, email, telefono1, telefono2, descDefault) => {
     return request.post(prefix + '/cliente/new')
       .send({
         ruc: ruc,
@@ -11,6 +11,7 @@ module.exports = {
         email: email,
         telefono1: telefono1,
         telefono2: telefono2,
+        descDefault: descDefault,
       })
       .set('Accept', 'application/json')
   },
@@ -38,13 +39,14 @@ module.exports = {
       .send()
   },
 
-  insertarProducto: (codigo, nombre, precioDist, precioVenta) => {
+  insertarProducto: (codigo, nombre, precioDist, precioVenta, pagaIva) => {
     return request.post(prefix + '/producto/new')
       .send({
         codigo: codigo,
         nombre: nombre,
         precioDist: precioDist,
         precioVenta: precioVenta,
+        pagaIva: pagaIva,
       })
       .set('Accept', 'application/json')
   },

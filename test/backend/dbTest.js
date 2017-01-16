@@ -28,15 +28,15 @@ describe('metodos de dbAdmin.js', function () {
   describe('insertarProducto', function () {
 
     it("persiste varios productos en la base encadenando con promise", function (done) {
-      db.insertarProducto("fsers4", "producto A", 9.99, 14.99)
+      db.insertarProducto("fsers4", "producto A", 9.99, 14.99, true)
       .then(function (ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')
-        return db.insertarProducto("gfdtt", "producto B", 19.99, 24.99)
+        return db.insertarProducto("gfdtt", "producto B", 19.99, 24.99, false)
       }).then(function (ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')
-        return db.insertarProducto("gfgtb4", "producto C", 14.99, 18.99)
+        return db.insertarProducto("gfgtb4", "producto C", 14.99, 18.99, true)
       }).then(function (ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')
@@ -79,6 +79,7 @@ describe('metodos de dbAdmin.js', function () {
     direccion:  "Av. Pedro Carbo y Sucre 512",
     telefono1: "2645987",
     telefono2: "2978504",
+    descDefault: 0,
   }
 
   describe('insertarCliente', function() {
@@ -86,12 +87,12 @@ describe('metodos de dbAdmin.js', function () {
 
     it('persiste varios clientes en la base encadenando con promise', function (done) {
       db.insertarCliente(cliente1.ruc, cliente1.nombre, cliente1.direccion,
-        cliente1.email, cliente1.telefono1, cliente1.telefono2)
+        cliente1.email, cliente1.telefono1, cliente1.telefono2, cliente1.descDefault)
       .then(function (ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')
         return db.insertarCliente("0934233576001", "Carlos Sanchez",
-        "Av. Brasil y la del ejercito", "carlos-sanchez84@live.com", "2353477", "2375980")
+        "Av. Brasil y la del ejercito", "carlos-sanchez84@live.com", "2353477", "2375980", 5)
       }).then(function(ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')

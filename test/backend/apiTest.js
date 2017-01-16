@@ -39,7 +39,7 @@ const cliente1 = {
   nombre: 'Dr. Julio Mendoza',
   direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
   correo: 'julio_mendoza@yahoo.com.ec',
-  telefono1: '2645422', telefono2: '2876357',
+  telefono1: '2645422', telefono2: '2876357', descDefault: 0,
 }
 
 describe('endpoints disponibles para el cliente', function () {
@@ -51,7 +51,7 @@ describe('endpoints disponibles para el cliente', function () {
         cliente1.nombre,
         cliente1.direccion,
         cliente1.correo,
-        cliente1.telefono1, cliente1.telefono2)
+        cliente1.telefono1, cliente1.telefono2, cliente1.descDefault)
       .then(function (resp) {
         const statusCode = resp.status
         statusCode.should.equal(200)
@@ -68,7 +68,7 @@ describe('endpoints disponibles para el cliente', function () {
         'Eduardo Villacreses',
         'Via a Samborondon km. 7.5 Urbanizacion Tornasol mz. 5 villa 20',
         'edu_vc@outlook.com',
-        '2854345', '28654768')
+        '2854345', '28654768', 5)
       .then(function (resp) {
         throw unexpectedError
       }, function (err) {
@@ -191,7 +191,7 @@ describe('endpoints disponibles para el cliente', function () {
       api.insertarProducto(
         'rytertg663433g',
         mi_producto,
-        39.99, 49.99)
+        39.99, 49.99, true)
       .then(function (resp) {
         const statusCode = resp.status
         statusCode.should.equal(200)
@@ -208,7 +208,7 @@ describe('endpoints disponibles para el cliente', function () {
       api.insertarProducto(
         '34tger5',
         mi_producto,
-        39.99, 49.99)
+        39.99, 49.99, true)
       .then(function (resp) {
         throw unexpectedError
       }, function (err) {

@@ -32,9 +32,10 @@ app.post('/cliente/new', function (req, res) {
     email,
     telefono1,
     telefono2,
+    descDefault,
   } = req.body
 
-  db.insertarCliente(ruc, nombre, email, direccion, telefono1, telefono2)
+  db.insertarCliente(ruc, nombre, email, direccion, telefono1, telefono2, descDefault)
   .then(function (data) {//OK!
     res.status(200)
     .send('OK')
@@ -109,9 +110,10 @@ app.post('/producto/new', function (req, res) {
     nombre,
     precioDist,
     precioVenta,
+    pagaIva,
   } = req.body
 
-  db.insertarProducto(codigo, nombre, precioDist, precioVenta)
+  db.insertarProducto(codigo, nombre, precioDist, precioVenta, pagaIva)
   .then(function(id) {
     res.status(200)
     .send(id)

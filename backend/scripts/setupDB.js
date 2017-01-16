@@ -10,6 +10,7 @@ module.exports = () => {
         table.string('nombre', 50)
         table.float('precioDist')
         table.float('precioVenta')
+        table.boolean('pagaIva')
 
         table.unique('nombre')
       })
@@ -20,6 +21,7 @@ module.exports = () => {
         table.string('email', 10)
         table.string('telefono1', 10)
         table.string('telefono2', 10)
+        table.int('descDefault')
       })
       .createTable('medicos', (table) => {
         table.string('nombre', 50).primary()

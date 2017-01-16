@@ -34,6 +34,7 @@ describe('FacturacionUtils', function () {
           fechaExp: DateParser.parseDBDate('2017-02-02'), //Fecha como la pone la DB
           count: 1,
           precioVenta: 10,
+          pagaIva: true,
         }),
         Immutable.Map({
           producto: 2,
@@ -41,6 +42,7 @@ describe('FacturacionUtils', function () {
           fechaExp: DateParser.oneYearFromToday(), //fecha como la pone FacturarView por default
           count: 2,
           precioVenta: 20,
+          pagaIva: true,
         })
       )
       const ventaRow = FacturacionUtils.crearVentaRow(clienteObj, facturaData, productos)
@@ -115,12 +117,14 @@ describe('FacturacionUtils', function () {
             rowid: 1,
             count: 3,
             precioVenta: '25.99',
+            pagaIva: true,
           }),
         Immutable.Map(
           {
             rowid: 4,
             count: 2,
             precioVenta: '17.99',
+            pagaIva: false,
           })
         )
 
@@ -133,8 +137,8 @@ describe('FacturacionUtils', function () {
 
       expect(subtotal).to.be.closeTo(113.95, 0.001)
       rebaja.should.equal(0)
-      expect(valorIVA).to.be.closeTo(15.953, 0.001)
-      expect(total).to.be.closeTo(129.90, 0.005)
+      expect(valorIVA).to.be.closeTo(10.916, 0.001)
+      expect(total).to.be.closeTo(124.87, 0.005)
     })
   })
 
@@ -143,6 +147,7 @@ describe('FacturacionUtils', function () {
       const producto = {
         rowid: 14,
         nombre: 'Acido Urico',
+        pagaIva: true,
         precioDist: 19.99,
         precioVenta: 29.99,
         codigo: 'asdf',
@@ -153,6 +158,7 @@ describe('FacturacionUtils', function () {
       unidad.should.have.property('producto', producto.rowid)
       unidad.should.not.have.property('rowid')
       unidad.should.not.have.property('precioDist')
+      unidad.should.not.have.property('pagaIva')
       unidad.should.have.property('codigo')
       unidad.should.have.property('nombre')
       unidad.should.have.property('precioVenta', producto.precioVenta)
