@@ -21,7 +21,7 @@ module.exports = {
       .send()
   },
 
-  insertarMedico: (nombre, direccion, comision, email, telefono1, telefono2) => {
+  insertarMedico: (nombre, direccion, email, comision, telefono1, telefono2) => {
     return request.post(prefix + '/medico/new')
       .send({
         nombre: nombre,

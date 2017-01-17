@@ -9,6 +9,7 @@ const util = require('util')
 
 const db = require('./dbAdmin.js')
 const formatter = require('./responseFormatter.js')
+const { validarCliente, validarMedico } = require('./sanitizationMiddleware.js')
 
 const port = process.env.PORT || 8192
 //crear directorio donde almacenar facturas en pdf.
@@ -24,7 +25,7 @@ const printError = (errorString) => {
 const app = Express()
 app.use(bodyParser.json()); // for parsing application/json
 
-app.post('/cliente/new', function (req, res) {
+app.post('/cliente/new', validarCliente, function (req, res) {
   const {
     ruc,
     nombre,
@@ -33,7 +34,7 @@ app.post('/cliente/new', function (req, res) {
     telefono1,
     telefono2,
     descDefault,
-  } = req.body
+  } = req.safeData
 
   db.insertarCliente(ruc, nombre, email, direccion, telefono1, telefono2, descDefault)
   .then(function (data) {//OK!
@@ -44,7 +45,6 @@ app.post('/cliente/new', function (req, res) {
     res.status(422)
     .send(err)
   })
-
 });
 
 app.get('/cliente/find', function (req,res) {
@@ -65,7 +65,7 @@ app.get('/cliente/find', function (req,res) {
 });
 
 
-app.post('/medico/new', function (req, res) {
+app.post('/medico/new', validarMedico, function (req, res) {
   const {
     nombre,
     direccion,
@@ -73,9 +73,9 @@ app.post('/medico/new', function (req, res) {
     comision,
     telefono1,
     telefono2,
-  } = req.body
+  } = req.safeData
 
-  db.insertarMedico(nombre, email, direccion, comision, telefono1, telefono2)
+  db.insertarMedico(nombre, direccion, email, comision, telefono1, telefono2)
   .then(function (data) {//OK!
     res.status(200)
     .send('OK')

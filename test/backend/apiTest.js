@@ -39,7 +39,7 @@ const cliente1 = {
   nombre: 'Dr. Julio Mendoza',
   direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
   correo: 'julio_mendoza@yahoo.com.ec',
-  telefono1: '2645422', telefono2: '2876357', descDefault: 0,
+  telefono1: '2645422', telefono2: '2876357', descDefault: '0',
 }
 
 describe('endpoints disponibles para el cliente', function () {
@@ -62,16 +62,15 @@ describe('endpoints disponibles para el cliente', function () {
       })
     })
 
-    it('retorna 500 al ingresar cliente con un ruc ya existente', function (done) {
+    it('retorna 422 al ingresar cliente con un ruc ya existente', function (done) {
       api.insertarCliente(
         cliente1.ruc,
         'Eduardo Villacreses',
         'Via a Samborondon km. 7.5 Urbanizacion Tornasol mz. 5 villa 20',
         'edu_vc@outlook.com',
-        '2854345', '28654768', 5)
-      .then(function (resp) {
-        throw unexpectedError
-      }, function (err) {
+        '2854345', '28654768', '5')
+      .then(undefined)
+      .catch(function (err) {
         const statusCode = err.status
         const resp = err.response
         statusCode.should.equal(422)
@@ -118,7 +117,7 @@ describe('endpoints disponibles para el cliente', function () {
   const medico1 = {
     nombre: 'Dr. Juan Coronel',
     direccion: 'Avenida Leopoldo Carrera Calvo 493',
-    correo: 'jcoronel23@yahoo.com.ec', comision: 20,
+    correo: 'jcoronel23@yahoo.com.ec', comision: '20',
     telefono1: '2448272', telefono2: '2885685',
   }
   describe('/medico/new', function () {

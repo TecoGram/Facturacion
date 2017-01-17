@@ -2,6 +2,7 @@ const validator = require('validator')
 const campo_obligatorio = 'Este campo es obligatorio'
 const campo_obligatorio_min = 'obligatorio'
 const invalido = 'inválido'
+const porcentaje_invalido = 'No está entre 0 y 100'
 
 const phoneCharset = '1234567890-+()'
 const usesCharset = (str, charset) => {
@@ -11,6 +12,8 @@ const usesCharset = (str, charset) => {
       return str[i]
   }
 }
+
+const percentageOpts = { min: 0, max: 100 }
 
 const isEmptyObj = (obj) => {
   return Object.keys(obj).length === 0 && obj.constructor === Object
@@ -24,6 +27,7 @@ module.exports = {
     const email = formData.email || ''
     const telefono1 = formData.telefono1 || ''
     const telefono2 = formData.telefono2 || ''
+    const descDefault = String(formData.descDefault || '0')
 
     const errors = {}
     const inputs = {}
@@ -45,7 +49,6 @@ module.exports = {
     else
       inputs.direccion = direccion
 
-
     if(!validator.isEmpty(email) && !validator.isEmail(email))
       errors.email = 'e-mail inválido'
     else
@@ -63,6 +66,11 @@ module.exports = {
     else
       inputs.telefono2 = telefono2
 
+    if(!validator.isInt(descDefault, percentageOpts))
+      errors.descDefault = 'descuento inválido. ' + porcentaje_invalido
+    else
+      inputs.descDefault = descDefault
+
     if(isEmptyObj(errors))
       return {
         errors: null,
@@ -78,15 +86,16 @@ module.exports = {
 
     const nombre = formData.nombre || ''
     const email = formData.email || ''
-    const comision = formData.comision || '0'
+    const direccion = formData.direccion || ''
+    const comision = String(formData.comision || '0')
     const telefono1 = formData.telefono1 || ''
     const telefono2 = formData.telefono2 || ''
 
     const errors = {}
-    const inputs = {}
+    const inputs = { direccion }
 
-    if(!validator.isInt(comision))
-      errors.comision = 'comision inválida'
+    if(!validator.isInt(comision, percentageOpts))
+      errors.comision = 'comision inválida. ' + porcentaje_invalido
     else
       inputs.comision = comision
 
