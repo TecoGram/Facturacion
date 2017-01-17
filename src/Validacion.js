@@ -136,11 +136,12 @@ module.exports = {
 
     const codigo = formData.codigo || ''
     const nombre = formData.nombre || ''
-    const precioFab = formData.precioFab || ''
-    const precioVenta = formData.precioVenta || ''
+    const precioFab = String(formData.precioFab || '')
+    const precioVenta = String(formData.precioVenta || '')
+    const pagaIva = Boolean(formData.pagaIva || true)
 
     const errors = {}
-    const inputs = {}
+    const inputs = { pagaIva }
 
     if(validator.isEmpty(codigo))
       errors.codigo = campo_obligatorio

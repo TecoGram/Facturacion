@@ -9,7 +9,7 @@ const util = require('util')
 
 const db = require('./dbAdmin.js')
 const formatter = require('./responseFormatter.js')
-const { validarCliente, validarMedico } = require('./sanitizationMiddleware.js')
+const { validarCliente, validarMedico, validarProducto } = require('./sanitizationMiddleware.js')
 
 const port = process.env.PORT || 8192
 //crear directorio donde almacenar facturas en pdf.
@@ -104,7 +104,7 @@ app.get('/medico/find', function (req,res) {
 
 });
 
-app.post('/producto/new', function (req, res) {
+app.post('/producto/new', validarProducto, function (req, res) {
   const {
     codigo,
     nombre,
