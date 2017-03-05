@@ -1,5 +1,11 @@
 [![Build Status](https://travis-ci.org/GAumala/Facturacion.svg?branch=master)](https://travis-ci.org/GAumala/Facturacion) [![Coverage Status](https://coveralls.io/repos/github/GAumala/Facturacion/badge.svg?branch=master)](https://coveralls.io/github/GAumala/Facturacion?branch=master)
 
+Sistema de facturación web sencillo escrito con React, Node.js y SQLite 3.
+
+Se recomienda usar versiones actuales de Google Chrome (>=56) para el cliente.
+
+______
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.  
