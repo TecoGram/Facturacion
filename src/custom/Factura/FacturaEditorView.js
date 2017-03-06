@@ -88,7 +88,9 @@ export default class FacturaEditorView extends Component {
       productos,
     } = this.state
 
-    const ventaRow = crearVentaRow(cliente, facturaData, productos)
+    const empresa = this.props.empresa
+
+    const ventaRow = crearVentaRow(cliente, facturaData, productos, empresa)
     const {
       errors,
     } = validarVentaRow(ventaRow)

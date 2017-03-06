@@ -42,6 +42,7 @@ const toolbarTitleStyle = {
 function mapStateToProps(state) {
   return {
     dialog: state.dialog,
+    empresa: state.empresa,
     snackbar: state.snackbar,
     page: state.page,
   }
@@ -145,6 +146,7 @@ class MainToolbar extends Component {
 
     const {
       cambiarDialog,
+      title,
       onLeftButtonClicked,
     } = this.props
 
@@ -156,7 +158,7 @@ class MainToolbar extends Component {
             onTouchTap={onLeftButtonClicked}>
             <NavigationMenu />
           </IconButton>
-          <ToolbarTitle text={this.props.title}
+          <ToolbarTitle text={title}
           style={toolbarTitleStyle}/>
         </ToolbarGroup>
 
@@ -218,9 +220,12 @@ class MainDialog extends Component {
 const SelectedPage = (props) => {
   const {
     abrirLinkConSnackbar,
+    empresa,
     page,
     editarFactura,
   } = props
+
+  page.props.empresa = empresa
 
   switch (page.type) {
     case NEW_FACTURA_PAGE:
@@ -267,16 +272,17 @@ class Main extends Component {
       cambiarDialog,
       cerrarDialogConMsg,
       dialog,
+      empresa,
       snackbar,
       page,
-      title,
     } = this.props
 
     return (
       <div style={{backgroundColor: '#ededed', height: 'inherit'}}>
-        <MainToolbar title={title} cambiarDialog={cambiarDialog}
+        <MainToolbar cambiarDialog={cambiarDialog} title={empresa}
         onLeftButtonClicked={() => this.handleDrawerChange(true)}/>
-        <SelectedPage page={page} editarFactura={editarFactura} abrirLinkConSnackbar={abrirLinkConSnackbar}/>
+        <SelectedPage page={page} editarFactura={editarFactura} empresa={empresa}
+          abrirLinkConSnackbar={abrirLinkConSnackbar}/>
         <MainDrawer open={this.state.drawerOpen} handleChange={this.handleDrawerChange}
           onPageSelected={this.onPageSelected}/>
         <MainDialog type={dialog} cambiarDialog={cambiarDialog}
@@ -298,16 +304,12 @@ class Main extends Component {
 export default class MainNavigationView extends Component {
 
   render() {
-    const {
-      title,
-    } = this.props
-
     const MainComponent = connect(mapStateToProps, mapDispatchToProps) (Main)
 
     return (
       <MuiThemeProvider muiTheme={CustomStyle.muiTheme}>
         <Provider store={store} >
-          <MainComponent title={title} />
+          <MainComponent />
         </Provider>
       </MuiThemeProvider>
     );

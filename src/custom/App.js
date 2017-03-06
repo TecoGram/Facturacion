@@ -4,8 +4,8 @@ import MainNavigationView from './MainNavigationView'
 class App extends Component {
   render() {
     return (
-        <MainNavigationView title={"TecoGram S.A."}/>
-      );
+        <MainNavigationView />
+    );
   }
 }
 

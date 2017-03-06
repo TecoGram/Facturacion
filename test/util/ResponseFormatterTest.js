@@ -7,6 +7,23 @@ const chai = require('chai')
 
 describe ('responseFormatter', function() {
 
+  describe('crearListaFacturasParaTabla', function () {
+    it('calcula y agrega el total a cada elemento', function () {
+      const ventas = [{
+        codigo:"00546",
+        empresa:"TecoGram",
+        fecha:"2017-03-05",
+        ruc:"09455476584",
+        nombre:"Miguel Narvaez",
+        iva:1.99,
+        descuento:0.99,
+        subtotal:19.99,
+      }]
+      const listaParaRender = formatter.crearListaFacturasParaTabla(ventas)
+      listaParaRender[0].total.should.be.equal(20.99)
+    })
+  })
+
   describe('formatFindVentas', function () {
     it('Recibe un array de objetos con campo \'total\' y formatea este campo' +
       ' para que solo tenga 2 numeros decimales.', function () {
@@ -72,6 +89,7 @@ describe ('responseFormatter', function() {
         descuento:0,
         formaPago:'CONTADO',
         subtotal:19.99,
+        total:21.99,
         medico: undefined,
         paciente: undefined,
       },

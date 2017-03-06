@@ -60,7 +60,6 @@ const crearUnidadesRows = (productos) => {
   return unidades
 }
 
-
 module.exports = {
   crearUnidadesRows: crearUnidadesRows,
 
@@ -76,7 +75,7 @@ module.exports = {
     return unidad
   },
 
-  crearVentaRow: (clienteObj, facturaData, productos) => {
+  crearVentaRow: (clienteObj, facturaData, productos, empresa) => {
 
     const desc = facturaData.get('descuento')
     const {
@@ -90,6 +89,7 @@ module.exports = {
       cliente: clienteObj.ruc,
       codigo: facturaData.get('codigo'),
       descuento: rebaja,
+      empresa: empresa,
       autorizacion: facturaData.get('autorizacion'),
       formaPago: facturaData.get('formaPago'),
       fecha: toReadableDate(facturaData.get('fecha')),
@@ -101,6 +101,5 @@ module.exports = {
   },
 
   calcularValores: calcularValores,
-
 
 }

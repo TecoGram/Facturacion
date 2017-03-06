@@ -1,6 +1,7 @@
 import React from 'react'
 import MaterialTable from '../lib/MaterialTable'
 import { getFacturaURL, findVentas, deleteVenta } from '../api'
+import { crearListaFacturasParaTabla } from '../../backend/responseFormatter.js'
 
 const columns = ['Código', 'Fecha', 'RUC', 'Cliente', 'Total']
 const keys = ['codigo', 'fecha', 'ruc', 'nombre', 'total']
@@ -16,19 +17,19 @@ export default class FacturasListView extends React.Component {
   }
 
   openFacturaInNewTab = (index) => {
-    const { codigo, fecha } = this.state.rows[index]
-    window.open(getFacturaURL(codigo, fecha))
+    const { codigo, empresa } = this.state.rows[index]
+    window.open(getFacturaURL(codigo, empresa))
 
   }
 
   openEditorPage = (index) => {
-    const { codigo, fecha } = this.state.rows[index]
-    this.props.editarFactura(codigo, fecha)
+    const { codigo, empresa } = this.state.rows[index]
+    this.props.editarFactura(codigo, empresa)
   }
 
   deleteRow = (index) => {
-    const { codigo, fecha } = this.state.rows[index]
-    deleteVenta(codigo, fecha)
+    const { codigo, empresa } = this.state.rows[index]
+    deleteVenta(codigo, empresa)
     .then(() => {
       if (this.state.rows.length === 1)
         this.setState({rows: this.state.rows.filter((item, i) => i !== index)})
@@ -38,7 +39,7 @@ export default class FacturasListView extends React.Component {
   requestData = (input) => {
     findVentas(input)
       .then((resp) => {
-        const ventas = resp.body
+        const ventas = crearListaFacturasParaTabla(resp.body)
         this.setState({rows: ventas})
       }, (err) => {
         if (err.status === 404) {

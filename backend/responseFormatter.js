@@ -1,4 +1,27 @@
+const calcularTotalVentaRow = (ventaRow) => {
+  return ventaRow.subtotal + ventaRow.iva - ventaRow.descuento
+}
+
 module.exports = {
+  calcularTotalVentaRow,
+  crearListaFacturasParaTabla: (ventas) => {
+    const len = ventas.length
+    const listaParaRender = []
+    for (let i = 0; i < len; i++) {
+      const venta = ventas[i]
+      const total = calcularTotalVentaRow(venta)
+      listaParaRender.push({
+        codigo: venta.codigo,
+        empresa: venta.empresa,
+        fecha: venta.fecha,
+        ruc: venta.ruc,
+        nombre: venta.nombre,
+        total: total,
+      })
+    }
+    return listaParaRender
+  },
+
   findVentas: (ventas) => {
     if (ventas.length > 0) {
       const newVentas = []
@@ -40,6 +63,7 @@ module.exports = {
         subtotal: subtotal,
         autorizacion: autorizacion,
         formaPago: formaPago,
+        total: calcularTotalVentaRow(ventaQueryResp.ventaRow),
       },
       productos: productos.slice(),
     }
