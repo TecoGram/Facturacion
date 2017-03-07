@@ -6,8 +6,6 @@ import { NEW_FACTURA_PAGE, FACTURA_LIST_PAGE, EDITAR_FACTURA_PAGE,
 import { CAMBIAR_DIALOG_ACTION, CAMBIAR_PAGE_ACTION, CERRAR_DIALOG_CON_MSG_ACTION,
   ABRIR_LINK_CON_SNACKBAR } from './ActionTypes'
 
-import { parseDBDate } from './DateParser'
-
 const cambiarPagina = (tipoPagina, props) => {
   switch (tipoPagina) {
     case FACTURA_LIST_PAGE:
@@ -82,12 +80,11 @@ module.exports = {
     }
   },
 
-  editarFactura(codigo, fechaString) {
+  editarFactura(codigo, empresa) {
     return cambiarPagina(EDITAR_FACTURA_PAGE, {
       ventaKey: {
         codigo: codigo,
-        fechaString: fechaString,
-        fecha: parseDBDate(fechaString),
+        empresa: empresa,
       },
     })
   },

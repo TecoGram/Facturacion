@@ -1,7 +1,7 @@
 import React from 'react';
 
 import RaisedButton from 'material-ui/RaisedButton'
-import { calcularValores } from './FacturacionUtils'
+import { calcularValoresFacturablesImm } from './Math'
 
 const ivaLabel = `IVA 14%: $`
 const nuevoLabel = 'Generar Factura'
@@ -12,7 +12,7 @@ export default class FacturaResults extends React.Component {
   render() {
     const {
       isExamen,
-      productos,
+      facturables,
       descuento,
       onGuardarClick,
       guardarButtonDisabled,
@@ -24,7 +24,7 @@ export default class FacturaResults extends React.Component {
       rebaja,
       valorIVA,
       total,
-    } = calcularValores(productos, descuento)
+    } = calcularValoresFacturablesImm(facturables, descuento)
 
     const label = nuevo ? nuevoLabel : editarLabel
 
@@ -68,7 +68,7 @@ export default class FacturaResults extends React.Component {
 
 FacturaResults.propTypes = {
   isExamen: React.PropTypes.bool,
-  productos: React.PropTypes.object.isRequired, //Immutable.js list
+  facturables: React.PropTypes.object.isRequired, //Immutable.js list
   descuento: React.PropTypes.number.isRequired,
   onGuardarClick: React.PropTypes.func,
   nuevo: React.PropTypes.bool.isRequired,

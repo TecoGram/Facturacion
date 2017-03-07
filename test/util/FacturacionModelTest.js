@@ -1,18 +1,14 @@
 /* eslint-env node, mocha */
 
 const Immutable = require('immutable')
-const assert = require('assert');
 const chai = require('chai')
   , expect = chai.expect
-  , should = chai.should();
 
-const FacturacionUtils = require('../../src/custom/Factura/FacturacionUtils.js')
+const FacturacionModels = require('../../src/custom/Factura/Models.js')
+const FacturacionMath = require('../../src/custom/Factura/Math.js')
 const DateParser = require('../../src/DateParser.js')
 
-const unexpectedError = Error('Ocurrio algo inesperado');
-
-
-describe('FacturacionUtils', function () {
+describe('Facturacion Models', function () {
   describe('crearVentaRow', function () {
     it('Genera la fila de una venta a partir de un mapa inmutable', function () {
       const clienteObj = {
@@ -27,7 +23,7 @@ describe('FacturacionUtils', function () {
         fecha: new Date(2016, 10, 26),
       })
 
-      const productos = Immutable.List.of(
+      const facturables = Immutable.List.of(
         Immutable.Map({
           producto: 1,
           lote: 'asd3',
@@ -45,34 +41,52 @@ describe('FacturacionUtils', function () {
           pagaIva: true,
         })
       )
-      const ventaRow = FacturacionUtils.crearVentaRow(clienteObj, facturaData, productos)
+      const unidades = [
+        {
+          producto: 1,
+          lote: 'asd3',
+          fechaExp: DateParser.parseDBDate('2017-02-02'), //Fecha como la pone la DB
+          count: 1,
+          precioVenta: 10,
+          pagaIva: true,
+        },
+        {
+          producto: 2,
+          lote: 'asd5',
+          fechaExp: DateParser.oneYearFromToday(), //fecha como la pone FacturarView por default
+          count: 2,
+          precioVenta: 20,
+          pagaIva: true,
+        },
+      ]
+      const empresa = "TecoGram"
+      const ventaRow = FacturacionModels.crearVentaRow(clienteObj, facturaData,
+        facturables, unidades, empresa)
       ventaRow.cliente.should.equal('09455867443001')
       ventaRow.codigo.should.equal('0003235')
       ventaRow.subtotal.should.equal(50)
       ventaRow.descuento.should.equal(5)
+      ventaRow.empresa.should.equal(empresa)
       expect(ventaRow.iva).to.be.closeTo(7, 0.001)
       expect(ventaRow.total).to.be.closeTo(52, 0.001)
       ventaRow.autorizacion.should.equal('5962')
       ventaRow.formaPago.should.equal('CONTADO')
       ventaRow.fecha.should.equal('2016-11-26')
 
-      const unidades = ventaRow.productos
-      unidades.length.should.equal(2)
+      const venta_unidades = ventaRow.unidades
+      venta_unidades.length.should.equal(unidades.length)
 
-      const primerItem = unidades[0]
+      const primerItem = venta_unidades[0]
       primerItem.producto.should.equal(1)
       primerItem.lote.should.equal('asd3')
-      primerItem.fechaExp.should.equal('2017-02-02')
+      primerItem.fechaExp.should.equal(unidades[0].fechaExp)
       primerItem.precioVenta.should.equal(10)
       primerItem.count.should.equal(1)
 
-      const segundoItem = unidades[1]
+      const segundoItem = venta_unidades[1]
       segundoItem.producto.should.equal(2)
       segundoItem.lote.should.equal('asd5')
-      segundoItem.fechaExp.length.should.be.equal(10)
-      segundoItem.fechaExp.should.contain('-')
-      segundoItem.fechaExp.should.not.contain('/')
-      segundoItem.fechaExp.should.not.contain(' ')
+      segundoItem.fechaExp.should.equal(unidades[1].fechaExp)
       segundoItem.precioVenta.should.equal(20)
       segundoItem.count.should.equal(2)
     })
@@ -99,7 +113,7 @@ describe('FacturacionUtils', function () {
           })
       )
 
-      const rows = FacturacionUtils.crearUnidadesRows(productos)
+      const rows = FacturacionModels.crearUnidadesRows(productos)
       rows.length.should.equal(5)
       rows.forEach((row, i) => {
         expect(row).to.have.property('producto', i < 3 ? 1 : 4)
@@ -133,7 +147,7 @@ describe('FacturacionUtils', function () {
         rebaja,
         total,
         valorIVA,
-      } = FacturacionUtils.calcularValores(productos, '')
+      } = FacturacionMath.calcularValoresFacturablesImm(productos, '')
 
       expect(subtotal).to.be.closeTo(113.95, 0.001)
       rebaja.should.equal(0)
@@ -142,8 +156,8 @@ describe('FacturacionUtils', function () {
     })
   })
 
-  describe('productoAUnidad', function() {
-    it('convierte una fila de producto a una fila de unidad con valores por defecto', function () {
+  describe('productoAFacturable', function() {
+    it('convierte una fila de producto a un objeto facturable con valores por defecto', function () {
       const producto = {
         rowid: 14,
         nombre: 'Acido Urico',
@@ -153,20 +167,43 @@ describe('FacturacionUtils', function () {
         codigo: 'asdf',
       }
 
-      const unidad = FacturacionUtils.productoAUnidad(producto)
+      const facturable = FacturacionModels.productoAFacturable(producto)
 
-      unidad.should.have.property('producto', producto.rowid)
-      unidad.should.not.have.property('rowid')
-      unidad.should.not.have.property('precioDist')
+      facturable.should.have.property('producto', producto.rowid)
+      facturable.should.not.have.property('rowid')
+      facturable.should.not.have.property('precioDist')
+      facturable.should.have.property('codigo')
+      facturable.should.have.property('nombre')
+      facturable.should.have.property('precioVenta', producto.precioVenta)
+      facturable.should.have.property('fechaExp')
+      facturable.should.have.property('count', 1)
+      facturable.should.have.property('lote', '')
+    })
+  })
+
+  describe('facturable', function() {
+    it('convierte un objeto facturable a una fila de unidad con valores por defecto', function () {
+      const facturable = {
+        producto: 1,
+        nombre: 'Acido Urico',
+        pagaIva: true,
+        precioVenta: 29.99,
+        codigo: 'asdf',
+        fechaExp: new Date(),
+        count: 1,
+        lote: '',
+      }
+
+      const unidad = FacturacionModels.facturableAUnidad(facturable)
+
+      unidad.should.have.property('producto')
       unidad.should.not.have.property('pagaIva')
-      unidad.should.have.property('codigo')
-      unidad.should.have.property('nombre')
-      unidad.should.have.property('precioVenta', producto.precioVenta)
+      unidad.should.not.have.property('codigo')
+      unidad.should.not.have.property('nombre')
+      unidad.should.have.property('precioVenta', facturable.precioVenta)
       unidad.should.have.property('fechaExp')
       unidad.should.have.property('count', 1)
       unidad.should.have.property('lote', '')
     })
-
   })
-
 })

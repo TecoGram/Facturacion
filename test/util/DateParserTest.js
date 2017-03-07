@@ -1,9 +1,7 @@
 /* eslint-env node, mocha */
 const DateParser = require('../../src/DateParser.js')
-const assert = require('assert');
 const chai = require('chai')
-  , expect = chai.expect
-  , should = chai.should();
+chai.should();
 
 describe ('DateParser', function() {
 
@@ -33,7 +31,7 @@ describe ('DateParser', function() {
           descuento:0,
           formaPago:'CONTADO',
         },
-        productos:[
+        facturables:[
           {
             nombre:'TGO 8x50',
             count:1,
@@ -59,7 +57,7 @@ describe ('DateParser', function() {
           descuento:0,
           formaPago:'CONTADO',
         },
-        productos:[
+        facturables:[
           {
             nombre:'TGO 8x50',
             count:1,
@@ -76,7 +74,7 @@ describe ('DateParser', function() {
       fechaVenta.toString().should.contain('Jan 06 2017')
       DateParser.toReadableDate(fechaVenta).should.be.equal('2017-01-06')
 
-      const p1FechaExp = formattedResp.productos[0].fechaExp
+      const p1FechaExp = formattedResp.facturables[0].fechaExp
       p1FechaExp.toString().should.contain('Apr 04 2017')
       DateParser.toReadableDate(p1FechaExp).should.be.equal('2017-04-04')
     })

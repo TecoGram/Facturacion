@@ -1,16 +1,14 @@
 /* eslint-env node, mocha */
 const api = require('../../src/api.js')
-const server = require('../../backend/server.js')
+require('../../backend/server.js')
 const fs = require('fs')
 const request = require('superagent')
 
-const assert = require('assert');
 const chai = require('chai')
-  , expect = chai.expect
-  , should = chai.should();
+chai.should();
 
 const setup = require('../../backend/scripts/setupDB.js')
-const FacturacionUtils = require('../../src/custom/Factura/FacturacionUtils')
+const FacturacionModels = require('../../src/custom/Factura/Models')
 const unexpectedError = Error('Ocurrio algo inesperado');
 const facturaDir = '/tmp/facturas/'
 
@@ -102,7 +100,7 @@ describe('endpoints disponibles para el cliente', function () {
 
     it('retorna 404 si no encuentra clientes', function (done) {
       api.findClientes('xyz')
-      .then(function (resp) {
+      .then(function () {
         throw unexpectedError
       }, function (err) {
         const statusCode = err.status
@@ -208,7 +206,7 @@ describe('endpoints disponibles para el cliente', function () {
         '34tger5',
         mi_producto,
         39.99, 49.99, true)
-      .then(function (resp) {
+      .then(function () {
         throw unexpectedError
       }, function (err) {
         const statusCode = err.status
@@ -243,7 +241,7 @@ describe('endpoints disponibles para el cliente', function () {
 
     it('retorna 404 si no encuentra productos', function (done) {
       api.findProductos('xyz')
-      .then(function (resp) {
+      .then(function () {
         throw unexpectedError
       }, function (err) {
         const statusCode = err.status
@@ -274,11 +272,12 @@ describe('endpoints disponibles para el cliente', function () {
       api.findProductos('TGO 8x50')
         .then(function (resp) {
           const products = resp.body
-          const unidades = [ FacturacionUtils.productoAUnidad(products[0]) ]
+          const unidades = [ FacturacionModels.facturableAUnidad(
+            FacturacionModels.productoAFacturable(products[0])) ]
           //knex.js no acepta keys que no corresponden a columnas de la tabla. borralas
           delete unidades[0].nombre
           delete unidades[0].codigo
-          newVentaRow.productos = unidades
+          newVentaRow.unidades = unidades
           return api.insertarVenta(newVentaRow)
         })
         .then(function (resp) {
@@ -329,11 +328,9 @@ describe('endpoints disponibles para el cliente', function () {
       api.findProductos('TGO 8x50')
         .then(function (resp) {
           const products = resp.body
-          const unidades = [ FacturacionUtils.productoAUnidad(products[0]) ]
-          //knex.js no acepta keys que no corresponden a columnas de la tabla. borralas
-          delete unidades[0].nombre
-          delete unidades[0].codigo
-          newVentaExRow.productos = unidades
+          const unidades = [ FacturacionModels.facturableAUnidad(
+            FacturacionModels.productoAFacturable(products[0])) ]
+          newVentaExRow.unidades = unidades
           return api.insertarVentaExamen(newVentaExRow)
         })
         .then(function (resp) {
@@ -409,13 +406,13 @@ describe('endpoints disponibles para el cliente', function () {
     it('retorna json si el header \'Accept\' es igual a \'application/json\'', function (done) {
       api.verVenta(newVentaRow.codigo, newVentaRow.empresa)
         .then(function (resp) {
-          const { facturaData, productos, cliente } = resp.body
+          const { facturaData, facturables, cliente } = resp.body
           facturaData.codigo.should.equal(newVentaRow.codigo)
           facturaData.empresa.should.equal(newVentaRow.empresa)
           facturaData.fecha.should.equal(newVentaRow.fecha)
           facturaData.formaPago.should.equal(formaPagoUpdated)
 
-          productos.length.should.equal(newVentaRow.productos.length)
+          facturables.length.should.equal(newVentaRow.unidades.length)
 
           cliente.ruc.should.equal(cliente1.ruc)
           cliente.nombre.should.equal(cliente1.nombre)
@@ -451,14 +448,14 @@ describe('endpoints disponibles para el cliente', function () {
     it('retorna json si el header \'Accept\' es igual a \'application/json\'', function (done) {
       api.verVentaExamen(newVentaExRow.codigo, newVentaExRow.empresa)
         .then(function (resp) {
-          const { facturaData, productos, cliente } = resp.body
+          const { facturaData, facturables, cliente } = resp.body
           facturaData.codigo.should.equal(newVentaExRow.codigo)
           facturaData.empresa.should.equal('TECOGRAM')
           facturaData.fecha.should.equal(newVentaExRow.fecha)
           facturaData.paciente.should.equal(pacienteUpdated)
           facturaData.autorizacion.should.equal(autorizacionUpdated)
 
-          productos.length.should.equal(newVentaExRow.productos.length)
+          facturables.length.should.equal(newVentaExRow.unidades.length)
 
           cliente.ruc.should.equal(cliente1.ruc)
           cliente.nombre.should.equal(cliente1.nombre)
@@ -499,7 +496,7 @@ describe('endpoints disponibles para el cliente', function () {
 
     it('retorna 404 si no encuentra ventas', function (done) {
       api.findVentas('xyz')
-      .then(function (resp) {
+      .then(function () {
         throw unexpectedError
       }, function (err) {
         const statusCode = err.status
@@ -530,7 +527,7 @@ describe('endpoints disponibles para el cliente', function () {
 
     it('retorna 404 si no encuentra facturas de examenes', function (done) {
       api.findVentasExamen('xyz')
-      .then(function (resp) {
+      .then(function () {
         throw unexpectedError
       }, function (err) {
         const statusCode = err.status

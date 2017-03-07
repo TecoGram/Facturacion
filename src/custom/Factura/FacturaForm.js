@@ -53,7 +53,6 @@ const CodigoText = (props) => {
 
 const FechaText = (props) => {
   const {
-    ventaKey,
     data,
     errors,
     onDataChanged,
@@ -65,14 +64,9 @@ const FechaText = (props) => {
     textFieldStyle: fechaTextStyle,
   }
 
-  if (ventaKey) {
-    myProps.disabled = true
-    myProps.value = ventaKey.fecha
-  } else {
-    myProps.value = data.fecha
-    myProps.errorText = errors.fecha
-    myProps.onChange = (n, date) => onDataChanged('fecha', date)
-  }
+  myProps.value = data.fecha
+  myProps.errorText = errors.fecha
+  myProps.onChange = (n, date) => onDataChanged('fecha', date)
 
   return <FormattedDatePicker {...myProps} />
 }

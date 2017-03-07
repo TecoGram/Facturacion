@@ -9,7 +9,7 @@ module.exports = {
         subtotal,
         total,
         descuento,
-        productos,
+        facturables,
       } = ventaRow
 
       const {
@@ -45,14 +45,14 @@ module.exports = {
       const precioColPosition = nameColPosition + productNameWidth + 25
       const valoresColPosition = precioColPosition + 75
 
-      for (let i = 0; i < productos.length; i++) {
-        const product = productos[i]
+      for (let i = 0; i < facturables.length; i++) {
+        const facturable = facturables[i]
         doc.text(i + 1, productTableLeftMargin, linePos, {align: 'right', width: 10})
-        doc.text(product.count, countColPosition, linePos, {align: 'right', width: 15})
-        doc.text(product.nombre, nameColPosition, linePos, {width: productNameWidth})
+        doc.text(facturable.count, countColPosition, linePos, {align: 'right', width: 15})
+        doc.text(facturable.nombre, nameColPosition, linePos, {width: productNameWidth})
         const nextLinePos = doc.y
-        doc.text(product.precioVenta, precioColPosition, linePos, {align: 'right', width: 40})
-        const precioTotal = Number(product.count * product.precioVenta).toFixed(2)
+        doc.text(facturable.precioVenta, precioColPosition, linePos, {align: 'right', width: 40})
+        const precioTotal = Number(facturable.count * facturable.precioVenta).toFixed(2)
         doc.text(precioTotal, valoresColPosition, linePos, {align: 'right', width: 50})
         linePos = nextLinePos + spaceBetweenLines
       }

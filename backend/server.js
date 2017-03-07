@@ -5,7 +5,6 @@ const PDFWriter = require('./pdf/PDFWriter.js')
 const pdfutils = require('./pdf/pdfutils.js')
 const facturaTemplates = require('./pdf/templates.js')
 const fs = require('fs')
-const util = require('util')
 
 const db = require('./dbAdmin.js')
 const formatter = require('./responseFormatter.js')
@@ -37,7 +36,7 @@ app.post('/cliente/new', validarCliente, function (req, res) {
   } = req.safeData
 
   db.insertarCliente(ruc, nombre, email, direccion, telefono1, telefono2, descDefault)
-  .then(function (data) {//OK!
+  .then(function () {//OK!
     res.status(200)
     .send('OK')
   }, function (err) {//ERROR!
@@ -76,7 +75,7 @@ app.post('/medico/new', validarMedico, function (req, res) {
   } = req.safeData
 
   db.insertarMedico(nombre, direccion, email, comision, telefono1, telefono2)
-  .then(function (data) {//OK!
+  .then(function () {//OK!
     res.status(200)
     .send('OK')
   }, function (err) {//ERROR!
@@ -254,12 +253,12 @@ app.post('/venta/new', function (req, res) {
     subtotal,
     descuento,
     iva,
-    productos,
+    unidades,
 
   } = req.body
   db.insertarVenta(codigo, empresa, cliente, fecha, autorizacion, formaPago,
-    descuento, iva, subtotal, productos)
-  .then(function (data) {  //OK!
+    descuento, iva, subtotal, unidades)
+  .then(function () {  //OK!
     res.status(200)
     .send("OK")
   }, function (error) {//ERROR!
@@ -277,15 +276,14 @@ app.post('/venta_ex/new', function (req, res) {
     formaPago,
     subtotal,
     descuento,
-    total,
-    productos,
+    unidades,
     medico,
     paciente,
 
   } = req.body
   db.insertarVentaExamen(codigo, cliente, fecha, autorizacion, formaPago,
-    descuento, subtotal, productos, medico, paciente)
-  .then(function (data) {  //OK!
+    descuento, subtotal, unidades, medico, paciente)
+  .then(function () {  //OK!
     res.status(200)
     .send("OK")
   }, function (error) {//ERROR!
@@ -305,13 +303,13 @@ app.post('/venta/update', function (req, res) {
     subtotal,
     descuento,
     iva,
-    productos,
+    unidades,
 
   } = req.body
 
   db.updateVenta(codigo, empresa, cliente, fecha, autorizacion, formaPago,
-    descuento, iva, subtotal, productos)
-  .then(function (data) {  //OK!
+    descuento, iva, subtotal, unidades)
+  .then(function () {  //OK!
     res.status(200)
     .send("OK")
   })
@@ -330,15 +328,15 @@ app.post('/venta_ex/update', function (req, res) {
     formaPago,
     subtotal,
     descuento,
-    productos,
+    unidades,
     medico,
     paciente,
 
   } = req.body
 
   db.updateVentaExamen(codigo, cliente, fecha, autorizacion, formaPago,
-    descuento, subtotal, productos, medico, paciente)
-  .then(function (data) {  //OK!
+    descuento, subtotal, unidades, medico, paciente)
+  .then(function () {  //OK!
     res.status(200)
     .send("OK")
   })

@@ -8,7 +8,7 @@ const phoneCharset = '1234567890-+()'
 const usesCharset = (str, charset) => {
   const len = str.length
   for (let i = 0; i < len; i++) {
-    if(!phoneCharset.includes(str[i]))
+    if(!charset.includes(str[i]))
       return str[i]
   }
 }
@@ -18,6 +18,7 @@ const percentageOpts = { min: 0, max: 100 }
 const isEmptyObj = (obj) => {
   return Object.keys(obj).length === 0 && obj.constructor === Object
 }
+
 module.exports = {
   validarCliente: (formData) => {
 

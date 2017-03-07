@@ -1,9 +1,7 @@
 /* eslint-env node, mocha */
 const formatter = require('../../backend/responseFormatter.js')
-const assert = require('assert');
 const chai = require('chai')
-  , expect = chai.expect
-  , should = chai.should();
+chai.should();
 
 describe ('responseFormatter', function() {
 
@@ -61,7 +59,7 @@ describe ('responseFormatter', function() {
         subtotal:19.99,
         descuento:0,
         iva:2,
-        productos:[
+        facturables:[
           {
             nombre:'TGO 8x50',
             count:1,
@@ -100,7 +98,7 @@ describe ('responseFormatter', function() {
         direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
         telefono1: '2645422',telefono2: '2876357',
       },
-      productos:[
+      facturables:[
         {
           nombre:'TGO 8x50',
           count:1,

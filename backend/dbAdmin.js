@@ -130,16 +130,17 @@ const getCliente = (ruc) => {
   .where('ruc', ruc)
 }
 
-const getUnidadesVenta = (codigo, empresa) => {
+const getFacturablesVenta = (codigo, empresa) => {
   return knex.select('productos.nombre', 'unidades.producto', 'unidades.count',
-  'unidades.precioVenta', 'unidades.lote', 'unidades.fechaExp')
+  'unidades.precioVenta', 'productos.codigo', 'productos.pagaIva',
+  'unidades.lote', 'unidades.fechaExp')
   .from('unidades')
   .join('productos', {'unidades.producto' : 'productos.rowid' })
   .where({codigoVenta: codigo, empresaVenta: empresa})
 }
 
-const getUnidadesVentaExamen = (codigo) => {
-  return getUnidadesVenta(codigo, empresaExamenes)
+const getFacturablesVentaExamen = (codigo) => {
+  return getFacturablesVenta(codigo, empresaExamenes)
 }
 
 const getVentaPorTipo = (codigo, empresa, tipo) => {
@@ -168,20 +169,20 @@ const getFacturaData = (codigo, empresa, tipo) => {
   .then((clientes) => {
     if (clientes.length > 0) {
       cliente = clientes[0]
-      return getUnidadesVenta(codigo, empresa)
+      return getFacturablesVenta(codigo, empresa)
     } else {
       return Promise.reject({errorCode: 404, text: "cliente no encontrado"})
     }
   })
 
   if (tipo === 0)
-    return p.then ((productos) => {
-      ventaRow.productos = productos
+    return p.then ((facturables) => {
+      ventaRow.facturables = facturables
       return Promise.resolve({ventaRow: ventaRow, cliente: cliente})
     })
   else
-    return p.then((productos) => {
-      ventaRow.productos = productos
+    return p.then((facturables) => {
+      ventaRow.facturables = facturables
       return getExamenInfo(codigo)
     })
     .then((rows) => {
@@ -302,10 +303,10 @@ module.exports = {
     return knex.transaction ((trx) => {
       return updateVenta(trx, codigo, empresa, cliente, fecha, autorizacion,
         formaPago, descuento, iva, subtotal)
-      .then((ids) => {
+      .then(() => {
         return deleteUnidadesVenta(trx, codigo, empresa)
       })
-      .then((ids) => {
+      .then(() => {
         colocarVentaID(unidades, codigo, empresa)
         return insertarNuevasUnidades(trx, unidades)
       })
@@ -317,13 +318,13 @@ module.exports = {
     return knex.transaction ((trx) => {
       return updateVentaExamen(trx, codigo, cliente, fecha, autorizacion, formaPago,
         descuento, subtotal)
-      .then((ids) => {
+      .then(() => {
         return deleteUnidadesVenta(trx, codigo, empresaExamenes)
       })
-      .then((ids) => {
+      .then(() => {
         return updateExamenInfo(trx, medico, paciente, codigo)
       })
-      .then((ids) => {
+      .then(() => {
         colocarVentaID(unidades, codigo, empresaExamenes)
         return insertarNuevasUnidades(trx, unidades)
       })
@@ -341,7 +342,7 @@ module.exports = {
 
   getExamenInfo,
   deleteVenta,
-  getUnidadesVenta,
-  getUnidadesVentaExamen,
+  getFacturablesVenta,
+  getFacturablesVentaExamen,
 
 }

@@ -41,6 +41,7 @@ module.exports = {
     const {
       codigo,
       empresa,
+      facturables,
       fecha,
       descuento,
       autorizacion,
@@ -48,7 +49,6 @@ module.exports = {
       medico,
       subtotal,
       formaPago,
-      productos,
     } = ventaQueryResp.ventaRow
 
     return {
@@ -65,7 +65,7 @@ module.exports = {
         formaPago: formaPago,
         total: calcularTotalVentaRow(ventaQueryResp.ventaRow),
       },
-      productos: productos.slice(),
+      facturables: facturables.slice(),
     }
   },
 }

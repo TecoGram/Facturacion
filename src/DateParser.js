@@ -21,23 +21,23 @@ module.exports = {
   toReadableDate,
 
   verVenta (resp) {
-    const { cliente, facturaData, productos } = resp
+    const { cliente, facturaData, facturables } = resp
     const _facturaData = Object.assign({}, facturaData)
     _facturaData.fecha = parseDBDate(facturaData.fecha)
-    const _productos = []
+    const _facturables = []
 
     let i
-    for (i = 0; i < productos.length; i++) {
-      const p = productos[i]
+    for (i = 0; i < facturables.length; i++) {
+      const p = facturables[i]
       const _p = Object.assign({}, p)
       _p.fechaExp = parseDBDate(p.fechaExp)
-      _productos.push(_p)
+      _facturables.push(_p)
     }
 
     return {
       cliente: cliente,
       facturaData: _facturaData,
-      productos: _productos,
+      facturables: _facturables,
     }
   },
 }

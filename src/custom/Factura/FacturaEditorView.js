@@ -6,7 +6,8 @@ import PaperContainer from '../../lib/PaperContainer'
 import FacturaForm from './FacturaForm'
 import FacturaTable from './FacturaTable'
 import FacturaResults from './FacturaResults'
-import { crearVentaRow, productoAUnidad } from './FacturacionUtils'
+import { crearVentaRow,
+         facturableAUnidad, productoAFacturable } from './Models.js'
 import { validarVentaRow } from '../../Validacion'
 import { insertarVenta, updateVenta, getFacturaURL, verVenta } from '../../api'
 import DateParser from '../../DateParser'
@@ -30,7 +31,7 @@ export default class FacturaEditorView extends Component {
         autorizacion: '',
         formaPago: '',
       }),
-      productos: Immutable.List(),
+      facturables: Immutable.List(),
     }
 
   }
@@ -45,8 +46,8 @@ export default class FacturaEditorView extends Component {
 
   onNewProductFromKeyboard = (newProduct) => {
     this.setState((prevState) => {
-      const unidad = Immutable.Map(productoAUnidad(newProduct))
-      return { productos: prevState.productos.push(unidad) }
+      const facturable = Immutable.Map(productoAFacturable(newProduct))
+      return { facturables: prevState.facturables.push(facturable) }
     })
   }
 
@@ -65,35 +66,37 @@ export default class FacturaEditorView extends Component {
     if(key === 'descuento' && newValue.length > 0 &&
       !validator.isInt(newValue, {min: 0, max: 100}))
       return;
-    this.setState({facturaData: this.state.facturaData.update(key, v => newValue)})
+    this.setState({facturaData: this.state.facturaData.set(key, newValue)})
   }
 
   onProductChanged = (index, key, newValue) => {
     if(this.newValueIsAppropiate(key, newValue)) {
-      const productos = this.state.productos
-      const updatedProduct = productos.get(index).update(key, v => newValue)
-      this.setState({productos: productos.update(index, v => updatedProduct)})
+      const facturables = this.state.facturables
+      const updatedFacturables = facturables.update(index,
+        (facturable) => facturable.set(key, newValue))
+      this.setState({facturables: updatedFacturables})
     }
   }
 
   onProductDeleted = (index) => {
-    this.setState({productos: this.state.productos.remove(index)})
+    this.setState({facturables: this.state.facturables.remove(index)})
   }
 
   onGenerarFacturaClick = () => {
 
     const {
       cliente,
+      facturables,
       facturaData,
-      productos,
     } = this.state
 
     const empresa = this.props.empresa
+    const unidades = facturables.map((facturableImm) => {
+      return facturableAUnidad(facturableImm.toJS())
+    })
+    const ventaRow = crearVentaRow(cliente, facturaData, facturables, unidades, empresa)
+    const { errors } = validarVentaRow(ventaRow)
 
-    const ventaRow = crearVentaRow(cliente, facturaData, productos, empresa)
-    const {
-      errors,
-    } = validarVentaRow(ventaRow)
     if(errors)
       this.setState({errors: errors})
     else {
@@ -105,7 +108,7 @@ export default class FacturaEditorView extends Component {
         prom = insertarVenta(ventaRow)
         msg = 'La factura se generó exitosamente.'
       }
-      prom.then((resp) => {
+      prom.then(() => {
         this.setState(this.getDefaultState())
         const pdfLink = getFacturaURL(ventaRow.codigo, ventaRow.fecha)
         window.open(pdfLink)
@@ -121,7 +124,7 @@ export default class FacturaEditorView extends Component {
     if(!this.state.cliente)
       return true
 
-    if(this.state.productos.isEmpty())
+    if(this.state.facturables.isEmpty())
       return true
 
     return false
@@ -130,13 +133,13 @@ export default class FacturaEditorView extends Component {
   componentDidMount() {
     const v = this.props.ventaKey
     if (v)
-      verVenta(v.codigo, v.fechaString)
+      verVenta(v.codigo, v.empresa)
         .then((respStr) => {
           const resp = DateParser.verVenta(respStr.body)
           this.setState({
             cliente: resp.cliente,
             facturaData: Immutable.fromJS(resp.facturaData),
-            productos: Immutable.fromJS(resp.productos),
+            facturables: Immutable.fromJS(resp.facturables),
           })
         })
   }
@@ -144,10 +147,10 @@ export default class FacturaEditorView extends Component {
   render() {
     const {
       cliente,
-      medico,
       errors,
+      facturables,
       facturaData,
-      productos,
+      medico,
     } = this.state
 
     const {
@@ -165,9 +168,9 @@ export default class FacturaEditorView extends Component {
             medico={medico} onDataChanged={this.onFacturaDataChanged} ventaKey={ventaKey}
             onNewMedico={this.onNewMedico} onNewCliente={this.onNewCliente}
             onNewProduct={this.onNewProductFromKeyboard} isExamen={isExamen} />
-          <FacturaTable items={productos} onProductChanged={this.onProductChanged}
+          <FacturaTable items={facturables} onProductChanged={this.onProductChanged}
             onProductDeleted={this.onProductDeleted} isExamen={isExamen} />
-          <FacturaResults productos={productos} descuento={Number(descuento)}
+          <FacturaResults facturables={facturables} descuento={Number(descuento)}
             onGuardarClick={this.onGenerarFacturaClick} nuevo={!ventaKey}
             guardarButtonDisabled={this.guardarFacturaDisabled()} isExamen={isExamen} />
         </div>
@@ -183,8 +186,7 @@ FacturaEditorView.propTypes = {
   isExamen: React.PropTypes.bool,
   ventaKey: React.PropTypes.shape({
     codigo: React.PropTypes.string.isRequired,
-    fecha: React.PropTypes.object.isRequired,
-    fechaString: React.PropTypes.string.isRequired,
+    empresa: React.PropTypes.string.isRequired,
   }),
 }
 
