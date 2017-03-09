@@ -13,6 +13,7 @@ const { validarCliente, validarMedico, validarProducto } = require('./sanitizati
 const port = process.env.PORT || 8192
 //crear directorio donde almacenar facturas en pdf.
 const facturaDir = pdfutils.createTemporaryDir('facturas/')
+const CONSTRAINT_ERROR_SQLITE = 19
 
 
 
@@ -262,8 +263,12 @@ app.post('/venta/new', function (req, res) {
     res.status(200)
     .send("OK")
   }, function (error) {//ERROR!
-    res.status(500)
-    res.send(error)
+    if (error.errno === CONSTRAINT_ERROR_SQLITE)
+      res.status(400)
+        .send("Ya existe una factura con ese código.")
+    else
+      res.status(500)
+        .send(error)
   })
 })
 
@@ -287,8 +292,12 @@ app.post('/venta_ex/new', function (req, res) {
     res.status(200)
     .send("OK")
   }, function (error) {//ERROR!
-    res.status(500)
-    res.send(error)
+    if (error.errno === CONSTRAINT_ERROR_SQLITE)
+      res.status(400)
+        .send("Ya existe una factura con ese código.")
+    else
+      res.status(500)
+        .send(error)
   })
 })
 

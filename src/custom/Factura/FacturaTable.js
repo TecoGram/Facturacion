@@ -38,22 +38,11 @@ const RenderTableHeader = (props) => {
 
 export default class FacturaTable extends React.Component {
 
-  static propTypes = {
-    isExamen: React.PropTypes.bool,
-    items: React.PropTypes.object.isRequired,
-    onProductChanged: React.PropTypes.func.isRequired,
-    onProductDeleted: React.PropTypes.func.isRequired,
-  }
-
-  static defaultProps = {
-    isExamen: false,
-  }
-
   renderRow = (product, i) => {
     const {
       isExamen,
-      onProductChanged,
-      onProductDeleted,
+      onFacturableChanged,
+      onFacturableDeleted,
     } = this.props
     const today = new Date()
 
@@ -65,13 +54,13 @@ export default class FacturaTable extends React.Component {
       <TableRowColumn width={60} style={noPaddingStyle}>
         <TextField value={product.get('lote')} style={{width: '50px'}} name={"lote"}
           inputStyle={{textAlign: 'right', fontSize: '13px'}}
-          onChange={(event) => { onProductChanged(i, 'lote', event.target.value) }}/>
+          onChange={(event) => { onFacturableChanged(i, 'lote', event.target.value) }}/>
       </TableRowColumn>
     let fechaExpCol =
       <TableRowColumn width={70} style={noPaddingStyle}>
         <FormattedDatePicker value={product.get('fechaExp')} hintText={"expiración"}
         textFieldStyle={{width: '70px', fontSize: '13px'}} minDate={today}
-          onChange={(event, date) => { onProductChanged(i, 'fechaExp', date) }}/>
+          onChange={(event, date) => { onFacturableChanged(i, 'fechaExp', date) }}/>
       </TableRowColumn>
 
     if (isExamen) { //ocultar columnas que no se usan en examenes
@@ -94,14 +83,14 @@ export default class FacturaTable extends React.Component {
       <TableRowColumn width={40} style={noPaddingStyle}>
         <TextField style={{width: '28px'}} value={product.get('count')} name={"count"}
           inputStyle={{textAlign: 'right', fontSize: '13px'}}
-          onChange={(event) => { onProductChanged(i, 'count', event.target.value) }}/>
+          onChange={(event) => { onFacturableChanged(i, 'count', event.target.value) }}/>
           </TableRowColumn>
 
       { fechaExpCol }
 
       <TableRowColumn width={60} style={noPaddingStyle}>
         $ <TextField style={{width: '50px'}} name={'precio'} value={product.get('precioVenta')}
-          onChange={(event) => { onProductChanged(i, 'precioVenta', event.target.value) }}
+          onChange={(event) => { onFacturableChanged(i, 'precioVenta', event.target.value) }}
           inputStyle={{fontSize: '13px'}}/>
       </TableRowColumn>
 
@@ -112,7 +101,7 @@ export default class FacturaTable extends React.Component {
       </TableRowColumn>
 
       <TableRowColumn width={30} style={{padding: '0px', textAlign: 'right'}} >
-                <IconButton onTouchTap={() => onProductDeleted(i)}>
+                <IconButton onTouchTap={() => onFacturableDeleted(i)}>
                   <Delete color={black54p}/>
                 </IconButton>
       </TableRowColumn>
@@ -131,4 +120,15 @@ export default class FacturaTable extends React.Component {
     </Table>
     );
   }
+}
+
+FacturaTable.propTypes = {
+  isExamen: React.PropTypes.bool,
+  items: React.PropTypes.object.isRequired,
+  onFacturableChanged: React.PropTypes.func.isRequired,
+  onFacturableDeleted: React.PropTypes.func.isRequired,
+}
+
+FacturaTable.defaultProps = {
+  isExamen: false,
 }

@@ -303,14 +303,15 @@ describe('endpoints disponibles para el cliente', function () {
       })
     })
 
-    it('retorna 500 al ingresar datos duplicados', function (done) {
+    it('retorna 400 al ingresar datos duplicados', function (done) {
       api.insertarVenta(newVentaRow)
       .then(function (resp) {
         console.error('test fail ' + JSON.stringify(resp))
         done(resp)
       }, function (err) {
         const statusCode = err.status
-        statusCode.should.equal(500)
+        err.response.text.should.equal('Ya existe una factura con ese código.')
+        statusCode.should.equal(400)
         done()
       })
     })
@@ -343,14 +344,15 @@ describe('endpoints disponibles para el cliente', function () {
         })
     })
 
-    it('retorna 500 al ingresar datos duplicados', function (done) {
-      api.insertarVenta(newVentaExRow)
+    it('retorna 400 al ingresar datos duplicados', function (done) {
+      api.insertarVentaExamen(newVentaExRow)
       .then(function (resp) {
         console.error('test fail ' + JSON.stringify(resp))
         done(resp)
       }, function (err) {
         const statusCode = err.status
-        statusCode.should.equal(500)
+        err.response.text.should.equal('Ya existe una factura con ese código.')
+        statusCode.should.equal(400)
         done()
       })
     })
