@@ -37,7 +37,6 @@ export default class FacturasListView extends React.Component {
   }
 
   requestData = (input) => {
-    console.log('request', input)
     findVentas(input)
       .then((resp) => {
         const ventas = crearListaFacturasParaTabla(resp.body)

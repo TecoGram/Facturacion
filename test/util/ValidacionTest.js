@@ -27,7 +27,7 @@ describe('Validacion', function () {
       inputs.telefono2.should.be.a('string')
       inputs.direccion.should.be.a('string')
       inputs.email.should.be.a('string')
-      inputs.descDefault.should.be.a('string')
+      inputs.descDefault.should.be.a('number')
     })
   })
 

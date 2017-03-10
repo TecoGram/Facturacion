@@ -39,6 +39,8 @@ export default class FacturaEditorView extends Component {
 
   onNewCliente = (newCliente) => {
     this.setState({ cliente: newCliente })
+    if (newCliente)
+      this.onFacturaDataChanged('descuento', '' + newCliente.descDefault)
   }
 
   onNewMedico = (newMedico) => {

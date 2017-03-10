@@ -1,10 +1,11 @@
 import React from 'react';
 
 import ActionStore from 'material-ui/svg-icons/action/store';
+import Email from 'material-ui/svg-icons/communication/email';
 import Info from 'material-ui/svg-icons/action/info';
+import Loyalty from 'material-ui/svg-icons/action/loyalty';
 import Person from 'material-ui/svg-icons/social/person';
 import Phone from 'material-ui/svg-icons/communication/phone';
-import Email from 'material-ui/svg-icons/communication/email';
 
 import IconTextFieldRow from '../../lib/formTable/IconTextFieldRow'
 
@@ -65,18 +66,28 @@ export default class NuevoClienteForm extends React.Component {
       onChange: (event) => {updateData('email', event.target.value)},
     }
 
+    const descDefaultInput = {
+      hintText: "Descuento recomendado (%)",
+      icon: Loyalty,
+      value: inputs.descDefault || '',
+      errorText: errors.descDefault,
+      onChange: (event) => {updateData('descDefault', event.target.value)},
+    }
+
     return (
       <table>
         <tbody>
           <IconTextFieldRow
-            leftInput={rucInput}
-            rightInput={clienteInput} />
+            leftInput={clienteInput}
+            rightInput={rucInput} />
           <IconTextFieldRow
             leftInput={direccionInput}
             rightInput={emailInput} />
           <IconTextFieldRow
             leftInput={telf1Input}
             rightInput={telf2Input} />
+          <IconTextFieldRow
+            leftInput={descDefaultInput} />
         </tbody>
       </table>
     )

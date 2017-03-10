@@ -100,7 +100,7 @@ const validarDescuentoDefault = (descDefault, errors, inputs) => {
   if(!esDescuentoValido(descDefault))
     errors.descDefault = 'descuento inválido. ' + porcentaje_invalido
   else
-    inputs.descDefault = descDefault
+    inputs.descDefault = parseInt(descDefault, 10)
 }
 
 const validarDescuentoSmall = (descuento, errors, inputs) => {

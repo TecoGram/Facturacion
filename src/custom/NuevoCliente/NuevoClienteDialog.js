@@ -41,11 +41,11 @@ export default class NuevoClienteDialog extends React.Component {
 
   guardarCliente = (inputs, cerrarDialog) => {
     const {
-      ruc, nombre, direccion, email, telefono1, telefono2,
+      ruc, nombre, direccion, email, telefono1, telefono2, descDefault,
     } = inputs
 
-    insertarCliente(ruc, nombre, direccion, email, telefono1, telefono2)
-    .then((resp) => {
+    insertarCliente(ruc, nombre, direccion, email, telefono1, telefono2, descDefault)
+    .then(() => {
       this.setState({inputs: {}, errors: {}, serverError: null})
       cerrarDialog(`Nuevo cliente guardado: ${nombre}`, NUEVO_CLIENTE_DIALOG_CLOSED)
     }, (err) => {
