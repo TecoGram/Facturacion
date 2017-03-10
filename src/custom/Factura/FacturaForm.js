@@ -168,13 +168,6 @@ export default class FacturaForm extends Component {
           <tbody>
             <tr>
               <td>
-                <IconBox icon={Receipt}/>
-              </td>
-              <td>
-                <CodigoText {...this.props} />
-              </td>
-
-              <td>
                 <IconBox icon={Today}/>
               </td>
               <td>
@@ -182,15 +175,10 @@ export default class FacturaForm extends Component {
               </td>
 
               <td>
-                <IconBox icon={Loyalty}/>
+                <IconBox icon={Receipt}/>
               </td>
               <td>
-                <TextField
-                  hintText="Desc." value={data.descuento}
-                  errorText={errors.descuento}
-                  onChange={(event) => onDataChanged('descuento', event.target.value)}
-                  style={{width:'40px'}} inputStyle={{textAlign:'right'}} />
-                <span style={{marginRight: txtMargin}}>%</span>
+                <CodigoText {...this.props} />
               </td>
 
               <td>
@@ -201,7 +189,19 @@ export default class FacturaForm extends Component {
                   hintText="Forma de pago" value={data.formaPago}
                   errorText={errors.formaPago}
                   onChange={(event) => onDataChanged('formaPago', event.target.value)}
-                  style={{width:'152px', marginRight: txtMargin}} />
+                  style={{width:'142px', marginRight: txtMargin}} />
+              </td>
+
+              <td>
+                <IconBox icon={Loyalty}/>
+              </td>
+              <td>
+                <TextField
+                  hintText="Desc." value={data.descuento}
+                  errorText={errors.descuento}
+                  onChange={(event) => onDataChanged('descuento', event.target.value)}
+                  style={{width:'35px'}} inputStyle={{textAlign:'right'}} />
+                <span style={{marginRight: txtMargin, paddingLeft: '9px'}}>%</span>
               </td>
 
               <td>
@@ -212,7 +212,7 @@ export default class FacturaForm extends Component {
                   hintText="Autorización" value={data.autorizacion}
                   errorText={errors.autorizacion}
                   onChange={(event) => onDataChanged('autorizacion', event.target.value)}
-                  style={{ verticalAlign: 'top', width:'156px'}} />
+                  style={{ verticalAlign: 'top', width:'155px'}} />
               </td>
             </tr>
           </tbody>
