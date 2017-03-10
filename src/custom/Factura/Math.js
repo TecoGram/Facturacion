@@ -1,5 +1,9 @@
 const iva = 0.14
 
+const calcularTotalVentaRow = (ventaRow) => {
+  return ventaRow.subtotal + ventaRow.iva - ventaRow.descuento
+}
+
 const calcularSubtotalIVAImm = (facturablesImm) => {
   let subtotal = 0
   let valorIVA = 0
@@ -14,7 +18,7 @@ const calcularSubtotalIVAImm = (facturablesImm) => {
   return { subtotal, valorIVA }
 }
 
-const crearValoresObject = (totalesObject, descuento) => {
+const calcularValoresTotales = (totalesObject, descuento) => {
   const { subtotal, valorIVA } = totalesObject
   const rebaja = subtotal * descuento / 100
   const total = subtotal - rebaja + valorIVA
@@ -29,10 +33,11 @@ const crearValoresObject = (totalesObject, descuento) => {
 
 const calcularValoresFacturablesImm = (facturablesImm, descuento) => {
   const totalesObject = calcularSubtotalIVAImm(facturablesImm)
-  return crearValoresObject(totalesObject, descuento)
+  return calcularValoresTotales(totalesObject, descuento)
 }
 
 module.exports = {
   calcularSubtotalIVAImm,
+  calcularTotalVentaRow,
   calcularValoresFacturablesImm,
 }

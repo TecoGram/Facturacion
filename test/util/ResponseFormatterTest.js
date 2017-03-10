@@ -18,7 +18,22 @@ describe ('responseFormatter', function() {
         subtotal:19.99,
       }]
       const listaParaRender = formatter.crearListaFacturasParaTabla(ventas)
-      listaParaRender[0].total.should.be.equal(20.99)
+      listaParaRender[0].total.should.be.equal('20.99')
+    })
+
+    it('calcula el total redondeando a dos decimales', function () {
+      const ventas = [{
+        codigo:"00546",
+        empresa:"TecoGram",
+        fecha:"2017-03-05",
+        ruc:"09455476584",
+        nombre:"Miguel Narvaez",
+        iva:1.9869,
+        descuento:0.3567,
+        subtotal:19.4667,
+      }]
+      const listaParaRender = formatter.crearListaFacturasParaTabla(ventas)
+      listaParaRender[0].total.should.be.equal('21.10')
     })
   })
 

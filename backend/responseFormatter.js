@@ -1,6 +1,4 @@
-const calcularTotalVentaRow = (ventaRow) => {
-  return ventaRow.subtotal + ventaRow.iva - ventaRow.descuento
-}
+const { calcularTotalVentaRow } = require('../src/custom/Factura/Math.js')
 
 module.exports = {
   calcularTotalVentaRow,
@@ -9,7 +7,7 @@ module.exports = {
     const listaParaRender = []
     for (let i = 0; i < len; i++) {
       const venta = ventas[i]
-      const total = calcularTotalVentaRow(venta)
+      const total = new Number(calcularTotalVentaRow(venta)).toFixed(2)
       listaParaRender.push({
         codigo: venta.codigo,
         empresa: venta.empresa,

@@ -37,6 +37,7 @@ export default class FacturasListView extends React.Component {
   }
 
   requestData = (input) => {
+    console.log('request', input)
     findVentas(input)
       .then((resp) => {
         const ventas = crearListaFacturasParaTabla(resp.body)
@@ -55,9 +56,16 @@ export default class FacturasListView extends React.Component {
   render () {
     const rows = this.state.rows
     return (
-      <MaterialTable columns={columns} keys={keys} rows={rows}
-        searchHint={searchHint} onOpenItem={this.openFacturaInNewTab} onEditItem={this.openEditorPage}
-        onDeleteItem={this.deleteRow} enableCheckbox={false} onQueryChanged={this.requestData}/>
+      <MaterialTable
+        columns={columns}
+        enableCheckbox={false}
+        keys={keys}
+        rows={rows}
+        searchHint={searchHint}
+        onDeleteItem={this.deleteRow}
+        onEditItem={this.openEditorPage}
+        onOpenItem={this.openFacturaInNewTab}
+        onQueryChanged={this.requestData}/>
     )
   }
 
