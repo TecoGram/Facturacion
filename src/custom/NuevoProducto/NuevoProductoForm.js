@@ -1,5 +1,6 @@
 import React from 'react';
 
+import Checkbox from 'material-ui/Checkbox';
 import Info from 'material-ui/svg-icons/action/info';
 import BusinessCenter from 'material-ui/svg-icons/places/business-center';
 import AttachMoney from 'material-ui/svg-icons/editor/attach-money';
@@ -7,6 +8,15 @@ import AttachMoney from 'material-ui/svg-icons/editor/attach-money';
 import IconTextFieldRow from '../../lib/formTable/IconTextFieldRow'
 
 export default class NuevoProductoForm extends React.Component {
+
+  renderIVACheckbox = (inputs, updateData) => {
+    return (
+      <Checkbox
+        label={"paga IVA"}
+        checked={inputs.pagaIva}
+        onCheck={(event, isChecked) => { updateData('pagaIva', isChecked)}} />
+    )
+  }
 
   render() {
     const {
@@ -48,16 +58,20 @@ export default class NuevoProductoForm extends React.Component {
     }
 
     return (
-      <table>
-        <tbody>
-          <IconTextFieldRow
-            leftInput={codigoInput}
-            rightInput={nombreInput} />
-          <IconTextFieldRow
-            leftInput={precioFabInput}
-            rightInput={precioVentaInput} />
-        </tbody>
-      </table>
+      <div>
+        <table style={{marginLeft: 10}}>
+          <tbody>
+            <IconTextFieldRow
+              leftInput={nombreInput}
+              rightInput={codigoInput} />
+            <IconTextFieldRow
+              leftInput={precioFabInput}
+              rightInput={precioVentaInput} />
+          </tbody>
+        </table>
+        <br/>
+        { this.renderIVACheckbox(inputs, updateData) }
+      </div>
     )
   }
 }

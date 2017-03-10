@@ -71,5 +71,27 @@ describe('Validacion', function () {
       inputs.precioFab.should.be.a('string')
       inputs.pagaIva.should.be.a('boolean')
     })
+
+    it('no altera el valor de "pagaIva"', function () {
+      const producto1 = {
+        nombre: "Producto A",
+        codigo: "AD-434",
+        precioVenta: "12.99",
+        precioFab: "5.99",
+        pagaIva: true,
+      }
+      const res1 = Validacion.validarProducto(producto1)
+      res1.inputs.pagaIva.should.be.true
+
+      const producto2 = {
+        nombre: "Producto B",
+        codigo: "AD-434",
+        precioVenta: "12.99",
+        precioFab: "5.99",
+        pagaIva: false,
+      }
+      const res2 = Validacion.validarProducto(producto2)
+      res2.inputs.pagaIva.should.be.false
+    })
   })
 })

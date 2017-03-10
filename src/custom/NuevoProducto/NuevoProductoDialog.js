@@ -10,16 +10,20 @@ import ServerErrorText from '../../lib/formTable/ServerErrorText'
 
 import { NUEVO_PRODUCTO_DIALOG_CLOSED } from '../../DialogTypes'
 
-export default class NuevoProductoDialog extends React.Component {
-
-  state = {
-    inputs: {},
+const getDefaultState = () => {
+  return {
+    inputs: { pagaIva: true },
     errors: {},
     serverError: null,
   }
+}
+export default class NuevoProductoDialog extends React.Component {
+
+  state = getDefaultState()
+
 
   cancelarDialog = () => {
-    this.setState({inputs: {}, errors: {}, serverError: null})
+    this.setState(getDefaultState())
     this.props.cambiarDialog(NUEVO_PRODUCTO_DIALOG_CLOSED)
   };
 
@@ -41,13 +45,13 @@ export default class NuevoProductoDialog extends React.Component {
 
   guardarProducto = (inputs, cerrarDialog) => {
     const {
-      codigo, nombre, precioFab, precioVenta,
+      codigo, nombre, precioFab, precioVenta, pagaIva,
     } = inputs
 
     //por ahora quemar true y que todos paguen iva
-    insertarProducto(codigo, nombre, precioFab, precioVenta, true)
-    .then((resp) => {
-      this.setState({inputs: {}, errors: {}, serverError: null})
+    insertarProducto(codigo, nombre, precioFab, precioVenta, pagaIva)
+    .then(() => {
+      this.setState(getDefaultState)
       cerrarDialog(`Nuevo producto guardado: ${nombre}`, NUEVO_PRODUCTO_DIALOG_CLOSED)
     }, (err) => {
       this.setState({ serverError: 'Error al almacenar datos: ' + err.response.text })
@@ -55,7 +59,7 @@ export default class NuevoProductoDialog extends React.Component {
   }
 
 
-  validarDatos = (userInputs) => {
+  validarDatos = () => {
     const { errors, inputs } = validarProducto(this.state.inputs)
     if(errors) {
       this.setState({errors: errors})

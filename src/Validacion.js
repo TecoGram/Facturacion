@@ -216,7 +216,7 @@ const validarProducto = (formData) => {
   const nombre = formData.nombre || ''
   const precioFab = String(formData.precioFab || '')
   const precioVenta = String(formData.precioVenta || '')
-  const pagaIva = Boolean(formData.pagaIva || true)
+  const pagaIva = formData.pagaIva 
 
   const errors = {}
   const inputs = { pagaIva }
