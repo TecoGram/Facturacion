@@ -88,6 +88,8 @@ export default class NuevoClienteForm extends React.Component {
             rightInput={telf2Input} />
           <IconTextFieldRow
             leftInput={descDefaultInput} />
+          { /* An additional empty row prevents jittering in the dialog */}
+          <IconTextFieldRow empty={true} />
         </tbody>
       </table>
     )

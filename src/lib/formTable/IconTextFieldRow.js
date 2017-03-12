@@ -13,6 +13,24 @@ const inputShape = React.PropTypes.shape({
   icon: React.PropTypes.func.isRequired,
 })
 
+const EmptyRow = (props) => {
+  return <tr><td><div style={{height: props.height}} /></td></tr>
+
+}
+const IconColumn = (props) => {
+  return <td style={props.style}><IconBox icon={props.input.icon}/></td>
+}
+
+const TextColumn = (props) => {
+  const input = props.input
+  return (
+    <td style={props.style}>
+      <TextField hintText={input.hintText} onChange={input.onChange}
+        errorText={input.errorText} value={input.value}/>
+    </td>
+  )
+}
+
 /**
 * Componente para mostrar un TextField con un icono a su izquierda o derecha.
 * La manera mas sencilla de alinear el icono con el TextField es una tabla, por
@@ -30,53 +48,67 @@ const inputShape = React.PropTypes.shape({
 * Si se pasan ambos props leftInput y rightInput se renderizan dos textFields,
 * de lo contrario uno, o ninguno si no se pasa nungun prop.
 *
+* El prop empty permite crear una fila vacia.
 * Por defecto se pinta el icono a la izquierda del TextField. se puede invertir
 * esto seteando el prop 'inverted' como true.
 */
 export default class IconTextFieldRow extends React.Component {
   static propTypes = {
+    empty: React.PropTypes.bool,
+    inverted: React.PropTypes.bool,
     leftInput: inputShape,
     rightInput: inputShape,
-    inverted: React.PropTypes.bool,
   }
+
+  getFirstIconColumn = (leftInput) => {
+    return leftInput && <IconColumn input={leftInput}/>
+  }
+
+  getFirstTextColumn = (leftInput, inverted) => {
+    return leftInput &&
+      <TextColumn
+        style={inverted ? secondInvColStyle : undefined}
+        input={leftInput} />
+  }
+
+  getSecondIconColumn = (rightInput, inverted) => {
+    return rightInput &&
+      <IconColumn
+        style={inverted ? undefined : secondColStyle}
+        input={rightInput} />
+
+  }
+
+  getSecondTextColumn = (rightInput) => {
+    return rightInput && <TextColumn input={rightInput} />
+  }
+
   render() {
     const {
+      empty,
+      inverted,
       leftInput,
       rightInput,
-      inverted,
     } = this.props
 
-    const firstIconColumn = leftInput &&
-      <td><IconBox icon={leftInput.icon}/></td>
-    const firstTextColumn = leftInput &&
-      <td style={inverted ? secondInvColStyle : undefined}>
-        <TextField hintText={leftInput.hintText} onChange={leftInput.onChange}
-          errorText={leftInput.errorText} value={leftInput.value}/>
-      </td>
-    const secondIconColumn = rightInput &&
-      <td style={inverted ? undefined : secondColStyle}><IconBox icon={rightInput.icon}/></td>
-    const secondTextColumn = rightInput &&
-      <td>
-        <TextField hintText={rightInput.hintText} onChange={rightInput.onChange}
-          errorText={rightInput.errorText} value={rightInput.value}/>
-      </td>
-
+    if (empty)
+      return <EmptyRow height={30} />
     if (inverted)
       return (
         <tr>
-          { firstTextColumn }
-          { firstIconColumn }
-          { secondTextColumn }
-          { secondIconColumn }
+          { this.getFirstTextColumn(leftInput, inverted) }
+          { this.getFirstIconColumn(leftInput) }
+          { this.getSecondTextColumn(rightInput) }
+          { this.getSecondIconColumn(rightInput, inverted) }
         </tr>
       )
     else
       return (
         <tr>
-          { firstIconColumn }
-          { firstTextColumn }
-          { secondIconColumn }
-          { secondTextColumn }
+          { this.getFirstIconColumn(leftInput) }
+          { this.getFirstTextColumn(leftInput, inverted) }
+          { this.getSecondIconColumn(rightInput, inverted) }
+          { this.getSecondTextColumn(rightInput) }
         </tr>
       )
   }
