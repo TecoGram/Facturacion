@@ -166,9 +166,11 @@ function verVenta(req, res, tipo) {
         } = resp
 
         ventaRow.total = formatter.calcularTotalVentaRow(ventaRow)
+        console.log("ver pdf", JSON.stringify(ventaRow), JSON.stringify(cliente))
         const writeFunc = facturaTemplates.biocled(ventaRow, cliente)
         return new PDFWriter(facturaDir + facturaFileName, writeFunc)
       }, function (error) { //ERROR!
+        console.log("PDF error", JSON.stringify(error))
         return Promise.reject(error)
       })
       .then(function () {

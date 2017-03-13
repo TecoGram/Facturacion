@@ -6,7 +6,15 @@ class PDFWriter {
   constructor(filepath, writeFunc) {
     this.filepath = filepath
     this.writeFunc = writeFunc
-    const doc = new PDFDocument({size: 'A4'})
+    const doc = new PDFDocument({
+      size: 'A4',
+      margins: {
+        top: 10,
+        left: 10,
+        bottom: 10,
+        right: 10,
+      },
+    })
     this.doc = doc
   }
 
