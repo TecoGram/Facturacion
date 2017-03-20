@@ -13,12 +13,13 @@ describe ('responseFormatter', function() {
         fecha:"2017-03-05",
         ruc:"09455476584",
         nombre:"Miguel Narvaez",
-        iva:1.99,
-        descuento:0.99,
-        subtotal:19.99,
+        iva:10,
+        descuento:1,
+        flete: 0.99,
+        subtotal:20,
       }]
       const listaParaRender = formatter.crearListaFacturasParaTabla(ventas)
-      listaParaRender[0].total.should.be.equal('20.99')
+      listaParaRender[0].total.should.be.equal('22.77')
     })
 
     it('calcula el total redondeando a dos decimales', function () {
@@ -28,12 +29,13 @@ describe ('responseFormatter', function() {
         fecha:"2017-03-05",
         ruc:"09455476584",
         nombre:"Miguel Narvaez",
-        iva:1.9869,
-        descuento:0.3567,
+        iva:10,
+        flete:0,
+        descuento:5,
         subtotal:19.4667,
       }]
       const listaParaRender = formatter.crearListaFacturasParaTabla(ventas)
-      listaParaRender[0].total.should.be.equal('21.10')
+      listaParaRender[0].total.should.be.equal('20.34')
     })
   })
 
@@ -74,6 +76,7 @@ describe ('responseFormatter', function() {
         subtotal:19.99,
         descuento:0,
         iva:2,
+        flete:0,
         facturables:[
           {
             nombre:'TGO 8x50',
@@ -102,7 +105,7 @@ describe ('responseFormatter', function() {
         descuento:0,
         formaPago:'CONTADO',
         subtotal:19.99,
-        total:21.99,
+        total:'20.39',
         medico: undefined,
         paciente: undefined,
       },
@@ -133,12 +136,14 @@ describe ('responseFormatter', function() {
     it('devuelve nombres de paciente y medico cuando se trata de una factura examen',
       function () {
         const examenQueryResp = Object.assign({}, queryResp)
+        examenQueryResp.ventaRow = Object.assign({}, queryResp.ventaRow)
         const medico1 = 'Dr. Benavides'
         const paciente1 = 'Edgar Bazurto'
         examenQueryResp.ventaRow.medico = medico1
         examenQueryResp.ventaRow.paciente = paciente1
 
         const examenDesiredResp = Object.assign({}, desiredResp)
+        examenDesiredResp.facturaData = Object.assign({}, examenDesiredResp.facturaData)
         examenDesiredResp.facturaData.medico = medico1
         examenDesiredResp.facturaData.paciente = paciente1
         const formattedResp = formatter.verVenta(examenQueryResp)

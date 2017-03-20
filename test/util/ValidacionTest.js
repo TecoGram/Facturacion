@@ -27,7 +27,7 @@ describe('Validacion', function () {
       inputs.telefono2.should.be.a('string')
       inputs.direccion.should.be.a('string')
       inputs.email.should.be.a('string')
-      inputs.descDefault.should.be.a('number')
+      inputs.descDefault.should.be.a('string')
     })
   })
 
@@ -56,6 +56,7 @@ describe('Validacion', function () {
     it('retorna unicamente "inputs" si el producto es correcto', function () {
       const producto = {
         nombre: "Producto A",
+        marca: "TECO",
         codigo: "AD-434",
         precioVenta: "12.99",
         precioFab: "5.99",
@@ -67,6 +68,7 @@ describe('Validacion', function () {
       expect(errors).to.be.null
       inputs.nombre.should.be.a('string')
       inputs.codigo.should.be.a('string')
+      inputs.marca.should.be.a('string')
       inputs.precioVenta.should.be.a('string')
       inputs.precioFab.should.be.a('string')
       inputs.pagaIva.should.be.a('boolean')

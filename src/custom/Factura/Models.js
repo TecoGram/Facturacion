@@ -1,5 +1,5 @@
 const { oneYearFromToday, toReadableDate } = require('../../DateParser.js')
-const { calcularValoresFacturablesImm } = require('./Math.js')
+const { calcularSubtotalImm } = require('./Math.js')
 
 const crearUnidadesRows = (facturablesImm) => {
   const len = facturablesImm.size
@@ -34,30 +34,26 @@ const facturableAUnidad = (facturable) => {
   delete unidad.pagaIva
   delete unidad.nombre
   delete unidad.codigo
+  delete unidad.marca
   unidad.fechaExp = toReadableDate(unidad.fechaExp)
   return unidad
 }
 
-const crearVentaRow = (clienteObj, facturaDataImm, facturablesImm, unidades, empresa) => {
-  const desc = facturaDataImm.get('descuento')
-  const {
-    subtotal,
-    rebaja,
-    valorIVA,
-    total,
-  } = calcularValoresFacturablesImm(facturablesImm, desc)
-
+const crearVentaRow = (clienteObj, facturaDataImm, facturablesImm, unidades,
+    empresa, porcentajeIVA) => {
+  const subtotal = calcularSubtotalImm(facturablesImm)
   return {
     cliente: clienteObj.ruc,
     codigo: facturaDataImm.get('codigo'),
-    descuento: rebaja,
+    descuento: facturaDataImm.get('descuento'),
     empresa: empresa,
     autorizacion: facturaDataImm.get('autorizacion'),
     formaPago: facturaDataImm.get('formaPago'),
     fecha: toReadableDate(facturaDataImm.get('fecha')),
-    iva: valorIVA,
+    detallado: facturaDataImm.get('detallado'),
+    flete: facturaDataImm.get('flete'),
+    iva: porcentajeIVA,
     subtotal: subtotal,
-    total: total,
     unidades: unidades,
   }
 }

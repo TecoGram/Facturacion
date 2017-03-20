@@ -10,7 +10,7 @@ const colocarVentaID = (unidades, codigo, empresa) => {
 }
 
 const insertarVentaBase = (builder, codigo, empresa, cliente, fecha, autorizacion,
-  formaPago, tipo, descuento, iva, subtotal) => {
+  formaPago, detallado, tipo, descuento, iva, flete, subtotal) => {
   return builder.table('ventas').insert({
     codigo: codigo,
     empresa: empresa,
@@ -18,15 +18,17 @@ const insertarVentaBase = (builder, codigo, empresa, cliente, fecha, autorizacio
     fecha: fecha,
     autorizacion: autorizacion,
     formaPago: formaPago,
+    detallado: detallado,
     tipo: tipo,
-    subtotal: subtotal,
     descuento: descuento,
     iva: iva,
+    flete: flete,
+    subtotal: subtotal,
   })
 }
 
 const updateVenta = (builder, codigo, empresa, cliente, fecha, autorizacion,
-    formaPago, descuento, iva, subtotal) => {
+    formaPago, detallado, descuento, iva, flete, subtotal) => {
   return builder('ventas')
     .where({codigo, empresa}).update({
       cliente: cliente,
@@ -42,7 +44,7 @@ const updateVenta = (builder, codigo, empresa, cliente, fecha, autorizacion,
 const updateVentaExamen = (builder, codigo, cliente, fecha, autorizacion, formaPago,
     descuento, subtotal) => {
   return updateVenta(builder, codigo, empresaExamenes, cliente, fecha, autorizacion,
-    formaPago, descuento, 0, subtotal)
+    formaPago, descuento, 0, 0, subtotal)
 }
 
 const updateExamenInfo = (builder, medico, paciente, codigo) => {
@@ -99,7 +101,7 @@ const getVentaExamen = (codigo) => {
 
 const findVentas = (nombreCliente) => {
   return knex.select('codigo', 'empresa', 'fecha', 'ruc', 'nombre', 'iva',
-    'descuento', 'subtotal')
+    'descuento', 'autorizacion', 'flete', 'detallado', 'subtotal')
     .from('ventas')
     .join('clientes', {'ventas.cliente' : 'clientes.ruc' })
     .where('nombre', 'like', `%${nombreCliente}%`)
@@ -269,10 +271,10 @@ module.exports = {
   },
 
   insertarVenta: (codigo, empresa, cliente, fecha, autorizacion, formaPago,
-    descuento, iva, subtotal, unidades) => {
+    detallado, descuento, iva, flete, subtotal, unidades) => {
     return knex.transaction ((trx) => {
       return insertarVentaBase(trx, codigo, empresa, cliente, fecha, autorizacion,
-        formaPago, 0, descuento, iva, subtotal)
+        formaPago, detallado, 0, descuento, iva, flete, subtotal)
       .then(() => {
         colocarVentaID(unidades, codigo, empresa)
         return insertarNuevasUnidades(trx, unidades)
@@ -286,7 +288,7 @@ module.exports = {
     descuento, subtotal, unidades, medico, paciente) => {
     return knex.transaction ((trx) => {
       return insertarVentaBase(trx, codigo, empresaExamenes, cliente, fecha,
-        autorizacion, formaPago, 1, descuento, 0, subtotal)
+        autorizacion, formaPago, false, 1, descuento, 0, 0, subtotal)
       .then(() => {
         return insertarExamenInfo(trx, medico, paciente, codigo)
       })
@@ -299,10 +301,10 @@ module.exports = {
 
 
   updateVenta: (codigo, empresa, cliente, fecha, autorizacion, formaPago,
-    descuento, iva, subtotal, unidades) => {
+    detallado, descuento, iva, flete, subtotal, unidades) => {
     return knex.transaction ((trx) => {
       return updateVenta(trx, codigo, empresa, cliente, fecha, autorizacion,
-        formaPago, descuento, iva, subtotal)
+        formaPago, detallado, descuento, iva, flete, subtotal)
       .then(() => {
         return deleteUnidadesVenta(trx, codigo, empresa)
       })

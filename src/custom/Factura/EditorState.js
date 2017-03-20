@@ -22,6 +22,8 @@ const getDefaultState = () => {
       descuento: '',
       autorizacion: '',
       formaPago: '',
+      flete: '',
+      detallado: true,
     }),
     facturables: Immutable.List(),
   }
@@ -34,10 +36,10 @@ const agregarProductoComoFacturable = (producto) => {
   }
 }
 
-const convertirFacturablesAUnidades = (facturablesImm) => {
+const convertirFacturablesImmAUnidades = (facturablesImm) => {
   return facturablesImm.map((facturableImm) => {
     return facturableAUnidad(facturableImm.toJS())
-  })
+  }).toJS()
 }
 
 const crearGuardarPromiseYMensaje = (editar, ventaRow) => {
@@ -95,16 +97,16 @@ const puedeGuardarFactura = (state) => {
   return true
 }
 
-const prepararFacturaParaGuardar = (state, editar, empresa) => {
+const prepararFacturaParaGuardar = (state, editar, empresa, porcentajeIVA) => {
   const {
     cliente,
     facturables,
     facturaData,
   } = state
 
-  const unidades = convertirFacturablesAUnidades(facturables)
+  const unidades = convertirFacturablesImmAUnidades(facturables)
   const ventaRow = crearVentaRow(cliente, facturaData, facturables, unidades,
-    empresa)
+    empresa, porcentajeIVA)
   const { errors } = validarVentaRow(ventaRow)
   if (errors)
     return { errors, prom: null, msg: null, ventaRow: null }

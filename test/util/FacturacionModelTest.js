@@ -20,6 +20,8 @@ describe('Facturacion Models', function () {
         descuento: '10',
         autorizacion: '5962',
         formaPago: 'CONTADO',
+        detallado: false,
+        flete: "",
         fecha: new Date(2016, 10, 26),
       })
 
@@ -61,15 +63,16 @@ describe('Facturacion Models', function () {
       ]
       const empresa = "TecoGram"
       const ventaRow = FacturacionModels.crearVentaRow(clienteObj, facturaData,
-        facturables, unidades, empresa)
+        facturables, unidades, empresa, 14)
       ventaRow.cliente.should.equal('09455867443001')
       ventaRow.codigo.should.equal('0003235')
       ventaRow.subtotal.should.equal(50)
-      ventaRow.descuento.should.equal(5)
+      ventaRow.descuento.should.equal('10')
       ventaRow.empresa.should.equal(empresa)
-      expect(ventaRow.iva).to.be.closeTo(7, 0.001)
-      expect(ventaRow.total).to.be.closeTo(52, 0.001)
+      ventaRow.iva.should.equal(14)
       ventaRow.autorizacion.should.equal('5962')
+      ventaRow.flete.should.equal('')
+      ventaRow.detallado.should.be.false
       ventaRow.formaPago.should.equal('CONTADO')
       ventaRow.fecha.should.equal('2016-11-26')
 
@@ -138,21 +141,21 @@ describe('Facturacion Models', function () {
             rowid: 4,
             count: 2,
             precioVenta: '17.99',
-            pagaIva: false,
+            pagaIva: true,
           })
         )
 
       const {
         subtotal,
         rebaja,
+        impuestos,
         total,
-        valorIVA,
-      } = FacturacionMath.calcularValoresFacturablesImm(productos, '')
+      } = FacturacionMath.calcularValoresFacturablesImm(productos, 2.99, 14, 10)
 
       expect(subtotal).to.be.closeTo(113.95, 0.001)
-      rebaja.should.equal(0)
-      expect(valorIVA).to.be.closeTo(10.916, 0.001)
-      expect(total).to.be.closeTo(124.87, 0.005)
+      expect(rebaja).to.be.closeTo(11.395, 0.001)
+      expect(impuestos).to.be.closeTo(14.358, 0.001)
+      expect(total).to.be.closeTo(119.90, 0.005)
     })
   })
 

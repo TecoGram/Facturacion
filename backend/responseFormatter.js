@@ -61,7 +61,7 @@ module.exports = {
         subtotal: subtotal,
         autorizacion: autorizacion,
         formaPago: formaPago,
-        total: calcularTotalVentaRow(ventaQueryResp.ventaRow),
+        total: new Number(calcularTotalVentaRow(ventaQueryResp.ventaRow)).toFixed(2),
       },
       facturables: facturables.slice(),
     }

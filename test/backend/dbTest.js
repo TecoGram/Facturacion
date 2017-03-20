@@ -26,15 +26,15 @@ describe('metodos de dbAdmin.js', function () {
   describe('insertarProducto', function () {
 
     it("persiste varios productos en la base encadenando con promise", function (done) {
-      db.insertarProducto("fsers4", "producto A", 9.99, 14.99, true)
+      db.insertarProducto("fsers4", "producto A", "TECO", 9.99, 14.99, true)
       .then(function (ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')
-        return db.insertarProducto("gfdtt", "producto B", 19.99, 24.99, false)
+        return db.insertarProducto("gfdtt", "producto B", "TECO", 19.99, 24.99, false)
       }).then(function (ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')
-        return db.insertarProducto("gfgtb4", "producto C", 14.99, 18.99, true)
+        return db.insertarProducto("gfgtb4", "producto C", "TECO", 14.99, 18.99, true)
       }).then(function (ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')
@@ -236,7 +236,9 @@ describe('metodos de dbAdmin.js', function () {
     fecha: '2017-01-01',
     autorizacion: 'fse4',
     formaPago: 'VISA',
+    detallado: false,
     subtotal: 21.00,
+    flete: 0,
     descuento: 3,
     iva: 12,
     unidades: [
@@ -266,6 +268,8 @@ describe('metodos de dbAdmin.js', function () {
       fecha,
       autorizacion,
       formaPago,
+      detallado,
+      flete,
       subtotal,
       descuento,
       iva,
@@ -275,7 +279,7 @@ describe('metodos de dbAdmin.js', function () {
     it('persiste una nueva venta en la base y agrega las unidades vendidas a la base',
       function (done) {
         db.insertarVenta(codigo, empresa, ruc, fecha, autorizacion, formaPago,
-          descuento, iva, subtotal, unidades)
+          detallado, descuento, iva, flete, subtotal, unidades)
         .then(function (res) {
           const lasInsertedId = res[0]
           lasInsertedId.should.be.a('number')
@@ -464,6 +468,8 @@ describe('metodos de dbAdmin.js', function () {
       ruc,
       fecha,
       subtotal,
+      detallado,
+      flete,
       descuento,
       iva,
       unidades,
@@ -475,7 +481,7 @@ describe('metodos de dbAdmin.js', function () {
     it('actualiza una venta y las unidades vendidas en la base',
       function (done) {
         db.updateVenta(codigo, empresa, ruc, fecha, autorizacionUpdated,
-          formaPagoUpdated, descuento, iva, subtotal, unidades)
+          formaPagoUpdated, detallado, descuento, iva, flete, subtotal, unidades)
         .then(function (res) {
           const lasInsertedId = res[0]
           //test api ya inserto 2 unidades, mas estas 2, la nueva debe de ser 4
@@ -506,7 +512,7 @@ describe('metodos de dbAdmin.js', function () {
           },
         ]
         db.updateVenta(codigo, empresa, ruc, fecha, autorizacionUpdated, formaPagoUpdated,
-          descuento, iva, subtotal, unidadesUpdated)
+          detallado, descuento, iva, flete, subtotal, unidadesUpdated)
         .then(function (res) {
           const lasInsertedId = res[0]
           lasInsertedId.should.be.a('number')

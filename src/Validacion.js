@@ -31,15 +31,23 @@ const eitherErrorsOrInputs = (errors, inputs) => {
   }
 }
 
-const esDescuentoValido = (descuentoString) => {
-  return descuentoString === ""
-    || validator.isInt(descuentoString, {min: 0, max: 100})
+const esPorcentajeValido = (porcentajeString) => {
+  return porcentajeString === ""
+    || validator.isInt(porcentajeString, {min: 0, max: 100})
+}
+
+
+const validarString = (str, errors, inputs, key) => {
+  if(typeof str === 'string' && str.length > 0)
+    inputs[key] = str
+  else
+    errors[key] = `${key} es un argumento erróneo`
 }
 
 const esFacturaDataPropValido = (propKey, newPropValue) => {
   switch(propKey) {
     case 'descuento':
-      return esDescuentoValido(newPropValue)
+      return esPorcentajeValido(newPropValue)
     default:
       return true
   }
@@ -56,6 +64,27 @@ const esFacturablePropValido = (propKey, newPropValue) => {
     default:
       return true
   }
+}
+
+const validarBoolean = (bool, errors, inputs, key) => {
+  if (typeof bool === 'boolean')
+    inputs[key] = bool
+  else
+    errors[key] = `${key} debe de ser boolean (true|false)`
+}
+
+const validarNumeroCalculado = (num, errors, inputs, key) => {
+  if (typeof num === 'number' && num >= 0)
+    inputs[key] = num
+  else
+    errors[key] = `${key} debe de ser un número real no negativo`
+}
+
+const validarNumeroIngresado = (num, errors, inputs, key) => {
+  if (!validator.isFloat(num, { min: 0 }))
+    errors[key] = `${key} debe ser un número real no negativo`
+  else
+    inputs[key] = num
 }
 
 const validarRUC = (ruc, errors, inputs, key) => {
@@ -96,15 +125,61 @@ const validarTelefono = (telefonoValue, errors, inputs, telefonoKey) => {
     inputs[telefonoKey] = telefonoValue
 }
 
+const validarPorcentajeIVA = (iva, errors, inputs) => {
+  if(typeof iva === 'number' && iva > 0 && iva < 30)
+    errors.iva = 'porcentaje iva inválido.'
+  else
+    inputs.iva = iva
+}
+
+const validarUnidad = (unidad) => {
+  const {
+    producto,
+    fechaExp,
+    lote,
+    count,
+    precioVenta,
+  } = unidad
+
+  if (typeof producto !== 'number' || !validator.isInt('' + producto))
+    return 'producto inválido'
+  if (typeof fechaExp !== 'string' || !validator.isDate(fechaExp))
+    return 'fecha expiración inválida'
+  if (typeof lote !== 'string')
+    return 'lote inválido'
+  if (typeof count !== 'number' || !validator.isInt('' + count))
+    return 'cantidad inválida'
+  if (typeof precioVenta !== 'number' || precioVenta < 0)
+    return 'precio de venta inválido'
+}
+
+const validarListaUnidades = (unidades, errors, inputs) => {
+  if (!unidades.length || unidades.length === 0) {
+    errors.unidades = 'unidades debe ser un arreglo válido, no vacío'
+    return
+  }
+
+  const esUnError = (item) => item
+  const erroresDeListaUnidades = unidades.map(validarUnidad)
+  const primerError = erroresDeListaUnidades.find(esUnError)
+  if (primerError) {
+    const posicionDelPrimerError = erroresDeListaUnidades.indexOf(primerError)
+    errors.unidades = `Error en posición #${posicionDelPrimerError}: ${primerError}`
+    return
+  }
+
+  inputs.unidades = unidades
+}
+
 const validarDescuentoDefault = (descDefault, errors, inputs) => {
-  if(!esDescuentoValido(descDefault))
+  if(!esPorcentajeValido(descDefault))
     errors.descDefault = 'descuento inválido. ' + porcentaje_invalido
   else
-    inputs.descDefault = parseInt(descDefault, 10)
+    inputs.descDefault = descDefault
 }
 
 const validarDescuentoSmall = (descuento, errors, inputs) => {
-  if(!esDescuentoValido(descuento))
+  if(!esPorcentajeValido(descuento))
     errors.descuento = invalido
   else
     inputs.descuento = descuento
@@ -214,12 +289,13 @@ const validarProducto = (formData) => {
 
   const codigo = formData.codigo || ''
   const nombre = formData.nombre || ''
+  const marca = formData.marca || ''
   const precioFab = String(formData.precioFab || '')
   const precioVenta = String(formData.precioVenta || '')
-  const pagaIva = formData.pagaIva 
+  const pagaIva = formData.pagaIva
 
   const errors = {}
-  const inputs = { pagaIva }
+  const inputs = { pagaIva, marca }
 
   validarCodigoRegistroSanitario(codigo, errors, inputs)
   validarNombre(nombre, errors, inputs)
@@ -230,6 +306,35 @@ const validarProducto = (formData) => {
 }
 
 const validarVentaRow = (formData) => {
+  const codigo = formData.codigo || ''
+  const fecha = formData.fecha || ''
+  const descuento = String(formData.descuento || '0')
+  const iva = String(formData.iva || '0')
+  const flete = String(formData.flete || '0')
+  const autorizacion = formData.autorizacion || ''
+  const formaPago = formData.formaPago || ''
+  const cliente = formData.cliente ||''
+
+  let errors = {}
+  let inputs = {}
+
+  validarCodigoFactura(codigo, errors, inputs)
+  validarFecha(fecha, errors, inputs)
+  validarString(formData.empresa, errors, inputs, 'empresa')
+  validarDescuentoSmall(descuento, errors, inputs)
+  validarPorcentajeIVA(iva, errors, inputs)
+  validarFormaPago(formaPago, errors, inputs )
+  validarRUC(cliente, errors, inputs, 'cliente')
+  validarBoolean(formData.detallado, errors, inputs, 'detallado')
+  validarNumeroIngresado(flete, errors, inputs, 'flete')
+  validarNumeroCalculado(formData.subtotal, errors, inputs, 'subtotal')
+  validarListaUnidades(formData.unidades, errors, inputs)
+  inputs.autorizacion = autorizacion
+
+  return eitherErrorsOrInputs(errors, inputs)
+}
+
+const validarVentaRowExamen = (formData) => {
   const codigo = formData.codigo || ''
   const fecha = formData.fecha || ''
   const descuento = String(formData.descuento || '0')
@@ -245,10 +350,15 @@ const validarVentaRow = (formData) => {
   validarDescuentoSmall(descuento, errors, inputs)
   validarFormaPago(formaPago, errors, inputs )
   validarRUC(cliente, errors, inputs, 'cliente')
+  validarNumeroCalculado(formData.subtotal, errors, inputs, 'subtotal')
+  validarListaUnidades(formData.unidades, errors, inputs)
+  validarString(formData.paciente, errors, inputs, 'paciente')
+  validarString(formData.medico, errors, inputs, 'medico')
   inputs.autorizacion = autorizacion
 
   return eitherErrorsOrInputs(errors, inputs)
 }
+
 
 module.exports = {
   esFacturablePropValido,
@@ -257,4 +367,5 @@ module.exports = {
   validarMedico,
   validarProducto,
   validarVentaRow,
+  validarVentaRowExamen,
 }

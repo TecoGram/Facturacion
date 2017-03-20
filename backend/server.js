@@ -8,14 +8,18 @@ const fs = require('fs')
 
 const db = require('./dbAdmin.js')
 const formatter = require('./responseFormatter.js')
-const { validarCliente, validarMedico, validarProducto } = require('./sanitizationMiddleware.js')
+const {
+  validarCliente,
+  validarMedico,
+  validarProducto,
+  validarVenta,
+  validarVentaExamen,
+ } = require('./sanitizationMiddleware.js')
 
 const port = process.env.PORT || 8192
 //crear directorio donde almacenar facturas en pdf.
 const facturaDir = pdfutils.createTemporaryDir('facturas/')
 const CONSTRAINT_ERROR_SQLITE = 19
-
-
 
 const printError = (errorString) => {
   //don't print errors in tests. Tests should print errors from the response
@@ -111,7 +115,7 @@ app.post('/producto/new', validarProducto, function (req, res) {
     precioDist,
     precioVenta,
     pagaIva,
-  } = req.body
+  } = req.safeData
 
   db.insertarProducto(codigo, nombre, precioDist, precioVenta, pagaIva)
   .then(function(id) {
@@ -166,11 +170,9 @@ function verVenta(req, res, tipo) {
         } = resp
 
         ventaRow.total = formatter.calcularTotalVentaRow(ventaRow)
-        console.log("ver pdf", JSON.stringify(ventaRow), JSON.stringify(cliente))
         const writeFunc = facturaTemplates.biocled(ventaRow, cliente)
         return new PDFWriter(facturaDir + facturaFileName, writeFunc)
       }, function (error) { //ERROR!
-        console.log("PDF error", JSON.stringify(error))
         return Promise.reject(error)
       })
       .then(function () {
@@ -245,7 +247,7 @@ app.get('/venta_ex/find', function (req, res) {
   findVentas(req, res, 1)
 });
 
-app.post('/venta/new', function (req, res) {
+app.post('/venta/new', validarVenta, function (req, res) {
   const {
     codigo,
     cliente,
@@ -253,14 +255,16 @@ app.post('/venta/new', function (req, res) {
     fecha,
     autorizacion,
     formaPago,
-    subtotal,
+    detallado,
     descuento,
     iva,
+    flete,
+    subtotal,
     unidades,
 
-  } = req.body
+  } = req.safeData
   db.insertarVenta(codigo, empresa, cliente, fecha, autorizacion, formaPago,
-    descuento, iva, subtotal, unidades)
+    detallado, descuento, iva, flete, subtotal, unidades)
   .then(function () {  //OK!
     res.status(200)
     .send("OK")
@@ -274,7 +278,7 @@ app.post('/venta/new', function (req, res) {
   })
 })
 
-app.post('/venta_ex/new', function (req, res) {
+app.post('/venta_ex/new', validarVentaExamen, function (req, res) {
   const {
     codigo,
     cliente,
@@ -287,7 +291,7 @@ app.post('/venta_ex/new', function (req, res) {
     medico,
     paciente,
 
-  } = req.body
+  } = req.safeData
   db.insertarVentaExamen(codigo, cliente, fecha, autorizacion, formaPago,
     descuento, subtotal, unidades, medico, paciente)
   .then(function () {  //OK!
@@ -303,7 +307,7 @@ app.post('/venta_ex/new', function (req, res) {
   })
 })
 
-app.post('/venta/update', function (req, res) {
+app.post('/venta/update', validarVenta, function (req, res) {
   const {
     codigo,
     empresa,
@@ -311,15 +315,17 @@ app.post('/venta/update', function (req, res) {
     fecha,
     autorizacion,
     formaPago,
-    subtotal,
+    detallado,
     descuento,
     iva,
+    flete,
+    subtotal,
     unidades,
 
-  } = req.body
+  } = req.safeData
 
   db.updateVenta(codigo, empresa, cliente, fecha, autorizacion, formaPago,
-    descuento, iva, subtotal, unidades)
+    detallado, descuento, iva, flete, subtotal, unidades)
   .then(function () {  //OK!
     res.status(200)
     .send("OK")
@@ -330,7 +336,7 @@ app.post('/venta/update', function (req, res) {
   })
 })
 
-app.post('/venta_ex/update', function (req, res) {
+app.post('/venta_ex/update', validarVentaExamen, function (req, res) {
   const {
     codigo,
     cliente,
@@ -343,7 +349,7 @@ app.post('/venta_ex/update', function (req, res) {
     medico,
     paciente,
 
-  } = req.body
+  } = req.safeData
 
   db.updateVentaExamen(codigo, cliente, fecha, autorizacion, formaPago,
     descuento, subtotal, unidades, medico, paciente)
@@ -356,6 +362,7 @@ app.post('/venta_ex/update', function (req, res) {
     res.send(error)
   })
 })
+
 const server = app.listen(port, function () {
   //eslint-disable-next-line
   console.log('Application listening on  port ' + port);

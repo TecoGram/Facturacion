@@ -187,7 +187,7 @@ describe('endpoints disponibles para el cliente', function () {
     it('retorna 200 al ingresar datos correctos', function (done) {
       api.insertarProducto(
         'rytertg663433g',
-        mi_producto,
+        mi_producto, "TECO",
         39.99, 49.99, true)
       .then(function (resp) {
         const statusCode = resp.status
@@ -204,7 +204,7 @@ describe('endpoints disponibles para el cliente', function () {
     it('retorna 500 al ingresar producto con un nombre ya existente', function (done) {
       api.insertarProducto(
         '34tger5',
-        mi_producto,
+        mi_producto, "TECO",
         39.99, 49.99, true)
       .then(function () {
         throw unexpectedError
@@ -261,6 +261,8 @@ describe('endpoints disponibles para el cliente', function () {
     fecha: '2016-11-26',
     autorizacion: '',
     formaPago: 'CONTADO',
+    detallado: false,
+    flete: 0,
     subtotal: 19.99,
     descuento: 0,
     iva: 12,
@@ -323,6 +325,8 @@ describe('endpoints disponibles para el cliente', function () {
   newVentaExRow.paciente = 'Juan Pesantes'
   delete newVentaExRow.iva
   delete newVentaExRow.empresa
+  delete newVentaExRow.detallado
+  delete newVentaExRow.flete
   describe('/venta_ex/new', function () {
     it('retorna 200 al ingresar datos correctos', function (done) {
 

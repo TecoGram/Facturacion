@@ -8,6 +8,7 @@ module.exports = () => {
         table.integer('rowid').primary()
         table.string('codigo', 10)
         table.string('nombre', 50)
+        table.string('marca', 30)
         table.float('precioDist')
         table.float('precioVenta')
         table.boolean('pagaIva')
@@ -37,11 +38,14 @@ module.exports = () => {
         table.string('cliente', 13)
         table.date('fecha').index()
         table.string('autorizacion', 10)
-        table.string('formaPago', 10)
+        //el valor es un indice de facturaPDFData.opcionesPagoDefault
+        table.integer('formaPago')
+        table.boolean('detallado')
         //tipo 0 para productos, 1 para examenes
         table.integer('tipo')
         table.integer('descuento')
         table.integer('iva')
+        table.float('flete')
         table.float('subtotal')
 
         table.primary('codigo', 'empresa')

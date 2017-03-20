@@ -31,7 +31,8 @@ const descriptionColumnSeparator = cantColumnSeparator + descriptionColumnWidth
 const unitPriceColumnWidth = 65
 const unitPriceColumnSeparator = descriptionColumnSeparator + unitPriceColumnWidth
 
-const chequeCruzadoString = 'FAVOR CANCELAR CON CHEQUE CRUZADO A NOMBRE DE TECO-GRAM S.A. AL HACER SUS PAGOS EN EFECTIVO EXIJA SU RECIBO'
+const chequeCruzadoString = 'FAVOR CANCELAR CON CHEQUE CRUZADO A NOMBRE DE'
+  + ' TECO-GRAM S.A. AL HACER SUS PAGOS EN EFECTIVO EXIJA SU RECIBO'
 const paymentAgreementString = 'Declaro expresamente haver recibido la mercadería'
   + ' y/o servicio detallado en esta factura y me comprometo a pagar integramente'
   + ' el valor total de la misma a TECO-GRAM S.A., en el plazo establecido en caso'
@@ -39,6 +40,7 @@ const paymentAgreementString = 'Declaro expresamente haver recibido la mercader�
   + ' mora y comisiones por cobranza, desde el vencimiento hasta el mismo día de'
   + ' pago. Para toda acción legal, renuncio a domicilio y me someto a los jueces'
   + ' de esta jurisdicción o al que elija el acreedor.'
+
 const drawContactInfo = (doc) => {
   const address = "Nueva Kennedy, Av. Del Periodista #428 y la 10ma. Este"
   const building = "Polimédico Costales"
@@ -396,8 +398,6 @@ module.exports = {
         total,
         facturables,
       } = ventaRow
-
-
 
       drawTitle(doc)
       drawContactInfo(doc)

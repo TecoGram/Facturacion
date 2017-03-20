@@ -7,6 +7,7 @@ const chai = require('chai')
 chai.use(require('chai-string'));
 
 const FacturaEditor = require('../../src/custom/Factura/EditorState.js')
+const DateParser = require('../../src/DateParser.js')
 const getState = FacturaEditor.getDefaultState
 
 const crearProducto = () => {
@@ -14,6 +15,7 @@ const crearProducto = () => {
     rowid: 0,
     codigo: "AA",
     nombre: "A",
+    marca: "TECO",
     precioDist: 0.99,
     precioVenta: 1.99,
     pagaIva: true,
@@ -150,14 +152,24 @@ describe('Factura Editor State', function () {
     })
 
     it('retorna unicamente prom, msg y ventaRow si logra validar factura nueva', function () {
+      const facturables = Immutable.List.of(
+        Immutable.Map({
+          producto: 1,
+          count: 2,
+          lote: 'AA',
+          fechaExp: DateParser.parseDBDate('2018-03-02'),
+          precioVenta: 12.99,
+        }))
+
       state.facturaData = state.facturaData.set('codigo', '00657')
                             .set('formaPago', 'CONTADO')
+      state.facturables = facturables
 
       const {
         errors,
         ventaRow,
         prom,
-        msg } = FacturaEditor.prepararFacturaParaGuardar(state, false, "emp")
+        msg } = FacturaEditor.prepararFacturaParaGuardar(state, false, "emp", 14)
 
       expect(errors).to.be.null
       prom.url.should.endWith('/venta/new')
