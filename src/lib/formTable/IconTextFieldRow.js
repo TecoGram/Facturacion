@@ -1,5 +1,6 @@
 import React from 'react';
 import TextField from 'material-ui/TextField';
+import Checkbox from 'material-ui/Checkbox';
 import IconBox from '../IconBox'
 
 const secondColStyle = { paddingLeft: '30px' }
@@ -13,10 +14,16 @@ const inputShape = React.PropTypes.shape({
   icon: React.PropTypes.func.isRequired,
 })
 
+const boolInputShape = React.PropTypes.shape({
+  hintText: React.PropTypes.string,
+  value: React.PropTypes.bool.isRequired,
+  onChange: React.PropTypes.func.isRequired,
+})
 const EmptyRow = (props) => {
   return <tr><td><div style={{height: props.height}} /></td></tr>
 
 }
+
 const IconColumn = (props) => {
   return <td style={props.style}><IconBox icon={props.input.icon}/></td>
 }
@@ -27,6 +34,18 @@ const TextColumn = (props) => {
     <td style={props.style}>
       <TextField hintText={input.hintText} onChange={input.onChange}
         errorText={input.errorText} value={input.value}/>
+    </td>
+  )
+}
+
+const BoolColumn = (props) => {
+  const input = props.input
+  return (
+    <td style={props.style} colSpan={2}>
+      <Checkbox
+        label={input.hintText}
+        checked={input.value}
+        onCheck={input.onChange} />
     </td>
   )
 }
@@ -58,6 +77,7 @@ export default class IconTextFieldRow extends React.Component {
     inverted: React.PropTypes.bool,
     leftInput: inputShape,
     rightInput: inputShape,
+    boolInput: boolInputShape,
   }
 
   getFirstIconColumn = (leftInput) => {
@@ -79,6 +99,11 @@ export default class IconTextFieldRow extends React.Component {
 
   }
 
+  getSecondBoolColumn = (rightInput) => {
+    return rightInput &&
+    <BoolColumn input={rightInput} style={{paddingLeft: '16px'}}/>
+  }
+
   getSecondTextColumn = (rightInput) => {
     return rightInput && <TextColumn input={rightInput} />
   }
@@ -89,10 +114,21 @@ export default class IconTextFieldRow extends React.Component {
       inverted,
       leftInput,
       rightInput,
+      boolInput,
     } = this.props
 
     if (empty)
       return <EmptyRow height={30} />
+    if (boolInput) {
+      const textInput = leftInput || rightInput
+      return (
+        <tr>
+          { this.getFirstIconColumn(textInput) }
+          { this.getFirstTextColumn(textInput, false) }
+          { this.getSecondBoolColumn(boolInput) }
+        </tr>
+      )
+    }
     if (inverted)
       return (
         <tr>

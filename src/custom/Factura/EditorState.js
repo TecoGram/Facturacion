@@ -10,6 +10,13 @@ const {
   esFacturablePropValido,
   esFacturaDataPropValido,
   validarVentaRow } = require('../../Validacion.js')
+const {
+  parseFormInt,
+  parseFormFloat,
+} = require('../../FormNumberPaser.js')
+const {
+  calcularValoresFacturablesImm,
+} = require('./Math.js')
 
 const getDefaultState = () => {
   return {
@@ -34,6 +41,14 @@ const agregarProductoComoFacturable = (producto) => {
     const facturable = Immutable.Map(productoAFacturable(producto))
     return { facturables: prevState.facturables.push(facturable) }
   }
+}
+
+const calcularValoresTotales = (facturablesImm, fleteString, porcentajeIVA,
+  porcentajeDescuentoString) => {
+  const flete = parseFormFloat(fleteString)
+  const porcentajeDescuento = parseFormInt(porcentajeDescuentoString)
+  return calcularValoresFacturablesImm(facturablesImm, flete,
+    porcentajeIVA, porcentajeDescuento)
 }
 
 const convertirFacturablesImmAUnidades = (facturablesImm) => {
@@ -122,6 +137,7 @@ const removeFacturableAt = (index) => {
 
 module.exports = {
   agregarProductoComoFacturable,
+  calcularValoresTotales,
   editarFacturaExistente,
   getDefaultState,
   modificarValorEnFacturaData,

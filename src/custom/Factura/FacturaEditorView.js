@@ -7,6 +7,7 @@ import FacturaResults from './FacturaResults'
 import { getFacturaURL, verVenta } from '../../api'
 import {
   agregarProductoComoFacturable,
+  calcularValoresTotales,
   editarFacturaExistente,
   getDefaultState,
   modificarValorEnFacturaData,
@@ -39,7 +40,7 @@ export default class FacturaEditorView extends Component {
 
   onNewCliente = (newCliente) => {
     this.setState({ cliente: newCliente })
-    if (newCliente)
+    if (newCliente && newCliente.descDefault > 0)
       this.onFacturaDataChanged('descuento', '' + newCliente.descDefault)
   }
 
@@ -105,7 +106,17 @@ export default class FacturaEditorView extends Component {
       ventaKey,
     } = this.props
 
-    const descuento = facturaData.get('descuento')
+    const porcentajeDescuentoString = facturaData.get('descuento')
+    const fleteString = facturaData.get('flete')
+    const detallado = facturaData.get('detallado')
+    const porcentajeIVA = 14
+    const {
+      subtotal,
+      rebaja,
+      impuestos,
+      total,
+    } = calcularValoresTotales(facturables, fleteString, porcentajeIVA,
+      porcentajeDescuentoString)
 
     return (
       <div style={{height:'100%', overflow:'auto'}} >
@@ -127,9 +138,14 @@ export default class FacturaEditorView extends Component {
             onFacturableDeleted={this.onFacturableDeleted}
             isExamen={isExamen} />
           <FacturaResults
-            facturables={facturables}
-            descuento={Number(descuento)}
+            subtotal={subtotal}
+            rebaja={rebaja}
+            impuestos={impuestos}
+            total={total}
+            porcentajeIVA={porcentajeIVA}
+            detallado={detallado}
             onGuardarClick={this.onGenerarFacturaClick}
+            onFacturaDataChanged={this.onGenerarFacturaClick}
             nuevo={!ventaKey}
             guardarButtonDisabled={!puedeGuardarFactura(this.state)}
             isExamen={isExamen} />

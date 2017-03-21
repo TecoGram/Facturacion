@@ -9,6 +9,7 @@ import Person from 'material-ui/svg-icons/social/person';
 import Receipt from 'material-ui/svg-icons/action/receipt';
 import Today from 'material-ui/svg-icons/action/today';
 import LocalHospital from 'material-ui/svg-icons/maps/local-hospital';
+import LocalShipping from 'material-ui/svg-icons/maps/local-shipping';
 import AirlineSeatReclineNormal from 'material-ui/svg-icons/notification/airline-seat-recline-normal';
 
 import ClienteAutoComplete from '../AutoComplete/ClienteAutoComplete'
@@ -20,10 +21,10 @@ import IconBox from '../../lib/IconBox'
 
 const autoCompleteWidth = '425px'
 const txtMargin = '35px'
-const codigoTextStyle = {width: '142px', verticalAlign: 'top', marginRight: txtMargin}
+const codigoTextStyle = {width: '90px', verticalAlign: 'top', marginRight: txtMargin}
 
 const fechaStyle={display: 'inline-block'}
-const fechaTextStyle = {width:'139px', marginRight: txtMargin}
+const fechaTextStyle = {width:'90px', marginRight: txtMargin}
 
 const CodigoText = (props) => {
   const {
@@ -53,8 +54,8 @@ const CodigoText = (props) => {
 
 const FechaText = (props) => {
   const {
-    data,
     errors,
+    data,
     onDataChanged,
   } = props
 
@@ -189,7 +190,19 @@ export default class FacturaForm extends Component {
                   hintText="Forma de pago" value={data.formaPago}
                   errorText={errors.formaPago}
                   onChange={(event) => onDataChanged('formaPago', event.target.value)}
-                  style={{width:'142px', marginRight: txtMargin}} />
+                  style={{width:'140px', marginRight: txtMargin}} />
+              </td>
+
+              <td>
+                <IconBox icon={LocalShipping}/>
+              </td>
+              <td>
+                <TextField
+                  hintText="Flete" value={data.flete}
+                  errorText={errors.flete}
+                  onChange={(event) => onDataChanged('flete', event.target.value)}
+                  style={{width:'50px', marginRight: txtMargin}}
+                  inputStyle={{textAlign:'right'}} />
               </td>
 
               <td>
@@ -212,7 +225,7 @@ export default class FacturaForm extends Component {
                   hintText="Autorización" value={data.autorizacion}
                   errorText={errors.autorizacion}
                   onChange={(event) => onDataChanged('autorizacion', event.target.value)}
-                  style={{ verticalAlign: 'top', width:'155px'}} />
+                  style={{ verticalAlign: 'top', width:'140px'}} />
               </td>
             </tr>
           </tbody>

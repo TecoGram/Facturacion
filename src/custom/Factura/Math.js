@@ -11,8 +11,8 @@ const calcularTotal = (subtotal, flete, impuestos, rebaja) => {
 
 const calcularTotalVentaRow = (ventaRow) => {
   const {
-    subtotal: subtotal,
-    flete: flete,
+    subtotal,
+    flete,
     iva: porcentajeIVA,
     descuento: porcentajeDescuento,
   } = ventaRow
@@ -26,7 +26,9 @@ const calcularSubtotalImm = (facturablesImm) => {
   const len = facturablesImm.size
   for (let i = 0; i < len; i++) {
     const facturableImm = facturablesImm.get(i)
-    const recargo = facturableImm.get('precioVenta') * facturableImm.get('count')
+    const precioVenta = parseFloat(facturableImm.get('precioVenta'))
+    const count = parseInt(facturableImm.get('count'), 10)
+    const recargo = precioVenta * count
     subtotal += recargo
   }
   return subtotal

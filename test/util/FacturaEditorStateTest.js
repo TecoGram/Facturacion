@@ -35,6 +35,44 @@ describe('Factura Editor State', function () {
     })
   })
 
+  describe('calcularValoresTotales', function () {
+    let state
+    before(function () {
+      state = getState()
+      const newProduct = crearProducto()
+      const modificacion = FacturaEditor.agregarProductoComoFacturable(newProduct)
+      state.facturables = modificacion(state).facturables
+    })
+    it('parsea los stings de flete y descuento y calcula los valores de la factura', function () {
+      const {
+        subtotal,
+        rebaja,
+        impuestos,
+        total,
+      } = FacturaEditor.calcularValoresTotales(state.facturables, '0.25', 14, '3')
+
+      subtotal.should.equal(1.99)
+      rebaja.should.be.closeTo(0.0597, 0.001)
+      impuestos.should.equal(0.270242)
+      total.should.be.closeTo(2.450542, 0.000001)
+    })
+
+    it('asume cero flete si es un string vacio y cero descuento si es un string vacio', function () {
+      const {
+        subtotal,
+        rebaja,
+        impuestos,
+        total,
+      } = FacturaEditor.calcularValoresTotales(state.facturables, '', 14, '')
+
+      subtotal.should.equal(1.99)
+      rebaja.should.equal(0)
+      impuestos.should.equal(0.2786)
+      total.should.equal(2.2686)
+
+    })
+  })
+
   describe('editarFacturaExistente', function () {
     it('modifica el estado para editar una factura a partir de la respuesta de "verVenta"', function () {
       const state = getState()

@@ -36,6 +36,15 @@ const esPorcentajeValido = (porcentajeString) => {
     || validator.isInt(porcentajeString, {min: 0, max: 100})
 }
 
+const esNumeroValido = (numeroString) => {
+  return numeroString === ''
+    || validator.isFloat(numeroString, { min: 0 })
+}
+
+const esEnteroValido = (enteroString) => {
+  return enteroString === ''
+    || validator.isInt(enteroString, { min: 0 })
+}
 
 const validarString = (str, errors, inputs, key) => {
   if(typeof str === 'string' && str.length > 0)
@@ -48,6 +57,8 @@ const esFacturaDataPropValido = (propKey, newPropValue) => {
   switch(propKey) {
     case 'descuento':
       return esPorcentajeValido(newPropValue)
+    case 'flete':
+      return esNumeroValido(newPropValue)
     default:
       return true
   }
@@ -56,11 +67,9 @@ const esFacturaDataPropValido = (propKey, newPropValue) => {
 const esFacturablePropValido = (propKey, newPropValue) => {
   switch(propKey) {
     case 'count':
-      return validator.isInt(newPropValue,{min: 0})
-        || newPropValue.length === 0
+      return esEnteroValido(newPropValue)
     case 'precioVenta':
-      return validator.isFloat(newPropValue, {min: 0})
-        || newPropValue.length === 0
+      return esNumeroValido(newPropValue)
     default:
       return true
   }
@@ -81,7 +90,7 @@ const validarNumeroCalculado = (num, errors, inputs, key) => {
 }
 
 const validarNumeroIngresado = (num, errors, inputs, key) => {
-  if (!validator.isFloat(num, { min: 0 }))
+  if (!esNumeroValido(num))
     errors[key] = `${key} debe ser un número real no negativo`
   else
     inputs[key] = num
@@ -126,7 +135,7 @@ const validarTelefono = (telefonoValue, errors, inputs, telefonoKey) => {
 }
 
 const validarPorcentajeIVA = (iva, errors, inputs) => {
-  if(typeof iva === 'number' && iva > 0 && iva < 30)
+  if(!typeof iva === 'number' || iva < 0 || iva > 30)
     errors.iva = 'porcentaje iva inválido.'
   else
     inputs.iva = iva
@@ -147,9 +156,9 @@ const validarUnidad = (unidad) => {
     return 'fecha expiración inválida'
   if (typeof lote !== 'string')
     return 'lote inválido'
-  if (typeof count !== 'number' || !validator.isInt('' + count))
+  if (typeof count !== 'number' || count < 1)
     return 'cantidad inválida'
-  if (typeof precioVenta !== 'number' || precioVenta < 0)
+  if (typeof precioVenta !== 'number' || precioVenta < 0.01)
     return 'precio de venta inválido'
 }
 
@@ -308,8 +317,8 @@ const validarProducto = (formData) => {
 const validarVentaRow = (formData) => {
   const codigo = formData.codigo || ''
   const fecha = formData.fecha || ''
-  const descuento = String(formData.descuento || '0')
-  const iva = String(formData.iva || '0')
+  const descuento = formData.descuento || ''
+  const iva = formData.iva
   const flete = String(formData.flete || '0')
   const autorizacion = formData.autorizacion || ''
   const formaPago = formData.formaPago || ''

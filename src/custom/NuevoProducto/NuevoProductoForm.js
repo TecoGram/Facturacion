@@ -1,22 +1,13 @@
 import React from 'react';
 
-import Checkbox from 'material-ui/Checkbox';
 import Info from 'material-ui/svg-icons/action/info';
+import Label from 'material-ui/svg-icons/action/label';
 import BusinessCenter from 'material-ui/svg-icons/places/business-center';
 import AttachMoney from 'material-ui/svg-icons/editor/attach-money';
 
 import IconTextFieldRow from '../../lib/formTable/IconTextFieldRow'
 
 export default class NuevoProductoForm extends React.Component {
-
-  renderIVACheckbox = (inputs, updateData) => {
-    return (
-      <Checkbox
-        label={"paga IVA"}
-        checked={inputs.pagaIva}
-        onCheck={(event, isChecked) => { updateData('pagaIva', isChecked)}} />
-    )
-  }
 
   render() {
     const {
@@ -57,21 +48,34 @@ export default class NuevoProductoForm extends React.Component {
       onChange: (event) => {updateData('precioVenta', event.target.value)},
     }
 
+    const marcaInput = {
+      hintText: "Marca",
+      icon: Label,
+      value: inputs.marca || '',
+      errorText: errors.marca,
+      onChange: (event) => {updateData('marca', event.target.value)},
+    }
+
+    const pagaIvaInput = {
+      hintText: "paga IVA",
+      value: inputs.pagaIva,
+      onChange: (event, isChecked) => {updateData('pagaIva', isChecked)},
+    }
+
     return (
-      <div>
-        <table style={{marginLeft: 10}}>
-          <tbody>
-            <IconTextFieldRow
-              leftInput={nombreInput}
-              rightInput={codigoInput} />
-            <IconTextFieldRow
-              leftInput={precioFabInput}
-              rightInput={precioVentaInput} />
-          </tbody>
-        </table>
-        <br/>
-        { this.renderIVACheckbox(inputs, updateData) }
-      </div>
+      <table style={{marginLeft: 10}}>
+        <tbody>
+          <IconTextFieldRow
+            leftInput={nombreInput}
+            rightInput={codigoInput} />
+          <IconTextFieldRow
+            leftInput={precioFabInput}
+            rightInput={precioVentaInput} />
+          <IconTextFieldRow
+            leftInput={marcaInput}
+            boolInput={pagaIvaInput} />
+        </tbody>
+      </table>
     )
   }
 }
