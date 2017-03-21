@@ -5,6 +5,9 @@ const {
   validarVentaRow,
   validarVentaRowExamen,
 } = require('../src/Validacion.js')
+const {
+  FormasDePago,
+} = require('../src/custom/Factura/Models.js')
 
 const sendBadArgumentsResponse = (res, errors) => {
   res.status(400).send(errors)
@@ -52,6 +55,7 @@ module.exports = {
     } else {
       inputs.descuento = Number(inputs.descuento)
       inputs.flete = Number(inputs.flete)
+      inputs.formaPago = FormasDePago.indexOf(inputs.formaPago.toUpperCase())
       req.safeData = inputs
       next()
     }
@@ -63,6 +67,7 @@ module.exports = {
       sendBadArgumentsResponse(res, errors)
     } else {
       inputs.descuento = Number(inputs.descuento)
+      inputs.formaPago = FormasDePago.indexOf(inputs.formaPago.toUpperCase())
       req.safeData = inputs
       next()
     }

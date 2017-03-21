@@ -1,5 +1,14 @@
+const deepFreeze = require('deep-freeze')
 const { oneYearFromToday, toReadableDate } = require('../../DateParser.js')
 const { calcularSubtotalImm } = require('./Math.js')
+
+const FormasDePago = deepFreeze([
+  'EFECTIVO',
+  'DINERO ELECTRÓNICO',
+  'TARJETA DE CRÉDITO/DÉBITO',
+  'TRANSFERENCIA',
+  'OTRO',
+])
 
 const crearUnidadesRows = (facturablesImm) => {
   const len = facturablesImm.size
@@ -62,5 +71,6 @@ module.exports = {
   crearUnidadesRows,
   crearVentaRow,
   facturableAUnidad,
+  FormasDePago,
   productoAFacturable,
 }

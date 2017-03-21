@@ -260,7 +260,7 @@ describe('endpoints disponibles para el cliente', function () {
     cliente: cliente1.ruc,
     fecha: '2016-11-26',
     autorizacion: '',
-    formaPago: 'CONTADO',
+    formaPago: 'EFECTIVO',
     detallado: false,
     flete: 0,
     subtotal: 19.99,
@@ -362,7 +362,7 @@ describe('endpoints disponibles para el cliente', function () {
     })
   })
 
-  const formaPagoUpdated = 'VISA'
+  const formaPagoUpdated = 'TRANSFERENCIA'
   const autorizacionUpdated = "1235"
   describe('/venta/update', function () {
     it('retorna 200 al ingresar datos correctos', function (done) {

@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import AutoComplete from 'material-ui/AutoComplete';
 import TextField from 'material-ui/TextField';
 
 import AddShoppingCart from 'material-ui/svg-icons/action/add-shopping-cart';
@@ -18,6 +19,8 @@ import MedicoAutoComplete from '../AutoComplete/MedicoAutoComplete'
 import CloseableColorChip from '../../lib/CloseableColorChip'
 import FormattedDatePicker from '../../lib/FormattedDatePicker';
 import IconBox from '../../lib/IconBox'
+
+import { FormasDePago } from '../../custom/Factura/Models'
 
 const autoCompleteWidth = '425px'
 const txtMargin = '35px'
@@ -183,17 +186,6 @@ export default class FacturaForm extends Component {
               </td>
 
               <td>
-                <IconBox icon={Payment}/>
-              </td>
-              <td>
-                <TextField
-                  hintText="Forma de pago" value={data.formaPago}
-                  errorText={errors.formaPago}
-                  onChange={(event) => onDataChanged('formaPago', event.target.value)}
-                  style={{width:'140px', marginRight: txtMargin}} />
-              </td>
-
-              <td>
                 <IconBox icon={LocalShipping}/>
               </td>
               <td>
@@ -225,8 +217,25 @@ export default class FacturaForm extends Component {
                   hintText="Autorización" value={data.autorizacion}
                   errorText={errors.autorizacion}
                   onChange={(event) => onDataChanged('autorizacion', event.target.value)}
-                  style={{ verticalAlign: 'top', width:'140px'}} />
+                  style={{ verticalAlign: 'top', width:'140px', marginRight: txtMargin}} />
               </td>
+
+              <td>
+                <IconBox icon={Payment}/>
+              </td>
+              <td>
+                <AutoComplete
+                  hintText="Forma de pago" searchText={data.formaPago}
+                  dataSource={FormasDePago}
+                  openOnFocus={true}
+                  errorText={errors.formaPago}
+                  filter={AutoComplete.caseInsensitiveFilter}
+                  onUpdateInput={(text) => onDataChanged('formaPago', text)}
+                  onNewRequest={(chosenReq) => onDataChanged('formaPago', chosenReq)}
+                  style={{width:'140px'}}
+                  textFieldStyle={{width:'140px'}} />
+              </td>
+
             </tr>
           </tbody>
         </table>

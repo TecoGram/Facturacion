@@ -38,7 +38,7 @@ module.exports = () => {
         table.string('cliente', 13)
         table.date('fecha').index()
         table.string('autorizacion', 10)
-        //el valor es un indice de facturaPDFData.opcionesPagoDefault
+        //el valor es un indice de Factura/Models.FormasDePago
         table.integer('formaPago')
         table.boolean('detallado')
         //tipo 0 para productos, 1 para examenes

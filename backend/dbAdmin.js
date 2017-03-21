@@ -11,7 +11,7 @@ const colocarVentaID = (unidades, codigo, empresa) => {
 
 const insertarVentaBase = (builder, codigo, empresa, cliente, fecha, autorizacion,
   formaPago, detallado, tipo, descuento, iva, flete, subtotal) => {
-  return builder.table('ventas').insert({
+  const q = builder.table('ventas').insert({
     codigo: codigo,
     empresa: empresa,
     cliente: cliente,
@@ -25,6 +25,7 @@ const insertarVentaBase = (builder, codigo, empresa, cliente, fecha, autorizacio
     flete: flete,
     subtotal: subtotal,
   })
+  return q
 }
 
 const updateVenta = (builder, codigo, empresa, cliente, fecha, autorizacion,

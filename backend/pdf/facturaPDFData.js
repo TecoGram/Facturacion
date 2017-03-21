@@ -1,13 +1,6 @@
-const deepFreeze = require('deep-freeze')
 const { calcularTotalVentaRow } = require('../../src/custom/Factura/Math.js')
+const { FormasDePago } = require('../../src/custom/Factura/Models.js')
 
-const FormasDePago = deepFreeze([
-  'EFECTIVO',
-  'DINERO ELECTRÓNICO',
-  'TARJETA DE CRÉDITO/DÉBITO',
-  'TRANSFERENCIA',
-  'OTRO',
-])
 
 const crearOpciondePagoConTotalPagado = (formaPagoIndex, total) => {
   return (opcion, index) => {

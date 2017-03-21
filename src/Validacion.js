@@ -1,4 +1,6 @@
 const validator = require('validator')
+const { FormasDePago } = require('./custom/Factura/Models.js')
+
 const campo_obligatorio = 'Este campo es obligatorio'
 const campo_obligatorio_min = 'obligatorio'
 const invalido = 'inválido'
@@ -135,7 +137,7 @@ const validarTelefono = (telefonoValue, errors, inputs, telefonoKey) => {
 }
 
 const validarPorcentajeIVA = (iva, errors, inputs) => {
-  if(!typeof iva === 'number' || iva < 0 || iva > 30)
+  if(typeof iva !== 'number' || iva < 0 || iva > 30)
     errors.iva = 'porcentaje iva inválido.'
   else
     inputs.iva = iva
@@ -245,6 +247,8 @@ const validarFecha = (fecha, errors, inputs) => {
 const validarFormaPago = (formaPago, errors, inputs) => {
   if(validator.isEmpty(formaPago))
     errors.formaPago = campo_obligatorio_min
+  else if (!FormasDePago.includes(formaPago.toUpperCase()))
+    errors.formaPago = invalido
   else
     inputs.formaPago = formaPago
 }

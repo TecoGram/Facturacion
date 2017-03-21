@@ -1,4 +1,5 @@
 const { calcularTotalVentaRow } = require('../src/custom/Factura/Math.js')
+const { FormasDePago } = require('../src/custom/Factura/Models.js')
 
 module.exports = {
   calcularTotalVentaRow,
@@ -41,6 +42,7 @@ module.exports = {
       empresa,
       facturables,
       fecha,
+      flete,
       descuento,
       autorizacion,
       paciente,
@@ -57,10 +59,11 @@ module.exports = {
         paciente: paciente,
         medico: medico,
         fecha: fecha,
-        descuento: descuento,
+        descuento: '' + descuento,
         subtotal: subtotal,
         autorizacion: autorizacion,
-        formaPago: formaPago,
+        flete: '' + flete,
+        formaPago: FormasDePago[formaPago],
         total: new Number(calcularTotalVentaRow(ventaQueryResp.ventaRow)).toFixed(2),
       },
       facturables: facturables.slice(),

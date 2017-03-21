@@ -71,11 +71,12 @@ export default class FacturaEditorView extends Component {
   onGenerarFacturaClick = () => {
     const empresa = this.props.empresa
     const editar = this.props.ventaKey
+    const porcentajeIVA = 14
     const {
       errors,
       msg,
       prom,
-      ventaRow } = prepararFacturaParaGuardar(this.state, editar, empresa)
+      ventaRow } = prepararFacturaParaGuardar(this.state, editar, empresa, porcentajeIVA)
 
     if (errors)
       this.setState({ errors: errors })
@@ -145,7 +146,7 @@ export default class FacturaEditorView extends Component {
             porcentajeIVA={porcentajeIVA}
             detallado={detallado}
             onGuardarClick={this.onGenerarFacturaClick}
-            onFacturaDataChanged={this.onGenerarFacturaClick}
+            onFacturaDataChanged={this.onFacturaDataChanged}
             nuevo={!ventaKey}
             guardarButtonDisabled={!puedeGuardarFactura(this.state)}
             isExamen={isExamen} />

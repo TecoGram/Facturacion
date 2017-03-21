@@ -200,7 +200,7 @@ describe('Factura Editor State', function () {
         }))
 
       state.facturaData = state.facturaData.set('codigo', '00657')
-                            .set('formaPago', 'CONTADO')
+                            .set('formaPago', 'EFECTIVO')
       state.facturables = facturables
 
       const {
@@ -217,13 +217,13 @@ describe('Factura Editor State', function () {
 
     it('retorna unicamente prom, msg y ventaRow si logra validar factura editada', function () {
       state.facturaData = state.facturaData.set('codigo', '00657')
-                            .set('formaPago', 'CONTADO')
+                            .set('formaPago', 'EFECTIVO')
 
       const {
         errors,
         ventaRow,
         prom,
-        msg } = FacturaEditor.prepararFacturaParaGuardar(state, true, "emp")
+        msg } = FacturaEditor.prepararFacturaParaGuardar(state, true, "emp", 14)
 
       expect(errors).to.be.null
       prom.url.should.endWith('/venta/update')
