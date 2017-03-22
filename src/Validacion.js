@@ -209,12 +209,12 @@ const validarCodigoRegistroSanitario = (codigo, errors, inputs) => {
     inputs.codigo = codigo
 }
 
-const validarPrecioFabrica = (precioFab, errors, inputs) => {
+const validarPrecioFabrica = (precioDist, errors, inputs) => {
   const precio_invalido = 'precio inválido'
-  if(!validator.isEmpty(precioFab) && !validator.isDecimal(precioFab))
-    errors.precioFab = precio_invalido
+  if(!validator.isEmpty(precioDist) && !validator.isDecimal(precioDist))
+    errors.precioDist = precio_invalido
   else
-    inputs.precioFab = precioFab
+    inputs.precioDist = precioDist
 }
 
 const validarPrecioVenta = (precioVenta, errors, inputs) => {
@@ -303,7 +303,7 @@ const validarProducto = (formData) => {
   const codigo = formData.codigo || ''
   const nombre = formData.nombre || ''
   const marca = formData.marca || ''
-  const precioFab = String(formData.precioFab || '')
+  const precioDist = String(formData.precioDist || '')
   const precioVenta = String(formData.precioVenta || '')
   const pagaIva = formData.pagaIva
 
@@ -312,7 +312,7 @@ const validarProducto = (formData) => {
 
   validarCodigoRegistroSanitario(codigo, errors, inputs)
   validarNombre(nombre, errors, inputs)
-  validarPrecioFabrica(precioFab, errors, inputs)
+  validarPrecioFabrica(precioDist, errors, inputs)
   validarPrecioVenta(precioVenta, errors, inputs)
 
   return eitherErrorsOrInputs(errors, inputs)

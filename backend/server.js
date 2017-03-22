@@ -112,12 +112,13 @@ app.post('/producto/new', validarProducto, function (req, res) {
   const {
     codigo,
     nombre,
+    marca,
     precioDist,
     precioVenta,
     pagaIva,
   } = req.safeData
 
-  db.insertarProducto(codigo, nombre, precioDist, precioVenta, pagaIva)
+  db.insertarProducto(codigo, nombre, marca, precioDist, precioVenta, pagaIva)
   .then(function(id) {
     res.status(200)
     .send(id)

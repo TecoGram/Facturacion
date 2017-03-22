@@ -39,11 +39,12 @@ module.exports = {
       .send()
   },
 
-  insertarProducto: (codigo, nombre, precioDist, precioVenta, pagaIva) => {
+  insertarProducto: (codigo, nombre, marca, precioDist, precioVenta, pagaIva) => {
     return request.post(prefix + '/producto/new')
       .send({
         codigo: codigo,
         nombre: nombre,
+        marca: marca,
         precioDist: precioDist,
         precioVenta: precioVenta,
         pagaIva: pagaIva,

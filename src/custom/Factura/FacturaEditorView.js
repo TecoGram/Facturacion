@@ -78,6 +78,7 @@ export default class FacturaEditorView extends Component {
       prom,
       ventaRow } = prepararFacturaParaGuardar(this.state, editar, empresa, porcentajeIVA)
 
+    console.log(JSON.stringify(errors))
     if (errors)
       this.setState({ errors: errors })
     else

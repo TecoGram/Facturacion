@@ -35,9 +35,9 @@ export default class NuevoProductoForm extends React.Component {
     const precioFabInput = {
       hintText: "Precio Distribuidora",
       icon: AttachMoney,
-      value: inputs.precioFab || '',
-      errorText: errors.precioFab,
-      onChange: (event) => {updateData('precioFab', event.target.value)},
+      value: inputs.precioDist || '',
+      errorText: errors.precioDist,
+      onChange: (event) => {updateData('precioDist', event.target.value)},
     }
 
     const precioVentaInput = {

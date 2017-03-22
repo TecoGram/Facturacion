@@ -243,7 +243,20 @@ const drawInvoiceDetailsBox = (doc) => {
   drawSignaturePlaceholders(doc)
 }
 
-const drawFacturableLine = (doc, facturable, pos) => {
+const drawFacturableDescription = (doc, facturable, detallado, linePos) => {
+  const descriptionOptions = {
+    width: descriptionColumnWidth - 10,
+  }
+  const descriptionStartX = cantColumnSeparator + 5
+  doc.text(facturable.nombre, descriptionStartX, linePos, descriptionOptions)
+  if (detallado) {
+    doc.text(facturable.marca, descriptionStartX, doc.y, descriptionOptions)
+    const loteFechaString = `LOTE: ${facturable.lote} FECHA: ${facturable.fechaExp}`
+    doc.text(loteFechaString, descriptionStartX, doc.y, descriptionOptions)
+  }
+}
+
+const drawFacturableLine = (doc, facturable, detallado, pos) => {
   const linePos = doc.y
   doc.text(pos, BOX2_POS.x + 5, linePos, {
     align: 'right',
@@ -263,21 +276,36 @@ const drawFacturableLine = (doc, facturable, pos) => {
     align: 'right',
     width: BOX2_END_X - unitPriceColumnSeparator - 10})
 
-  doc.text(facturable.nombre, cantColumnSeparator + 5, linePos, {
-    width: descriptionColumnWidth - 10,
-  })
+  drawFacturableDescription(doc, facturable, detallado, linePos)
+
 }
 
-const drawFacturablesDetails = (doc, facturables) => {
+const drawRemainingFacturablesOnNextPage = (doc, detallado, facturables, startPos) => {
+  doc.addPage({
+    margins: {
+      left: 72,
+      top: 72,
+      right: 72,
+      bottom: 72,
+    },
+  })
+
+  for (let i = startPos; i < facturables.length; i++) {
+    const facturable = facturables[i]
+    drawFacturableLine(doc, facturable, detallado, i + 1)
+  }
+}
+
+const drawFacturablesDetails = (doc, facturables, detallado) => {
   drawInvoiceDetailsBox(doc)
-
   doc.y = Y3_LINE + 5
-
   for (let i = 0; i < facturables.length; i++) {
     const facturable = facturables[i]
-    drawFacturableLine(doc, facturable, i + 1)
+    const heightFactor = detallado ? 4 : 2
+    const facturableSeDesborda = doc.y + doc.currentLineHeight() * heightFactor > Y4_LINE
+    if (facturableSeDesborda) return i
+    drawFacturableLine(doc, facturable, detallado, i + 1)
   }
-
 }
 
 const drawValueLine = (doc, valueLabel, valueSymbol, valueNumber) => {
@@ -379,6 +407,7 @@ module.exports = {
     const writeFunc = (doc) => {
 
       const {
+        detallado,
         total,
         formasDePago,
         facturables,
@@ -387,11 +416,15 @@ module.exports = {
       drawTitle(doc)
       drawContactInfo(doc)
       drawInvoiceInfo(doc, facturaPDFData, cliente)
-
-      drawFacturablesDetails(doc, facturables)
+      const remainingFacturablesIndex = drawFacturablesDetails(doc, facturables,
+        detallado)
       drawTotalPalabras(doc, "SON: " + valorPalabras(total))
       drawTotalValues(doc, facturaPDFData)
       drawPaymentMethodFooter(doc, formasDePago)
+
+      if (remainingFacturablesIndex) {
+        drawRemainingFacturablesOnNextPage(doc, detallado, facturables, remainingFacturablesIndex)
+      }
     }
 
     return writeFunc

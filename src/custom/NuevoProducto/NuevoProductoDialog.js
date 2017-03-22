@@ -45,11 +45,11 @@ export default class NuevoProductoDialog extends React.Component {
 
   guardarProducto = (inputs, cerrarDialog) => {
     const {
-      codigo, nombre, precioFab, precioVenta, pagaIva,
+      codigo, nombre, marca, precioDist, precioVenta, pagaIva,
     } = inputs
 
     //por ahora quemar true y que todos paguen iva
-    insertarProducto(codigo, nombre, precioFab, precioVenta, pagaIva)
+    insertarProducto(codigo, nombre, marca, precioDist, precioVenta, pagaIva)
     .then(() => {
       this.setState(getDefaultState)
       cerrarDialog(`Nuevo producto guardado: ${nombre}`, NUEVO_PRODUCTO_DIALOG_CLOSED)

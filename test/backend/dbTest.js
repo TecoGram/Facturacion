@@ -50,7 +50,11 @@ describe('metodos de dbAdmin.js', function () {
       db.findProductos('')
       .then(function(productos) {
         productos.should.be.an('array')
-        productos.should.not.be.empty
+        productos.length.should.equal(3)
+
+        //asegurar que estan los valores correctos
+        const primerProducto = productos[0]
+        primerProducto.marca.should.equal("TECO")
         done()
       })
     })

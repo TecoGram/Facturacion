@@ -136,7 +136,7 @@ const getCliente = (ruc) => {
 const getFacturablesVenta = (codigo, empresa) => {
   return knex.select('productos.nombre', 'unidades.producto', 'unidades.count',
   'unidades.precioVenta', 'productos.codigo', 'productos.pagaIva',
-  'unidades.lote', 'unidades.fechaExp')
+  'productos.marca', 'unidades.lote', 'unidades.fechaExp')
   .from('unidades')
   .join('productos', {'unidades.producto' : 'productos.rowid' })
   .where({codigoVenta: codigo, empresaVenta: empresa})
@@ -202,10 +202,11 @@ const getFacturaData = (codigo, empresa, tipo) => {
 
 module.exports = {
   close: () => { knex.destroy() },
-  insertarProducto: (codigo, nombre, precioDist, precioVenta, pagaIva) => {
+  insertarProducto: (codigo, nombre, marca, precioDist, precioVenta, pagaIva) => {
     return knex.table('productos').insert({
       codigo: codigo,
       nombre: nombre,
+      marca: marca,
       precioDist: precioDist,
       precioVenta: precioVenta,
       pagaIva: pagaIva,
