@@ -1,6 +1,14 @@
 const { calcularTotalVentaRow } = require('../src/custom/Factura/Math.js')
 const { FormasDePago } = require('../src/custom/Factura/Models.js')
 
+const parsearBooleanSQLite = (bool) => {
+  if (typeof bool === 'boolean')
+    return bool
+  if (typeof bool === 'number')
+    return bool !== 0
+  throw Error('Unexpected type ' + (typeof bool))
+}
+
 module.exports = {
   calcularTotalVentaRow,
   crearListaFacturasParaTabla: (ventas) => {
@@ -44,6 +52,7 @@ module.exports = {
       fecha,
       flete,
       descuento,
+      detallado,
       autorizacion,
       paciente,
       medico,
@@ -58,6 +67,7 @@ module.exports = {
         empresa: empresa,
         paciente: paciente,
         medico: medico,
+        detallado: parsearBooleanSQLite(detallado),
         fecha: fecha,
         descuento: '' + descuento,
         subtotal: subtotal,

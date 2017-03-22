@@ -91,13 +91,13 @@ export default class FacturaResults extends React.Component {
 
 FacturaResults.propTypes = {
   isExamen: React.PropTypes.bool,
-  detallado: React.PropTypes.bool,
+  detallado: React.PropTypes.bool.isRequired,
   rebaja: React.PropTypes.number.isRequired,
   subtotal: React.PropTypes.number.isRequired,
   impuestos: React.PropTypes.number,
   total: React.PropTypes.number.isRequired,
   onGuardarClick: React.PropTypes.func,
-  onFacturaDataChanged: React.PropTypes.func,
+  onFacturaDataChanged: React.PropTypes.func.isRequired,
   nuevo: React.PropTypes.bool.isRequired,
   porcentajeIVA: React.PropTypes.number,
 }

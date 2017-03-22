@@ -70,7 +70,7 @@ describe('Validacion', function () {
       inputs.codigo.should.be.a('string')
       inputs.marca.should.be.a('string')
       inputs.precioVenta.should.be.a('string')
-      inputs.precioFab.should.be.a('string')
+      inputs.precioDist.should.be.a('string')
       inputs.pagaIva.should.be.a('boolean')
     })
 

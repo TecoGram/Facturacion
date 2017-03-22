@@ -417,6 +417,7 @@ describe('endpoints disponibles para el cliente', function () {
           facturaData.empresa.should.equal(newVentaRow.empresa)
           facturaData.fecha.should.equal(newVentaRow.fecha)
           facturaData.formaPago.should.equal(formaPagoUpdated)
+          facturaData.detallado.should.be.false
 
           facturables.length.should.equal(newVentaRow.unidades.length)
 
