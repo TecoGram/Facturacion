@@ -193,10 +193,10 @@ describe('Factura Editor State', function () {
       const facturables = Immutable.List.of(
         Immutable.Map({
           producto: 1,
-          count: 2,
+          count: '2',
           lote: 'AA',
           fechaExp: DateParser.parseDBDate('2018-03-02'),
-          precioVenta: 12.99,
+          precioVenta: '12.99',
         }))
 
       state.facturaData = state.facturaData.set('codigo', '00657')
@@ -207,11 +207,14 @@ describe('Factura Editor State', function () {
         errors,
         ventaRow,
         prom,
-        msg } = FacturaEditor.prepararFacturaParaGuardar(state, false, "emp", 14)
+        msg } = FacturaEditor.prepararFacturaParaGuardar(state, false, "emp",
+        true, 14)
 
       expect(errors).to.be.null
       prom.url.should.endWith('/venta/new')
       ventaRow.empresa.should.equal("emp")
+      ventaRow.detallado.should.be.false
+      ventaRow.iva.should.equal(0)
       msg.should.equal('La factura se generó exitosamente.')
     })
 
@@ -223,11 +226,16 @@ describe('Factura Editor State', function () {
         errors,
         ventaRow,
         prom,
-        msg } = FacturaEditor.prepararFacturaParaGuardar(state, true, "emp", 14)
+        msg } = FacturaEditor.prepararFacturaParaGuardar(state, true, "emp",
+          false, 14)
 
       expect(errors).to.be.null
       prom.url.should.endWith('/venta/update')
       ventaRow.empresa.should.equal("emp")
+      ventaRow.detallado.should.be.true
+      ventaRow.iva.should.equal(14)
+
+
       msg.should.equal('La factura se editó exitosamente.')
     })
   })

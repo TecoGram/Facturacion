@@ -158,9 +158,9 @@ const validarUnidad = (unidad) => {
     return 'fecha expiración inválida'
   if (typeof lote !== 'string')
     return 'lote inválido'
-  if (typeof count !== 'number' || count < 1)
+  if (!esEnteroValido(count))
     return 'cantidad inválida'
-  if (typeof precioVenta !== 'number' || precioVenta < 0.01)
+  if (!esNumeroValido(precioVenta))
     return 'precio de venta inválido'
 }
 

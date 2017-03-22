@@ -112,7 +112,7 @@ const puedeGuardarFactura = (state) => {
   return true
 }
 
-const prepararFacturaParaGuardar = (state, editar, empresa, porcentajeIVA) => {
+const prepararFacturaParaGuardar = (state, editar, empresa, isExamen, porcentajeIVA) => {
   const {
     cliente,
     facturables,
@@ -121,7 +121,7 @@ const prepararFacturaParaGuardar = (state, editar, empresa, porcentajeIVA) => {
 
   const unidades = convertirFacturablesImmAUnidades(facturables)
   const ventaRow = crearVentaRow(cliente, facturaData, facturables, unidades,
-    empresa, porcentajeIVA)
+    empresa, isExamen, porcentajeIVA)
   const { errors } = validarVentaRow(ventaRow)
   if (errors)
     return { errors, prom: null, msg: null, ventaRow: null }

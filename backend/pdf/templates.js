@@ -314,17 +314,17 @@ const drawValueLine = (doc, valueLabel, valueSymbol, valueNumber) => {
   const valueColumnWidth = BOX2_END_X - unitPriceColumnSeparator - 10
   const valueColumnX = unitPriceColumnSeparator + 5
   const linePos = doc.y
-  const valueAsFormattedString = new Number(valueNumber).toFixed(2)
 
   doc.text(valueLabel, labelColumnX, linePos)
   doc.text(valueSymbol, X2_LINE, linePos, {
     align: 'right',
     width: symbolColumnWidth,
   })
-  doc.text(valueAsFormattedString, valueColumnX, linePos, {
-    align: 'right',
-    width: valueColumnWidth,
-  })
+  if (valueNumber !== '')
+    doc.text(valueNumber, valueColumnX, linePos, {
+      align: 'right',
+      width: valueColumnWidth,
+    })
 }
 
 const drawTotalValues = (doc, facturaPDFData) => {

@@ -71,13 +71,15 @@ export default class FacturaEditorView extends Component {
   onGenerarFacturaClick = () => {
     const empresa = this.props.empresa
     const editar = this.props.ventaKey
+    const isExamen = this.props.isExamen
     const porcentajeIVA = 14
+
     const {
       errors,
       msg,
       prom,
-      ventaRow } = prepararFacturaParaGuardar(this.state, editar, empresa, porcentajeIVA)
-
+      ventaRow } = prepararFacturaParaGuardar(this.state, editar, empresa,
+        isExamen, porcentajeIVA)
     if (errors)
       this.setState({ errors: errors })
     else
@@ -116,7 +118,7 @@ export default class FacturaEditorView extends Component {
       rebaja,
       impuestos,
       total,
-    } = calcularValoresTotales(facturables, fleteString, porcentajeIVA,
+    } = calcularValoresTotales(facturables, fleteString, isExamen ? 0 : porcentajeIVA,
       porcentajeDescuentoString)
 
     return (

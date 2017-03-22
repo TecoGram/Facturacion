@@ -33,7 +33,8 @@ const productoAFacturable = (producto) => {
   delete facturable.rowid
   delete facturable.precioDist
   facturable.lote = ''
-  facturable.count = 1
+  facturable.count = '1'
+  facturable.precioVenta = '' + producto.precioVenta
   facturable.fechaExp = oneYearFromToday()
   return facturable
 }
@@ -49,7 +50,7 @@ const facturableAUnidad = (facturable) => {
 }
 
 const crearVentaRow = (clienteObj, facturaDataImm, facturablesImm, unidades,
-    empresa, porcentajeIVA) => {
+    empresa, isExamen, porcentajeIVA) => {
   const subtotal = calcularSubtotalImm(facturablesImm)
   return {
     cliente: clienteObj.ruc,
@@ -59,9 +60,9 @@ const crearVentaRow = (clienteObj, facturaDataImm, facturablesImm, unidades,
     autorizacion: facturaDataImm.get('autorizacion'),
     formaPago: facturaDataImm.get('formaPago'),
     fecha: toReadableDate(facturaDataImm.get('fecha')),
-    detallado: facturaDataImm.get('detallado'),
+    detallado: isExamen ? false : facturaDataImm.get('detallado'),
     flete: facturaDataImm.get('flete'),
-    iva: porcentajeIVA,
+    iva: isExamen ? 0 : porcentajeIVA,
     subtotal: subtotal,
     unidades: unidades,
   }

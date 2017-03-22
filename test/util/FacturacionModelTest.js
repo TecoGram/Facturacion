@@ -10,60 +10,62 @@ const DateParser = require('../../src/DateParser.js')
 
 describe('Facturacion Models', function () {
   describe('crearVentaRow', function () {
-    it('Genera la fila de una venta a partir de un mapa inmutable', function () {
-      const clienteObj = {
-        ruc: '09455867443001',
-      }
+    const clienteObj = {
+      ruc: '09455867443001',
+    }
 
-      const facturaData = Immutable.Map({
-        codigo: '0003235',
-        descuento: '10',
-        autorizacion: '5962',
-        formaPago: 'CONTADO',
-        detallado: false,
-        flete: "",
-        fecha: new Date(2016, 10, 26),
+    const facturaData = Immutable.Map({
+      codigo: '0003235',
+      descuento: '10',
+      autorizacion: '5962',
+      formaPago: 'CONTADO',
+      detallado: true,
+      flete: "",
+      fecha: new Date(2016, 10, 26),
+    })
+
+    const facturables = Immutable.List.of(
+      Immutable.Map({
+        producto: 1,
+        lote: 'asd3',
+        fechaExp: DateParser.parseDBDate('2017-02-02'), //Fecha como la pone la DB
+        count: 1,
+        precioVenta: 10,
+        pagaIva: true,
+      }),
+      Immutable.Map({
+        producto: 2,
+        lote: 'asd5',
+        fechaExp: DateParser.oneYearFromToday(), //fecha como la pone FacturarView por default
+        count: 2,
+        precioVenta: 20,
+        pagaIva: true,
       })
+    )
+    const unidades = [
+      {
+        producto: 1,
+        lote: 'asd3',
+        fechaExp: DateParser.parseDBDate('2017-02-02'), //Fecha como la pone la DB
+        count: 1,
+        precioVenta: 10,
+        pagaIva: true,
+      },
+      {
+        producto: 2,
+        lote: 'asd5',
+        fechaExp: DateParser.oneYearFromToday(), //fecha como la pone FacturarView por default
+        count: 2,
+        precioVenta: 20,
+        pagaIva: true,
+      },
+    ]
 
-      const facturables = Immutable.List.of(
-        Immutable.Map({
-          producto: 1,
-          lote: 'asd3',
-          fechaExp: DateParser.parseDBDate('2017-02-02'), //Fecha como la pone la DB
-          count: 1,
-          precioVenta: 10,
-          pagaIva: true,
-        }),
-        Immutable.Map({
-          producto: 2,
-          lote: 'asd5',
-          fechaExp: DateParser.oneYearFromToday(), //fecha como la pone FacturarView por default
-          count: 2,
-          precioVenta: 20,
-          pagaIva: true,
-        })
-      )
-      const unidades = [
-        {
-          producto: 1,
-          lote: 'asd3',
-          fechaExp: DateParser.parseDBDate('2017-02-02'), //Fecha como la pone la DB
-          count: 1,
-          precioVenta: 10,
-          pagaIva: true,
-        },
-        {
-          producto: 2,
-          lote: 'asd5',
-          fechaExp: DateParser.oneYearFromToday(), //fecha como la pone FacturarView por default
-          count: 2,
-          precioVenta: 20,
-          pagaIva: true,
-        },
-      ]
-      const empresa = "TecoGram"
+    const empresa = "TecoGram"
+
+    it('Genera la fila de una venta a partir de un mapa inmutable', function () {
       const ventaRow = FacturacionModels.crearVentaRow(clienteObj, facturaData,
-        facturables, unidades, empresa, 14)
+        facturables, unidades, empresa, false, 14)
       ventaRow.cliente.should.equal('09455867443001')
       ventaRow.codigo.should.equal('0003235')
       ventaRow.subtotal.should.equal(50)
@@ -72,7 +74,7 @@ describe('Facturacion Models', function () {
       ventaRow.iva.should.equal(14)
       ventaRow.autorizacion.should.equal('5962')
       ventaRow.flete.should.equal('')
-      ventaRow.detallado.should.be.false
+      ventaRow.detallado.should.be.true
       ventaRow.formaPago.should.equal('CONTADO')
       ventaRow.fecha.should.equal('2016-11-26')
 
@@ -92,6 +94,14 @@ describe('Facturacion Models', function () {
       segundoItem.fechaExp.should.equal(unidades[1].fechaExp)
       segundoItem.precioVenta.should.equal(20)
       segundoItem.count.should.equal(2)
+    })
+
+
+    it('Genera la fila de una venta con cero iva y detallado = false si es examen', function () {
+      const ventaRow = FacturacionModels.crearVentaRow(clienteObj, facturaData,
+        facturables, unidades, empresa, true, 14)
+      ventaRow.detallado.should.be.false
+      ventaRow.iva.should.equal(0)
     })
   })
 
@@ -177,9 +187,9 @@ describe('Facturacion Models', function () {
       facturable.should.not.have.property('precioDist')
       facturable.should.have.property('codigo')
       facturable.should.have.property('nombre')
-      facturable.should.have.property('precioVenta', producto.precioVenta)
+      facturable.should.have.property('precioVenta', '' + producto.precioVenta)
       facturable.should.have.property('fechaExp')
-      facturable.should.have.property('count', 1)
+      facturable.should.have.property('count', '1')
       facturable.should.have.property('lote', '')
     })
   })

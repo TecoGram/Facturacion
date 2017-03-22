@@ -48,9 +48,11 @@ const ResultsTable = (props) => {
 const FacturaDetalladaCheckbox = (props) => {
   const {
     detallado,
+    isExamen,
     onFacturaDataChanged,
   } = props
 
+  if (isExamen) return null
   return (
     <Checkbox
       label={"Mostrar Información detallada en cada producto"}

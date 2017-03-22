@@ -13,6 +13,14 @@ const sendBadArgumentsResponse = (res, errors) => {
   res.status(400).send(errors)
 }
 
+const parsearNumerosEnUnidades = (unidades) => {
+  for (let i = 0; i < unidades.length; i++) {
+    const unidad = unidades[i]
+    unidad.count = Number(unidad.count)
+    unidad.precioVenta = Number(unidad.precioVenta)
+  }
+}
+
 module.exports = {
   validarCliente: function (req, res, next) {
     const { inputs, errors } = validarCliente(req.body)
@@ -56,6 +64,7 @@ module.exports = {
       inputs.descuento = Number(inputs.descuento)
       inputs.flete = Number(inputs.flete)
       inputs.formaPago = FormasDePago.indexOf(inputs.formaPago.toUpperCase())
+      parsearNumerosEnUnidades(inputs.unidades)
       req.safeData = inputs
       next()
     }
@@ -68,6 +77,7 @@ module.exports = {
     } else {
       inputs.descuento = Number(inputs.descuento)
       inputs.formaPago = FormasDePago.indexOf(inputs.formaPago.toUpperCase())
+      parsearNumerosEnUnidades(inputs.unidades)
       req.safeData = inputs
       next()
     }
