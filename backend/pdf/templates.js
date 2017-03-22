@@ -299,21 +299,13 @@ const drawValueLine = (doc, valueLabel, valueSymbol, valueNumber) => {
   })
 }
 
-const drawTotalValues = (doc, ventaRow) => {
+const drawTotalValues = (doc, facturaPDFData) => {
   doc.lineGap(7)
   doc.y = Y4_LINE + 15
 
-  const drawValueLineArgs = [
-    [ doc, 'Descuento US', '$', ventaRow.descuento],
-    [ doc, 'Sub-Total', '$', ventaRow.subtotal],
-    [ doc, 'IVA', '0%', ventaRow.iva],
-    [ doc, 'Flete', '$', 0],
-    [ doc, 'IVA', '14%', ventaRow.iva],
-    [ doc, 'Total US', '$', ventaRow.total],
-  ]
-
+  const drawValueLineArgs = facturaPDFData.matrizValoresTotales
   drawValueLineArgs.forEach((args) => {
-    drawValueLine(...args)
+    drawValueLine(doc, ...args)
   })
 
   doc.lineGap(0) //restore default
@@ -338,7 +330,7 @@ const drawPaymentMethodColumn = (doc, boxHeight, methodName, totalPayed) => {
   doc.rect(doc.x, paymentMethodValueBoxY, boxWidth, boxHeight)
     .stroke()
 
-  if (totalPayed > 0) {
+  if (totalPayed) {
     doc.fontSize(7)
       .text(totalPayed, doc.x, textY, {
         width: boxWidth - 3,
@@ -365,25 +357,17 @@ const drawPaymentMethodSubtitle = (doc) => {
   doc.x = doc.x + doc.widthOfString('FORMA DE PAGO:') + 3
 }
 
-const drawPaymentMethodFooter = (doc, paymentMethod) => {
+const drawPaymentMethodFooter = (doc, paymentMethods) => {
   const startX = BOX2_POS.x
+  const valueBoxHeight = doc.currentLineHeight() + 4
 
   doc.fontSize(6)
+
   doc.x = startX
   drawPaymentMethodSubtitle(doc)
-
-  const valueBoxHeight = doc.currentLineHeight() + 9
-  const paymentMethodColumnArgs = [
-    [ doc, valueBoxHeight, 'EFECTIVO', 88888.88 ],
-    [ doc, valueBoxHeight, 'DINERO ELECTRÓNICO', 0 ],
-    [ doc, valueBoxHeight, 'TARJETA DE CRÉDITO/DÉBITO', 0 ],
-    [ doc, valueBoxHeight, 'TRANSFERENCIA', 0 ],
-    [ doc, valueBoxHeight, 'OTRO', 0 ],
-  ]
-  paymentMethodColumnArgs.forEach((args) => {
-    drawPaymentMethodColumn(...args)
+  paymentMethods.forEach((args) => {
+    drawPaymentMethodColumn(doc, valueBoxHeight, ...args)
   })
-
   drawPaymentAgreement(doc, valueBoxHeight)
 
   doc.fontSize(12) //restore default
@@ -391,22 +375,23 @@ const drawPaymentMethodFooter = (doc, paymentMethod) => {
 
 
 module.exports = {
-  biocled: (ventaRow, cliente) => {
+  biocled: (facturaPDFData, cliente) => {
     const writeFunc = (doc) => {
 
       const {
         total,
+        formasDePago,
         facturables,
-      } = ventaRow
+      } = facturaPDFData
 
       drawTitle(doc)
       drawContactInfo(doc)
-      drawInvoiceInfo(doc, ventaRow, cliente)
+      drawInvoiceInfo(doc, facturaPDFData, cliente)
 
       drawFacturablesDetails(doc, facturables)
       drawTotalPalabras(doc, "SON: " + valorPalabras(total))
-      drawTotalValues(doc, ventaRow)
-      drawPaymentMethodFooter(doc, ventaRow.formaPago)
+      drawTotalValues(doc, facturaPDFData)
+      drawPaymentMethodFooter(doc, formasDePago)
     }
 
     return writeFunc

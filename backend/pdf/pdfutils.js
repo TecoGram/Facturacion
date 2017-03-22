@@ -1,4 +1,5 @@
 const fs = require('fs')
+const { fromVentaRow } = require('./facturaPDFData.js')
 
 const billetesPalabras = (billetes) => {
   if (billetes === 0)
@@ -120,4 +121,5 @@ module.exports = {
   billetesPalabras: billetesPalabras,
   valorPalabras: valorPalabras,
   createTemporaryDir: createTemporaryDir,
+  ventaRowToPDFData: fromVentaRow,
 }

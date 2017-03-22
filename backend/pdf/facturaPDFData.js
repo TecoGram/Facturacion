@@ -1,12 +1,12 @@
-const { calcularTotalVentaRow } = require('../../src/custom/Factura/Math.js')
+const { calcularValoresTotales } = require('../../src/custom/Factura/Math.js')
 const { FormasDePago } = require('../../src/custom/Factura/Models.js')
 
 
 const crearOpciondePagoConTotalPagado = (formaPagoIndex, total) => {
   return (opcion, index) => {
-    const nuevaOpcion = [ opcion, 0 ]
+    const nuevaOpcion = [ opcion, null]
     if (formaPagoIndex === index)
-      nuevaOpcion[1] = total
+      nuevaOpcion[1] = Number(total).toFixed(2)
     return nuevaOpcion
   }
 }
@@ -16,16 +16,47 @@ const generarDetalleOpcionesDePago = (formaPago, total) => {
   return FormasDePago.map(func)
 }
 
+const crearMatrizValoresTotales = (subtotal, flete, impuestos, rebaja, total, porcentajeIVA) => {
+  const matrix = []
+  matrix.push(['Descuento US', '$', Number(rebaja).toFixed(2)])
+  matrix.push(['Sub-Total', '$', Number(subtotal).toFixed(2)])
+  if (porcentajeIVA === 0)
+    matrix.push(['IVA', '0%', '0.00'])
+  else
+    matrix.push(['IVA', '%', ''])
+  matrix.push(['Flete', '$', Number(flete).toFixed(2)])
+  if (porcentajeIVA > 0)
+    matrix.push(['IVA', `${porcentajeIVA}%`, Number(impuestos).toFixed(2)])
+  else
+    matrix.push(['IVA', '%', ''])
+  matrix.push(['Total US', '$', Number(total).toFixed(2)])
+  return matrix
+}
+
 const fromVentaRow = (ventaRow) => {
   const facturaPDFData = Object.assign({}, ventaRow)
-  const total = calcularTotalVentaRow(ventaRow)
+  const {
+    subtotal,
+    iva,
+    descuento,
+    flete,
+    formaPago,
+  } = facturaPDFData
+  const {
+    rebaja,
+    impuestos,
+    total,
+  } = calcularValoresTotales(subtotal, flete, iva, descuento)
+
   facturaPDFData.total = total
-  facturaPDFData.formasDePago = generarDetalleOpcionesDePago(ventaRow.formaPago,
-    total)
+  facturaPDFData.formasDePago = generarDetalleOpcionesDePago(formaPago, total)
+  facturaPDFData.matrizValoresTotales = crearMatrizValoresTotales(subtotal,
+    flete, impuestos, rebaja, total, iva)
+
   return facturaPDFData
 }
 
 module.exports = {
-  FormasDePago,
+  crearMatrizValoresTotales,
   fromVentaRow,
 }

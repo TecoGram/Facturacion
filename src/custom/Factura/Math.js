@@ -58,4 +58,5 @@ module.exports = {
   calcularSubtotalImm,
   calcularTotalVentaRow,
   calcularValoresFacturablesImm,
+  calcularValoresTotales,
 }
