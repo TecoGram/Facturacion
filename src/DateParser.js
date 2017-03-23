@@ -21,7 +21,7 @@ module.exports = {
   toReadableDate,
 
   verVenta (resp) {
-    const { cliente, facturaData, facturables } = resp
+    const { cliente, medico, facturaData, facturables } = resp
     const _facturaData = Object.assign({}, facturaData)
     _facturaData.fecha = parseDBDate(facturaData.fecha)
     const _facturables = []
@@ -35,7 +35,8 @@ module.exports = {
     }
 
     return {
-      cliente: cliente,
+      cliente,
+      medico,
       facturaData: _facturaData,
       facturables: _facturables,
     }

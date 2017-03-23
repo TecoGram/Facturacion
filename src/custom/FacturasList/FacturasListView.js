@@ -1,52 +1,54 @@
 import React from 'react'
-import MaterialTable from '../lib/MaterialTable'
-import { getFacturaURL, getFacturaExamenURL, findAllVentas, deleteVenta } from '../api'
+import MaterialTable from '../../lib/MaterialTable'
+import {
+  getFacturaURLByType,
+  findAllVentas, deleteVenta } from '../../api'
 
-const columns = ['Código', 'Fecha', 'RUC', 'Cliente', 'Total']
-const keys = ['codigo', 'fecha', 'ruc', 'nombre', 'total']
+import ListState from './ListState'
+
+const columns = ['Código', 'Empresa', 'Fecha', 'Cliente', 'Total']
+const keys = ['codigo', 'empresa', 'fecha', 'nombre', 'total']
 const searchHint = 'Buscar facturas...'
 
 export default class FacturasListView extends React.Component {
 
   constructor(props) {
     super(props)
+    this.stateManager = new ListState(props, (args) => this.setState(args))
     this.state = {
       rows: [],
     }
   }
 
+  componentWillReceiveProps = (nextProps) => {
+    this.stateManager.props = nextProps
+  }
+
   openFacturaInNewTab = (index) => {
     const { codigo, empresa, tipo } = this.state.rows[index]
-    const facturaURL = tipo === 0 ? getFacturaURL(codigo, empresa)
-                                 : getFacturaExamenURL(codigo, empresa)
+    const facturaURL = getFacturaURLByType(codigo, empresa, tipo)
     window.open(facturaURL)
-
   }
 
   openEditorPage = (index) => {
     const { codigo, empresa, tipo } = this.state.rows[index]
-    if (tipo === 0)
-      this.props.editarFactura(codigo, empresa)
-    else
-      this.props.editarFacturaExamen(codigo, empresa)
+    this.stateManager.openEditorPage(codigo, empresa, tipo)
   }
 
   deleteRow = (index) => {
     const { codigo, empresa } = this.state.rows[index]
     deleteVenta(codigo, empresa)
-    .then(() => {
-      if (this.state.rows.length === 1)
-        this.setState({rows: this.state.rows.filter((item, i) => i !== index)})
-    })
+      .then(() => { this.stateManager.deleteVenta(codigo, empresa) })
   }
 
   requestData = (input) => {
     findAllVentas(input)
       .then((resp) => {
-        this.setState({rows: resp.body})
+        const listaVentas = resp.body
+        this.stateManager.colocarVentas(listaVentas)
       }, (err) => {
         if (err.status === 404) {
-          this.setState({rows: []})
+          this.stateManager.colocarVentas([])
         }
       })
   }

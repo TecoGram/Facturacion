@@ -35,6 +35,8 @@ const updateVenta = (builder, codigo, empresa, cliente, fecha, autorizacion,
       fecha: fecha,
       autorizacion: autorizacion,
       formaPago: formaPago,
+      detallado: detallado,
+      flete: flete,
       descuento: descuento,
       iva: iva,
       subtotal: subtotal,
@@ -44,7 +46,7 @@ const updateVenta = (builder, codigo, empresa, cliente, fecha, autorizacion,
 const updateVentaExamen = (builder, codigo, empresa, cliente, fecha, autorizacion, formaPago,
     descuento, subtotal) => {
   return updateVenta(builder, codigo, empresa, cliente, fecha, autorizacion,
-    formaPago, descuento, 0, 0, subtotal)
+    formaPago, false, descuento, 0, 0, subtotal)
 }
 
 const updateExamenInfo = (builder, medico, paciente, codigo, empresa) => {
@@ -194,9 +196,9 @@ const getFacturaData = (codigo, empresa, tipo) => {
     .then((rows) => {
       if (rows.length > 0) {
         const exInfo = rows[0]
-        ventaRow.medico = exInfo.medico_id
+        const medico = { nombre: exInfo.medico_id }
         ventaRow.paciente = exInfo.paciente
-        return Promise.resolve({ventaRow: ventaRow, cliente: cliente})
+        return Promise.resolve({ventaRow, cliente, medico})
       } else {
         return Promise.reject({errorCode: 404, text: 'examen no encontrado'})
       }

@@ -202,7 +202,6 @@ function deleteVenta(req, res) {
     codigo,
     empresa,
   } = req.params
-
   db.deleteVenta(codigo, empresa)
   .then(function(deletions) {
     if (deletions === 0)
@@ -216,11 +215,11 @@ function deleteVenta(req, res) {
     .send(err)
   })}
 
-app.get('/venta/delete/:empresa/:codigo', function (req, res) {
+app.post('/venta/delete/:empresa/:codigo', function (req, res) {
   deleteVenta(req, res)
 });
 
-app.get('/venta_ex/delete/:empresa/:codigo', function (req, res) {
+app.post('/venta_ex/delete/:empresa/:codigo', function (req, res) {
   deleteVenta(req, res)
 });
 
@@ -357,7 +356,6 @@ app.post('/venta_ex/update', validarVentaExamen, function (req, res) {
     paciente,
 
   } = req.safeData
-
   db.updateVentaExamen(codigo, empresa, cliente, fecha, autorizacion, formaPago,
     descuento, subtotal, unidades, medico, paciente)
   .then(function () {  //OK!

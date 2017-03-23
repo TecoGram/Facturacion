@@ -464,6 +464,34 @@ describe('metodos de dbAdmin.js', function () {
 
     })
 
+    it('busca en la base de datos la fila de la venta examen, y los productos vendidos',
+    function (done) {
+      const {
+        codigo,
+        empresa,
+        subtotal,
+      } = ventaExInsertada
+
+      db.getFacturaData(codigo, empresa, 1) //datos del test anterior 'insertarVentaExamen'
+      .then (function (resp) {
+        const {
+          ventaRow,
+          cliente,
+          medico,
+        } = resp
+
+        ventaRow.subtotal.should.equal(subtotal)
+        ventaRow.facturables.length.should.equal(1)
+
+        cliente.nombre.should.equal(cliente1.nombre)
+        medico.nombre.should.equal(medico1.nombre)
+
+        done()
+      })
+      .catch(done)
+
+    })
+
     it ('rechaza la promesa si no encuentra la factura', function (done) {
       db.getFacturaData('2016-11-03', 'VER', 0) //inexistente
       .then( undefined, function (error) {
@@ -492,11 +520,14 @@ describe('metodos de dbAdmin.js', function () {
 
     const formaPagoUpdated = 'CHEQUE'
     const autorizacionUpdated ="qwe4"
+    const detalladoUpdated = true
+    const fleteUpdated = 6.99
 
     it('actualiza una venta y las unidades vendidas en la base',
       function (done) {
         db.updateVenta(codigo, empresa, ruc, fecha, autorizacionUpdated,
-          formaPagoUpdated, detallado, descuento, iva, flete, subtotal, unidades)
+          formaPagoUpdated, detalladoUpdated, descuento, iva, fleteUpdated,
+          subtotal, unidades)
         .then(function (res) {
           const lasInsertedId = res[0]
           //test api ya inserto 2 unidades, mas estas 2, la nueva debe de ser 4
@@ -507,6 +538,8 @@ describe('metodos de dbAdmin.js', function () {
           const { ventaRow } = resp
           ventaRow.formaPago.should.be.equal(formaPagoUpdated)
           ventaRow.autorizacion.should.be.equal(autorizacionUpdated)
+          ventaRow.flete.should.be.equal(fleteUpdated)
+          ventaRow.detallado.should.be.equal(1)
           ventaRow.facturables.length.should.be.equal(2)
           done()
         })
@@ -561,11 +594,12 @@ describe('metodos de dbAdmin.js', function () {
 
     const formaPagoUpdated = 'EXPRESS'
     const pacienteUpdated = "Julio Fuentes"
+    const subtotalUpdated = 26.44
 
     it('actualiza una venta y las unidades vendidas en la base',
       function (done) {
         db.updateVentaExamen(codigo, empresa, ruc, fecha, autorizacion, formaPagoUpdated,
-          descuento, subtotal, unidades, medico, pacienteUpdated)
+          descuento, subtotalUpdated, unidades, medico, pacienteUpdated)
         .then(function (res) {
           const lasInsertedId = res[0]
           lasInsertedId.should.be.a('number')
@@ -574,6 +608,7 @@ describe('metodos de dbAdmin.js', function () {
         .then(function (resp) {
           const { ventaRow } = resp
           ventaRow.formaPago.should.be.equal(formaPagoUpdated)
+          ventaRow.subtotal.should.be.equal(subtotalUpdated)
           ventaRow.facturables.length.should.be.equal(1)
           return db.findVentas(pacienteUpdated, 1)
         })

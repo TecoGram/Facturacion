@@ -30,7 +30,7 @@ import {NuevaFacturaPage, EditarFacturaPage, NuevaFacturaExamenPage,
 import NuevoClienteDialog from './NuevoCliente/NuevoClienteDialog'
 import NuevoProductoDialog from './NuevoProducto/NuevoProductoDialog'
 import NuevoMedicoDialog from './NuevoMedico/NuevoMedicoDialog'
-import FacturasListView from './FacturasListView'
+import FacturasListView from './FacturasList/FacturasListView'
 import store from '../Store'
 
 const toolbarTextColor = '#FFFFFF'

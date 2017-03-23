@@ -1,6 +1,15 @@
 const request = require('superagent')
 
 const prefix = process.env.NODE_ENV === 'test' ? 'http://localhost:8192' : ''
+
+const getFacturaURL = (codigo, empresa) => {
+  return `http://localhost:8192/venta/ver/${empresa}/${codigo}`
+}
+
+const getFacturaExamenURL = (codigo, empresa) => {
+  return `http://localhost:8192/venta_ex/ver/${empresa}/${codigo}`
+}
+
 module.exports = {
   insertarCliente: (ruc, nombre, direccion, email, telefono1, telefono2, descDefault) => {
     return request.post(prefix + '/cliente/new')
@@ -109,23 +118,24 @@ module.exports = {
   },
 
   deleteVenta: (codigo, empresa) => {
-    return request.get(prefix + `/venta/delete/${empresa}/${codigo}`)
+    return request.post(prefix + `/venta/delete/${empresa}/${codigo}`)
       .send()
       .set('Accept', 'application/json')
   },
 
   deleteVentaExamen: (codigo, empresa) => {
-    return request.get(prefix + `/venta_ex/delete/${empresa}/${codigo}`)
+    return request.post(prefix + `/venta_ex/delete/${empresa}/${codigo}`)
       .send()
       .set('Accept', 'application/json')
   },
 
-  getFacturaURL: (codigo, empresa) => {
-    return `http://localhost:8192/venta/ver/${empresa}/${codigo}`
+  getFacturaURL,
+  getFacturaExamenURL,
+  getFacturaURLByType: (codigo, empresa, tipo) => {
+    if (tipo === 0)
+      return getFacturaURL(codigo, empresa)
+    if (tipo === 1)
+      return getFacturaExamenURL(codigo, empresa)
+    throw Error('tipo desconocido ' + tipo)
   },
-
-  getFacturaExamenURL: (codigo, empresa) => {
-    return `http://localhost:8192/venta_ex/ver/${empresa}/${codigo}`
-  },
-
 }

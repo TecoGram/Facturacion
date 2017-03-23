@@ -111,7 +111,7 @@ const MedicoInput = (props) => {
   else
     return (
       <MedicoAutoComplete width={width}
-        errorText={errors.get('medico')} onNewItemSelected={onNewMedico}/>
+        errorText={errors.medico} onNewItemSelected={onNewMedico}/>
     )
 }
 

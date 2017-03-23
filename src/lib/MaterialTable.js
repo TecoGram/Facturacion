@@ -177,7 +177,7 @@ export default class MaterialTable extends React.Component {
                     })}
                     { ButtonsColumn(i, onEditItem, onDeleteItem, onOpenItem) }
                   </TableRow>
-                )
+                  )
                 })
               }
               </TableBody>

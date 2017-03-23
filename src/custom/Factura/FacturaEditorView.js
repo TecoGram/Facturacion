@@ -159,7 +159,7 @@ export default class FacturaEditorView extends Component {
             onGuardarClick={this.onGenerarFacturaClick}
             onFacturaDataChanged={this.onFacturaDataChanged}
             nuevo={!ventaKey}
-            guardarButtonDisabled={!puedeGuardarFactura(this.state)}
+            guardarButtonDisabled={!puedeGuardarFactura(this.state, isExamen)}
             isExamen={isExamen} />
         </div>
       </PaperContainer>

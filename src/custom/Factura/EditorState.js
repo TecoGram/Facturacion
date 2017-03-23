@@ -63,6 +63,16 @@ const convertirFacturablesImmAUnidades = (facturablesImm) => {
   }).toJS()
 }
 
+const selectGuardarPromise = (editar, isExamen, ventaRow) => {
+  if (editar && isExamen)
+    return updateVentaExamen(ventaRow)
+  if (isExamen)
+    return insertarVentaExamen(ventaRow)
+  if (editar)
+    return updateVenta(ventaRow)
+  return insertarVenta(ventaRow)
+}
+
 const crearGuardarPromiseYMensaje = (editar, isExamen, ventaRow) => {
   const actionVerb = editar ? 'editó' : 'generó'
   const msg = `La factura se ${actionVerb} exitosamente.`
@@ -80,6 +90,7 @@ const editarFacturaExistente = (verVentaResp) => {
   return () => {
     return {
       cliente: resp.cliente,
+      medico: resp.medico,
       facturaData: Immutable.fromJS(resp.facturaData),
       facturables: Immutable.fromJS(resp.facturables),
     }
@@ -106,9 +117,10 @@ const modificarValorEnFacturaData = (dataKey, newDataValue) => {
   }
 }
 
-const puedeGuardarFactura = (state) => {
+const puedeGuardarFactura = (state, isExamen) => {
   if(!state.cliente) return false
   if(state.facturables.isEmpty()) return false
+  if (isExamen && !state.medico) return false
   return true
 }
 
@@ -134,16 +146,6 @@ const removeFacturableAt = (index) => {
   return (prevState) => {
     return { facturables: prevState.facturables.remove(index) }
   }
-}
-
-const selectGuardarPromise = (editar, isExamen, ventaRow) => {
-  if (editar && isExamen)
-    return updateVentaExamen(ventaRow)
-  if (isExamen)
-    return insertarVentaExamen(ventaRow)
-  if (editar)
-    return updateVenta(ventaRow)
-  return insertarVenta(ventaRow)
 }
 
 module.exports = {

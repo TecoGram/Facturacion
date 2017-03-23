@@ -153,11 +153,22 @@ describe('Factura Editor State', function () {
   describe('puedeGuardarFactura', function () {
     it('retorna true si tiene cliente y por lo menos 1 item facturable', function () {
       const state = getState()
-      FacturaEditor.puedeGuardarFactura(state).should.equal(false)
+      FacturaEditor.puedeGuardarFactura(state, false).should.equal(false)
       state.cliente = { ruc: "0956676546" }
-      FacturaEditor.puedeGuardarFactura(state).should.equal(false)
+      FacturaEditor.puedeGuardarFactura(state, false).should.equal(false)
       state.facturables = Immutable.List.of(crearProducto())
-      FacturaEditor.puedeGuardarFactura(state).should.equal(true)
+      FacturaEditor.puedeGuardarFactura(state, false).should.equal(true)
+    })
+
+    it('en facturas examen, retorna true si tiene cliente, medico y por lo menos 1 item facturable', function () {
+      const state = getState()
+      FacturaEditor.puedeGuardarFactura(state, true).should.equal(false)
+      state.cliente = { ruc: "0956676546" }
+      FacturaEditor.puedeGuardarFactura(state, true).should.equal(false)
+      state.facturables = Immutable.List.of(crearProducto())
+      FacturaEditor.puedeGuardarFactura(state, true).should.equal(false)
+      state.medico = { nombre: "Noguchi" }
+      FacturaEditor.puedeGuardarFactura(state, true).should.equal(true)
     })
   })
 

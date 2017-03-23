@@ -85,6 +85,7 @@ describe ('responseFormatter', function() {
         direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
         telefono1: '2645422',telefono2: '2876357',
       },
+      medico: undefined,
       facturables:[
         {
           nombre:'TGO 8x50',
@@ -108,13 +109,14 @@ describe ('responseFormatter', function() {
         examenQueryResp.ventaRow = Object.assign({}, queryResp.ventaRow)
         const medico1 = 'Dr. Benavides'
         const paciente1 = 'Edgar Bazurto'
-        examenQueryResp.ventaRow.medico = medico1
+        examenQueryResp.medico = { nombre: medico1 }
         examenQueryResp.ventaRow.paciente = paciente1
 
         const examenDesiredResp = Object.assign({}, desiredResp)
         examenDesiredResp.facturaData = Object.assign({}, examenDesiredResp.facturaData)
-        examenDesiredResp.facturaData.medico = medico1
+        examenDesiredResp.medico = { nombre: medico1 }
         examenDesiredResp.facturaData.paciente = paciente1
+
         const formattedResp = formatter.verVenta(examenQueryResp)
         formattedResp.should.be.eql(examenDesiredResp)
       })
