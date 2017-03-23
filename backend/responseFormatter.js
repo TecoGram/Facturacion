@@ -6,38 +6,62 @@ const parsearBooleanSQLite = (bool) => {
     return bool
   if (typeof bool === 'number')
     return bool !== 0
-  throw Error('Unexpected type ' + (typeof bool))
+  throw Error('Unexpected type ' + typeof bool)
+}
+
+const stringifyNumerosEnUnidades = (unidades) => {
+  const _unidades = unidades.slice()
+  for (let i = 0; i < _unidades.length; i++) {
+    const unidad = _unidades[i]
+    unidad.count = '' + unidad.count
+    unidad.precioVenta = '' + unidad.precioVenta
+  }
+  return _unidades
+}
+const formatVentaRowIntoFacturaData = (ventaRow) => {
+  const {
+    codigo,
+    empresa,
+    fecha,
+    flete,
+    descuento,
+    detallado,
+    autorizacion,
+    paciente,
+    medico,
+    subtotal,
+    formaPago,
+  } = ventaRow
+
+  return {
+    codigo: codigo,
+    empresa: empresa,
+    paciente: paciente,
+    medico: medico,
+    detallado: parsearBooleanSQLite(detallado), //examenes no tienen detallado
+    fecha: fecha,
+    descuento: '' + descuento,
+    subtotal: subtotal,
+    autorizacion: autorizacion,
+    flete: '' + flete,
+    formaPago: FormasDePago[formaPago],
+    total: new Number(calcularTotalVentaRow(ventaRow)).toFixed(2),
+  }
 }
 
 module.exports = {
   calcularTotalVentaRow,
-  crearListaFacturasParaTabla: (ventas) => {
-    const len = ventas.length
-    const listaParaRender = []
-    for (let i = 0; i < len; i++) {
-      const venta = ventas[i]
-      const total = new Number(calcularTotalVentaRow(venta)).toFixed(2)
-      listaParaRender.push({
-        codigo: venta.codigo,
-        empresa: venta.empresa,
-        fecha: venta.fecha,
-        ruc: venta.ruc,
-        nombre: venta.nombre,
-        total: total,
-      })
-    }
-    return listaParaRender
-  },
-
   findVentas: (ventas) => {
     if (ventas.length > 0) {
       const newVentas = []
       let i
       for (i = 0; i < ventas.length; i++) {
-        const v = ventas[i]
-        const copy = Object.assign({}, v)
-        copy.total = new Number(v.total).toFixed(2)
-        newVentas.push(copy)
+        const ventaRow = ventas[i]
+        const facturaData = formatVentaRowIntoFacturaData(ventaRow)
+        facturaData.ruc = ventaRow.ruc
+        facturaData.nombre = ventaRow.nombre
+        facturaData.tipo = ventaRow.tipo
+        newVentas.push(facturaData)
       }
       return newVentas
     }
@@ -46,37 +70,14 @@ module.exports = {
 
   verVenta: (ventaQueryResp) => {
     const {
-      codigo,
-      empresa,
       facturables,
-      fecha,
-      flete,
-      descuento,
-      detallado,
-      autorizacion,
-      paciente,
-      medico,
-      subtotal,
-      formaPago,
     } = ventaQueryResp.ventaRow
 
+    const facturablesFormateados = stringifyNumerosEnUnidades(facturables)
     return {
       cliente: Object.assign({}, ventaQueryResp.cliente),
-      facturaData: {
-        codigo: codigo,
-        empresa: empresa,
-        paciente: paciente,
-        medico: medico,
-        detallado: parsearBooleanSQLite(detallado),
-        fecha: fecha,
-        descuento: '' + descuento,
-        subtotal: subtotal,
-        autorizacion: autorizacion,
-        flete: '' + flete,
-        formaPago: FormasDePago[formaPago],
-        total: new Number(calcularTotalVentaRow(ventaQueryResp.ventaRow)).toFixed(2),
-      },
-      facturables: facturables.slice(),
+      facturaData: formatVentaRowIntoFacturaData(ventaQueryResp.ventaRow),
+      facturables: facturablesFormateados,
     }
   },
 }

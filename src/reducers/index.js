@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux';
 
 import dialog from './dialog'
-import empresa from './empresa'
+import ajustes from './ajustes'
 import page from './page'
 import snackbar from './snackbar'
 
-const rootReducer = combineReducers({dialog, empresa, page, snackbar});
+const rootReducer = combineReducers({dialog, ajustes, page, snackbar});
 
 export default rootReducer;

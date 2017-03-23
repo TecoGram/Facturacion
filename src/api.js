@@ -91,6 +91,11 @@ module.exports = {
       .send()
   },
 
+  findAllVentas: (queryString) => {
+    return request.get(prefix + '/venta/findAll?q=' + queryString)
+      .send()
+  },
+
   verVenta: (codigo, empresa) => {
     return request.get(prefix + `/venta/ver/${empresa}/${codigo}`)
       .send()

@@ -4,7 +4,10 @@ import PaperContainer from '../../lib/PaperContainer'
 import FacturaForm from './FacturaForm'
 import FacturaTable from './FacturaTable'
 import FacturaResults from './FacturaResults'
-import { getFacturaURL, verVenta } from '../../api'
+import {
+  getFacturaURL,
+  getFacturaExamenURL,
+  verVenta, verVentaExamen } from '../../api'
 import {
   agregarProductoComoFacturable,
   calcularValoresTotales,
@@ -54,7 +57,9 @@ export default class FacturaEditorView extends Component {
 
   resetearEditorYMostrarResultado = (ventaGuardada, msg) => {
     this.setState(getDefaultState())
-    const pdfLink = getFacturaURL(ventaGuardada.codigo, ventaGuardada.empresa)
+    const pdfLink = this.props.isExamen
+      ? getFacturaExamenURL(ventaGuardada.codigo, ventaGuardada.empresa)
+      : getFacturaURL(ventaGuardada.codigo, ventaGuardada.empresa)
     window.open(pdfLink)
     this.props.abrirLinkConSnackbar(msg, pdfLink)
   }
@@ -69,17 +74,18 @@ export default class FacturaEditorView extends Component {
   }
 
   onGenerarFacturaClick = () => {
-    const empresa = this.props.empresa
+    const {
+      empresa,
+      iva } = this.props.ajustes
     const editar = this.props.ventaKey
     const isExamen = this.props.isExamen
-    const porcentajeIVA = 14
 
     const {
       errors,
       msg,
       prom,
       ventaRow } = prepararFacturaParaGuardar(this.state, editar, empresa,
-        isExamen, porcentajeIVA)
+        isExamen, iva)
     if (errors)
       this.setState({ errors: errors })
     else
@@ -88,8 +94,10 @@ export default class FacturaEditorView extends Component {
 
   componentDidMount() {
     const facturaAEditar = this.props.ventaKey
+    const isExamen = this.props.isExamen
+    const obtenerFacturaInfo = isExamen ? verVentaExamen : verVenta
     if (facturaAEditar)
-      verVenta(facturaAEditar.codigo, facturaAEditar.empresa)
+      obtenerFacturaInfo(facturaAEditar.codigo, facturaAEditar.empresa)
         .then((resp) => {
           this.setState(editarFacturaExistente(resp))
         })
@@ -107,12 +115,13 @@ export default class FacturaEditorView extends Component {
     const {
       isExamen,
       ventaKey,
+      ajustes,
     } = this.props
 
     const porcentajeDescuentoString = facturaData.get('descuento')
     const fleteString = facturaData.get('flete')
     const detallado = facturaData.get('detallado')
-    const porcentajeIVA = 14
+    const porcentajeIVA = ajustes.iva
     const {
       subtotal,
       rebaja,

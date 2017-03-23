@@ -1,6 +1,10 @@
 const Immutable = require('immutable')
 
-const { insertarVenta, updateVenta } = require('../../api.js')
+const {
+  insertarVenta,
+  updateVenta,
+  insertarVentaExamen,
+  updateVentaExamen } = require('../../api.js')
 const DateParser = require('../../DateParser.js')
 const {
   crearVentaRow,
@@ -9,7 +13,8 @@ const {
 const {
   esFacturablePropValido,
   esFacturaDataPropValido,
-  validarVentaRow } = require('../../Validacion.js')
+  validarVentaRow,
+  validarVentaRowExamen } = require('../../Validacion.js')
 const {
   parseFormInt,
   parseFormFloat,
@@ -31,6 +36,7 @@ const getDefaultState = () => {
       formaPago: '',
       flete: '',
       detallado: true,
+      paciente: '',
     }),
     facturables: Immutable.List(),
   }
@@ -57,21 +63,15 @@ const convertirFacturablesImmAUnidades = (facturablesImm) => {
   }).toJS()
 }
 
-const crearGuardarPromiseYMensaje = (editar, ventaRow) => {
-  if (editar) {
-    return {
-      errors: null,
-      prom: updateVenta(ventaRow),
-      msg: 'La factura se editó exitosamente.',
-      ventaRow,
-    }
-  } else {
-    return {
-      errors: null,
-      prom: insertarVenta(ventaRow),
-      msg: 'La factura se generó exitosamente.',
-      ventaRow,
-    }
+const crearGuardarPromiseYMensaje = (editar, isExamen, ventaRow) => {
+  const actionVerb = editar ? 'editó' : 'generó'
+  const msg = `La factura se ${actionVerb} exitosamente.`
+  const prom = selectGuardarPromise(editar, isExamen, ventaRow)
+  return {
+    errors: null,
+    prom,
+    msg,
+    ventaRow,
   }
 }
 
@@ -115,24 +115,35 @@ const puedeGuardarFactura = (state) => {
 const prepararFacturaParaGuardar = (state, editar, empresa, isExamen, porcentajeIVA) => {
   const {
     cliente,
+    medico,
     facturables,
     facturaData,
   } = state
 
   const unidades = convertirFacturablesImmAUnidades(facturables)
-  const ventaRow = crearVentaRow(cliente, facturaData, facturables, unidades,
+  const ventaRow = crearVentaRow(cliente, medico, facturaData, facturables, unidades,
     empresa, isExamen, porcentajeIVA)
-  const { errors } = validarVentaRow(ventaRow)
+  const { errors } = isExamen ? validarVentaRowExamen(ventaRow) : validarVentaRow(ventaRow)
   if (errors)
     return { errors, prom: null, msg: null, ventaRow: null }
   else
-    return crearGuardarPromiseYMensaje(editar, ventaRow)
+    return crearGuardarPromiseYMensaje(editar, isExamen, ventaRow)
 }
 
 const removeFacturableAt = (index) => {
   return (prevState) => {
     return { facturables: prevState.facturables.remove(index) }
   }
+}
+
+const selectGuardarPromise = (editar, isExamen, ventaRow) => {
+  if (editar && isExamen)
+    return updateVentaExamen(ventaRow)
+  if (isExamen)
+    return insertarVentaExamen(ventaRow)
+  if (editar)
+    return updateVenta(ventaRow)
+  return insertarVenta(ventaRow)
 }
 
 module.exports = {
@@ -145,4 +156,5 @@ module.exports = {
   puedeGuardarFactura,
   prepararFacturaParaGuardar,
   removeFacturableAt,
+  selectGuardarPromise,
 }

@@ -42,7 +42,7 @@ const toolbarTitleStyle = {
 function mapStateToProps(state) {
   return {
     dialog: state.dialog,
-    empresa: state.empresa,
+    ajustes: state.ajustes,
     snackbar: state.snackbar,
     page: state.page,
   }
@@ -74,7 +74,7 @@ const MainDrawer = (props) => {
 
 class MainSnackbar extends React.Component {
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps) {
     if (this.props.data !== nextProps.data) return true
     return false
   }
@@ -87,7 +87,7 @@ class MainSnackbar extends React.Component {
       message = data.message
       if (data.link) {
         action = "ABRIR"
-        onActionTouchTap = (ev) => window.open(data.link)
+        onActionTouchTap = () => window.open(data.link)
       }
     } else {
       open = false
@@ -169,11 +169,11 @@ class MainToolbar extends Component {
             </IconButton> }
             targetOrigin={{horizontal: 'right', vertical: 'top'}}
             anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}>
-            <MenuItem primaryText="Nuevo Producto" onTouchTap={(event) =>
+            <MenuItem primaryText="Nuevo Producto" onTouchTap={() =>
               cambiarDialog(NUEVO_PRODUCTO_DIALOG)}/>
-            <MenuItem primaryText="Nuevo Cliente" onTouchTap={(event) =>
+            <MenuItem primaryText="Nuevo Cliente" onTouchTap={() =>
               cambiarDialog(NUEVO_CLIENTE_DIALOG)}/>
-            <MenuItem primaryText="Nuevo Medico" onTouchTap={(event) =>
+            <MenuItem primaryText="Nuevo Medico" onTouchTap={() =>
               cambiarDialog(NUEVO_MEDICO_DIALOG)}/>
           </IconMenu>
         </ToolbarGroup>
@@ -220,24 +220,30 @@ class MainDialog extends Component {
 const SelectedPage = (props) => {
   const {
     abrirLinkConSnackbar,
-    empresa,
+    ajustes,
     page,
     editarFactura,
+    editarFacturaExamen,
   } = props
 
-  page.props.empresa = empresa
+  const pageProps = { ...page.props, ajustes }
 
   switch (page.type) {
     case NEW_FACTURA_PAGE:
-      return <NuevaFacturaPage abrirLinkConSnackbar={abrirLinkConSnackbar} {...page.props}/>
+      return <NuevaFacturaPage abrirLinkConSnackbar={abrirLinkConSnackbar}
+        {...pageProps}/>
     case EDITAR_FACTURA_PAGE:
-      return <EditarFacturaPage abrirLinkConSnackbar={abrirLinkConSnackbar} {...page.props}/>
+      return <EditarFacturaPage abrirLinkConSnackbar={abrirLinkConSnackbar}
+        {...pageProps}/>
     case NEW_FACTURA_EXAMEN_PAGE:
-      return <NuevaFacturaExamenPage abrirLinkConSnackbar={abrirLinkConSnackbar} {...page.props}/>
+      return <NuevaFacturaExamenPage abrirLinkConSnackbar={abrirLinkConSnackbar}
+        {...pageProps}/>
     case EDITAR_FACTURA_EXAMEN_PAGE:
-      return <EditarFacturaExamenPage abrirLinkConSnackbar={abrirLinkConSnackbar} {...page.props}/>
+      return <EditarFacturaExamenPage abrirLinkConSnackbar={abrirLinkConSnackbar}
+        {...pageProps}/>
     case FACTURA_LIST_PAGE:
-      return <FacturasListView editarFactura={editarFactura} {...page.props}/>
+      return <FacturasListView editarFactura={editarFactura}
+        editarFacturaExamen={editarFacturaExamen} {...pageProps}/>
     default:
       return null
   }
@@ -245,7 +251,7 @@ const SelectedPage = (props) => {
 
 class Main extends Component {
 
-  constructor(props, context) {
+  constructor(props) {
     super(props);
     this.state = {
       drawerOpen: false,
@@ -269,20 +275,21 @@ class Main extends Component {
     const {
       abrirLinkConSnackbar,
       editarFactura,
+      editarFacturaExamen,
       cambiarDialog,
       cerrarDialogConMsg,
       dialog,
-      empresa,
+      ajustes,
       snackbar,
       page,
     } = this.props
 
     return (
       <div style={{backgroundColor: '#ededed', height: 'inherit'}}>
-        <MainToolbar cambiarDialog={cambiarDialog} title={empresa}
+        <MainToolbar cambiarDialog={cambiarDialog} title={ajustes.empresa}
         onLeftButtonClicked={() => this.handleDrawerChange(true)}/>
-        <SelectedPage page={page} editarFactura={editarFactura} empresa={empresa}
-          abrirLinkConSnackbar={abrirLinkConSnackbar}/>
+        <SelectedPage page={page} editarFactura={editarFactura} ajustes={ajustes}
+          editarFacturaExamen={editarFacturaExamen} abrirLinkConSnackbar={abrirLinkConSnackbar}/>
         <MainDrawer open={this.state.drawerOpen} handleChange={this.handleDrawerChange}
           onPageSelected={this.onPageSelected}/>
         <MainDialog type={dialog} cambiarDialog={cambiarDialog}

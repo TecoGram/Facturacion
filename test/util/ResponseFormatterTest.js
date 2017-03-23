@@ -5,56 +5,22 @@ chai.should();
 
 describe ('responseFormatter', function() {
 
-  describe('crearListaFacturasParaTabla', function () {
-    it('calcula y agrega el total a cada elemento', function () {
-      const ventas = [{
-        codigo:"00546",
-        empresa:"TecoGram",
-        fecha:"2017-03-05",
-        ruc:"09455476584",
-        nombre:"Miguel Narvaez",
-        iva:10,
-        descuento:1,
-        flete: 0.99,
-        subtotal:20,
-      }]
-      const listaParaRender = formatter.crearListaFacturasParaTabla(ventas)
-      listaParaRender[0].total.should.be.equal('22.77')
-    })
-
-    it('calcula el total redondeando a dos decimales', function () {
-      const ventas = [{
-        codigo:"00546",
-        empresa:"TecoGram",
-        fecha:"2017-03-05",
-        ruc:"09455476584",
-        nombre:"Miguel Narvaez",
-        iva:10,
-        flete:0,
-        descuento:5,
-        subtotal:19.4667,
-      }]
-      const listaParaRender = formatter.crearListaFacturasParaTabla(ventas)
-      listaParaRender[0].total.should.be.equal('20.34')
-    })
-  })
-
   describe('formatFindVentas', function () {
     it('Recibe un array de objetos con campo \'total\' y formatea este campo' +
       ' para que solo tenga 2 numeros decimales.', function () {
       const arr = [
-        { total: 23.34596 },
-        { total: 12.5612 },
-        { total: 657.9998 },
+        { subtotal: 23.34596, iva: 12, descuento: 0, flete: 0, detallado: 0 },
+        { subtotal: 12.5612, iva: 12, descuento: 0, flete: 0, detallado: false },
+        { subtotal: 657.9998, iva: 12, descuento: 0, flete: 0, detallado: 1 },
       ]
       const formatted = formatter.findVentas(arr)
 
       formatted.should.be.an('array')
       arr.should.not.be.eql(formatted)
 
-      formatted[0].total.should.be.equal('23.35')
-      formatted[1].total.should.be.equal('12.56')
-      formatted[2].total.should.be.equal('658.00')
+      formatted[0].total.should.be.equal('26.15')
+      formatted[1].total.should.be.equal('14.07')
+      formatted[2].total.should.be.equal('736.96')
     })
 
     it('Si recibe un array vacio, devuelve lo mismo', function () {
@@ -122,8 +88,8 @@ describe ('responseFormatter', function() {
       facturables:[
         {
           nombre:'TGO 8x50',
-          count:1,
-          precioVenta:11,
+          count:'1',
+          precioVenta:'11',
           lote:'ert3',
           fechaExp: '2017-04-04',
         },

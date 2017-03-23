@@ -2,7 +2,10 @@ const { NEW_FACTURA_PAGE } = require('../src/PageTypes')
 
 module.exports = {
   dialog : null,
-  empresa: "TecoGram",
+  ajustes: {
+    empresa: "TecoGram S.A.",
+    iva: 14,
+  },
   snackbar: null,
   page: {
     type: NEW_FACTURA_PAGE,

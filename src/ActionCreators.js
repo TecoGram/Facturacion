@@ -89,6 +89,15 @@ module.exports = {
     })
   },
 
+  editarFacturaExamen(codigo, empresa) {
+    return cambiarPagina(EDITAR_FACTURA_EXAMEN_PAGE, {
+      ventaKey: {
+        codigo: codigo,
+        empresa: empresa,
+      },
+    })
+  },
+  
   cambiarPagina: cambiarPagina,
 
   cerrarDialogConMsg(msg, dialogType) {

@@ -201,7 +201,9 @@ describe('Factura Editor State', function () {
 
       state.facturaData = state.facturaData.set('codigo', '00657')
                             .set('formaPago', 'EFECTIVO')
+                            .set('paciente', 'Paul Vaso')
       state.facturables = facturables
+      state.medico = { nombre: "John Smith"}
 
       const {
         errors,
@@ -211,7 +213,7 @@ describe('Factura Editor State', function () {
         true, 14)
 
       expect(errors).to.be.null
-      prom.url.should.endWith('/venta/new')
+      prom.url.should.endWith('/venta_ex/new')
       ventaRow.empresa.should.equal("emp")
       ventaRow.detallado.should.be.false
       ventaRow.iva.should.equal(0)

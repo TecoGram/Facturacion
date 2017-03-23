@@ -359,6 +359,7 @@ const validarVentaRowExamen = (formData) => {
   let inputs = {}
 
   validarCodigoFactura(codigo, errors, inputs)
+  validarString(formData.empresa, errors, inputs, 'empresa')
   validarFecha(fecha, errors, inputs)
   validarDescuentoSmall(descuento, errors, inputs)
   validarFormaPago(formaPago, errors, inputs )

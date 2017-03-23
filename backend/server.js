@@ -197,13 +197,13 @@ app.get('/venta_ex/ver/:empresa/:codigo', function (req, res) {
   verVenta(req, res, 1)
 })
 
-function deleteVenta(req, res, tipo) {
+function deleteVenta(req, res) {
   const {
     codigo,
     empresa,
   } = req.params
 
-  db.deleteVenta(codigo, empresa, tipo)
+  db.deleteVenta(codigo, empresa)
   .then(function(deletions) {
     if (deletions === 0)
       res.status(404)
@@ -217,17 +217,17 @@ function deleteVenta(req, res, tipo) {
   })}
 
 app.get('/venta/delete/:empresa/:codigo', function (req, res) {
-  deleteVenta(req, res, 0)
+  deleteVenta(req, res)
 });
 
 app.get('/venta_ex/delete/:empresa/:codigo', function (req, res) {
-  deleteVenta(req, res, 1)
+  deleteVenta(req, res)
 });
 
-function findVentas (req, res, tipo) {
+function findVentas (req, res, tipo, all) {
   const q = req.query.q || ''
-  db.findVentas(q, tipo)
-  .then(function(ventas) {
+  const promise = all ? db.findAllVentas(q) : db.findVentas(q, tipo)
+  promise.then(function(ventas) {
     if(ventas.length === 0)
       res.status(404)
       .send('No existen facturas con esa cadena de caracteres')
@@ -246,6 +246,10 @@ app.get('/venta/find', function (req, res) {
 
 app.get('/venta_ex/find', function (req, res) {
   findVentas(req, res, 1)
+});
+
+app.get('/venta/findAll', function (req, res) {
+  findVentas(req, res, null, true)
 });
 
 app.post('/venta/new', validarVenta, function (req, res) {
@@ -282,6 +286,7 @@ app.post('/venta/new', validarVenta, function (req, res) {
 app.post('/venta_ex/new', validarVentaExamen, function (req, res) {
   const {
     codigo,
+    empresa,
     cliente,
     fecha,
     autorizacion,
@@ -293,7 +298,7 @@ app.post('/venta_ex/new', validarVentaExamen, function (req, res) {
     paciente,
 
   } = req.safeData
-  db.insertarVentaExamen(codigo, cliente, fecha, autorizacion, formaPago,
+  db.insertarVentaExamen(codigo, empresa, cliente, fecha, autorizacion, formaPago,
     descuento, subtotal, unidades, medico, paciente)
   .then(function () {  //OK!
     res.status(200)
@@ -340,6 +345,7 @@ app.post('/venta/update', validarVenta, function (req, res) {
 app.post('/venta_ex/update', validarVentaExamen, function (req, res) {
   const {
     codigo,
+    empresa,
     cliente,
     fecha,
     autorizacion,
@@ -352,7 +358,7 @@ app.post('/venta_ex/update', validarVentaExamen, function (req, res) {
 
   } = req.safeData
 
-  db.updateVentaExamen(codigo, cliente, fecha, autorizacion, formaPago,
+  db.updateVentaExamen(codigo, empresa, cliente, fecha, autorizacion, formaPago,
     descuento, subtotal, unidades, medico, paciente)
   .then(function () {  //OK!
     res.status(200)

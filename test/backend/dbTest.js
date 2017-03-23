@@ -183,6 +183,7 @@ describe('metodos de dbAdmin.js', function () {
 
   const ventaExInsertada = {
     codigo: '0009991',
+    empresa: 'TecoGram S.A.',
     ruc: cliente1.ruc,
     medico: medico1.nombre,
     paciente: 'Fabricio Encarnacion',
@@ -206,6 +207,7 @@ describe('metodos de dbAdmin.js', function () {
 
     const {
       codigo,
+      empresa,
       ruc,
       fecha,
       autorizacion,
@@ -219,7 +221,7 @@ describe('metodos de dbAdmin.js', function () {
 
     it('persiste una nueva venta en la base y agrega las unidades vendidas a la base',
       function (done) {
-        db.insertarVentaExamen(codigo, ruc, fecha, autorizacion, formaPago,
+        db.insertarVentaExamen(codigo, empresa, ruc, fecha, autorizacion, formaPago,
           descuento, subtotal, unidades, medico, paciente)
         .then(function (res) {
           const lasInsertedId = res[0]
@@ -410,6 +412,15 @@ describe('metodos de dbAdmin.js', function () {
     })
   })
 
+  describe('findAllVentas', function () {
+    it('obtiene ventas de ambos tipos', function () {
+      db.findAllVentas('')
+        .then(function (rows) {
+          rows.length.should.equal(2)
+        })
+    })
+  })
+
   describe('getFacturaData', function () {
     it('busca en la base de datos la fila de la venta, y los productos vendidos',
     function (done) {
@@ -538,6 +549,7 @@ describe('metodos de dbAdmin.js', function () {
 
     const {
       codigo,
+      empresa,
       ruc,
       fecha,
       autorizacion,
@@ -552,12 +564,12 @@ describe('metodos de dbAdmin.js', function () {
 
     it('actualiza una venta y las unidades vendidas en la base',
       function (done) {
-        db.updateVentaExamen(codigo, ruc, fecha, autorizacion, formaPagoUpdated,
+        db.updateVentaExamen(codigo, empresa, ruc, fecha, autorizacion, formaPagoUpdated,
           descuento, subtotal, unidades, medico, pacienteUpdated)
         .then(function (res) {
           const lasInsertedId = res[0]
           lasInsertedId.should.be.a('number')
-          return db.getFacturaData(codigo, null, 1)
+          return db.getFacturaData(codigo, empresa, 1)
         })
         .then(function (resp) {
           const { ventaRow } = resp
@@ -593,12 +605,12 @@ describe('metodos de dbAdmin.js', function () {
             precioVenta: 20,
           },
         ]
-        db.updateVentaExamen(codigo, ruc, fecha, autorizacion, formaPagoUpdated,
+        db.updateVentaExamen(codigo, empresa, ruc, fecha, autorizacion, formaPagoUpdated,
           descuento, subtotal, unidadesUpdated, medico, pacienteUpdated)
         .then(function (res) {
           const lasInsertedId = res[0]
           lasInsertedId.should.be.a('number')
-          return db.getFacturaData(codigo, null, 1)
+          return db.getFacturaData(codigo, empresa, 1)
         })
         .then(function (resp) {
           const { ventaRow } = resp
@@ -638,21 +650,22 @@ describe('metodos de dbAdmin.js', function () {
 
   describe('deleteVentaExamen', function () {
     it('borra una venta examen de la db y todas las unidades asociadas', function (done) {
-      db.getFacturablesVentaExamen(ventaExInsertada.codigo)
+      const { codigo, empresa } = ventaExInsertada
+      db.getFacturablesVenta(codigo, empresa)
         .then(function (rows) {
           rows.should.have.lengthOf(2)
-          return db.deleteVenta(ventaExInsertada.codigo, null, 1)
+          return db.deleteVenta(codigo, empresa, 1)
         })
         .then(function () {
-          return db.getFacturaData(ventaExInsertada.codigo, null, 1)
+          return db.getFacturaData(codigo, empresa, 1)
         })
         .then(undefined, function (err) {
           err.errorCode.should.be.equal(404)
-          return db.getFacturablesVentaExamen(ventaExInsertada.fecha, ventaExInsertada.codigo)
+          return db.getFacturablesVenta(codigo, empresa)
         })
         .then(function (rows) {
           rows.should.be.empty
-          return db.getExamenInfo(ventaExInsertada.codigo)
+          return db.getExamenInfo(codigo)
         })
         .then(function (rows) {
           rows.should.be.empty

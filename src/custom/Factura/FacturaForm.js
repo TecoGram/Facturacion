@@ -133,14 +133,25 @@ const ClienteDataRow = (props) => {
 
 const PacienteDataRow = (props) => {
   let width = autoCompleteWidth
+  const {
+    onNewMedico,
+    onDataChanged,
+    data,
+    medico,
+  } = props
+
+  const {
+    paciente,
+  } = data
 
   return (
     <div style={{display: 'block'}}>
       <IconBox icon={LocalHospital} />
-      <MedicoInput medico={props.medico} errors={props.errors}
-        onNewMedico={props.onNewMedico} width={width} />
+      <MedicoInput medico={medico} errors={props.errors}
+        onNewMedico={onNewMedico} width={width} />
       <IconBox icon={AirlineSeatReclineNormal} />
-      <TextField hintText='Paciente' style={{width: width}} />
+      <TextField hintText='Paciente' style={{width: width}} value={paciente}
+        onChange={(event) => onDataChanged('paciente', event.target.value)} />
     </div>
   )
 }

@@ -49,9 +49,11 @@ const facturableAUnidad = (facturable) => {
   return unidad
 }
 
-const crearVentaRow = (clienteObj, facturaDataImm, facturablesImm, unidades,
+const crearVentaRow = (clienteObj, medicoObj, facturaDataImm, facturablesImm, unidades,
     empresa, isExamen, porcentajeIVA) => {
   const subtotal = calcularSubtotalImm(facturablesImm)
+  let medicoId
+  if (medicoObj) medicoId = medicoObj.nombre
   return {
     cliente: clienteObj.ruc,
     codigo: facturaDataImm.get('codigo'),
@@ -65,6 +67,8 @@ const crearVentaRow = (clienteObj, facturaDataImm, facturablesImm, unidades,
     iva: isExamen ? 0 : porcentajeIVA,
     subtotal: subtotal,
     unidades: unidades,
+    medico: medicoId,
+    paciente: facturaDataImm.get('paciente'),
   }
 }
 

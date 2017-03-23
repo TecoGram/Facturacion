@@ -1,5 +1,4 @@
 const knex = require('./db.js')
-const empresaExamenes = 'TECOGRAM'
 
 const colocarVentaID = (unidades, codigo, empresa) => {
   const len = unidades.length
@@ -42,15 +41,15 @@ const updateVenta = (builder, codigo, empresa, cliente, fecha, autorizacion,
     })
 }
 
-const updateVentaExamen = (builder, codigo, cliente, fecha, autorizacion, formaPago,
+const updateVentaExamen = (builder, codigo, empresa, cliente, fecha, autorizacion, formaPago,
     descuento, subtotal) => {
-  return updateVenta(builder, codigo, empresaExamenes, cliente, fecha, autorizacion,
+  return updateVenta(builder, codigo, empresa, cliente, fecha, autorizacion,
     formaPago, descuento, 0, 0, subtotal)
 }
 
-const updateExamenInfo = (builder, medico, paciente, codigo) => {
+const updateExamenInfo = (builder, medico, paciente, codigo, empresa) => {
   return builder('examen_info')
-    .where({codigoVenta: codigo, empresaVenta: empresaExamenes}).update({
+    .where({codigoVenta: codigo, empresaVenta: empresa}).update({
       medico_id: medico,
       paciente: paciente,
     })
@@ -62,8 +61,7 @@ const getExamenInfo = (codigo) => {
     .where({codigoVenta: codigo})
 }
 
-const deleteVenta = (codigo, empresa, tipo) => {
-  if (tipo !== 0) empresa = empresaExamenes
+const deleteVenta = (codigo, empresa) => {
   return knex('ventas')
     .where({codigo, empresa})
     .del()
@@ -79,12 +77,12 @@ const insertarNuevasUnidades = (builder, listaDeUnidades) => {
   return builder.table('unidades').insert(listaDeUnidades)
 }
 
-const insertarExamenInfo = (builder, medico, paciente, codigo) => {
+const insertarExamenInfo = (builder, medico, paciente, codigo, empresa) => {
   return builder.table('examen_info').insert({
     medico_id: medico,
     paciente: paciente,
     codigoVenta: codigo,
-    empresaVenta: empresaExamenes,
+    empresaVenta: empresa,
   })
 }
 
@@ -94,15 +92,15 @@ const getVenta = (codigo, empresa) => {
   .where({codigo: codigo, empresa: empresa, tipo: 0})
 }
 
-const getVentaExamen = (codigo) => {
+const getVentaExamen = (codigo, empresa) => {
   return knex.select('*')
   .from('ventas')
-  .where({empresa: empresaExamenes, codigo: codigo, tipo: 1})
+  .where({empresa: empresa, codigo: codigo, tipo: 1})
 }
 
 const findVentas = (nombreCliente) => {
   return knex.select('codigo', 'empresa', 'fecha', 'ruc', 'nombre', 'iva',
-    'descuento', 'autorizacion', 'flete', 'detallado', 'subtotal')
+    'descuento', 'autorizacion', 'flete', 'detallado', 'subtotal', 'tipo')
     .from('ventas')
     .join('clientes', {'ventas.cliente' : 'clientes.ruc' })
     .where('nombre', 'like', `%${nombreCliente}%`)
@@ -111,9 +109,19 @@ const findVentas = (nombreCliente) => {
     .limit(20)
 }
 
+const findAllVentas = (nombreCliente) => {
+  return knex.select('codigo', 'empresa', 'fecha', 'ruc', 'nombre', 'iva',
+    'descuento', 'autorizacion', 'flete', 'detallado', 'subtotal', 'tipo')
+    .from('ventas')
+    .join('clientes', {'ventas.cliente' : 'clientes.ruc' })
+    .where('nombre', 'like', `%${nombreCliente}%`)
+    .orderBy('fecha', 'desc')
+    .limit(20)
+}
+
 const findVentasExamen = (nombre) => {
   return knex.select('codigo', 'fecha', 'ruc', 'nombre', 'subtotal',
-    'descuento', 'iva', 'paciente', 'medico_id')
+    'descuento', 'iva', 'paciente', 'medico_id', 'detallado')
     .from('ventas')
     .join('clientes', {'ventas.cliente' : 'clientes.ruc' })
     .join('examen_info', {
@@ -142,16 +150,12 @@ const getFacturablesVenta = (codigo, empresa) => {
   .where({codigoVenta: codigo, empresaVenta: empresa})
 }
 
-const getFacturablesVentaExamen = (codigo) => {
-  return getFacturablesVenta(codigo, empresaExamenes)
-}
-
 const getVentaPorTipo = (codigo, empresa, tipo) => {
   switch (tipo) {
     case 0:
       return getVenta(codigo, empresa)
     case 1:
-      return getVentaExamen(codigo)
+      return getVentaExamen(codigo, empresa)
     default:
       throw Error('Tipo de venta desconocido')
   }
@@ -159,7 +163,6 @@ const getVentaPorTipo = (codigo, empresa, tipo) => {
 
 const getFacturaData = (codigo, empresa, tipo) => {
   let ventaRow, cliente;
-  if (tipo !== 0) empresa = empresaExamenes
   const p = getVentaPorTipo(codigo, empresa, tipo)
   .then((ventas) => {
     if (ventas.length > 0) {
@@ -286,16 +289,16 @@ module.exports = {
     })
   },
 
-  insertarVentaExamen: (codigo, cliente, fecha, autorizacion, formaPago,
+  insertarVentaExamen: (codigo, empresa, cliente, fecha, autorizacion, formaPago,
     descuento, subtotal, unidades, medico, paciente) => {
     return knex.transaction ((trx) => {
-      return insertarVentaBase(trx, codigo, empresaExamenes, cliente, fecha,
+      return insertarVentaBase(trx, codigo, empresa, cliente, fecha,
         autorizacion, formaPago, false, 1, descuento, 0, 0, subtotal)
       .then(() => {
-        return insertarExamenInfo(trx, medico, paciente, codigo)
+        return insertarExamenInfo(trx, medico, paciente, codigo, empresa)
       })
       .then(() => {
-        colocarVentaID(unidades, codigo, empresaExamenes)
+        colocarVentaID(unidades, codigo, empresa)
         return insertarNuevasUnidades(trx, unidades)
       })
     })
@@ -317,24 +320,25 @@ module.exports = {
     })
   },
 
-  updateVentaExamen: (codigo, cliente, fecha, autorizacion, formaPago,
+  updateVentaExamen: (codigo, empresa, cliente, fecha, autorizacion, formaPago,
     descuento, subtotal, unidades, medico, paciente) => {
     return knex.transaction ((trx) => {
-      return updateVentaExamen(trx, codigo, cliente, fecha, autorizacion, formaPago,
-        descuento, subtotal)
+      return updateVentaExamen(trx, codigo, empresa, cliente, fecha, autorizacion,
+        formaPago, descuento, subtotal)
       .then(() => {
-        return deleteUnidadesVenta(trx, codigo, empresaExamenes)
+        return deleteUnidadesVenta(trx, codigo, empresa)
       })
       .then(() => {
-        return updateExamenInfo(trx, medico, paciente, codigo)
+        return updateExamenInfo(trx, medico, paciente, codigo, empresa)
       })
       .then(() => {
-        colocarVentaID(unidades, codigo, empresaExamenes)
+        colocarVentaID(unidades, codigo, empresa)
         return insertarNuevasUnidades(trx, unidades)
       })
     })
   },
 
+  findAllVentas,
   findVentas: (keywords, tipo) => {
     if (tipo === 0)
       return findVentas(keywords)
@@ -347,6 +351,4 @@ module.exports = {
   getExamenInfo,
   deleteVenta,
   getFacturablesVenta,
-  getFacturablesVentaExamen,
-
 }

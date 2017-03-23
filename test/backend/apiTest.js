@@ -256,7 +256,7 @@ describe('endpoints disponibles para el cliente', function () {
 
   const newVentaRow = {
     codigo: '9999999',
-    empresa: 'TECOGRAM',
+    empresa: 'TecoGram S.A.',
     cliente: cliente1.ruc,
     fecha: '2016-11-26',
     autorizacion: '',
@@ -324,7 +324,6 @@ describe('endpoints disponibles para el cliente', function () {
   newVentaExRow.medico = medico1.nombre
   newVentaExRow.paciente = 'Juan Pesantes'
   delete newVentaExRow.iva
-  delete newVentaExRow.empresa
   delete newVentaExRow.detallado
   delete newVentaExRow.flete
   describe('/venta_ex/new', function () {
@@ -457,7 +456,7 @@ describe('endpoints disponibles para el cliente', function () {
         .then(function (resp) {
           const { facturaData, facturables, cliente } = resp.body
           facturaData.codigo.should.equal(newVentaExRow.codigo)
-          facturaData.empresa.should.equal('TECOGRAM')
+          facturaData.empresa.should.equal(newVentaExRow.empresa)
           facturaData.fecha.should.equal(newVentaExRow.fecha)
           facturaData.paciente.should.equal(pacienteUpdated)
           facturaData.autorizacion.should.equal(autorizacionUpdated)
@@ -521,7 +520,6 @@ describe('endpoints disponibles para el cliente', function () {
       .then(function (resp) {
         const statusCode = resp.status
         statusCode.should.equal(200)
-        //Esto asume que en el test anterior se insertaron 2 ventas
         const ventas = resp.body
         ventas.should.be.an('array')
         ventas.length.should.equal(1)
@@ -534,6 +532,36 @@ describe('endpoints disponibles para el cliente', function () {
 
     it('retorna 404 si no encuentra facturas de examenes', function (done) {
       api.findVentasExamen('xyz')
+      .then(function () {
+        throw unexpectedError
+      }, function (err) {
+        const statusCode = err.status
+        const resp = err.response
+        statusCode.should.equal(404)
+        resp.text.should.be.a('string')
+        done()
+      })
+    })
+  })
+
+  describe('/venta/findAll', function () {
+    it('retorna 200 al encontrar facturas de ambos tipos', function (done) {
+      api.findAllVentas('')
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        const ventas = resp.body
+        ventas.should.be.an('array')
+        ventas.length.should.equal(3)
+        done()
+      }, function (err) {
+        console.error('test fail ' + JSON.stringify(err))
+        done(err)
+      })
+    })
+
+    it('retorna 404 si no encuentra facturas', function (done) {
+      api.findAllVentas('xyz')
       .then(function () {
         throw unexpectedError
       }, function (err) {

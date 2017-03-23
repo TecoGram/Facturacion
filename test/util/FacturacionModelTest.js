@@ -13,6 +13,9 @@ describe('Facturacion Models', function () {
     const clienteObj = {
       ruc: '09455867443001',
     }
+    const medicoObj = {
+      nombre: 'John Smith',
+    }
 
     const facturaData = Immutable.Map({
       codigo: '0003235',
@@ -64,8 +67,8 @@ describe('Facturacion Models', function () {
     const empresa = "TecoGram"
 
     it('Genera la fila de una venta a partir de un mapa inmutable', function () {
-      const ventaRow = FacturacionModels.crearVentaRow(clienteObj, facturaData,
-        facturables, unidades, empresa, false, 14)
+      const ventaRow = FacturacionModels.crearVentaRow(clienteObj, medicoObj,
+        facturaData, facturables, unidades, empresa, false, 14)
       ventaRow.cliente.should.equal('09455867443001')
       ventaRow.codigo.should.equal('0003235')
       ventaRow.subtotal.should.equal(50)
@@ -98,8 +101,8 @@ describe('Facturacion Models', function () {
 
 
     it('Genera la fila de una venta con cero iva y detallado = false si es examen', function () {
-      const ventaRow = FacturacionModels.crearVentaRow(clienteObj, facturaData,
-        facturables, unidades, empresa, true, 14)
+      const ventaRow = FacturacionModels.crearVentaRow(clienteObj, medicoObj,
+        facturaData, facturables, unidades, empresa, true, 14)
       ventaRow.detallado.should.be.false
       ventaRow.iva.should.equal(0)
     })
