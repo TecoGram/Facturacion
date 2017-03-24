@@ -2,7 +2,9 @@ import React, {Component, PropTypes} from 'react';
 
 import Add from 'material-ui/svg-icons/content/add';
 import ExitToApp from 'material-ui/svg-icons/action/exit-to-app'
+import ViewList from 'material-ui/svg-icons/action/view-list'
 import Drawer from 'material-ui/Drawer';
+import Divider from 'material-ui/Divider';
 import {Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import IconMenu from 'material-ui/IconMenu';
@@ -54,6 +56,12 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(ActionCreators, dispatch);
 }
 
+const redirectEmpresa = (redirigirATeco) => {
+  if (redirigirATeco)
+    window.location = '/teco'
+  else
+    window.location = '/biocled'
+}
 
 const MainDrawer = (props) => {
 
@@ -67,9 +75,33 @@ const MainDrawer = (props) => {
       width={200}
       open={props.open}
       onRequestChange={props.handleChange}>
-      <MenuItem onTouchTap={() => cp(NEW_FACTURA_PAGE)}>Nueva Factura</MenuItem>
-      <MenuItem onTouchTap={() => cp(NEW_FACTURA_EXAMEN_PAGE)}>Nueva Factura Examenes</MenuItem>
-      <MenuItem onTouchTap={() => cp(FACTURA_LIST_PAGE)}>Ver Facturas</MenuItem>
+      <MenuItem
+        onTouchTap={() => cp(NEW_FACTURA_PAGE)}
+        leftIcon={<Add />}>
+        Factura
+      </MenuItem>
+      <MenuItem
+        onTouchTap={() => cp(NEW_FACTURA_EXAMEN_PAGE)}
+        leftIcon={<Add />}>
+        Factura Examen
+      </MenuItem>
+      <Divider />
+      <MenuItem
+        onTouchTap={() => cp(FACTURA_LIST_PAGE)}
+        leftIcon={<ViewList />}>
+        Facturas
+      </MenuItem>
+      <Divider />
+      <MenuItem
+        onTouchTap={() => redirectEmpresa(true)}
+        leftIcon={<ExitToApp />}>
+        TecoGram S.A.
+      </MenuItem>
+      <MenuItem
+        onTouchTap={() => redirectEmpresa(false)}
+        leftIcon={<ExitToApp />}>
+        Biocled
+      </MenuItem>
     </Drawer>
   )
 }
@@ -186,9 +218,9 @@ class MainToolbar extends Component {
             targetOrigin={{horizontal: 'right', vertical: 'top'}}
             anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}>
             <MenuItem primaryText="TecoGram S.A." onTouchTap={() => {
-              window.location = '/teco'}} />
+              redirectEmpresa(true)}} />
             <MenuItem primaryText="Biocled" onTouchTap={() => {
-              window.location = '/biocled'}} />
+              redirectEmpresa(false)}} />
           </IconMenu>
 
         </ToolbarGroup>
