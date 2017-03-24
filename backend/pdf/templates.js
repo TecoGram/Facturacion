@@ -1,22 +1,22 @@
 const valorPalabras =require('../pdf/pdfutils.js').valorPalabras
 
-const MAIN_BOX_X = 40
-const MAIN_BOX_WIDTH = 520
+const MAIN_BOX_X = 27
+const MAIN_BOX_WIDTH = 526
 
-const BOX1_POS = { x: MAIN_BOX_X, y: 120 }
-const BOX1_SIZE = { x: MAIN_BOX_WIDTH, y: 81 }
-const BOX2_POS = { x: MAIN_BOX_X, y: 210 }
-const BOX2_SIZE = { x: MAIN_BOX_WIDTH, y: 520 }
+const BOX1_POS = { x: MAIN_BOX_X, y: 150 }
+const BOX1_SIZE = { x: MAIN_BOX_WIDTH, y: 89 }
+const BOX2_POS = { x: MAIN_BOX_X, y: 248 }
+const BOX2_SIZE = { x: MAIN_BOX_WIDTH, y: 482 }
 
 const BOX2_END_X = BOX2_POS.x + BOX2_SIZE.x
 const BOX2_END_Y = BOX2_POS.y + BOX2_SIZE.y
 
-const X1_LINE = 380
+const X1_LINE = 416
 const X2_LINE = 350
 const X3_LINE = (X2_LINE - MAIN_BOX_X)/2 + MAIN_BOX_X
-const Y1_LINE = 140
-const Y2_LINE = 181
-const Y3_LINE = 235
+const Y1_LINE = 180
+const Y2_LINE = 211
+const Y3_LINE = 273
 const Y4_LINE = 590
 const Y5_LINE = 670
 
@@ -88,12 +88,6 @@ const drawInvoiceInfoBox = (doc) => {
 
   doc.moveTo(X1_LINE, BOX1_POS.y)
     .lineTo(X1_LINE, BOX1_POS.y + BOX1_SIZE.y)
-
-  doc.moveTo(X1_LINE, Y1_LINE)
-    .lineTo(BOX1_POS.x + BOX1_SIZE.x, Y1_LINE)
-
-  doc.moveTo(X1_LINE, Y2_LINE)
-    .lineTo(BOX1_POS.x + BOX1_SIZE.x, Y2_LINE)
     .stroke()
 }
 
@@ -105,8 +99,9 @@ const drawInvoiceInfoContents = (doc, fecha, cliente) => {
     ruc,
   } = cliente
 
-  const topTableStart = {x: 65, y: 130}
-  const tableContentRowPos = 130
+  const topTableStart = {x: BOX1_POS.x + 8, y: BOX1_POS.y + 16}
+  const tableContentRowPos = 95
+  doc.fontSize(11)
   doc.lineGap(3)
   doc.text("Guayaquil: ", topTableStart.x, topTableStart.y)
     .text("Nombre: ")
@@ -134,16 +129,10 @@ const drawInvoiceCode = (doc, code) => {
     align: 'center',
   }
 
-  doc.text("FACTURA", facturaTextPos.x, facturaTextPos.y, boxOptions)
-  const serieTextY = 145
-  const codigoTextY = 160
-  const autSRITextY = 185
-  doc.fontSize(10)
-    .text("Serie 001-001", facturaTextPos.x, serieTextY, boxOptions)
+  const codigoTextY = Y1_LINE + 20
   doc.fontSize(16)
     .text(code, facturaTextPos.x, codigoTextY, boxOptions)
   doc.fontSize(12) //Restore default
-    .text("Aut. SRI # 1119500334", facturaTextPos.x, autSRITextY, boxOptions)
 }
 
 const drawInvoiceInfo = (doc, ventaRow, cliente) => {
@@ -414,7 +403,6 @@ module.exports = {
       } = facturaPDFData
 
       drawTitle(doc)
-      drawContactInfo(doc)
       drawInvoiceInfo(doc, facturaPDFData, cliente)
       const remainingFacturablesIndex = drawFacturablesDetails(doc, facturables,
         detallado)
