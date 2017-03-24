@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 
 import Add from 'material-ui/svg-icons/content/add';
+import ExitToApp from 'material-ui/svg-icons/action/exit-to-app'
 import Drawer from 'material-ui/Drawer';
 import {Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -178,6 +179,18 @@ class MainToolbar extends Component {
             <MenuItem primaryText="Nuevo Medico" onTouchTap={() =>
               cambiarDialog(NUEVO_MEDICO_DIALOG)}/>
           </IconMenu>
+          <IconMenu iconButtonElement={
+            <IconButton touch={true} style={iconButtonStyle} iconStyle={iconButtonIconStyle}>
+            <ExitToApp />
+          </IconButton> }
+            targetOrigin={{horizontal: 'right', vertical: 'top'}}
+            anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}>
+            <MenuItem primaryText="TecoGram S.A." onTouchTap={() => {
+              window.location = '/teco'}} />
+            <MenuItem primaryText="Biocled" onTouchTap={() => {
+              window.location = '/biocled'}} />
+          </IconMenu>
+
         </ToolbarGroup>
 
       </Toolbar>
