@@ -7,7 +7,7 @@ let defaultState
 if(window.__PRELOADED_STATE__){
   defaultState = window.__PRELOADED_STATE__
 }else
-  defaultState = require('../test/TestStore.js')
+  defaultState = require('./DefaultStore.js')
 
 const store = createStore(rootReducer, defaultState);
 

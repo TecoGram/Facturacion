@@ -1,4 +1,4 @@
-const { NEW_FACTURA_PAGE } = require('../src/PageTypes')
+const { NEW_FACTURA_PAGE } = require('../src/PageTypes.js')
 
 module.exports = {
   dialog : null,

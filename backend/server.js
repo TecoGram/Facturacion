@@ -1,11 +1,12 @@
+const fs = require('fs')
+const path = require('path')
 
 const Express = require('express')
 const bodyParser = require('body-parser');
+
 const PDFWriter = require('./pdf/PDFWriter.js')
 const pdfutils = require('./pdf/pdfutils.js')
 const facturaTemplates = require('./pdf/templates.js')
-const fs = require('fs')
-
 const db = require('./dbAdmin.js')
 const formatter = require('./responseFormatter.js')
 const {
@@ -15,11 +16,14 @@ const {
   validarVenta,
   validarVentaExamen,
  } = require('./sanitizationMiddleware.js')
-
+const {
+  serveTecogram,
+  serveBiocled,
+} = require('./empresaMiddleware.js')
+const CONSTRAINT_ERROR_SQLITE = 19
 const port = process.env.PORT || 8192
 //crear directorio donde almacenar facturas en pdf.
 const facturaDir = pdfutils.createTemporaryDir('facturas/')
-const CONSTRAINT_ERROR_SQLITE = 19
 
 const printError = (errorString) => {
   //don't print errors in tests. Tests should print errors from the response
@@ -27,7 +31,12 @@ const printError = (errorString) => {
 }
 
 const app = Express()
+app.get('/', function (req, res) { res.redirect('/teco') })
+app.use('/', Express.static(path.join(__dirname, '../build')))
 app.use(bodyParser.json()); // for parsing application/json
+
+app.get('/teco', serveTecogram)
+app.get('/biocled', serveBiocled)
 
 app.post('/cliente/new', validarCliente, function (req, res) {
   const {
