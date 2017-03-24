@@ -3,11 +3,11 @@ const request = require('superagent')
 const prefix = process.env.NODE_ENV === 'test' ? 'http://localhost:8192' : ''
 
 const getFacturaURL = (codigo, empresa) => {
-  return `http://localhost:8192/venta/ver/${empresa}/${codigo}`
+  return `${prefix}/venta/ver/${empresa}/${codigo}`
 }
 
 const getFacturaExamenURL = (codigo, empresa) => {
-  return `http://localhost:8192/venta_ex/ver/${empresa}/${codigo}`
+  return `${prefix}/venta_ex/ver/${empresa}/${codigo}`
 }
 
 module.exports = {
