@@ -1,14 +1,8 @@
 import { createStore } from 'redux';
 
 import rootReducer from './reducers/index';
+import initialStore from './InitialStore'
 
-let defaultState
-
-if(window.__PRELOADED_STATE__){
-  defaultState = window.__PRELOADED_STATE__
-}else
-  defaultState = require('./DefaultStore.js')
-
-const store = createStore(rootReducer, defaultState);
+const store = createStore(rootReducer, initialStore);
 
 export default store;

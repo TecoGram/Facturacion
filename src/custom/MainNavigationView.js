@@ -32,6 +32,7 @@ import NuevoProductoDialog from './NuevoProducto/NuevoProductoDialog'
 import NuevoMedicoDialog from './NuevoMedico/NuevoMedicoDialog'
 import FacturasListView from './FacturasList/FacturasListView'
 import store from '../Store'
+import InitialStore from '../InitialStore'
 
 const toolbarTextColor = '#FFFFFF'
 const toolbarTitleStyle = {
@@ -150,9 +151,10 @@ class MainToolbar extends Component {
       onLeftButtonClicked,
     } = this.props
 
-    return (
-      <Toolbar style={{backgroundColor: CustomStyle.muiTheme.palette.primary1Color}}>
+    const appBar = this.context.muiTheme.appBar
 
+    return (
+      <Toolbar style={{backgroundColor: appBar.color}}>
         <ToolbarGroup>
           <IconButton style={iconButtonStyle} iconStyle={iconButtonIconStyle}
             onTouchTap={onLeftButtonClicked}>
@@ -286,13 +288,22 @@ class Main extends Component {
 
     return (
       <div style={{backgroundColor: '#ededed', height: 'inherit'}}>
-        <MainToolbar cambiarDialog={cambiarDialog} title={ajustes.empresa}
-        onLeftButtonClicked={() => this.handleDrawerChange(true)}/>
-        <SelectedPage page={page} editarFactura={editarFactura} ajustes={ajustes}
-          editarFacturaExamen={editarFacturaExamen} abrirLinkConSnackbar={abrirLinkConSnackbar}/>
-        <MainDrawer open={this.state.drawerOpen} handleChange={this.handleDrawerChange}
+        <MainToolbar
+          cambiarDialog={cambiarDialog}
+          title={ajustes.empresa}
+          onLeftButtonClicked={() => this.handleDrawerChange(true)}/>
+        <SelectedPage
+          page={page}
+          editarFactura={editarFactura}
+          ajustes={ajustes}
+          editarFacturaExamen={editarFacturaExamen}
+          abrirLinkConSnackbar={abrirLinkConSnackbar}/>
+        <MainDrawer
+          open={this.state.drawerOpen}
+          handleChange={this.handleDrawerChange}
           onPageSelected={this.onPageSelected}/>
-        <MainDialog type={dialog} cambiarDialog={cambiarDialog}
+        <MainDialog type={dialog}
+          cambiarDialog={cambiarDialog}
           cerrarDialogConMsg={cerrarDialogConMsg}/>
         <MainSnackbar data={snackbar}/>
       </div>
@@ -309,16 +320,15 @@ class Main extends Component {
 * all  height available it won't render properly.
 */
 export default class MainNavigationView extends Component {
-
   render() {
     const MainComponent = connect(mapStateToProps, mapDispatchToProps) (Main)
-
+    const muiTheme = CustomStyle.getEmpresaTheme(InitialStore.ajustes.empresa)
     return (
-      <MuiThemeProvider muiTheme={CustomStyle.muiTheme}>
-        <Provider store={store} >
+      <Provider store={store} >
+        <MuiThemeProvider muiTheme={muiTheme}>
           <MainComponent />
-        </Provider>
-      </MuiThemeProvider>
+        </MuiThemeProvider>
+      </Provider>
     );
   }
 }
