@@ -112,7 +112,7 @@ export default class FacturaTable extends React.Component {
 
   render() {
     return (
-    <Table height={'300px'} selectable={false}>
+    <Table height={'200px'} selectable={false}>
       { RenderTableHeader(this.props) }
       <TableBody displayRowCheckbox={false}>
         { this.props.items.map(this.renderRow) }

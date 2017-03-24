@@ -80,8 +80,7 @@ export default class FacturaResults extends React.Component {
 
   render() {
     return (
-      <div style={{width: '100%', textAlign: 'right'}}>
-        <br />
+      <div style={{width: '100%', paddingTop: '6px', textAlign: 'right'}}>
         <ResultsTable {...this.props} />
         <FacturaDetalladaCheckbox {...this.props} />
         <br />
