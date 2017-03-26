@@ -23,8 +23,12 @@ import { NUEVO_CLIENTE_DIALOG,
   NUEVO_CLIENTE_DIALOG_CLOSED,
   NUEVO_MEDICO_DIALOG_CLOSED,
   NUEVO_PRODUCTO_DIALOG_CLOSED } from '../DialogTypes'
-import { NEW_FACTURA_PAGE, EDITAR_FACTURA_PAGE, NEW_FACTURA_EXAMEN_PAGE,
-  EDITAR_FACTURA_EXAMEN_PAGE, FACTURA_LIST_PAGE } from '../PageTypes'
+import {
+  NEW_FACTURA_PAGE,
+  EDITAR_FACTURA_PAGE,
+  NEW_FACTURA_EXAMEN_PAGE,
+  EDITAR_FACTURA_EXAMEN_PAGE,
+  FACTURA_LIST_PAGE, PRODUCTO_LIST_PAGE } from '../PageTypes'
 
 import ActionCreators from '../ActionCreators'
 import CustomStyle from '../CustomStyle'
@@ -34,6 +38,7 @@ import NuevoClienteDialog from './NuevoCliente/NuevoClienteDialog'
 import NuevoProductoDialog from './NuevoProducto/NuevoProductoDialog'
 import NuevoMedicoDialog from './NuevoMedico/NuevoMedicoDialog'
 import FacturasListView from './FacturasList/FacturasListView'
+import ProductosListView from './ProductosListView'
 import store from '../Store'
 import InitialStore from '../InitialStore'
 
@@ -90,6 +95,11 @@ const MainDrawer = (props) => {
         onTouchTap={() => cp(FACTURA_LIST_PAGE)}
         leftIcon={<ViewList />}>
         Facturas
+      </MenuItem>
+      <MenuItem
+        onTouchTap={() => cp(PRODUCTO_LIST_PAGE)}
+        leftIcon={<ViewList />}>
+        Productos
       </MenuItem>
       <Divider />
       <MenuItem
@@ -291,6 +301,8 @@ const SelectedPage = (props) => {
     case FACTURA_LIST_PAGE:
       return <FacturasListView editarFactura={editarFactura}
         editarFacturaExamen={editarFacturaExamen} {...pageProps}/>
+    case PRODUCTO_LIST_PAGE:
+      return <ProductosListView {...pageProps}/>
     default:
       return null
   }
