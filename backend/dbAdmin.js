@@ -1,4 +1,5 @@
 const knex = require('./db.js')
+const convertToAscii = require('normalize-for-search')
 
 const colocarVentaID = (unidades, codigo, empresa) => {
   const len = unidades.length
@@ -50,17 +51,21 @@ const updateVentaExamen = (builder, codigo, empresa, cliente, fecha, autorizacio
 }
 
 const updateExamenInfo = (builder, medico, paciente, codigo, empresa) => {
+  const medicoAscii = convertToAscii(medico)
+  const pacienteAscii = convertToAscii(paciente)
   return builder('examen_info')
     .where({codigoVenta: codigo, empresaVenta: empresa}).update({
-      medico_id: medico,
+      medico_id: medicoAscii,
       paciente: paciente,
+      pacienteAscii: pacienteAscii,
     })
 }
 
-const getExamenInfo = (codigo) => {
-  return knex.select('*')
+const getExamenInfo = (codigo, empresa) => {
+  return knex.select('nombre', 'nombreAscii', 'paciente')
     .from('examen_info')
-    .where({codigoVenta: codigo})
+    .join('medicos', { 'examen_info.medico_id' : 'medicos.nombreAscii' })
+    .where({codigoVenta: codigo, empresaVenta: empresa})
 }
 
 const deleteVenta = (codigo, empresa) => {
@@ -80,9 +85,12 @@ const insertarNuevasUnidades = (builder, listaDeUnidades) => {
 }
 
 const insertarExamenInfo = (builder, medico, paciente, codigo, empresa) => {
+  const medicoAscii = convertToAscii(medico)
+  const pacienteAscii = convertToAscii(paciente)
   return builder.table('examen_info').insert({
-    medico_id: medico,
+    medico_id: medicoAscii,
     paciente: paciente,
+    pacienteAscii: pacienteAscii,
     codigoVenta: codigo,
     empresaVenta: empresa,
   })
@@ -101,27 +109,30 @@ const getVentaExamen = (codigo, empresa) => {
 }
 
 const findVentas = (nombreCliente) => {
+  const nombreClienteAscii = convertToAscii(nombreCliente)
   return knex.select('codigo', 'empresa', 'fecha', 'ruc', 'nombre', 'iva',
     'descuento', 'autorizacion', 'flete', 'detallado', 'subtotal', 'tipo')
     .from('ventas')
     .join('clientes', {'ventas.cliente' : 'clientes.ruc' })
-    .where('nombre', 'like', `%${nombreCliente}%`)
+    .where('nombreAscii', 'like', `%${nombreClienteAscii}%`)
     .where('tipo', 0)
     .orderBy('fecha', 'desc')
     .limit(20)
 }
 
 const findAllVentas = (nombreCliente) => {
+  const nombreClienteAscii = convertToAscii(nombreCliente)
   return knex.select('codigo', 'empresa', 'fecha', 'ruc', 'nombre', 'iva',
     'descuento', 'autorizacion', 'flete', 'detallado', 'subtotal', 'tipo')
     .from('ventas')
     .join('clientes', {'ventas.cliente' : 'clientes.ruc' })
-    .where('nombre', 'like', `%${nombreCliente}%`)
+    .where('nombreAscii', 'like', `%${nombreClienteAscii}%`)
     .orderBy('fecha', 'desc')
     .limit(20)
 }
 
 const findVentasExamen = (nombre) => {
+  const nombreAscii = convertToAscii(nombre)
   return knex.select('codigo', 'fecha', 'ruc', 'nombre', 'subtotal',
     'descuento', 'iva', 'paciente', 'medico_id', 'detallado')
     .from('ventas')
@@ -130,8 +141,8 @@ const findVentasExamen = (nombre) => {
       'ventas.codigo' : 'examen_info.codigoVenta',
       'ventas.empresa' : 'examen_info.empresaVenta',
     })
-    .where('nombre', 'like', `%${nombre}%`)
-    .orWhere('paciente', 'like', `%${nombre}%`)
+    .where('nombreAscii', 'like', `%${nombreAscii}%`)
+    .orWhere('pacienteAscii', 'like', `%${nombreAscii}%`)
     .where('tipo', 1)
     .orderBy('fecha', 'desc')
     .limit(20)
@@ -191,12 +202,12 @@ const getFacturaData = (codigo, empresa, tipo) => {
   else
     return p.then((facturables) => {
       ventaRow.facturables = facturables
-      return getExamenInfo(codigo)
+      return getExamenInfo(codigo, empresa)
     })
     .then((rows) => {
       if (rows.length > 0) {
         const exInfo = rows[0]
-        const medico = { nombre: exInfo.medico_id }
+        const medico = { nombre: exInfo.nombre, nombreAscii: exInfo.nombreAscii }
         ventaRow.paciente = exInfo.paciente
         return Promise.resolve({ventaRow, cliente, medico})
       } else {
@@ -205,11 +216,22 @@ const getFacturaData = (codigo, empresa, tipo) => {
     })
 }
 
+const buscarEnTabla = (tabla, columna, queryString) => {
+  const query = knex.select('*')
+    .from(tabla)
+    .limit(5)
+  if (queryString !== '')
+    return query.where(columna, 'like', `%${queryString}%`)
+  return query
+}
+
 module.exports = {
   close: () => { knex.destroy() },
   insertarProducto: (codigo, nombre, marca, precioDist, precioVenta, pagaIva) => {
+    const nombreAscii = convertToAscii(nombre)
     return knex.table('productos').insert({
       codigo: codigo,
+      nombreAscii: nombreAscii,
       nombre: nombre,
       marca: marca,
       precioDist: precioDist,
@@ -219,20 +241,15 @@ module.exports = {
   },
 
   findProductos: (queryString) => {
-    const queries = queryString.split(' ')
-    const queryObject = knex.select('*')
-      .from('productos')
-      .where('nombre', 'like', `%${queries[0]}%`)
-
-    for(let i = 1; i < queries.length; i++)
-      queryObject.orWhere('nombre', 'like', `%${queries[i]}%`)
-
-    return queryObject.limit(5)
+    const queryStringAscii = convertToAscii(queryString)
+    return buscarEnTabla('productos', 'nombreAscii', queryStringAscii)
   },
 
   insertarCliente: (ruc, nombre, direccion, email, telefono1, telefono2, descDefault) => {
+    const nombreAscii = convertToAscii(nombre)
     return knex.table('clientes').insert({
       ruc: ruc,
+      nombreAscii: nombreAscii,
       nombre: nombre,
       direccion: direccion,
       email: email,
@@ -243,19 +260,14 @@ module.exports = {
   },
 
   findClientes: (queryString) => {
-    const queries = queryString.split(' ')
-    const queryObject = knex.select('*')
-      .from('clientes')
-      .where('nombre', 'like', `%${queries[0]}%`)
-
-    for(let i = 1; i < queries.length; i++)
-      queryObject.orWhere('nombre', 'like', `%${queries[i]}%`)
-
-    return queryObject.limit(5)
+    const queryStringAscii = convertToAscii(queryString)
+    return buscarEnTabla('clientes', 'nombreAscii', queryStringAscii)
   },
 
   insertarMedico: (nombre, direccion, email, comision, telefono1, telefono2) => {
+    const nombreAscii = convertToAscii(nombre)
     return knex.table('medicos').insert({
+      nombreAscii: nombreAscii,
       nombre: nombre,
       direccion: direccion,
       email: email,
@@ -266,15 +278,8 @@ module.exports = {
   },
 
   findMedicos: (queryString) => {
-    const queries = queryString.split(' ')
-    const queryObject = knex.select('*')
-      .from('medicos')
-      .where('nombre', 'like', `%${queries[0]}%`)
-
-    for(let i = 1; i < queries.length; i++)
-      queryObject.orWhere('nombre', 'like', `%${queries[i]}%`)
-
-    return queryObject.limit(5)
+    const queryStringAscii = convertToAscii(queryString)
+    return buscarEnTabla('medicos', 'nombreAscii', queryStringAscii)
   },
 
   insertarVenta: (codigo, empresa, cliente, fecha, autorizacion, formaPago,

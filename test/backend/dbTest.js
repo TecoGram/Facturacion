@@ -26,7 +26,7 @@ describe('metodos de dbAdmin.js', function () {
   describe('insertarProducto', function () {
 
     it("persiste varios productos en la base encadenando con promise", function (done) {
-      db.insertarProducto("fsers4", "producto A", "TECO", 9.99, 14.99, true)
+      db.insertarProducto("fsers4", "producto Á", "TECO", 9.99, 14.99, true)
       .then(function (ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')
@@ -65,18 +65,27 @@ describe('metodos de dbAdmin.js', function () {
         productos.should.be.an('array')
         //Esto asume que en el describe anterior se ingresaron unicamente 3 productos
         productos.length.should.be.equal(3)
-        productos[0].nombre.should.be.equal('producto A')
+        productos[0].nombre.should.be.equal('producto Á')
         productos[1].nombre.should.be.equal('producto B')
         productos[2].nombre.should.be.equal('producto C')
         done()
       })
     })
 
+    it('puede buscar prodctos por nombre, sin tener que escribir las tildes', function (done) {
+      db.findProductos('producto a')
+      .then(function(productos) {
+        productos.should.be.an('array')
+        productos.length.should.be.equal(1)
+        productos[0].nombre.should.be.equal('producto Á')
+        done()
+      })
+    })
   })
 
   const cliente1 = {
     ruc: "0954236576001",
-    nombre: "Dr. Juan Perez",
+    nombre: "Dr. Juan Pérez",
     email: "jperez@gmail.com",
     direccion:  "Av. Pedro Carbo y Sucre 512",
     telefono1: "2645987",
@@ -93,7 +102,7 @@ describe('metodos de dbAdmin.js', function () {
       .then(function (ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')
-        return db.insertarCliente("0934233576001", "Carlos Sanchez",
+        return db.insertarCliente("0934233576001", "Carlos Sánchez",
         "Av. Brasil y la del ejercito", "carlos-sanchez84@live.com", "2353477", "2375980", 5)
       }).then(function(ids) {
         ids.should.not.be.empty
@@ -117,17 +126,24 @@ describe('metodos de dbAdmin.js', function () {
     })
 
     it('puede buscar clientes por nombre, si se le pasa un string no vacio como argumento', function (done) {
-      db.findClientes('Juan Carlos')
+      db.findClientes('Juan')
       .then(function(clientes) {
         clientes.should.be.an('array')
-        //Esto asume que en el describe anterior se ingresaron unicamente Juan Perez y Carlos Sanchez
-        clientes.length.should.be.equal(2)
-        clientes[0].nombre.should.be.equal('Dr. Juan Perez')
-        clientes[1].nombre.should.be.equal('Carlos Sanchez')
+        clientes.length.should.be.equal(1)
+        clientes[0].nombre.should.be.equal('Dr. Juan Pérez')
         done()
       })
     })
 
+    it('puede buscar clientes por nombre, sin tener que escribir las tildes', function (done) {
+      db.findClientes('sanchez')
+      .then(function(clientes) {
+        clientes.should.be.an('array')
+        clientes.length.should.be.equal(1)
+        clientes[0].nombre.should.be.equal('Carlos Sánchez')
+        done()
+      })
+    })
   })
 
   const medico1 = {
@@ -147,7 +163,7 @@ describe('metodos de dbAdmin.js', function () {
       .then(function (ids) {
         ids.should.not.be.empty
         ids[0].should.be.a('number')
-        return db.insertarMedico("Dr. Carlos Jaramillo", "Av. Brasil 546",
+        return db.insertarMedico("Verónica Jaramillo", "Av. Brasil 546",
         "carlos-jm@live.com", 5, "2353477", "2375980")
       }).then(function(ids) {
         ids.should.not.be.empty
@@ -179,6 +195,15 @@ describe('metodos de dbAdmin.js', function () {
       })
     })
 
+    it('puede buscar clientes por nombre, sin tener que escribir tildes', function (done) {
+      db.findMedicos('vero')
+      .then(function(medicos) {
+        medicos.should.be.an('array')
+        medicos.should.have.lengthOf(1)
+        medicos[0].nombre.should.be.equal('Verónica Jaramillo')
+        done()
+      })
+    })
   })
 
   const ventaExInsertada = {
@@ -186,7 +211,7 @@ describe('metodos de dbAdmin.js', function () {
     empresa: 'TecoGram S.A.',
     ruc: cliente1.ruc,
     medico: medico1.nombre,
-    paciente: 'Fabricio Encarnacion',
+    paciente: 'Fabricio Encarnación',
     fecha: '2017-01-01',
     autorizacion: 'fse4',
     formaPago: 'VISA',
@@ -336,7 +361,19 @@ describe('metodos de dbAdmin.js', function () {
           done(err)
         })
     })
+    it ('encuentra ventas por cliente sin tener que escribir tildes', function (done) {
+      db.findVentas('perez', 0)
+        .then(function (results) {
+          results.length.should.be.equal(1)
 
+          const ultimaVenta = results[0]
+          ultimaVenta.nombre.should.be.equal(cliente1.nombre)
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+    })
     it ('devuelve array vacio si no encuentra ventas con ese cliente', function (done) {
       db.findVentas('xxyz', 0)
         .then(function (results) {
@@ -385,6 +422,19 @@ describe('metodos de dbAdmin.js', function () {
         })
     })
 
+    it ('encuentra ventas por cliente sin tener que escribir tildes', function (done) {
+      db.findVentas('perez', 1)
+        .then(function (results) {
+          results.length.should.be.equal(1)
+
+          const ultimaVentaEx = results[0]
+          ultimaVentaEx.nombre.should.be.equal(cliente1.nombre)
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+    })
     it ('devuelve las ultimas ventas examen cuyo nombre de paciente coincide con el string pasado como argumento', function (done) {
       db.findVentas('Fabri', 1)
         .then(function (results) {
@@ -403,6 +453,19 @@ describe('metodos de dbAdmin.js', function () {
           done(err)
         })
     })
+    it ('encuentra ventas por paciente sin tener que escribir tildes', function (done) {
+      db.findVentas('encarnacion', 1)
+        .then(function (results) {
+          results.length.should.be.equal(1)
+
+          const ultimaVentaEx = results[0]
+          ultimaVentaEx.paciente.should.be.equal(ventaExInsertada.paciente)
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+    })
     it ('devuelve array vacio si no encuentra ventas examen con ese paciente', function (done) {
       db.findVentas('xxyz', 1)
         .then(function (results) {
@@ -415,6 +478,12 @@ describe('metodos de dbAdmin.js', function () {
   describe('findAllVentas', function () {
     it('obtiene ventas de ambos tipos', function () {
       db.findAllVentas('')
+        .then(function (rows) {
+          rows.length.should.equal(2)
+        })
+    })
+    it('obtiene ventas de ambos tipos, sin tener que escribir tildes', function () {
+      db.findAllVentas('perez')
         .then(function (rows) {
           rows.length.should.equal(2)
         })
@@ -485,6 +554,7 @@ describe('metodos de dbAdmin.js', function () {
 
         cliente.nombre.should.equal(cliente1.nombre)
         medico.nombre.should.equal(medico1.nombre)
+        medico.nombreAscii.should.equal('dr. william hurtado')
 
         done()
       })
@@ -681,9 +751,6 @@ describe('metodos de dbAdmin.js', function () {
           done(err)
         })
     })
-  })
-
-  describe('deleteVentaExamen', function () {
     it('borra una venta examen de la db y todas las unidades asociadas', function (done) {
       const { codigo, empresa } = ventaExInsertada
       db.getFacturablesVenta(codigo, empresa)
@@ -700,7 +767,7 @@ describe('metodos de dbAdmin.js', function () {
         })
         .then(function (rows) {
           rows.should.be.empty
-          return db.getExamenInfo(codigo)
+          return db.getExamenInfo(codigo, empresa)
         })
         .then(function (rows) {
           rows.should.be.empty
@@ -711,5 +778,4 @@ describe('metodos de dbAdmin.js', function () {
         })
     })
   })
-
 })

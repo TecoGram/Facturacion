@@ -7,6 +7,7 @@ module.exports = () => {
       return knex.schema.createTable('productos', (table) => {
         table.integer('rowid').primary()
         table.string('codigo', 10)
+        table.string('nombreAscii', 50)
         table.string('nombre', 50)
         table.string('marca', 30)
         table.float('precioDist')
@@ -17,7 +18,8 @@ module.exports = () => {
       })
       .createTable('clientes', (table) => {
         table.string('ruc', 13).primary()
-        table.string('nombre', 50).index()
+        table.string('nombreAscii', 50).index()
+        table.string('nombre', 50)
         table.string('direccion', 60)
         table.string('email', 10)
         table.string('telefono1', 10)
@@ -25,7 +27,8 @@ module.exports = () => {
         table.int('descDefault')
       })
       .createTable('medicos', (table) => {
-        table.string('nombre', 50).primary()
+        table.string('nombreAscii', 50).primary()
+        table.string('nombre', 50)
         table.string('direccion', 60)
         table.string('email', 10)
         table.integer('comision')
@@ -63,9 +66,9 @@ module.exports = () => {
   .then(() => {//Knex no soporta composite foreign keys. Raw queries SMH
     return knex.raw('create table "examen_info" ("rowid" integer, "medico_id" varchar(50), '
       + '"codigoVenta" varchar(10), "empresaVenta" varchar(10), "paciente" '
-      + 'varchar(50), foreign key("medico_id") references "medicos"("nombre"), '
-      + 'foreign key("codigoVenta", "empresaVenta") references "ventas"("codigo", '
-      + '"empresa") on delete CASCADE, primary key ("rowid"))')
+      + 'varchar(50), "pacienteAscii" varchar(50), foreign key("medico_id") '
+      + 'references "medicos"("nombreAscii"), foreign key("codigoVenta", "empresaVenta") '
+      + 'references "ventas"("codigo", "empresa") on delete CASCADE, primary key ("rowid"))')
   }, (err) => Promise.reject(err))
   .then(() => {
     return knex.raw('create table "unidades" ("rowid" integer, "producto" integer, '

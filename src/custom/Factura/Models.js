@@ -32,6 +32,7 @@ const productoAFacturable = (producto) => {
   facturable.producto = producto.rowid
   delete facturable.rowid
   delete facturable.precioDist
+  delete facturable.nombreAscii
   facturable.lote = ''
   facturable.count = '1'
   facturable.precioVenta = '' + producto.precioVenta

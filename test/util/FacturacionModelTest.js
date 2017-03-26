@@ -177,6 +177,7 @@ describe('Facturacion Models', function () {
       const producto = {
         rowid: 14,
         nombre: 'Acido Urico',
+        nombreAscii: 'acido urico',
         pagaIva: true,
         precioDist: 19.99,
         precioVenta: 29.99,
@@ -188,6 +189,7 @@ describe('Facturacion Models', function () {
       facturable.should.have.property('producto', producto.rowid)
       facturable.should.not.have.property('rowid')
       facturable.should.not.have.property('precioDist')
+      facturable.should.not.have.property('nombreAscii')
       facturable.should.have.property('codigo')
       facturable.should.have.property('nombre')
       facturable.should.have.property('precioVenta', '' + producto.precioVenta)
