@@ -1,11 +1,14 @@
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import {blue500, pink500} from 'material-ui/styles/colors';
+import {blue500, pink300} from 'material-ui/styles/colors';
 
 
 const myTheme = (color) => getMuiTheme({
   appBar: {
     textColor: '#FFFFFF',
     color: color,
+  },
+  chip: {
+    backgroundColor: pink300,
   },
   palette: {
     primary1Color: color,
@@ -17,7 +20,7 @@ const getEmpresaTheme = (empresa) => {
   if (empresa === 'TecoGram S.A.')
     color = blue500
   else if (empresa === 'Biocled')
-    color = pink500
+    color = pink300
   else
     throw new Error('Empresa desconocida: ' + empresa)
   const theme = myTheme(color)
