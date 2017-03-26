@@ -216,10 +216,11 @@ const getFacturaData = (codigo, empresa, tipo) => {
     })
 }
 
-const buscarEnTabla = (tabla, columna, queryString) => {
+const buscarEnTabla = (tabla, columna, queryString, limit) => {
+  const limitValue = limit || 5
   const query = knex.select('*')
     .from(tabla)
-    .limit(5)
+    .limit(limitValue)
   if (queryString !== '')
     return query.where(columna, 'like', `%${queryString}%`)
   return query
@@ -240,9 +241,9 @@ module.exports = {
     })
   },
 
-  findProductos: (queryString) => {
+  findProductos: (queryString, limit) => {
     const queryStringAscii = convertToAscii(queryString)
-    return buscarEnTabla('productos', 'nombreAscii', queryStringAscii)
+    return buscarEnTabla('productos', 'nombreAscii', queryStringAscii, limit)
   },
 
   insertarCliente: (ruc, nombre, direccion, email, telefono1, telefono2, descDefault) => {

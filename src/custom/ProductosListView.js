@@ -16,7 +16,7 @@ export default class FacturasListView extends React.Component {
   }
 
   requestData = (input) => {
-    findProductos(input)
+    findProductos(input, 10)
       .then((resp) => {
         const listaProductos = resp.body
         this.setState({rows: listaProductos})

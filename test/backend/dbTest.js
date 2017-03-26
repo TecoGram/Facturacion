@@ -81,6 +81,15 @@ describe('metodos de dbAdmin.js', function () {
         done()
       })
     })
+
+    it('permite controlar el limite con el segundo argumento', function (done) {
+      db.findProductos('', 2)
+      .then(function(productos) {
+        productos.should.be.an('array')
+        productos.length.should.be.equal(2)
+        done()
+      })
+    })
   })
 
   const cliente1 = {

@@ -10,6 +10,7 @@ const facturaTemplates = require('./pdf/templates.js')
 const db = require('./dbAdmin.js')
 const formatter = require('./responseFormatter.js')
 const {
+  validarBusqueda,
   validarCliente,
   validarMedico,
   validarProducto,
@@ -138,9 +139,9 @@ app.post('/producto/new', validarProducto, function (req, res) {
   })
 })
 
-app.get('/producto/find', function (req,res) {
+app.get('/producto/find', validarBusqueda, function (req,res) {
   const q = req.query.q || ''
-  db.findProductos(q)
+  db.findProductos(q, req.query.limit)
   .then(function(productos) {
     if(productos.length === 0)
       res.status(404)

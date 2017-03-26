@@ -239,6 +239,32 @@ describe('endpoints disponibles para el cliente', function () {
       })
     })
 
+    it('puede limitar el numero de resultados con el segundo argumento', function (done) {
+      api.insertarProducto('34tger5', 'TGPx20x12', "TECO", 39.99, 49.99, true)
+        .then(function (){
+          return api.findProductos('TG', 1)
+        })
+        .then(function (resp) {
+          const statusCode = resp.status
+          statusCode.should.equal(200)
+          const productos = resp.body
+          productos.should.be.a('array')
+          productos.length.should.equal(1)
+          return api.findProductos('TG')
+        })
+        .then(function (resp) {
+          const statusCode = resp.status
+          statusCode.should.equal(200)
+          const productos = resp.body
+          productos.should.be.a('array')
+          productos.length.should.equal(2)
+          done()
+        })
+        .catch(function (err) {
+          console.error('test fail ' + JSON.stringify(err))
+          done(err)
+        })
+    })
     it('retorna 404 si no encuentra productos', function (done) {
       api.findProductos('xyz')
       .then(function () {

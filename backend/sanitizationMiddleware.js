@@ -1,4 +1,5 @@
 const {
+  validarBusqueda,
   validarCliente,
   validarMedico,
   validarProducto,
@@ -22,6 +23,15 @@ const parsearNumerosEnUnidades = (unidades) => {
 }
 
 module.exports = {
+  validarBusqueda: (req, res, next) => {
+    const q = req.query.q
+    const limit = req.query.limit
+    const errors = validarBusqueda(q, limit)
+    if (errors)
+      sendBadArgumentsResponse(res, errors)
+    else next()
+  },
+
   validarCliente: function (req, res, next) {
     const { inputs, errors } = validarCliente(req.body)
     if (errors) {

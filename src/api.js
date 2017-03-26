@@ -61,8 +61,10 @@ module.exports = {
       .set('Accept', 'application/json')
   },
 
-  findProductos: (queryString) => {
-    return request.get(prefix + '/producto/find?q=' + queryString)
+  findProductos: (queryString, limit) => {
+    let url = prefix + `/producto/find?q=${queryString}`
+    if (limit) url += `&limit=${limit}`
+    return request.get(url)
       .send()
   },
 

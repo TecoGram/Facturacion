@@ -373,10 +373,20 @@ const validarVentaRowExamen = (formData) => {
   return eitherErrorsOrInputs(errors, inputs)
 }
 
+const validarBusqueda = (q, limit) => {
+  const errors = {}
+  if (q && typeof q !== 'string')
+    errors.q = 'consulta invalida'
+  if (limit && !validator.isInt('' + limit))
+    errors.limit = 'limite invalido, debe de ser un entero'
+  if (isEmptyObj(errors)) return null
+  return errors
+}
 
 module.exports = {
   esFacturablePropValido,
   esFacturaDataPropValido,
+  validarBusqueda,
   validarCliente,
   validarMedico,
   validarProducto,

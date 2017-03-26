@@ -96,4 +96,15 @@ describe('Validacion', function () {
       res2.inputs.pagaIva.should.be.false
     })
   })
+
+  describe('validarBusqueda', function () {
+    it('retorna null los parametros son incorrectos', function () {
+      let errors = Validacion.validarBusqueda('ar', 'e4')
+      expect(errors).to.not.be.null
+      errors = Validacion.validarBusqueda(5, 4)
+      expect(errors).to.not.be.null
+      errors = Validacion.validarBusqueda('ar', '4')
+      expect(errors).to.be.null
+    })
+  })
 })
