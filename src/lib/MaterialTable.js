@@ -130,6 +130,7 @@ export default class MaterialTable extends React.Component {
     keys: React.PropTypes.array.isRequired,
     searchHint: React.PropTypes.string.isRequired,
     onQueryChanged: React.PropTypes.func.isRequired,
+    height: React.PropTypes.string,
     onEditItem: React.PropTypes.func,
     onDeleteItem: React.PropTypes.func,
     onOpenItem: React.PropTypes.func,
@@ -139,6 +140,7 @@ export default class MaterialTable extends React.Component {
   render() {
     const {
       enableCheckbox,
+      height,
       keys,
       onEditItem,
       onDeleteItem,
@@ -157,7 +159,7 @@ export default class MaterialTable extends React.Component {
       <div style={{height:'100%', overflow:'auto'}} >
         <PaperContainer padding={'15px'}>
           <SearchBox hint={searchHint} onQueryChanged={onQueryChanged} />
-          <Table selectable={enableCheckbox}>
+          <Table selectable={enableCheckbox} height={height}>
              <TableHeader displaySelectAll={enableCheckbox}
                adjustForCheckbox={enableCheckbox}>
                <TableRow>

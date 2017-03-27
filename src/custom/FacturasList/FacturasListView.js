@@ -69,6 +69,7 @@ export default class FacturasListView extends React.Component {
         onDeleteItem={this.deleteRow}
         onEditItem={this.openEditorPage}
         onOpenItem={this.openFacturaInNewTab}
+        height={'450px'}
         onQueryChanged={this.requestData}/>
     )
   }

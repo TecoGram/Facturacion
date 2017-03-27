@@ -16,7 +16,7 @@ export default class FacturasListView extends React.Component {
   }
 
   requestData = (input) => {
-    findProductos(input, 10)
+    findProductos(input, 50)
       .then((resp) => {
         const listaProductos = resp.body
         this.setState({rows: listaProductos})
@@ -40,6 +40,7 @@ export default class FacturasListView extends React.Component {
         keys={keys}
         rows={rows}
         searchHint={searchHint}
+        height={'450px'}
         onQueryChanged={this.requestData}/>
     )
   }

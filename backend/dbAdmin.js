@@ -117,7 +117,7 @@ const findVentas = (nombreCliente) => {
     .where('nombreAscii', 'like', `%${nombreClienteAscii}%`)
     .where('tipo', 0)
     .orderBy('fecha', 'desc')
-    .limit(20)
+    .limit(50)
 }
 
 const findAllVentas = (nombreCliente) => {
@@ -128,7 +128,7 @@ const findAllVentas = (nombreCliente) => {
     .join('clientes', {'ventas.cliente' : 'clientes.ruc' })
     .where('nombreAscii', 'like', `%${nombreClienteAscii}%`)
     .orderBy('fecha', 'desc')
-    .limit(20)
+    .limit(50)
 }
 
 const findVentasExamen = (nombre) => {
@@ -145,7 +145,7 @@ const findVentasExamen = (nombre) => {
     .orWhere('pacienteAscii', 'like', `%${nombreAscii}%`)
     .where('tipo', 1)
     .orderBy('fecha', 'desc')
-    .limit(10)
+    .limit(50)
 }
 
 const getCliente = (ruc) => {

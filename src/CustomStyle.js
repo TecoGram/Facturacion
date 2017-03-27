@@ -8,7 +8,7 @@ const myTheme = (color) => getMuiTheme({
     color: color,
   },
   chip: {
-    backgroundColor: pink300,
+    backgroundColor: color,
   },
   palette: {
     primary1Color: color,
