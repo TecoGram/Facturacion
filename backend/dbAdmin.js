@@ -145,7 +145,7 @@ const findVentasExamen = (nombre) => {
     .orWhere('pacienteAscii', 'like', `%${nombreAscii}%`)
     .where('tipo', 1)
     .orderBy('fecha', 'desc')
-    .limit(20)
+    .limit(10)
 }
 
 const getCliente = (ruc) => {

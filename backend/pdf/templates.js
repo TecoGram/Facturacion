@@ -14,8 +14,8 @@ const BOX2_END_Y = BOX2_POS.y + BOX2_SIZE.y
 const X1_LINE = 416
 const X2_LINE = 350
 const X3_LINE = (X2_LINE - MAIN_BOX_X)/2 + MAIN_BOX_X
-const Y1_LINE = 180
-const Y2_LINE = 211
+const Y1_LINE = 160
+//const Y2_LINE = 211
 const Y3_LINE = 273
 const Y4_LINE = 590
 const Y5_LINE = 670
@@ -31,8 +31,6 @@ const descriptionColumnSeparator = cantColumnSeparator + descriptionColumnWidth
 const unitPriceColumnWidth = 65
 const unitPriceColumnSeparator = descriptionColumnSeparator + unitPriceColumnWidth
 
-const chequeCruzadoString = 'FAVOR CANCELAR CON CHEQUE CRUZADO A NOMBRE DE'
-  + ' TECO-GRAM S.A. AL HACER SUS PAGOS EN EFECTIVO EXIJA SU RECIBO'
 const paymentAgreementString = 'Declaro expresamente haver recibido la mercadería'
   + ' y/o servicio detallado en esta factura y me comprometo a pagar integramente'
   + ' el valor total de la misma a TECO-GRAM S.A., en el plazo establecido en caso'
@@ -40,30 +38,6 @@ const paymentAgreementString = 'Declaro expresamente haver recibido la mercader�
   + ' mora y comisiones por cobranza, desde el vencimiento hasta el mismo día de'
   + ' pago. Para toda acción legal, renuncio a domicilio y me someto a los jueces'
   + ' de esta jurisdicción o al que elija el acreedor.'
-
-const drawContactInfo = (doc) => {
-  const address = "Nueva Kennedy, Av. Del Periodista #428 y la 10ma. Este"
-  const building = "Polimédico Costales"
-  const addressReference = "Diagonal a la Clínica Kennedy"
-  const phones = "Telfs.: 2396966 - 2397979"
-  const fax = "Fax: 2396610"
-  const email = "E-mail: info@tecogram.com, teco-gram@gye.satnet.net"
-  const city = "Guayaquil - Ecuador"
-  const elabDate = "F. Elab.: 22/Septiembre/2016"
-
-  const infoPos = { x: 300, y: 30 }
-
-  doc.save()
-    .fontSize(9)
-    .text(address, infoPos.x, infoPos.y)
-    .text(building + ", " + addressReference)
-    .text(phones)
-    .text(fax)
-    .text(email)
-    .text(city)
-    .text(elabDate)
-    .restore()
-}
 
 const drawTitle = (doc) => {
   const titlePos = {x: 50, y: 30 }
@@ -147,65 +121,6 @@ const drawInvoiceInfo = (doc, ventaRow, cliente) => {
 
 }
 
-const drawInvoiceDetailsHeader = (doc) => {
-
-  doc.moveTo(itemColumnSeparator, BOX2_POS.y)
-    .lineTo(itemColumnSeparator, Y3_LINE)
-
-  doc.moveTo(cantColumnSeparator, BOX2_POS.y)
-    .lineTo(cantColumnSeparator, Y3_LINE)
-
-  doc.moveTo(descriptionColumnSeparator, BOX2_POS.y)
-    .lineTo(descriptionColumnSeparator, Y3_LINE)
-
-  doc.moveTo(unitPriceColumnSeparator, BOX2_POS.y)
-    .lineTo(unitPriceColumnSeparator, Y3_LINE)
-    .stroke()
-
-  const textY = BOX2_POS.y + 8
-  doc.text('ITEM', BOX2_POS.x, textY, {
-    width: itemColumnWidth,
-    align: 'center',
-  })
-  doc.text('CANT.', itemColumnSeparator, textY, {
-    width: cantColumnWidth,
-    align: 'center',
-  })
-  doc.text('DESCRIPCIÓN', cantColumnSeparator, textY, {
-    width: descriptionColumnWidth,
-    align: 'center',
-  })
-  doc.text('V.UNIT.', descriptionColumnSeparator, textY, {
-    width: unitPriceColumnWidth,
-    align: 'center',
-  })
-  doc.text('TOTAL', unitPriceColumnSeparator, textY, {
-    width: BOX2_POS.x + BOX2_SIZE.x - unitPriceColumnSeparator,
-    align: 'center',
-  })
-}
-
-const drawSignaturePlaceholders = (doc) => {
-  const signatureLineHorizontalMargin = 25
-  const signatureLineY = BOX2_END_Y - 20
-
-  const drawPlaceholders = (upperText, lowerText, leftX, rightX) => {
-    const options = {
-      width: rightX - leftX,
-      align: 'center',
-    }
-    doc.text(upperText, leftX, Y5_LINE + 5, options)
-      .text(lowerText, leftX, signatureLineY + 5, options)
-      .moveTo(leftX + signatureLineHorizontalMargin, signatureLineY)
-      .lineTo(rightX - signatureLineHorizontalMargin, signatureLineY)
-      .stroke()
-  }
-
-  doc.fontSize(9)
-  drawPlaceholders("APROBADO POR", "CLIENTE", BOX2_POS.x, X3_LINE)
-  drawPlaceholders("ENTREGADO POR", "FIRMA Y SELLO", X3_LINE, X2_LINE)
-  doc.fontSize(12)
-}
 const drawInvoiceDetailsBox = (doc) => {
 
 
@@ -226,10 +141,6 @@ const drawInvoiceDetailsBox = (doc) => {
   doc.moveTo(X3_LINE, Y5_LINE)
     .lineTo(X3_LINE, BOX2_END_Y)
     .stroke()
-
-
-  drawInvoiceDetailsHeader(doc)
-  drawSignaturePlaceholders(doc)
 }
 
 const drawFacturableDescription = (doc, facturable, detallado, linePos) => {
@@ -239,9 +150,10 @@ const drawFacturableDescription = (doc, facturable, detallado, linePos) => {
   const descriptionStartX = cantColumnSeparator + 5
   doc.text(facturable.nombre, descriptionStartX, linePos, descriptionOptions)
   if (detallado) {
-    doc.text(facturable.marca, descriptionStartX, doc.y, descriptionOptions)
-    const loteFechaString = `LOTE: ${facturable.lote} FECHA: ${facturable.fechaExp}`
-    doc.text(loteFechaString, descriptionStartX, doc.y, descriptionOptions)
+    const detalleString = facturable.lote !== ''
+      ? `MARCA: ${facturable.marca} LOTE: ${facturable.lote} FECHA: ${facturable.fechaExp}`
+      : `MARCA: ${facturable.marca} FECHA: ${facturable.fechaExp}`
+    doc.text(detalleString, descriptionStartX, doc.y, descriptionOptions)
   }
 }
 
@@ -288,17 +200,26 @@ const drawRemainingFacturablesOnNextPage = (doc, detallado, facturables, startPo
 const drawFacturablesDetails = (doc, facturables, detallado) => {
   drawInvoiceDetailsBox(doc)
   doc.y = Y3_LINE + 5
-  for (let i = 0; i < facturables.length; i++) {
-    const facturable = facturables[i]
-    const heightFactor = detallado ? 4 : 2
-    const facturableSeDesborda = doc.y + doc.currentLineHeight() * heightFactor > Y4_LINE
-    if (facturableSeDesborda) return i
-    drawFacturableLine(doc, facturable, detallado, i + 1)
+  try {
+    doc.fontSize(10)
+    for (let i = 0; i < facturables.length; i++) {
+      const facturable = facturables[i]
+      const heightFactor = detallado ? 4 : 2
+      const facturableSeDesborda = doc.y + doc.currentLineHeight() * heightFactor > Y4_LINE
+      if (facturableSeDesborda) throw { indiceDeDesborde: i }
+      drawFacturableLine(doc, facturable, detallado, i + 1)
+    }
+  } catch (err) {
+    if (err.indiceDeDesborde)
+      return err.indiceDeDesborde
+    else throw err
+  } finally {
+    doc.fontSize(12)
   }
 }
 
 const drawValueLine = (doc, valueLabel, valueSymbol, valueNumber) => {
-  const labelColumnX = X2_LINE + 25
+  const labelColumnX = X2_LINE + 15
   const symbolColumnWidth = unitPriceColumnSeparator - X2_LINE
   const valueColumnWidth = BOX2_END_X - unitPriceColumnSeparator - 10
   const valueColumnX = unitPriceColumnSeparator + 5
@@ -331,11 +252,9 @@ const drawTotalValues = (doc, facturaPDFData) => {
 const drawTotalPalabras = (doc, palabras) => {
   const textStartX = BOX2_POS.x + 5
   const options = { width: X2_LINE - BOX2_POS.x - 10 }
-  doc.fontSize(10)
-    .text(chequeCruzadoString, textStartX, Y4_LINE + 5, options)
-    .fontSize(12) //restore default
-
-  doc.text(palabras, textStartX, doc.y, options)
+  doc.fontSize(9)
+    .text(palabras, textStartX, Y4_LINE + 30, options)
+    .fontSize(12)
 }
 
 const drawPaymentMethodColumn = (doc, boxHeight, methodName, totalPayed) => {
