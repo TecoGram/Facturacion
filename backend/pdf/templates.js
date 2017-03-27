@@ -39,32 +39,6 @@ const paymentAgreementString = 'Declaro expresamente haver recibido la mercader�
   + ' pago. Para toda acción legal, renuncio a domicilio y me someto a los jueces'
   + ' de esta jurisdicción o al que elija el acreedor.'
 
-const drawTitle = (doc) => {
-  const titlePos = {x: 50, y: 30 }
-  const title = "Teco Gram S.A."
-  const subtitle = "Laboratorio Clínico"
-  const subtitle2 = "Resultados confiables para su bienestar."
-  const rucSubtitle = "R.U.C. # 0992218916001"
-
-  doc.save()
-    .fontSize(22)
-    .text(title, titlePos.x, titlePos.y)
-    .fontSize(12) //restore
-
-  doc.text(subtitle)
-    .text(subtitle2)
-    .text(rucSubtitle)
-}
-
-const drawInvoiceInfoBox = (doc) => {
-
-  doc.rect(BOX1_POS.x, BOX1_POS.y, BOX1_SIZE.x, BOX1_SIZE.y)
-
-  doc.moveTo(X1_LINE, BOX1_POS.y)
-    .lineTo(X1_LINE, BOX1_POS.y + BOX1_SIZE.y)
-    .stroke()
-}
-
 const drawInvoiceInfoContents = (doc, fecha, cliente) => {
   const {
     nombre,
@@ -96,51 +70,13 @@ const drawInvoiceInfoContents = (doc, fecha, cliente) => {
   doc.lineGap(0) //restore default
 }
 
-const drawInvoiceCode = (doc, code) => {
-  const facturaTextPos = { x: X1_LINE, y: BOX1_POS.y + 5 }
-  const boxOptions = {
-    width: MAIN_BOX_X + MAIN_BOX_WIDTH - X1_LINE,
-    align: 'center',
-  }
-
-  const codigoTextY = Y1_LINE + 20
-  doc.fontSize(16)
-    .text(code, facturaTextPos.x, codigoTextY, boxOptions)
-  doc.fontSize(12) //Restore default
-}
-
 const drawInvoiceInfo = (doc, ventaRow, cliente) => {
   const {
-    codigo,
     fecha,
   } = ventaRow
 
-  drawInvoiceInfoBox(doc)
-  drawInvoiceCode(doc, codigo)
   drawInvoiceInfoContents(doc, fecha, cliente)
 
-}
-
-const drawInvoiceDetailsBox = (doc) => {
-
-
-  doc.rect(BOX2_POS.x, BOX2_POS.y, BOX2_SIZE.x, BOX2_SIZE.y)
-
-  doc.moveTo(BOX2_POS.x, Y3_LINE)
-    .lineTo(BOX2_END_X, Y3_LINE)
-
-  doc.moveTo(BOX2_POS.x, Y4_LINE)
-    .lineTo(BOX2_END_X, Y4_LINE)
-
-  doc.moveTo(X2_LINE, Y4_LINE)
-    .lineTo(X2_LINE, BOX2_END_Y)
-
-  doc.moveTo(BOX2_POS.x, Y5_LINE)
-    .lineTo(X2_LINE, Y5_LINE)
-
-  doc.moveTo(X3_LINE, Y5_LINE)
-    .lineTo(X3_LINE, BOX2_END_Y)
-    .stroke()
 }
 
 const drawFacturableDescription = (doc, facturable, detallado, linePos) => {
@@ -198,7 +134,6 @@ const drawRemainingFacturablesOnNextPage = (doc, detallado, facturables, startPo
 }
 
 const drawFacturablesDetails = (doc, facturables, detallado) => {
-  drawInvoiceDetailsBox(doc)
   doc.y = Y3_LINE + 5
   try {
     doc.fontSize(10)
@@ -280,7 +215,7 @@ const drawPaymentMethodColumn = (doc, boxHeight, methodName, totalPayed) => {
 
 const drawPaymentAgreement = (doc, boxHeight) => {
   const textY = paymentMethodValueBoxY + boxHeight + 5
-  doc.fontSize(9)
+  doc.fontSize(8)
     .text(paymentAgreementString, BOX2_POS.x, textY, {
       width: BOX2_SIZE.x,
     })
@@ -321,7 +256,6 @@ module.exports = {
         facturables,
       } = facturaPDFData
 
-      drawTitle(doc)
       drawInvoiceInfo(doc, facturaPDFData, cliente)
       const remainingFacturablesIndex = drawFacturablesDetails(doc, facturables,
         detallado)
