@@ -1,7 +1,7 @@
 const valorPalabras =require('../pdf/pdfutils.js').valorPalabras
 
 const MAIN_BOX_X = 27
-const MAIN_BOX_WIDTH = 526
+const MAIN_BOX_WIDTH = 519
 
 const BOX1_POS = { x: MAIN_BOX_X, y: 150 }
 const BOX1_SIZE = { x: MAIN_BOX_WIDTH, y: 89 }
@@ -16,7 +16,7 @@ const X2_LINE = 350
 const X3_LINE = (X2_LINE - MAIN_BOX_X)/2 + MAIN_BOX_X
 const Y1_LINE = 160
 //const Y2_LINE = 211
-const Y3_LINE = 273
+const Y3_LINE = 265
 const Y4_LINE = 590
 const Y5_LINE = 670
 
@@ -136,7 +136,7 @@ const drawRemainingFacturablesOnNextPage = (doc, detallado, facturables, startPo
 const drawFacturablesDetails = (doc, facturables, detallado) => {
   doc.y = Y3_LINE + 5
   try {
-    doc.fontSize(10)
+    doc.fontSize(8)
     for (let i = 0; i < facturables.length; i++) {
       const facturable = facturables[i]
       const heightFactor = detallado ? 4 : 2

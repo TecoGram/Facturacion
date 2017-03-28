@@ -4,6 +4,8 @@ Sistema de facturación web sencillo escrito con React, Node.js y SQLite 3.
 
 Se recomienda usar versiones actuales de Google Chrome (>=56) para el cliente.
 
+![screenshot1](https://cloud.githubusercontent.com/assets/5729175/24410708/5fa3bcaa-1399-11e7-9cf7-378244afe11d.png)
+
 ______
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
