@@ -38,7 +38,7 @@ import NuevoClienteDialog from './NuevoCliente/NuevoClienteDialog'
 import NuevoProductoDialog from './NuevoProducto/NuevoProductoDialog'
 import NuevoMedicoDialog from './NuevoMedico/NuevoMedicoDialog'
 import FacturasListView from './FacturasList/FacturasListView'
-import ProductosListView from './ProductosListView'
+import ProductosListView from './ProductosList/ProductosListView'
 import store from '../Store'
 import InitialStore from '../InitialStore'
 
@@ -123,9 +123,9 @@ class MainSnackbar extends React.Component {
     return false
   }
 
-  render () {
-    const data = this.props.data
-    let action, message, open, onActionTouchTap
+  getDataFromProps = (props) => {
+    const data = props.data
+    let action, message, open, onActionTouchTap, duration
     if (data) {
       open = true
       message = data.message
@@ -133,14 +133,28 @@ class MainSnackbar extends React.Component {
         action = "ABRIR"
         onActionTouchTap = () => window.open(data.link)
       }
+      if (data.duration)
+        duration = data.duration
     } else {
       open = false
       message = ''
     }
 
+    return { action, message, open, onActionTouchTap, duration }
+  }
+
+  render () {
+    const {
+      action,
+      message,
+      open,
+      duration,
+      onActionTouchTap,
+    } = this.getDataFromProps(this.props)
+
     return (
       <Snackbar open={open} message={message} action={action}
-      onActionTouchTap={onActionTouchTap} autoHideDuration={12000}/>
+      onActionTouchTap={onActionTouchTap} autoHideDuration={duration || 12000}/>
     )
   }
 }
@@ -277,6 +291,7 @@ class MainDialog extends Component {
 const SelectedPage = (props) => {
   const {
     abrirLinkConSnackbar,
+    mostrarErrorConSnackbar,
     ajustes,
     page,
     editarFactura,
@@ -302,7 +317,8 @@ const SelectedPage = (props) => {
       return <FacturasListView editarFactura={editarFactura}
         editarFacturaExamen={editarFacturaExamen} {...pageProps}/>
     case PRODUCTO_LIST_PAGE:
-      return <ProductosListView {...pageProps}/>
+      return <ProductosListView mostrarErrorConSnackbar={mostrarErrorConSnackbar}
+        {...pageProps}/>
     default:
       return null
   }
@@ -333,6 +349,7 @@ class Main extends Component {
   render() {
     const {
       abrirLinkConSnackbar,
+      mostrarErrorConSnackbar,
       editarFactura,
       editarFacturaExamen,
       cambiarDialog,
@@ -354,7 +371,8 @@ class Main extends Component {
           editarFactura={editarFactura}
           ajustes={ajustes}
           editarFacturaExamen={editarFacturaExamen}
-          abrirLinkConSnackbar={abrirLinkConSnackbar}/>
+          abrirLinkConSnackbar={abrirLinkConSnackbar}
+          mostrarErrorConSnackbar={mostrarErrorConSnackbar} />
         <MainDrawer
           open={this.state.drawerOpen}
           handleChange={this.handleDrawerChange}

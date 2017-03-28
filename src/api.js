@@ -68,6 +68,11 @@ module.exports = {
       .send()
   },
 
+  deleteProducto: (rowid) => {
+    return request.post(prefix + `/producto/delete/${rowid}`)
+      .send()
+  },
+
   insertarVenta: (ventaRow) => {
     return request.post(prefix + '/venta/new')
       .send(ventaRow)

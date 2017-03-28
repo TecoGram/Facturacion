@@ -343,6 +343,15 @@ describe('endpoints disponibles para el cliente', function () {
         done()
       })
     })
+
+    it('no permite borrar productos facturados', function (done) {
+      api.deleteProducto(1)
+      .then(done, function (err) {
+        const statusCode = err.status
+        statusCode.should.equal(400)
+        done()
+      })
+    })
   })
 
   const newVentaExRow = Object.assign({}, newVentaRow)
@@ -652,6 +661,27 @@ describe('endpoints disponibles para el cliente', function () {
         done()
       })
       .catch(done)
+    })
+  })
+
+  describe('/producto/delete', function () {
+    it('retorna 200 al borrar un producto exitosamente', function (done) {
+      api.deleteProducto(2)
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        done()
+      })
+      .catch(done)
+    })
+
+    it('retorna 404 al tratar de borrar un producto inexistente', function (done) {
+      api.deleteProducto(15)
+      .then(done, function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(404)
+        done()
+      })
     })
   })
 })

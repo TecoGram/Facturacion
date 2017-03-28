@@ -329,6 +329,16 @@ describe('metodos de dbAdmin.js', function () {
           done(err)
         })
       })
+
+    it('No se permite borrar productos despues de facturarlos',
+      function (done) {
+        db.deleteProducto(unidades[0].producto)
+        .then(function (res) { done(res) },
+          function (err) {
+            err.code.should.equal('SQLITE_CONSTRAINT')
+            done()
+          })
+      })
   })
 
 
@@ -738,6 +748,7 @@ describe('metodos de dbAdmin.js', function () {
       })
   })
 
+
   describe('deleteVenta', function () {
     it('borra una venta de la db y todas las unidades asociadas', function (done) {
       db.getFacturablesVenta(ventaInsertada.codigo, ventaInsertada.empresa)
@@ -785,6 +796,25 @@ describe('metodos de dbAdmin.js', function () {
         .catch(function (err) {
           done(err)
         })
+    })
+  })
+
+  describe('deleteProducto', function () {
+    it("elimina un producto de la base de datos, si no ha sido facturado", function (done) {
+      const itemABorrar = 1
+      db.deleteProducto(itemABorrar)
+      .then(function (id) {
+        id.should.equal(1)
+        done()
+      })
+    })
+    it("retorna 0 en el callback si no encuentra un producto a borrar", function (done) {
+      const itemABorrar = 15
+      db.deleteProducto(itemABorrar)
+      .then(function (id) {
+        id.should.equal(0)
+        done()
+      })
     })
   })
 })

@@ -156,6 +156,27 @@ app.get('/producto/find', validarBusqueda, function (req,res) {
 
 });
 
+app.post('/producto/delete/:id', function (req, res) {
+  const id = req.params.id
+
+  const handleSuccess = function(deleteCount) {
+    if (deleteCount === 0)
+      res.status(404).send('Producto no encontrado')
+    else
+      res.status(200).send('Producto eliminado')
+  }
+
+  const handleFailiure = function (err) {
+    if (err.errno === CONSTRAINT_ERROR_SQLITE)
+      res.status(400)
+        .send('Error: Borrar este producto dañaría una factura existente.')
+    else
+      res.status(422).send(err)
+  }
+
+  db.deleteProducto(id).then(handleSuccess, handleFailiure)
+})
+
 function verVenta(req, res, tipo) {
   const {
     codigo,

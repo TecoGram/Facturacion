@@ -16,7 +16,8 @@ import {
   CAMBIAR_DIALOG_ACTION,
   CAMBIAR_PAGE_ACTION,
   CERRAR_DIALOG_CON_MSG_ACTION,
-  ABRIR_LINK_CON_SNACKBAR } from './ActionTypes'
+  ABRIR_LINK_CON_SNACKBAR,
+  MOSTRAR_ERROR_CON_SNACKBAR } from './ActionTypes'
 
 const cambiarPagina = (tipoPagina, props) => {
   switch (tipoPagina) {
@@ -134,6 +135,14 @@ module.exports = {
       type: ABRIR_LINK_CON_SNACKBAR,
       message: msg,
       link: link,
+    }
+  },
+
+  mostrarErrorConSnackbar(msg) {
+    return {
+      type: MOSTRAR_ERROR_CON_SNACKBAR,
+      message: msg,
+      duration: 5000,
     }
   },
 }
