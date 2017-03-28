@@ -79,6 +79,13 @@ const deleteProducto = (rowid) => {
     .where({rowid})
     .del()
 }
+
+const deleteCliente = (ruc) => {
+  return knex('clientes')
+    .where({ ruc })
+    .del()
+}
+
 const deleteUnidadesVenta = (builder, codigo, empresa) => {
   return builder('unidades')
     .where({ codigoVenta: codigo, empresaVenta: empresa})
@@ -362,6 +369,7 @@ module.exports = {
   getFacturaData,
 
   getExamenInfo,
+  deleteCliente,
   deleteVenta,
   deleteProducto,
   getFacturablesVenta,

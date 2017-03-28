@@ -8,6 +8,7 @@ import {
 import {
   NEW_FACTURA_PAGE,
   FACTURA_LIST_PAGE,
+  CLIENTE_LIST_PAGE,
   PRODUCTO_LIST_PAGE,
   EDITAR_FACTURA_PAGE,
   NEW_FACTURA_EXAMEN_PAGE,
@@ -25,6 +26,12 @@ const cambiarPagina = (tipoPagina, props) => {
       return {
         type: CAMBIAR_PAGE_ACTION,
         value: FACTURA_LIST_PAGE,
+        props: props,
+      }
+    case CLIENTE_LIST_PAGE:
+      return {
+        type: CAMBIAR_PAGE_ACTION,
+        value: CLIENTE_LIST_PAGE,
         props: props,
       }
     case PRODUCTO_LIST_PAGE:

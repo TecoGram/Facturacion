@@ -339,6 +339,16 @@ describe('metodos de dbAdmin.js', function () {
             done()
           })
       })
+
+    it('No se permite borrar un cliente que tenga una factura asociada',
+      function (done) {
+        db.deleteProducto(ventaInsertada.ruc)
+        .then(function (res) { done(res) },
+          function (err) {
+            err.code.should.equal('SQLITE_CONSTRAINT')
+            done()
+          })
+      })
   })
 
 
@@ -811,6 +821,25 @@ describe('metodos de dbAdmin.js', function () {
     it("retorna 0 en el callback si no encuentra un producto a borrar", function (done) {
       const itemABorrar = 15
       db.deleteProducto(itemABorrar)
+      .then(function (id) {
+        id.should.equal(0)
+        done()
+      })
+    })
+  })
+
+  describe('deleteCliente', function () {
+    it("elimina un cliente de la base de datos, si no tiene facturas", function (done) {
+      const clienteABorrar = ventaInsertada.ruc
+      db.deleteCliente(clienteABorrar)
+      .then(function (id) {
+        id.should.equal(1)
+        done()
+      })
+    })
+    it("retorna 0 en el callback si no encuentra un cliente a borrar", function (done) {
+      const clienteABorrar = '12345'
+      db.deleteProducto(clienteABorrar)
       .then(function (id) {
         id.should.equal(0)
         done()

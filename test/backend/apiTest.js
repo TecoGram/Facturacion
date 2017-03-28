@@ -352,6 +352,16 @@ describe('endpoints disponibles para el cliente', function () {
         done()
       })
     })
+
+    it('no permite borrar clientes con facturas', function (done) {
+      api.deleteCliente(cliente1.ruc)
+      .then(done, function (err) {
+        const statusCode = err.status
+        statusCode.should.equal(400)
+        done()
+      })
+    })
+
   })
 
   const newVentaExRow = Object.assign({}, newVentaRow)
@@ -677,6 +687,31 @@ describe('endpoints disponibles para el cliente', function () {
 
     it('retorna 404 al tratar de borrar un producto inexistente', function (done) {
       api.deleteProducto(15)
+      .then(done, function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(404)
+        done()
+      })
+    })
+  })
+
+  describe('/cliente/delete', function () {
+    it('retorna 200 al borrar un cliente exitosamente', function (done) {
+
+      api.deleteVenta(newVentaRow.codigo, 'BIOCLED') //primero borrar ventas asociadas
+      .then(function () {
+        return api.deleteCliente(cliente1.ruc)
+      })
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        done()
+      })
+      .catch(done)
+    })
+
+    it('retorna 404 al tratar de borrar un cliente inexistente', function (done) {
+      api.deleteCliente('12345')
       .then(done, function (resp) {
         const statusCode = resp.status
         statusCode.should.equal(404)

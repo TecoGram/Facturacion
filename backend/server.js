@@ -78,6 +78,28 @@ app.get('/cliente/find', function (req,res) {
 
 });
 
+app.post('/cliente/delete/:id', function (req, res) {
+  const ruc = req.params.id
+
+ console.log('ruc', ruc)
+  const handleSuccess = function(deleteCount) {
+    if (deleteCount === 0)
+      res.status(404).send('Cliente no encontrado')
+    else
+      res.status(200).send('Cliente eliminado')
+  }
+
+  const handleFailiure = function (err) {
+    if (err.errno === CONSTRAINT_ERROR_SQLITE)
+      res.status(400)
+        .send('Error: Borrar este cliente dañaría una factura existente.')
+    else
+      res.status(422).send(err)
+  }
+
+  db.deleteCliente(ruc).then(handleSuccess, handleFailiure)
+})
+
 
 app.post('/medico/new', validarMedico, function (req, res) {
   const {

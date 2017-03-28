@@ -28,7 +28,8 @@ import {
   EDITAR_FACTURA_PAGE,
   NEW_FACTURA_EXAMEN_PAGE,
   EDITAR_FACTURA_EXAMEN_PAGE,
-  FACTURA_LIST_PAGE, PRODUCTO_LIST_PAGE } from '../PageTypes'
+  FACTURA_LIST_PAGE,
+  CLIENTE_LIST_PAGE, PRODUCTO_LIST_PAGE } from '../PageTypes'
 
 import ActionCreators from '../ActionCreators'
 import CustomStyle from '../CustomStyle'
@@ -38,6 +39,7 @@ import NuevoClienteDialog from './NuevoCliente/NuevoClienteDialog'
 import NuevoProductoDialog from './NuevoProducto/NuevoProductoDialog'
 import NuevoMedicoDialog from './NuevoMedico/NuevoMedicoDialog'
 import FacturasListView from './FacturasList/FacturasListView'
+import ClientesListView from './ClientesList/ClientesListView'
 import ProductosListView from './ProductosList/ProductosListView'
 import store from '../Store'
 import InitialStore from '../InitialStore'
@@ -91,6 +93,11 @@ const MainDrawer = (props) => {
         Factura Examen
       </MenuItem>
       <Divider />
+      <MenuItem
+        onTouchTap={() => cp(CLIENTE_LIST_PAGE)}
+        leftIcon={<ViewList />}>
+        Clientes
+      </MenuItem>
       <MenuItem
         onTouchTap={() => cp(FACTURA_LIST_PAGE)}
         leftIcon={<ViewList />}>
@@ -316,6 +323,9 @@ const SelectedPage = (props) => {
     case FACTURA_LIST_PAGE:
       return <FacturasListView editarFactura={editarFactura}
         editarFacturaExamen={editarFacturaExamen} {...pageProps}/>
+    case CLIENTE_LIST_PAGE:
+      return <ClientesListView mostrarErrorConSnackbar={mostrarErrorConSnackbar}
+        {...pageProps}/>
     case PRODUCTO_LIST_PAGE:
       return <ProductosListView mostrarErrorConSnackbar={mostrarErrorConSnackbar}
         {...pageProps}/>
