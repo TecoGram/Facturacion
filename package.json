@@ -20,7 +20,6 @@
     "deep-freeze": "0.0.1",
     "express": "^4.14.0",
     "fecha": "^2.3.0",
-    "fixed-data-table": "^0.6.3",
     "immutable": "^3.8.1",
     "knex": "^0.12.6",
     "material-ui": "^0.16.3",
@@ -35,6 +34,7 @@
     "redux": "^3.6.0",
     "sqlite3": "^3.1.8",
     "superagent": "^2.3.0",
+    "typeface-roboto": "0.0.22",
     "validator": "^6.1.0"
   },
   "scripts": {

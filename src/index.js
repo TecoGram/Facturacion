@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import App from './custom/App'
 
-import 'fixed-data-table/dist/fixed-data-table.css'
+import 'typeface-roboto'
 import './index.css'
 
 injectTapEventPlugin();
