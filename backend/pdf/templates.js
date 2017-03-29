@@ -43,7 +43,7 @@ const drawInvoiceInfoContents = (doc, fecha, cliente) => {
   const {
     nombre,
     telefono1,
-    email,
+    direccion,
     ruc,
   } = cliente
 
@@ -58,7 +58,7 @@ const drawInvoiceInfoContents = (doc, fecha, cliente) => {
 
   doc.text(fecha, tableContentRowPos, topTableStart.y)
     .text(nombre)
-    .text(email)
+    .text(direccion)
 
   const RUCTitleLeftMargin = 240
   const RUCLeftMargin = 275
