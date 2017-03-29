@@ -47,6 +47,8 @@ export default class ClientesListView extends React.Component {
 
   componentWillReceiveProps = (nextProps) => {
     this.stateManager.props = nextProps
+    if (this.state.rows.length === 0)
+      this.requestData('')
   }
 
   componentDidMount() {
