@@ -39,10 +39,16 @@ export default class ProductosListView extends React.Component {
       .then(handleSuccess, mostrarError)
   }
 
+  editRow = (index) => {
+    const objetoAEditar = this.state.rows[index]
+    this.stateManager.colocarListaVacia()
+    this.props.editarProducto(objetoAEditar)
+  }
+
   componentWillReceiveProps = (nextProps) => {
     this.stateManager.props = nextProps
   }
-  
+
   componentDidMount() {
     this.requestData('')
   }
@@ -58,7 +64,8 @@ export default class ProductosListView extends React.Component {
         searchHint={searchHint}
         height={'450px'}
         onQueryChanged={this.requestData}
-        onDeleteItem={this.deleteRow} />
+        onDeleteItem={this.deleteRow}
+        onEditItem={this.editRow} />
     )
   }
 
@@ -66,4 +73,5 @@ export default class ProductosListView extends React.Component {
 
 ProductosListView.propTypes = {
   mostrarErrorConSnackbar: React.PropTypes.func.isRequired,
+  editarProducto: React.PropTypes.func.isRequired,
 }

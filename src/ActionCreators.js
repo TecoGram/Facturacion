@@ -112,6 +112,15 @@ module.exports = {
     }
   },
 
+  editarProducto(productoAEditar) {
+    return {
+      type: CAMBIAR_DIALOG_ACTION,
+      value: PRODUCTO_DIALOG,
+      editar: productoAEditar,
+      open: true,
+    }
+  },
+
   editarFactura(codigo, empresa) {
     return cambiarPagina(EDITAR_FACTURA_PAGE, {
       ventaKey: {

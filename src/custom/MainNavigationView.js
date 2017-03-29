@@ -296,6 +296,7 @@ const SelectedPage = (props) => {
     ajustes,
     page,
     editarCliente,
+    editarProducto,
     editarFactura,
     editarFacturaExamen,
   } = props
@@ -323,7 +324,7 @@ const SelectedPage = (props) => {
         editarCliente={editarCliente} {...pageProps}/>
     case PRODUCTO_LIST_PAGE:
       return <ProductosListView mostrarErrorConSnackbar={mostrarErrorConSnackbar}
-        {...pageProps}/>
+        editarProducto={editarProducto} {...pageProps}/>
     default:
       return null
   }
@@ -356,6 +357,7 @@ class Main extends Component {
       abrirLinkConSnackbar,
       mostrarErrorConSnackbar,
       editarCliente,
+      editarProducto,
       editarFactura,
       editarFacturaExamen,
       cancelarDialog,
@@ -377,6 +379,7 @@ class Main extends Component {
           ajustes={ajustes}
           page={page}
           editarCliente={editarCliente}
+          editarProducto={editarProducto}
           editarFactura={editarFactura}
           editarFacturaExamen={editarFacturaExamen}
           abrirLinkConSnackbar={abrirLinkConSnackbar}

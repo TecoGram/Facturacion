@@ -5,7 +5,7 @@ chai.should()
 chai.use(require('chai-string'));
 const expect = chai.expect
 
-const DialogState = require('../../src/custom/NuevoCliente/DialogState.js')
+const DialogState = require('../../src/custom/NuevoProducto/DialogState.js')
 let state
 let stateManager
 const setStateFunc = (arg) => {
@@ -14,32 +14,29 @@ const setStateFunc = (arg) => {
 
 const llenarStateConDatosCorrectos = () => {
   state.inputs = {
-    ruc: '0937816882001',
-    nombre: 'Dr. Julio Mendoza',
-    direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
-    correo: 'julio_mendoza@yahoo.com.ec',
-    telefono1: '2645422', telefono2: '2876357', descDefault: '0',
+    codigo: "fsers4",
+    nombre: "producto Á",
+    marca: "TECO",
+    precioDist: 9.99,
+    precioVenta: 14.99,
+    pagaIva: true,
   }
 }
 
-describe('Cliente Dialog State', function () {
+describe('PRODUCTO_DIALOG Dialog State', function () {
 
   before(function () {
-    state = {
-      inputs: {},
-      errors: {},
-      serverError: null,
-    }
+    state = new DialogState({}, setStateFunc).getDefaultState()
   })
 
   describe('validarDatos', function () {
-    it('retorna null si no logra validar el cliente', function () {
+    it('retorna null si no logra validar el producto', function () {
       stateManager = new DialogState({}, setStateFunc)
       const result = stateManager.validarDatos(state.inputs)
       expect(result).to.be.null
     })
 
-    it('retorna el objeto inputs si logra validar el cliente', function () {
+    it('retorna el objeto inputs si logra validar el producto', function () {
       stateManager = new DialogState({}, setStateFunc)
       llenarStateConDatosCorrectos()
       const result = stateManager.validarDatos(state.inputs)
@@ -56,6 +53,7 @@ describe('Cliente Dialog State', function () {
       stateManager = new DialogState({ cerrarDialogConMsg }, setStateFunc)
       llenarStateConDatosCorrectos()
       stateManager.cerrarDialogConExito('test')
+      state.should.eql(stateManager.getDefaultState())
       msg.should.endWith('test')
     })
   })
@@ -88,11 +86,7 @@ describe('Cliente Dialog State', function () {
       stateManager = new DialogState({ cancelarDialog }, setStateFunc)
       stateManager.cancelarDialog()
       called.should.be.true
-      state.should.eql({
-        inputs: {},
-        errors: {},
-        serverError: null,
-      })
+      state.should.eql(stateManager.getDefaultState())
     })
   })
 
@@ -100,26 +94,37 @@ describe('Cliente Dialog State', function () {
     it('obtiene el mensaje de exito a mostrar segun el valor de editar en props', function () {
       stateManager = new DialogState({ editar: {} }, setStateFunc)
       const editarMsg = stateManager.getMensajeExito('test')
-      editarMsg.should.equal('Cliente actualizado: test')
+      editarMsg.should.equal('Producto actualizado: test')
 
       stateManager.props.editar = null
       const insertarMsg = stateManager.getMensajeExito('test')
-      insertarMsg.should.equal('Nuevo cliente guardado: test')
+      insertarMsg.should.equal('Nuevo producto guardado: test')
     })
   })
 
   describe('revisarDataParaEditar', function () {
     it('revisa props y si hay un objeto editar se lo pasa al state', function () {
       const editar = {
-        ruc: '0937816882001',
-        nombre: 'Dr. Julio Mendoza',
-        direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
-        correo: 'julio_mendoza@yahoo.com.ec',
-        telefono1: '2645422', telefono2: '2876357', descDefault: '0',
+        rowid: 1,
+        codigo: "fgdfg4",
+        nombre: "producto B",
+        marca: "BIO",
+        precioDist: 19.99,
+        precioVenta: 24.99,
+        pagaIva: 0,
+      }
+      const editarInputs = {
+        rowid: 1,
+        codigo: "fgdfg4",
+        nombre: "producto B",
+        marca: "BIO",
+        precioDist: '19.99',
+        precioVenta: '24.99',
+        pagaIva: false,
       }
       stateManager = new DialogState({ editar }, setStateFunc)
       stateManager.revisarDataParaEditar()
-      state.inputs.should.eql(editar)
+      state.inputs.should.eql(editarInputs)
     })
   })
 })

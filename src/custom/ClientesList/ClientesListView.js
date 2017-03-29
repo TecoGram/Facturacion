@@ -41,6 +41,7 @@ export default class ClientesListView extends React.Component {
 
   editRow = (index) => {
     const objetoAEditar = this.state.rows[index]
+    this.stateManager.colocarListaVacia()
     this.props.editarCliente(objetoAEditar)
   }
 

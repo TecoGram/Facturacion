@@ -831,7 +831,7 @@ describe('metodos de dbAdmin.js', function () {
 
   describe('updateCliente', function () {
     const updateArgs = [cliente1.ruc, 'Alvar Ortiz', 'Samborondon 123',
-        'me@url.com', '2345678', '2987765', 3]
+      'me@url.com', '2345678', '2987765', 3]
     it("actualiza un cliente en la base de datos", function (done) {
       db.updateCliente(...updateArgs)
       .then(function (ids) {

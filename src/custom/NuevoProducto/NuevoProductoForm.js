@@ -79,3 +79,9 @@ export default class NuevoProductoForm extends React.Component {
     )
   }
 }
+
+NuevoProductoForm.propTypes = {
+  errors: React.PropTypes.object.isRequired,
+  inputs: React.PropTypes.object.isRequired,
+  updateData: React.PropTypes.func.isRequired,
+}
