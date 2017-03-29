@@ -25,6 +25,20 @@ module.exports = {
       .set('Accept', 'application/json')
   },
 
+  updateCliente: (ruc, nombre, direccion, email, telefono1, telefono2, descDefault) => {
+    return request.post(prefix + '/cliente/update')
+      .send({
+        ruc: ruc,
+        nombre: nombre,
+        direccion: direccion,
+        email: email,
+        telefono1: telefono1,
+        telefono2: telefono2,
+        descDefault: descDefault,
+      })
+      .set('Accept', 'application/json')
+  },
+
   findClientes: (queryString) => {
     return request.get(prefix + '/cliente/find?q=' + queryString)
       .send()
@@ -56,6 +70,20 @@ module.exports = {
   insertarProducto: (codigo, nombre, marca, precioDist, precioVenta, pagaIva) => {
     return request.post(prefix + '/producto/new')
       .send({
+        codigo: codigo,
+        nombre: nombre,
+        marca: marca,
+        precioDist: precioDist,
+        precioVenta: precioVenta,
+        pagaIva: pagaIva,
+      })
+      .set('Accept', 'application/json')
+  },
+
+  updateProducto: (rowid, codigo, nombre, marca, precioDist, precioVenta, pagaIva) => {
+    return request.post(prefix + '/producto/update')
+      .send({
+        rowid: rowid,
         codigo: codigo,
         nombre: nombre,
         marca: marca,

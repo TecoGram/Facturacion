@@ -78,10 +78,35 @@ app.get('/cliente/find', function (req,res) {
 
 });
 
+app.post('/cliente/update', validarCliente, function (req, res) {
+  const {
+    ruc,
+    nombre,
+    direccion,
+    email,
+    telefono1,
+    telefono2,
+    descDefault,
+  } = req.safeData
+
+  const handleSuccess = function(updateCount) {
+    if (updateCount === 0)
+      res.status(404).send('Cliente no encontrado')
+    else
+      res.status(200).send('Cliente actualizado')
+  }
+
+  const handleFailiure = function (err) {
+    res.status(500).send(err)
+  }
+
+  db.updateCliente(ruc, nombre, email, direccion, telefono1, telefono2, descDefault)
+    .then(handleSuccess, handleFailiure)
+})
+
 app.post('/cliente/delete/:id', function (req, res) {
   const ruc = req.params.id
 
- console.log('ruc', ruc)
   const handleSuccess = function(deleteCount) {
     if (deleteCount === 0)
       res.status(404).send('Cliente no encontrado')
@@ -177,6 +202,32 @@ app.get('/producto/find', validarBusqueda, function (req,res) {
   })
 
 });
+
+app.post('/producto/update', validarProducto, function (req, res) {
+  const {
+    rowid,
+    codigo,
+    nombre,
+    marca,
+    precioDist,
+    precioVenta,
+    pagaIva,
+  } = req.safeData
+
+  const handleSuccess = function(updateCount) {
+    if (updateCount === 0)
+      res.status(404).send('Producto no encontrado')
+    else
+      res.status(200).send('Producto actualizado')
+  }
+
+  const handleFailiure = function (err) {
+    res.status(500).send(err)
+  }
+
+  db.updateProducto(rowid, codigo, nombre, marca, precioDist, precioVenta, pagaIva)
+    .then(handleSuccess, handleFailiure)
+})
 
 app.post('/producto/delete/:id', function (req, res) {
   const id = req.params.id

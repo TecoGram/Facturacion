@@ -809,6 +809,47 @@ describe('metodos de dbAdmin.js', function () {
     })
   })
 
+  describe('updateProducto', function () {
+    const updateArgs = [1, "fdrh2", "producto Z", "BIO", 19.99, 34.99, false]
+    it("actualiza un producto en la base de datos", function (done) {
+      db.updateProducto(...updateArgs)
+      .then(function (ids) {
+        ids.should.equal(1)
+        done()
+      })
+    })
+    it("retorna 0 en el callback si no encuentra un producto a actualizar", function (done) {
+      const wrongArgs = [...updateArgs]
+      wrongArgs[0] = 99
+      db.updateProducto(...wrongArgs)
+      .then(function (ids) {
+        ids.should.equal(0)
+        done()
+      })
+    })
+  })
+
+  describe('updateCliente', function () {
+    const updateArgs = [cliente1.ruc, 'Alvar Ortiz', 'Samborondon 123',
+        'me@url.com', '2345678', '2987765', 3]
+    it("actualiza un cliente en la base de datos", function (done) {
+      db.updateCliente(...updateArgs)
+      .then(function (ids) {
+        ids.should.equal(1)
+        done()
+      })
+    })
+    it("retorna 0 en el callback si no encuentra un cliente a actualizar", function (done) {
+      const wrongArgs = [...updateArgs]
+      wrongArgs[0] = '999333'
+      db.updateCliente(...wrongArgs)
+      .then(function (ids) {
+        ids.should.equal(0)
+        done()
+      })
+    })
+  })
+
   describe('deleteProducto', function () {
     it("elimina un producto de la base de datos, si no ha sido facturado", function (done) {
       const itemABorrar = 1

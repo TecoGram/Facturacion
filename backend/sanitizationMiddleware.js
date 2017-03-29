@@ -61,6 +61,8 @@ module.exports = {
     } else {
       inputs.precioDist = Number(inputs.precioDist)
       inputs.precioVenta = Number(inputs.precioVenta)
+      if (req.url === '/producto/update')
+        inputs.rowid = req.body.rowid
       req.safeData = inputs
       next()
     }

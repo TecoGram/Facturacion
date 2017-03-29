@@ -674,6 +674,28 @@ describe('endpoints disponibles para el cliente', function () {
     })
   })
 
+  describe('/producto/update', function () {
+    const updateArgs = ['trhbi3', 'prod XYZ', "BIO", 19.99, 79.99, false]
+    it('retorna 200 al actualizar un producto exitosamente', function (done) {
+      api.updateProducto(2, ...updateArgs)
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        done()
+      })
+      .catch(done)
+    })
+
+    it('retorna 404 al tratar de actualizar un producto inexistente', function (done) {
+      api.updateProducto(15, ...updateArgs)
+      .then(done, function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(404)
+        done()
+      })
+    })
+  })
+
   describe('/producto/delete', function () {
     it('retorna 200 al borrar un producto exitosamente', function (done) {
       api.deleteProducto(2)
@@ -687,6 +709,29 @@ describe('endpoints disponibles para el cliente', function () {
 
     it('retorna 404 al tratar de borrar un producto inexistente', function (done) {
       api.deleteProducto(15)
+      .then(done, function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(404)
+        done()
+      })
+    })
+  })
+
+  describe('/cliente/update', function () {
+    const updateArgs = ['Julio Plaza', 'Ceibos Norte 123', 'you@somewhere.com',
+        '555555','666666', 8]
+    it('retorna 200 al actualizar un cliente exitosamente', function (done) {
+      api.updateCliente(cliente1.ruc, ...updateArgs)
+      .then(function (resp) {
+        const statusCode = resp.status
+        statusCode.should.equal(200)
+        done()
+      })
+      .catch(done)
+    })
+
+    it('retorna 404 al tratar de actualizar un cliente inexistente', function (done) {
+      api.updateCliente('546889', ...updateArgs)
       .then(done, function (resp) {
         const statusCode = resp.status
         statusCode.should.equal(404)

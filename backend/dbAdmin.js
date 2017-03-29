@@ -238,6 +238,32 @@ const buscarEnTabla = (tabla, columna, queryString, limit) => {
   return query
 }
 
+const updateProducto = (rowid, codigo, nombre, marca, precioDist, precioVenta, pagaIva) => {
+  const nombreAscii = convertToAscii(nombre)
+  return knex.table('productos').where({ rowid }).update({
+    codigo: codigo,
+    nombreAscii: nombreAscii,
+    nombre: nombre,
+    marca: marca,
+    precioDist: precioDist,
+    precioVenta: precioVenta,
+    pagaIva: pagaIva,
+  })
+}
+
+const updateCliente = (ruc, nombre, direccion, email, telefono1, telefono2, descDefault) => {
+  const nombreAscii = convertToAscii(nombre)
+  return knex.table('clientes').where({ ruc }).update({
+    nombreAscii: nombreAscii,
+    nombre: nombre,
+    direccion: direccion,
+    email: email,
+    telefono1: telefono1,
+    telefono2: telefono2,
+    descDefault: descDefault,
+  })
+}
+
 module.exports = {
   close: () => { knex.destroy() },
   insertarProducto: (codigo, nombre, marca, precioDist, precioVenta, pagaIva) => {
@@ -369,8 +395,10 @@ module.exports = {
   getFacturaData,
 
   getExamenInfo,
+  getFacturablesVenta,
   deleteCliente,
   deleteVenta,
   deleteProducto,
-  getFacturablesVenta,
+  updateCliente,
+  updateProducto,
 }
