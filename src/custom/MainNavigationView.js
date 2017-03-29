@@ -17,12 +17,11 @@ import NavigationMenu from 'material-ui/svg-icons/navigation/menu';
 import { bindActionCreators } from 'redux';
 import { connect, Provider } from 'react-redux'
 
-import { NUEVO_CLIENTE_DIALOG,
-  NUEVO_PRODUCTO_DIALOG,
-  NUEVO_MEDICO_DIALOG,
-  NUEVO_CLIENTE_DIALOG_CLOSED,
-  NUEVO_MEDICO_DIALOG_CLOSED,
-  NUEVO_PRODUCTO_DIALOG_CLOSED } from '../DialogTypes'
+import {
+  CLIENTE_DIALOG,
+  PRODUCTO_DIALOG,
+  MEDICO_DIALOG,
+} from '../DialogTypes'
 import {
   NEW_FACTURA_PAGE,
   EDITAR_FACTURA_PAGE,
@@ -210,7 +209,7 @@ class MainToolbar extends Component {
     } = this.getIconStyles(this.props, this.context)
 
     const {
-      cambiarDialog,
+      mostrarDialog,
       title,
       onLeftButtonClicked,
     } = this.props
@@ -236,11 +235,11 @@ class MainToolbar extends Component {
             targetOrigin={{horizontal: 'right', vertical: 'top'}}
             anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}>
             <MenuItem primaryText="Nuevo Producto" onTouchTap={() =>
-              cambiarDialog(NUEVO_PRODUCTO_DIALOG)}/>
+              mostrarDialog(PRODUCTO_DIALOG)}/>
             <MenuItem primaryText="Nuevo Cliente" onTouchTap={() =>
-              cambiarDialog(NUEVO_CLIENTE_DIALOG)}/>
+              mostrarDialog(CLIENTE_DIALOG)}/>
             <MenuItem primaryText="Nuevo Medico" onTouchTap={() =>
-              cambiarDialog(NUEVO_MEDICO_DIALOG)}/>
+              mostrarDialog(MEDICO_DIALOG)}/>
           </IconMenu>
           <IconMenu iconButtonElement={
             <IconButton touch={true} style={iconButtonStyle} iconStyle={iconButtonIconStyle}>
@@ -264,34 +263,29 @@ class MainToolbar extends Component {
 class MainDialog extends Component {
   render() {
     const {
-      type,
-      cambiarDialog,
+      dialogState,
+      mostrarDialog,
+      cancelarDialog,
       cerrarDialogConMsg,
     } = this.props
 
-    if(!type)
-      return (
-        <div />
-      )
-    else if (type === NUEVO_CLIENTE_DIALOG || type === NUEVO_CLIENTE_DIALOG_CLOSED)
-      return (
-        <NuevoClienteDialog open={ type === NUEVO_CLIENTE_DIALOG }
-          cambiarDialog={cambiarDialog}
-          cerrarDialogConMsg={cerrarDialogConMsg} />
-      )
-    else if (type === NUEVO_PRODUCTO_DIALOG || type === NUEVO_PRODUCTO_DIALOG_CLOSED)
-      return (
-        <NuevoProductoDialog open={ type === NUEVO_PRODUCTO_DIALOG }
-          cambiarDialog={cambiarDialog}
-          cerrarDialogConMsg={cerrarDialogConMsg} />
-      )
-    else if (type === NUEVO_MEDICO_DIALOG || type === NUEVO_MEDICO_DIALOG_CLOSED)
-      return (
-        <NuevoMedicoDialog open={ type === NUEVO_MEDICO_DIALOG }
-          cambiarDialog={cambiarDialog}
-          cerrarDialogConMsg={cerrarDialogConMsg} />
-      )
-    else throw Error('Tipo de dialog desconocido')
+    const dialogProps = {
+      open: dialogState.open,
+      editar: dialogState.editar,
+      cancelarDialog,
+      mostrarDialog,
+      cerrarDialogConMsg,
+    }
+    switch(dialogState.value) {
+      case CLIENTE_DIALOG:
+        return <NuevoClienteDialog {...dialogProps} />
+      case MEDICO_DIALOG:
+        return <NuevoMedicoDialog {...dialogProps} />
+      case PRODUCTO_DIALOG:
+        return <NuevoProductoDialog {...dialogProps} />
+      default:
+        throw Error('Unknown dialog: ' + dialogState.value)
+    }
   }
 }
 
@@ -301,6 +295,7 @@ const SelectedPage = (props) => {
     mostrarErrorConSnackbar,
     ajustes,
     page,
+    editarCliente,
     editarFactura,
     editarFacturaExamen,
   } = props
@@ -325,7 +320,7 @@ const SelectedPage = (props) => {
         editarFacturaExamen={editarFacturaExamen} {...pageProps}/>
     case CLIENTE_LIST_PAGE:
       return <ClientesListView mostrarErrorConSnackbar={mostrarErrorConSnackbar}
-        {...pageProps}/>
+        editarCliente={editarCliente} {...pageProps}/>
     case PRODUCTO_LIST_PAGE:
       return <ProductosListView mostrarErrorConSnackbar={mostrarErrorConSnackbar}
         {...pageProps}/>
@@ -360,9 +355,11 @@ class Main extends Component {
     const {
       abrirLinkConSnackbar,
       mostrarErrorConSnackbar,
+      editarCliente,
       editarFactura,
       editarFacturaExamen,
-      cambiarDialog,
+      cancelarDialog,
+      mostrarDialog,
       cerrarDialogConMsg,
       dialog,
       ajustes,
@@ -373,13 +370,14 @@ class Main extends Component {
     return (
       <div style={{backgroundColor: '#ededed', height: 'inherit'}}>
         <MainToolbar
-          cambiarDialog={cambiarDialog}
+          mostrarDialog={mostrarDialog}
           title={ajustes.empresa}
           onLeftButtonClicked={() => this.handleDrawerChange(true)}/>
         <SelectedPage
-          page={page}
-          editarFactura={editarFactura}
           ajustes={ajustes}
+          page={page}
+          editarCliente={editarCliente}
+          editarFactura={editarFactura}
           editarFacturaExamen={editarFacturaExamen}
           abrirLinkConSnackbar={abrirLinkConSnackbar}
           mostrarErrorConSnackbar={mostrarErrorConSnackbar} />
@@ -387,8 +385,10 @@ class Main extends Component {
           open={this.state.drawerOpen}
           handleChange={this.handleDrawerChange}
           onPageSelected={this.onPageSelected}/>
-        <MainDialog type={dialog}
-          cambiarDialog={cambiarDialog}
+        <MainDialog
+          dialogState={dialog}
+          cancelarDialog={cancelarDialog}
+          mostrarDialog={mostrarDialog}
           cerrarDialogConMsg={cerrarDialogConMsg}/>
         <MainSnackbar data={snackbar}/>
       </div>

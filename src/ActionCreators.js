@@ -1,24 +1,21 @@
-import {
-  NUEVO_CLIENTE_DIALOG,
-  NUEVO_PRODUCTO_DIALOG,
-  NUEVO_MEDICO_DIALOG,
-  NUEVO_CLIENTE_DIALOG_CLOSED,
-  NUEVO_PRODUCTO_DIALOG_CLOSED,
-  NUEVO_MEDICO_DIALOG_CLOSED } from './DialogTypes'
-import {
+const {
+  CLIENTE_DIALOG,
+  PRODUCTO_DIALOG,
+  MEDICO_DIALOG } = require('./DialogTypes')
+const {
   NEW_FACTURA_PAGE,
   FACTURA_LIST_PAGE,
   CLIENTE_LIST_PAGE,
   PRODUCTO_LIST_PAGE,
   EDITAR_FACTURA_PAGE,
   NEW_FACTURA_EXAMEN_PAGE,
-  EDITAR_FACTURA_EXAMEN_PAGE } from './PageTypes'
-import {
+  EDITAR_FACTURA_EXAMEN_PAGE } = require('./PageTypes')
+const {
   CAMBIAR_DIALOG_ACTION,
   CAMBIAR_PAGE_ACTION,
   CERRAR_DIALOG_CON_MSG_ACTION,
   ABRIR_LINK_CON_SNACKBAR,
-  MOSTRAR_ERROR_CON_SNACKBAR } from './ActionTypes'
+  MOSTRAR_ERROR_CON_SNACKBAR } = require('./ActionTypes')
 
 const cambiarPagina = (tipoPagina, props) => {
   switch (tipoPagina) {
@@ -70,39 +67,48 @@ const cambiarPagina = (tipoPagina, props) => {
 }
 
 module.exports = {
-  cambiarDialog(tipoDialog) {
+  mostrarDialog(tipoDialog, editar) {
+    const open = true
     switch (tipoDialog) {
-      case NUEVO_CLIENTE_DIALOG:
+      case CLIENTE_DIALOG:
         return {
           type: CAMBIAR_DIALOG_ACTION,
-          value: NUEVO_CLIENTE_DIALOG,
+          value: CLIENTE_DIALOG,
+          editar,
+          open,
         }
-      case NUEVO_MEDICO_DIALOG:
+      case MEDICO_DIALOG:
         return {
           type: CAMBIAR_DIALOG_ACTION,
-          value: NUEVO_MEDICO_DIALOG,
+          value: MEDICO_DIALOG,
+          editar,
+          open,
         }
-      case NUEVO_PRODUCTO_DIALOG:
-        return {
-          type: CAMBIAR_DIALOG_ACTION, value: NUEVO_PRODUCTO_DIALOG,
-        }
-      case NUEVO_CLIENTE_DIALOG_CLOSED:
+      case PRODUCTO_DIALOG:
         return {
           type: CAMBIAR_DIALOG_ACTION,
-          value: NUEVO_CLIENTE_DIALOG_CLOSED,
-        }
-      case NUEVO_MEDICO_DIALOG_CLOSED:
-        return {
-          type: CAMBIAR_DIALOG_ACTION,
-          value: NUEVO_MEDICO_DIALOG_CLOSED,
-        }
-      case NUEVO_PRODUCTO_DIALOG_CLOSED:
-        return {
-          type: CAMBIAR_DIALOG_ACTION,
-          value: NUEVO_PRODUCTO_DIALOG_CLOSED,
+          value: PRODUCTO_DIALOG,
+          editar,
+          open,
         }
       default:
         throw new Error("Tipo de dialog desconocido: " + tipoDialog)
+    }
+  },
+
+  cancelarDialog() {
+    return {
+      type: CAMBIAR_DIALOG_ACTION,
+      open: false,
+    }
+  },
+
+  editarCliente(clienteAEditar) {
+    return {
+      type: CAMBIAR_DIALOG_ACTION,
+      value: CLIENTE_DIALOG,
+      editar: clienteAEditar,
+      open: true,
     }
   },
 
@@ -126,14 +132,11 @@ module.exports = {
 
   cambiarPagina: cambiarPagina,
 
-  cerrarDialogConMsg(msg, dialogType) {
-    if(dialogType !== NUEVO_PRODUCTO_DIALOG_CLOSED
-      && dialogType !== NUEVO_CLIENTE_DIALOG_CLOSED && dialogType !== NUEVO_MEDICO_DIALOG_CLOSED)
-      throw Error('Para cerrar el dialog es necesario un tipo que termine en _CLOSED')
+  cerrarDialogConMsg(msg) {
     return {
       type: CERRAR_DIALOG_CON_MSG_ACTION,
-      dialog: dialogType,
       message: msg,
+      open: false,
     }
   },
 

@@ -1,6 +1,6 @@
 /* eslint-env node, mocha */
 
-require('chai')
+require('chai').should()
 
 const ListState = require('../../src/custom/ClientesList/ListState.js')
 let state

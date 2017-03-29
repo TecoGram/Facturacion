@@ -36,7 +36,7 @@ const cliente1 = {
   ruc: '0937816882001',
   nombre: 'Dr. Julio Mendoza',
   direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
-  correo: 'julio_mendoza@yahoo.com.ec',
+  email: 'julio_mendoza@yahoo.com.ec',
   telefono1: '2645422', telefono2: '2876357', descDefault: '0',
 }
 
@@ -48,7 +48,7 @@ describe('endpoints disponibles para el cliente', function () {
         cliente1.ruc,
         cliente1.nombre,
         cliente1.direccion,
-        cliente1.correo,
+        cliente1.email,
         cliente1.telefono1, cliente1.telefono2, cliente1.descDefault)
       .then(function (resp) {
         const statusCode = resp.status
@@ -91,6 +91,11 @@ describe('endpoints disponibles para el cliente', function () {
         const clientes = resp.body
         clientes.should.be.a('array')
         clientes.length.should.equal(1)
+
+        const clienteInsertado = clientes[0]
+        delete clienteInsertado.nombreAscii
+        clienteInsertado.descDefault = '' + clienteInsertado.descDefault
+        clienteInsertado.should.eql(cliente1)
         done()
       }, function (err) {
         console.error('test fail ' + JSON.stringify(err))
@@ -719,12 +724,22 @@ describe('endpoints disponibles para el cliente', function () {
 
   describe('/cliente/update', function () {
     const updateArgs = ['Julio Plaza', 'Ceibos Norte 123', 'you@somewhere.com',
-        '555555','666666', 8]
+      '555555','666666', 8]
     it('retorna 200 al actualizar un cliente exitosamente', function (done) {
       api.updateCliente(cliente1.ruc, ...updateArgs)
       .then(function (resp) {
         const statusCode = resp.status
         statusCode.should.equal(200)
+        return api.findClientes('Julio')
+      })
+      .then(function (resp) {
+        const cliente = resp.body[0]
+        cliente.nombre.should.equal(updateArgs[0])
+        cliente.direccion.should.equal(updateArgs[1])
+        cliente.email.should.equal(updateArgs[2])
+        cliente.telefono1.should.equal(updateArgs[3])
+        cliente.telefono2.should.equal(updateArgs[4])
+        cliente.descDefault.should.equal(updateArgs[5])
         done()
       })
       .catch(done)

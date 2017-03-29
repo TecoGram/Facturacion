@@ -39,6 +39,15 @@ export default class ClientesListView extends React.Component {
       .then(handleSuccess, mostrarError)
   }
 
+  editRow = (index) => {
+    const objetoAEditar = this.state.rows[index]
+    this.props.editarCliente(objetoAEditar)
+  }
+
+  componentWillReceiveProps = (nextProps) => {
+    this.stateManager.props = nextProps
+  }
+
   componentDidMount() {
     this.requestData('')
   }
@@ -54,7 +63,8 @@ export default class ClientesListView extends React.Component {
         searchHint={searchHint}
         height={'450px'}
         onQueryChanged={this.requestData}
-        onDeleteItem={this.deleteRow} />
+        onDeleteItem={this.deleteRow}
+        onEditItem={this.editRow} />
     )
   }
 
@@ -62,4 +72,5 @@ export default class ClientesListView extends React.Component {
 
 ClientesListView.propTypes = {
   mostrarErrorConSnackbar: React.PropTypes.func.isRequired,
+  editarCliente: React.PropTypes.func.isRequired,
 }

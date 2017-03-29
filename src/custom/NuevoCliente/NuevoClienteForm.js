@@ -13,6 +13,7 @@ export default class NuevoClienteForm extends React.Component {
 
   render() {
     const {
+      editar,
       errors,
       inputs,
       updateData,
@@ -23,6 +24,7 @@ export default class NuevoClienteForm extends React.Component {
       icon: Info,
       value: inputs.ruc || '',
       errorText: errors.ruc,
+      disabled: editar,
       onChange: (event) => {updateData('ruc', event.target.value)},
     }
 
@@ -94,4 +96,11 @@ export default class NuevoClienteForm extends React.Component {
       </table>
     )
   }
+}
+
+NuevoClienteForm.propTypes = {
+  editar: React.PropTypes.bool.isRequired,
+  errors: React.PropTypes.object.isRequired,
+  inputs: React.PropTypes.object.isRequired,
+  updateData: React.PropTypes.func.isRequired,
 }

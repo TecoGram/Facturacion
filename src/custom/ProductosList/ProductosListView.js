@@ -39,6 +39,10 @@ export default class ProductosListView extends React.Component {
       .then(handleSuccess, mostrarError)
   }
 
+  componentWillReceiveProps = (nextProps) => {
+    this.stateManager.props = nextProps
+  }
+  
   componentDidMount() {
     this.requestData('')
   }

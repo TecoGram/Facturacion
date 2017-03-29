@@ -4,31 +4,28 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
 import NuevoClienteForm from './NuevoClienteForm'
-import { validarCliente } from '../../Validacion'
-import { insertarCliente } from '../../api'
+import DialogState from './DialogState'
+import { insertarCliente, updateCliente } from '../../api'
 import ServerErrorText from '../../lib/formTable/ServerErrorText'
-
-import { NUEVO_CLIENTE_DIALOG_CLOSED } from '../../DialogTypes'
 
 export default class NuevoClienteDialog extends React.Component {
 
-  state = {
-    inputs: {},
-    errors: {},
-    serverError: null,
+  constructor(props) {
+    super(props)
+    this.stateManager = new DialogState(props, (args) => this.setState(args))
+    this.state = {
+      inputs: {},
+      errors: {},
+      serverError: null,
+    }
   }
 
   cancelarDialog = () => {
-    this.setState({inputs: {}, errors: {}, serverError: null})
-    this.props.cambiarDialog(NUEVO_CLIENTE_DIALOG_CLOSED)
+    this.stateManager.cancelarDialog()
   };
 
   updateData = (fieldName, newValue) => {
-    const newData = { ...this.state.inputs }
-    newData[fieldName] = newValue
-    const newErrors = { ...this.state.errors }
-    newErrors[fieldName] = null
-    this.setState({inputs: newData, errors: newErrors})
+    this.stateManager.updateData(fieldName, newValue, this.state)
   }
 
   renderServerError = (errText) => {
@@ -39,33 +36,44 @@ export default class NuevoClienteDialog extends React.Component {
     else return <div />
   }
 
-  guardarCliente = (inputs, cerrarDialog) => {
+  guardarCliente = (inputs) => {
     const {
       ruc, nombre, direccion, email, telefono1, telefono2, descDefault,
     } = inputs
 
-    insertarCliente(ruc, nombre, direccion, email, telefono1, telefono2, descDefault)
-    .then(() => {
-      this.setState({inputs: {}, errors: {}, serverError: null})
-      cerrarDialog(`Nuevo cliente guardado: ${nombre}`, NUEVO_CLIENTE_DIALOG_CLOSED)
-    }, (err) => {
-      this.setState({ serverError: 'Error al almacenar datos: ' + err.response.text })
-    })
+    const {
+      cerrarDialogConExito,
+      mostrarErrorDeServidor,
+    } = this.stateManager
+
+    const guardarAction = this.props.editar ? updateCliente: insertarCliente
+    const handleSuccess = () => cerrarDialogConExito(inputs.nombre)
+
+    guardarAction(ruc, nombre, direccion, email, telefono1, telefono2, descDefault)
+      .then(handleSuccess, mostrarErrorDeServidor)
   }
 
   validarDatos = () => {
-    const { errors, inputs } = validarCliente(this.state.inputs)
-    if(errors) {
-      this.setState({errors: errors})
-    } else {
-      this.setState({errors: {}})
+    const rawInputs = this.state.inputs
+    const inputs = this.stateManager.validarDatos(rawInputs)
+    if(inputs) {
       this.guardarCliente(inputs, this.props.cerrarDialogConMsg)
     }
+  }
+
+  componentDidMount() {
+    this.stateManager.revisarDataParaEditar()
+  }
+
+  componentWillReceiveProps = (nextProps) => {
+    this.stateManager.props = nextProps
+    this.stateManager.revisarDataParaEditar()
   }
 
   render() {
     const {
       open,
+      editar,
     } = this.props
 
     const actions = [
@@ -90,9 +98,16 @@ export default class NuevoClienteDialog extends React.Component {
         open={open}
         onRequestClose={this.handleClose} >
         <NuevoClienteForm inputs={this.state.inputs} errors={this.state.errors}
-        updateData={this.updateData}/>
+          updateData={this.updateData} editar={Boolean(editar)}/>
         { this.renderServerError(this.state.serverError) }
       </Dialog>
     )
   }
+}
+
+NuevoClienteDialog.propTypes = {
+  editar: React.PropTypes.object,
+  open: React.PropTypes.bool.isRequired,
+  cancelarDialog: React.PropTypes.func.isRequired,
+  cerrarDialogConMsg: React.PropTypes.func.isRequired,
 }

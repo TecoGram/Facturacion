@@ -50,7 +50,7 @@ app.post('/cliente/new', validarCliente, function (req, res) {
     descDefault,
   } = req.safeData
 
-  db.insertarCliente(ruc, nombre, email, direccion, telefono1, telefono2, descDefault)
+  db.insertarCliente(ruc, nombre, direccion, email, telefono1, telefono2, descDefault)
   .then(function () {//OK!
     res.status(200)
     .send('OK')
@@ -100,7 +100,7 @@ app.post('/cliente/update', validarCliente, function (req, res) {
     res.status(500).send(err)
   }
 
-  db.updateCliente(ruc, nombre, email, direccion, telefono1, telefono2, descDefault)
+  db.updateCliente(ruc, nombre, direccion, email, telefono1, telefono2, descDefault)
     .then(handleSuccess, handleFailiure)
 })
 

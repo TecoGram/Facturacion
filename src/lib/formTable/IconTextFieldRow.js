@@ -12,6 +12,7 @@ const inputShape = React.PropTypes.shape({
   value: React.PropTypes.string.isRequired,
   onChange: React.PropTypes.func.isRequired,
   icon: React.PropTypes.func.isRequired,
+  disabled: React.PropTypes.bool,
 })
 
 const boolInputShape = React.PropTypes.shape({
@@ -32,8 +33,12 @@ const TextColumn = (props) => {
   const input = props.input
   return (
     <td style={props.style}>
-      <TextField hintText={input.hintText} onChange={input.onChange}
-        errorText={input.errorText} value={input.value}/>
+      <TextField
+        hintText={input.hintText}
+        onChange={input.onChange}
+        errorText={input.errorText}
+        disabled={input.disabled}
+        value={input.value}/>
     </td>
   )
 }
@@ -45,6 +50,7 @@ const BoolColumn = (props) => {
       <Checkbox
         label={input.hintText}
         checked={input.value}
+        disabled={input.disabled}
         onCheck={input.onChange} />
     </td>
   )
@@ -62,6 +68,7 @@ const BoolColumn = (props) => {
 * - hintText: texto 'hint' a mostrar cuando el TextField esta vacio
 * - errorText: texto de error a mostrar debajo del TextField
 * - value: string a mostrar como contenido del TextField
+* - disabled: true si el campo debe de estar desabilitado
 * - onChange: callback a ejecutar cuando cambia el texto del TextField. esta
 * funcion deberia de terminar cambiando el prop 'value'
 * Si se pasan ambos props leftInput y rightInput se renderizan dos textFields,
