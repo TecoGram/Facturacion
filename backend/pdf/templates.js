@@ -22,12 +22,14 @@ const Y5_LINE = 670
 
 const paymentMethodValueBoxY = BOX2_END_Y + 15
 
-const itemColumnWidth = 50
+const numberColWidth = 43
+
+const itemColumnWidth = numberColWidth
 const itemColumnSeparator = BOX2_POS.x + itemColumnWidth
-const cantColumnWidth = 50
+const cantColumnWidth = numberColWidth - 4
 const cantColumnSeparator = itemColumnSeparator + cantColumnWidth
-const descriptionColumnWidth = 260
-const descriptionColumnSeparator = cantColumnSeparator + descriptionColumnWidth
+const descriptionColumnWidth = 246
+const descriptionColumnSeparator = cantColumnSeparator + numberColWidth + descriptionColumnWidth
 const unitPriceColumnWidth = 65
 const unitPriceColumnSeparator = descriptionColumnSeparator + unitPriceColumnWidth
 
@@ -83,7 +85,7 @@ const drawFacturableDescription = (doc, facturable, detallado, linePos) => {
   const descriptionOptions = {
     width: descriptionColumnWidth - 10,
   }
-  const descriptionStartX = cantColumnSeparator + 5
+  const descriptionStartX = cantColumnSeparator + numberColWidth + 5
   doc.text(facturable.nombre, descriptionStartX, linePos, descriptionOptions)
   if (detallado) {
     const detalleString = facturable.lote !== ''
@@ -103,7 +105,9 @@ const drawFacturableLine = (doc, facturable, detallado, pos) => {
     align: 'right',
     width: cantColumnWidth - 10,
   })
-  doc.text(facturable.precioVenta, descriptionColumnSeparator + 5, linePos, {
+
+  const precioVentaStr = Number(facturable.precioVenta).toFixed(2)
+  doc.text(precioVentaStr, descriptionColumnSeparator + 5, linePos, {
     align: 'right',
     width: unitPriceColumnWidth - 10,
   })
@@ -114,7 +118,6 @@ const drawFacturableLine = (doc, facturable, detallado, pos) => {
     width: BOX2_END_X - unitPriceColumnSeparator - 10})
 
   drawFacturableDescription(doc, facturable, detallado, linePos)
-
 }
 
 const drawRemainingFacturablesOnNextPage = (doc, detallado, facturables, startPos) => {
@@ -134,7 +137,7 @@ const drawRemainingFacturablesOnNextPage = (doc, detallado, facturables, startPo
 }
 
 const drawFacturablesDetails = (doc, facturables, detallado) => {
-  doc.y = Y3_LINE + 5
+  doc.y = Y3_LINE + 9
   try {
     doc.fontSize(8)
     for (let i = 0; i < facturables.length; i++) {

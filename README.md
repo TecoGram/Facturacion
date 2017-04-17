@@ -6,6 +6,35 @@ Se recomienda usar versiones actuales de Google Chrome (>=56) para el cliente.
 
 ![screenshot1](https://cloud.githubusercontent.com/assets/5729175/24410708/5fa3bcaa-1399-11e7-9cf7-378244afe11d.png)
 
+## Setup
+
+Primero, clona este repositorio e instala las dependencias
+
+```bash
+git clone https://github.com/GAumala/Facturacion
+cd Facturacion
+npm install
+```
+Segundo, crea la base de datos
+
+```bash
+npm run init-db
+```
+
+Tercero, crea el build de producción del React App.
+
+```bash
+npm run build
+```
+
+Ahora solo falta levantar el servidor
+
+```bash
+npm run server
+```
+
+Puedes entrar al sistema desde Google Chrome con la siguiente URL: http://localhost:8192
+
 ______
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).

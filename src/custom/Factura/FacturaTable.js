@@ -72,7 +72,7 @@ export default class FacturaTable extends React.Component {
     return (
     <TableRow key={i}>
 
-      <TableRowColumn width={40} style={noPaddingStyle}>{i}</TableRowColumn>
+      <TableRowColumn width={40} style={noPaddingStyle}>{i + 1}</TableRowColumn>
 
       { regSanCol }
 
