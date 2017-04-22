@@ -5,7 +5,7 @@ chai.should()
 chai.use(require('chai-string'));
 const expect = chai.expect
 
-const DialogState = require('../../src/custom/NuevoCliente/DialogState.js')
+const DialogState = require('../../src/NuevoCliente/DialogState.js')
 let state
 let stateManager
 const setStateFunc = (arg) => {

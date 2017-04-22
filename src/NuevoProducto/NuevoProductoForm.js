@@ -5,7 +5,7 @@ import Label from 'material-ui/svg-icons/action/label';
 import BusinessCenter from 'material-ui/svg-icons/places/business-center';
 import AttachMoney from 'material-ui/svg-icons/editor/attach-money';
 
-import IconTextFieldRow from '../../lib/formTable/IconTextFieldRow'
+import IconTextFieldRow from '../lib/formTable/IconTextFieldRow'
 
 export default class NuevoProductoForm extends React.Component {
 

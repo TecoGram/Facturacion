@@ -1,6 +1,6 @@
 import React from 'react'
-import MaterialTable from '../../lib/MaterialTable'
-import { findProductos, deleteProducto } from '../../api'
+import MaterialTable from '../lib/MaterialTable'
+import { findProductos, deleteProducto } from '../api'
 
 import ListState from './ListState'
 

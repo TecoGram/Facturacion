@@ -4,8 +4,8 @@ const Immutable = require('immutable')
 const chai = require('chai')
   , expect = chai.expect
 
-const FacturacionModels = require('../../src/custom/Factura/Models.js')
-const FacturacionMath = require('../../src/custom/Factura/Math.js')
+const FacturacionModels = require('../../src/Factura/Models.js')
+const FacturacionMath = require('../../src/Factura/Math.js')
 const DateParser = require('../../src/DateParser.js')
 
 describe('Facturacion Models', function () {

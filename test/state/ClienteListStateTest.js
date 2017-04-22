@@ -2,7 +2,7 @@
 
 require('chai').should()
 
-const ListState = require('../../src/custom/ClientesList/ListState.js')
+const ListState = require('../../src/ClientesList/ListState.js')
 let state
 let stateManager
 const setStateFunc = (funcArg) => {

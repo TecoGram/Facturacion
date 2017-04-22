@@ -1,21 +1,32 @@
 import React from 'react';
 
 import ActionStore from 'material-ui/svg-icons/action/store';
+import Email from 'material-ui/svg-icons/communication/email';
+import Info from 'material-ui/svg-icons/action/info';
+import Loyalty from 'material-ui/svg-icons/action/loyalty';
 import Person from 'material-ui/svg-icons/social/person';
 import Phone from 'material-ui/svg-icons/communication/phone';
-import Email from 'material-ui/svg-icons/communication/email';
-import MonetizationOn from 'material-ui/svg-icons/editor/monetization-on';
 
-import IconTextFieldRow from '../../lib/formTable/IconTextFieldRow'
+import IconTextFieldRow from '../lib/formTable/IconTextFieldRow'
 
-export default class NuevoMedicoForm extends React.Component {
+export default class NuevoClienteForm extends React.Component {
 
   render() {
     const {
+      editar,
       errors,
       inputs,
       updateData,
     } = this.props
+
+    const rucInput = {
+      hintText: "RUC",
+      icon: Info,
+      value: inputs.ruc || '',
+      errorText: errors.ruc,
+      disabled: editar,
+      onChange: (event) => {updateData('ruc', event.target.value)},
+    }
 
     const telf1Input = {
       hintText: "Teléfono 1",
@@ -25,8 +36,8 @@ export default class NuevoMedicoForm extends React.Component {
       onChange: (event) => {updateData('telefono1', event.target.value)},
     }
 
-    const medicoInput = {
-      hintText: "Medico",
+    const clienteInput = {
+      hintText: "Cliente",
       icon: Person,
       value: inputs.nombre || '',
       errorText: errors.nombre,
@@ -57,28 +68,39 @@ export default class NuevoMedicoForm extends React.Component {
       onChange: (event) => {updateData('email', event.target.value)},
     }
 
-    const comisionInput = {
-      hintText: "Comision",
-      icon: MonetizationOn,
-      value: inputs.comision || '',
-      errorText: errors.comision,
-      onChange: (event) => {updateData('comision', event.target.value)},
+    const descDefaultInput = {
+      hintText: "Descuento recomendado (%)",
+      icon: Loyalty,
+      value: inputs.descDefault || '',
+      errorText: errors.descDefault,
+      onChange: (event) => {updateData('descDefault', event.target.value)},
     }
 
     return (
       <table>
         <tbody>
           <IconTextFieldRow
-            leftInput={medicoInput}
-            rightInput={direccionInput} />
+            leftInput={clienteInput}
+            rightInput={rucInput} />
           <IconTextFieldRow
-            leftInput={comisionInput}
+            leftInput={direccionInput}
             rightInput={emailInput} />
           <IconTextFieldRow
             leftInput={telf1Input}
             rightInput={telf2Input} />
+          <IconTextFieldRow
+            leftInput={descDefaultInput} />
+          { /* An additional empty row prevents jittering in the dialog */}
+          <IconTextFieldRow empty={true} />
         </tbody>
       </table>
     )
   }
+}
+
+NuevoClienteForm.propTypes = {
+  editar: React.PropTypes.bool.isRequired,
+  errors: React.PropTypes.object.isRequired,
+  inputs: React.PropTypes.object.isRequired,
+  updateData: React.PropTypes.func.isRequired,
 }

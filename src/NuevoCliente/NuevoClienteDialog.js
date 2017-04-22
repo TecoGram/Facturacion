@@ -5,8 +5,8 @@ import FlatButton from 'material-ui/FlatButton';
 
 import NuevoClienteForm from './NuevoClienteForm'
 import DialogState from './DialogState'
-import { insertarCliente, updateCliente } from '../../api'
-import ServerErrorText from '../../lib/formTable/ServerErrorText'
+import { insertarCliente, updateCliente } from '../api'
+import ServerErrorText from '../lib/formTable/ServerErrorText'
 
 export default class NuevoClienteDialog extends React.Component {
 

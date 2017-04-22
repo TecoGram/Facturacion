@@ -16,11 +16,11 @@ import AirlineSeatReclineNormal from 'material-ui/svg-icons/notification/airline
 import ClienteAutoComplete from '../AutoComplete/ClienteAutoComplete'
 import ProductoAutoComplete from '../AutoComplete/ProductoAutoComplete'
 import MedicoAutoComplete from '../AutoComplete/MedicoAutoComplete'
-import CloseableColorChip from '../../lib/CloseableColorChip'
-import FormattedDatePicker from '../../lib/FormattedDatePicker';
-import IconBox from '../../lib/IconBox'
+import CloseableColorChip from '../lib/CloseableColorChip'
+import FormattedDatePicker from '../lib/FormattedDatePicker';
+import IconBox from '../lib/IconBox'
 
-import { FormasDePago } from '../../custom/Factura/Models'
+import { FormasDePago } from './Models'
 
 const autoCompleteWidth = '425px'
 const txtMargin = '35px'

@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 
-import PaperContainer from '../../lib/PaperContainer'
+import PaperContainer from '../lib/PaperContainer'
 import FacturaForm from './FacturaForm'
 import FacturaTable from './FacturaTable'
 import FacturaResults from './FacturaResults'
 import {
   getFacturaURL,
   getFacturaExamenURL,
-  verVenta, verVentaExamen } from '../../api'
+  verVenta, verVentaExamen } from '../api'
 import {
   agregarProductoComoFacturable,
   calcularValoresTotales,

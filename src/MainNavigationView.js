@@ -21,17 +21,17 @@ import {
   CLIENTE_DIALOG,
   PRODUCTO_DIALOG,
   MEDICO_DIALOG,
-} from '../DialogTypes'
+} from './DialogTypes'
 import {
   NEW_FACTURA_PAGE,
   EDITAR_FACTURA_PAGE,
   NEW_FACTURA_EXAMEN_PAGE,
   EDITAR_FACTURA_EXAMEN_PAGE,
   FACTURA_LIST_PAGE,
-  CLIENTE_LIST_PAGE, PRODUCTO_LIST_PAGE } from '../PageTypes'
+  CLIENTE_LIST_PAGE, PRODUCTO_LIST_PAGE } from './PageTypes'
 
-import ActionCreators from '../ActionCreators'
-import CustomStyle from '../CustomStyle'
+import ActionCreators from './ActionCreators'
+import CustomStyle from './CustomStyle'
 import {NuevaFacturaPage, EditarFacturaPage, NuevaFacturaExamenPage,
   EditarFacturaExamenPage} from './Factura/Variantes'
 import NuevoClienteDialog from './NuevoCliente/NuevoClienteDialog'
@@ -40,8 +40,8 @@ import NuevoMedicoDialog from './NuevoMedico/NuevoMedicoDialog'
 import FacturasListView from './FacturasList/FacturasListView'
 import ClientesListView from './ClientesList/ClientesListView'
 import ProductosListView from './ProductosList/ProductosListView'
-import store from '../Store'
-import InitialStore from '../InitialStore'
+import store from './Store'
+import InitialStore from './InitialStore'
 
 const toolbarTextColor = '#FFFFFF'
 const toolbarTitleStyle = {

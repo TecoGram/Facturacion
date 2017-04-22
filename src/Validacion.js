@@ -1,5 +1,5 @@
 const validator = require('validator')
-const { FormasDePago } = require('./custom/Factura/Models.js')
+const { FormasDePago } = require('./Factura/Models.js')
 
 const campo_obligatorio = 'Este campo es obligatorio'
 const campo_obligatorio_min = 'obligatorio'

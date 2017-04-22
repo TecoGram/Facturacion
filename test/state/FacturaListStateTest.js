@@ -2,7 +2,7 @@
 
 require('chai')
 
-const ListState = require('../../src/custom/FacturasList/ListState.js')
+const ListState = require('../../src/FacturasList/ListState.js')
 let state
 const setStateFunc = (funcArg) => {
   state = Object.assign (state, funcArg(state))

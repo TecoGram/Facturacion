@@ -4,11 +4,11 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
 import NuevoMedicoForm from './NuevoMedicoForm'
-import { validarMedico } from '../../Validacion'
-import { insertarMedico } from '../../api'
-import ServerErrorText from '../../lib/formTable/ServerErrorText'
+import { validarMedico } from '../Validacion'
+import { insertarMedico } from '../api'
+import ServerErrorText from '../lib/formTable/ServerErrorText'
 
-import { NUEVO_MEDICO_DIALOG_CLOSED } from '../../DialogTypes'
+import { NUEVO_MEDICO_DIALOG_CLOSED } from '../DialogTypes'
 
 export default class NuevoMedicoDialog extends React.Component {
 

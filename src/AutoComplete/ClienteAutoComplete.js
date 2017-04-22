@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { findClientes } from '../../api.js'
-import AutoCompleteComponent from '../../lib/AutoCompleteComponent'
+import { findClientes } from '../api.js'
+import AutoCompleteComponent from '../lib/AutoCompleteComponent'
 
 const dataSourceConfig = {
   text: 'nombre',

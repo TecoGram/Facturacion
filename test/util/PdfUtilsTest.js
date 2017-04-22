@@ -1,10 +1,7 @@
 /* eslint-env node, mocha */
 
-const Immutable = require('immutable')
-const assert = require('assert');
 const chai = require('chai')
-  , expect = chai.expect
-  , should = chai.should();
+chai.should();
 
 const pdfutils = require('../../backend/pdf/pdfutils.js')
 const billetesPalabras = pdfutils.billetesPalabras

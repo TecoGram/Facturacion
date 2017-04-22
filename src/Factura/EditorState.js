@@ -4,8 +4,8 @@ const {
   insertarVenta,
   updateVenta,
   insertarVentaExamen,
-  updateVentaExamen } = require('../../api.js')
-const DateParser = require('../../DateParser.js')
+  updateVentaExamen } = require('../api.js')
+const DateParser = require('../DateParser.js')
 const {
   crearVentaRow,
   facturableAUnidad,
@@ -14,11 +14,11 @@ const {
   esFacturablePropValido,
   esFacturaDataPropValido,
   validarVentaRow,
-  validarVentaRowExamen } = require('../../Validacion.js')
+  validarVentaRowExamen } = require('../Validacion.js')
 const {
   parseFormInt,
   parseFormFloat,
-} = require('../../FormNumberPaser.js')
+} = require('../FormNumberPaser.js')
 const {
   calcularValoresFacturablesImm,
 } = require('./Math.js')

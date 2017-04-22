@@ -6,7 +6,7 @@ const chai = require('chai')
 
 chai.use(require('chai-string'));
 
-const FacturaEditor = require('../../src/custom/Factura/EditorState.js')
+const FacturaEditor = require('../../src/Factura/EditorState.js')
 const DateParser = require('../../src/DateParser.js')
 const getState = FacturaEditor.getDefaultState
 

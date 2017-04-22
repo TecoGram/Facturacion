@@ -8,7 +8,7 @@ const chai = require('chai')
 chai.should();
 
 const setup = require('../../backend/scripts/setupDB.js')
-const FacturacionModels = require('../../src/custom/Factura/Models')
+const FacturacionModels = require('../../src/Factura/Models')
 const unexpectedError = Error('Ocurrio algo inesperado');
 const facturaDir = '/tmp/facturas/'
 

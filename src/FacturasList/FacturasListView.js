@@ -1,8 +1,8 @@
 import React from 'react'
-import MaterialTable from '../../lib/MaterialTable'
+import MaterialTable from '../lib/MaterialTable'
 import {
   getFacturaURLByType,
-  findAllVentas, deleteVenta } from '../../api'
+  findAllVentas, deleteVenta } from '../api'
 
 import ListState from './ListState'
 

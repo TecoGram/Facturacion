@@ -1,6 +1,6 @@
 import React from 'react'
-import MaterialTable from '../../lib/MaterialTable'
-import { findClientes, deleteCliente } from '../../api'
+import MaterialTable from '../lib/MaterialTable'
+import { findClientes, deleteCliente } from '../api'
 
 import ListState from './ListState'
 

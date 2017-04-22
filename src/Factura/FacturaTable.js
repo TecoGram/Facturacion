@@ -3,7 +3,7 @@ import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColu
 import TextField from 'material-ui/TextField'
 import IconButton from 'material-ui/IconButton';
 import Delete from 'material-ui/svg-icons/action/delete';
-import FormattedDatePicker from '../../lib/FormattedDatePicker'
+import FormattedDatePicker from '../lib/FormattedDatePicker'
 
 const black54p = '#757575'
 const noPaddingStyle = {padding: '0px'}

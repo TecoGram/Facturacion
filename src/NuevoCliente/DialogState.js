@@ -1,4 +1,4 @@
-const { validarProducto } = require('../../Validacion.js')
+const { validarCliente } = require('../Validacion.js')
 
 class DialogState {
   constructor (props, setStateFunc) {
@@ -6,7 +6,6 @@ class DialogState {
     this.props = props
 
     this.validarDatos = this.validarDatos.bind(this);
-    this.getDefaultState = this.getDefaultState.bind(this);
     this.cerrarDialogConExito = this.cerrarDialogConExito.bind(this);
     this.mostrarErrorDeServidor = this.mostrarErrorDeServidor.bind(this);
     this.updateData = this.updateData.bind(this);
@@ -14,21 +13,9 @@ class DialogState {
     this.getMensajeExito = this.getMensajeExito.bind(this);
     this.revisarDataParaEditar = this.revisarDataParaEditar.bind(this);
   }
-  getDefaultState () {
-    return {
-      inputs: { pagaIva: true },
-      errors: {},
-      serverError: null,
-    }
-  }
-
-  cancelarDialog () {
-    this.setState(this.getDefaultState())
-    this.props.cancelarDialog()
-  }
 
   validarDatos(inputs) {
-    const { errors, inputs: _inputs } = validarProducto(inputs)
+    const { errors, inputs: _inputs } = validarCliente(inputs)
     if(errors) {
       this.setState({errors: errors})
       return null
@@ -40,13 +27,13 @@ class DialogState {
 
   getMensajeExito(nombre) {
     if (this.props.editar)
-      return `Producto actualizado: ${nombre}`
-    return `Nuevo producto guardado: ${nombre}`
+      return `Cliente actualizado: ${nombre}`
+    return `Nuevo cliente guardado: ${nombre}`
   }
 
   cerrarDialogConExito(nombre) {
     const msg = this.getMensajeExito(nombre)
-    this.setState(this.getDefaultState())
+    this.setState({inputs: {}, errors: {}, serverError: null})
     this.props.cerrarDialogConMsg(msg)
   }
 
@@ -62,15 +49,14 @@ class DialogState {
     this.setState({inputs: newData, errors: newErrors})
   }
 
+  cancelarDialog () {
+    this.setState({inputs: {}, errors: {}, serverError: null})
+    this.props.cancelarDialog()
+  }
+
   revisarDataParaEditar() {
     const editarData = this.props.editar
-    if (editarData) {
-      const editarInputs = Object.assign({}, editarData)
-      editarInputs.precioDist = '' + editarData.precioDist
-      editarInputs.precioVenta = '' + editarData.precioVenta
-      editarInputs.pagaIva = editarData.pagaIva === 0 ? false : true
-      this.setState({ inputs: editarInputs})
-    }
+    if (editarData) this.setState({ inputs: Object.assign({}, editarData )})
   }
 }
 

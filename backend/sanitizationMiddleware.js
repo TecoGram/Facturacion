@@ -8,7 +8,7 @@ const {
 } = require('../src/Validacion.js')
 const {
   FormasDePago,
-} = require('../src/custom/Factura/Models.js')
+} = require('../src/Factura/Models.js')
 
 const sendBadArgumentsResponse = (res, errors) => {
   res.status(400).send(errors)
