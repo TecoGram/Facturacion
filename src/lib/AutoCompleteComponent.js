@@ -26,7 +26,7 @@ export default class AutoCompleteComponent extends React.Component {
   static propTypes = {
     dataSourceConfig: React.PropTypes.object.isRequired,
     hintText: React.PropTypes.string.isRequired,
-    onNewItemSelected: React.PropTypes.func,
+    onNewItemSelected: React.PropTypes.func.isRequired,
     newDataPromise: React.PropTypes.func.isRequired,
     style: React.PropTypes.object,
     width: React.PropTypes.string.isRequired,
@@ -41,7 +41,6 @@ export default class AutoCompleteComponent extends React.Component {
   }
 
   reqNewData = (input) => {
-
     const newDataPromise = this.props.newDataPromise
     if(input.length === 0)
       this.setState({ text: input, suggestions: [] })
@@ -50,7 +49,7 @@ export default class AutoCompleteComponent extends React.Component {
       newDataPromise(input)
       .then(
         (resp) => { this.setState({ suggestions: resp.body }) },
-        (err) => { this.setState({ suggestions: [] }) }
+        () => { this.setState({ suggestions: [] }) }
       )
     }
   }
@@ -59,19 +58,17 @@ export default class AutoCompleteComponent extends React.Component {
     this.setState({ text: '', suggestions: []})
   }
 
-  onNewItemSelected = (selectedValue, index) => {
+  onNewItemSelected = (selectedValue) => {
     const onNewItemSelected = this.props.onNewItemSelected
-    if(!onNewItemSelected)
-      return;
-
     const items = this.state.suggestions
     const totalSuggestions = items.length
-    if(index >= 0 && index < totalSuggestions) {
-      this.clearAutoComplete()
-      onNewItemSelected(items[index])
-    } else if (index === -1 && totalSuggestions > 0) {
-      this.clearAutoComplete()
+
+    if (typeof selectedValue === 'string' && totalSuggestions > 0) {
       onNewItemSelected(items[0])
+      this.clearAutoComplete()
+    } else if (typeof selectedValue === 'object') {
+      onNewItemSelected(selectedValue)
+      this.clearAutoComplete()
     }
   }
 
