@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 
 const PDFWriter = require('./pdf/PDFWriter.js')
 const pdfutils = require('./pdf/pdfutils.js')
-const facturaTemplates = require('./pdf/templates.js')
+const facturaTemplate = require('./pdf/template.js')
 const db = require('./dbAdmin.js')
 const formatter = require('./responseFormatter.js')
 const {
@@ -275,7 +275,7 @@ function verVenta(req, res, tipo) {
         } = resp
 
         const pdfData = pdfutils.ventaRowToPDFData(ventaRow)
-        const writeFunc = facturaTemplates.biocled(pdfData, cliente)
+        const writeFunc = facturaTemplate(pdfData, cliente)
         return new PDFWriter(facturaDir + facturaFileName, writeFunc)
       }, function (error) { //ERROR!
         return Promise.reject(error)

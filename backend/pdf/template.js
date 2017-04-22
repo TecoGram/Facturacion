@@ -248,29 +248,27 @@ const drawPaymentMethodFooter = (doc, paymentMethods) => {
 }
 
 
-module.exports = {
-  biocled: (facturaPDFData, cliente) => {
-    const writeFunc = (doc) => {
+module.exports = (facturaPDFData, cliente) => {
+  const writeFunc = (doc) => {
 
-      const {
-        detallado,
-        total,
-        formasDePago,
-        facturables,
-      } = facturaPDFData
+    const {
+      detallado,
+      total,
+      formasDePago,
+      facturables,
+    } = facturaPDFData
 
-      drawInvoiceInfo(doc, facturaPDFData, cliente)
-      const remainingFacturablesIndex = drawFacturablesDetails(doc, facturables,
-        detallado)
-      drawTotalPalabras(doc, "SON: " + valorPalabras(total))
-      drawTotalValues(doc, facturaPDFData)
-      drawPaymentMethodFooter(doc, formasDePago)
+    drawInvoiceInfo(doc, facturaPDFData, cliente)
+    const remainingFacturablesIndex = drawFacturablesDetails(doc, facturables,
+      detallado)
+    drawTotalPalabras(doc, "SON: " + valorPalabras(total))
+    drawTotalValues(doc, facturaPDFData)
+    drawPaymentMethodFooter(doc, formasDePago)
 
-      if (remainingFacturablesIndex) {
-        drawRemainingFacturablesOnNextPage(doc, detallado, facturables, remainingFacturablesIndex)
-      }
+    if (remainingFacturablesIndex) {
+      drawRemainingFacturablesOnNextPage(doc, detallado, facturables, remainingFacturablesIndex)
     }
+  }
 
-    return writeFunc
-  },
+  return writeFunc
 }
