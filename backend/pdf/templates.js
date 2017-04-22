@@ -4,21 +4,21 @@ const MAIN_BOX_X = 27
 const MAIN_BOX_WIDTH = 519
 
 const BOX1_POS = { x: MAIN_BOX_X, y: 150 }
-const BOX1_SIZE = { x: MAIN_BOX_WIDTH, y: 89 }
+//const BOX1_SIZE = { x: MAIN_BOX_WIDTH, y: 89 }
 const BOX2_POS = { x: MAIN_BOX_X, y: 248 }
 const BOX2_SIZE = { x: MAIN_BOX_WIDTH, y: 482 }
 
 const BOX2_END_X = BOX2_POS.x + BOX2_SIZE.x
 const BOX2_END_Y = BOX2_POS.y + BOX2_SIZE.y
 
-const X1_LINE = 416
+//const X1_LINE = 416
 const X2_LINE = 350
-const X3_LINE = (X2_LINE - MAIN_BOX_X)/2 + MAIN_BOX_X
-const Y1_LINE = 160
+//const X3_LINE = (X2_LINE - MAIN_BOX_X)/2 + MAIN_BOX_X
+//const Y1_LINE = 160
 //const Y2_LINE = 211
 const Y3_LINE = 265
 const Y4_LINE = 590
-const Y5_LINE = 670
+//const Y5_LINE = 670
 
 const paymentMethodValueBoxY = BOX2_END_Y + 15
 
@@ -89,8 +89,8 @@ const drawFacturableDescription = (doc, facturable, detallado, linePos) => {
   doc.text(facturable.nombre, descriptionStartX, linePos, descriptionOptions)
   if (detallado) {
     const detalleString = facturable.lote !== ''
-      ? `MARCA: ${facturable.marca} LOTE: ${facturable.lote} FECHA: ${facturable.fechaExp}`
-      : `MARCA: ${facturable.marca} FECHA: ${facturable.fechaExp}`
+      ? `MARCA: ${facturable.marca} LOTE: ${facturable.lote} REG. SAN: ${facturable.codigo} FECHA: ${facturable.fechaExp}`
+      : `MARCA: ${facturable.marca} REG. SAN: ${facturable.codigo} FECHA: ${facturable.fechaExp}`
     doc.text(detalleString, descriptionStartX, doc.y, descriptionOptions)
   }
 }
