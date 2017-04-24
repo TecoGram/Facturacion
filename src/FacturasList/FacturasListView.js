@@ -6,8 +6,11 @@ import {
 
 import ListState from './ListState'
 
+const ColumnTypes = MaterialTable.ColumnTypes
 const columns = ['Código', 'Empresa', 'Fecha', 'Cliente', 'Total']
 const keys = ['codigo', 'empresa', 'fecha', 'nombre', 'total']
+const columnTypes = [ColumnTypes.string, ColumnTypes.string, ColumnTypes.string, 
+  ColumnTypes.string, ColumnTypes.numeric]
 const searchHint = 'Buscar facturas...'
 
 export default class FacturasListView extends React.Component {
@@ -62,6 +65,7 @@ export default class FacturasListView extends React.Component {
     return (
       <MaterialTable
         columns={columns}
+        columnTypes={columnTypes}
         enableCheckbox={false}
         keys={keys}
         rows={rows}

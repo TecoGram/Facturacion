@@ -4,8 +4,10 @@ import { findProductos, deleteProducto } from '../api'
 
 import ListState from './ListState'
 
+const ColumnTypes = MaterialTable.ColumnTypes
 const columns = ['Reg. Sanitario', 'Marca', 'Nombre', 'Precio Venta']
 const keys = ['codigo', 'marca', 'nombre', 'precioVenta']
+const columnTypes = [ColumnTypes.string, ColumnTypes.string, ColumnTypes.string, ColumnTypes.numeric]
 const searchHint = 'Buscar productos...'
 
 export default class ProductosListView extends React.Component {
@@ -60,6 +62,7 @@ export default class ProductosListView extends React.Component {
     return (
       <MaterialTable
         columns={columns}
+        columnTypes={columnTypes}
         enableCheckbox={false}
         keys={keys}
         rows={rows}

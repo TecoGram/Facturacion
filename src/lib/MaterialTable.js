@@ -122,12 +122,22 @@ class SearchBox extends React.Component {
 * Esto usa el componente Table de material-ui, el cual no recicla views, por lo
 * tanto hay que tener cuidado con no renderizar muchas filas
 */
+
+const _columnTypes = {
+  string: 0,
+  numeric: 1,
+}
+
+
 export default class MaterialTable extends React.Component {
+
+  static ColumnTypes = Object.freeze(_columnTypes)
 
   static propTypes = {
     columns: React.PropTypes.array.isRequired,
     rows: React.PropTypes.array.isRequired,
     keys: React.PropTypes.array.isRequired,
+    columnTypes: React.PropTypes.array,
     searchHint: React.PropTypes.string.isRequired,
     onQueryChanged: React.PropTypes.func.isRequired,
     height: React.PropTypes.string,
@@ -137,16 +147,45 @@ export default class MaterialTable extends React.Component {
     enableCheckbox: React.PropTypes.bool,
   }
 
+  renderTableRows = () => {
+    const {
+      keys,
+      rows,
+      columnTypes,
+      onDeleteItem,
+      onEditItem,
+      onOpenItem,
+    } = this.props
+    
+      
+    return rows.map((item, i) => {
+      const row = rows[i]
+      return (
+      <TableRow key={i}>
+        { 
+          keys.map((propName, j) => {
+            let dataToDisplay = row[propName] 
+            let columnStyle
+            if (columnTypes && columnTypes[j] === MaterialTable.ColumnTypes.numeric) {
+              dataToDisplay = Number(row[propName]).toFixed(2)
+              columnStyle = { textAlign: 'right' }
+            }
+            return <TableRowColumn style={columnStyle} key={j}>{dataToDisplay}</TableRowColumn>
+          })
+        }
+        { ButtonsColumn(i, onEditItem, onDeleteItem, onOpenItem) }
+      </TableRow>
+      )
+    })
+  }
+
   render() {
     const {
       enableCheckbox,
       height,
-      keys,
-      onEditItem,
       onDeleteItem,
-      onOpenItem,
+      onEditItem,
       onQueryChanged,
-      rows,
       searchHint,
     } = this.props
 
@@ -169,20 +208,8 @@ export default class MaterialTable extends React.Component {
               </TableRow>
              </TableHeader>
              <TableBody displayRowCheckbox={enableCheckbox}>
-              {
-                rows.map((item, i) => {
-                  const row = rows[i]
-                  return (
-                  <TableRow key={i}>
-                    { keys.map((propName, j) => {
-                      return <TableRowColumn key={j}>{row[propName]}</TableRowColumn>
-                    })}
-                    { ButtonsColumn(i, onEditItem, onDeleteItem, onOpenItem) }
-                  </TableRow>
-                  )
-                })
-              }
-              </TableBody>
+              { this.renderTableRows() }
+             </TableBody>
           </Table>
         </PaperContainer>
       </div>
