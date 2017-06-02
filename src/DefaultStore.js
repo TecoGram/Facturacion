@@ -9,7 +9,7 @@ module.exports = {
   },
   ajustes: {
     empresa: "TecoGram S.A.",
-    iva: 14,
+    iva: 12,
   },
   snackbar: null,
   page: {
