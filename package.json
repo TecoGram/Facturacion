@@ -42,6 +42,7 @@
   "scripts": {
     "lint": "eslint backend src test",
     "prettier": "gulp prettier",
+    "production": "git pull origin master && make && yarn server",
     "server": "node backend/server.js",
     "start": "react-scripts start",
     "init-db": "node backend/scripts/setupDB.js",
