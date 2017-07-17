@@ -3,9 +3,15 @@ import React from 'react';
 import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
 
+import ServerErrorText from '../lib/formTable/ServerErrorText';
+
 const ivaLabel = porcentajeIVA => `IVA ${porcentajeIVA}%: $`;
 const nuevoLabel = 'Generar Factura';
 const editarLabel = 'Guardar Cambios';
+const errorMsgStyle = {
+  fontSize: '14px',
+  textAlign: 'left',
+};
 
 const ResultsTable = props => {
   const { isExamen, subtotal, rebaja, impuestos, total, porcentajeIVA } = props;
@@ -93,6 +99,9 @@ export default class FacturaResults extends React.Component {
   render() {
     return (
       <div style={{ width: '100%', paddingTop: '6px', textAlign: 'right' }}>
+        <ServerErrorText style={errorMsgStyle}>
+          {this.props.errorUnidades}
+        </ServerErrorText>
         <ResultsTable {...this.props} />
         <FacturaDetalladaCheckbox {...this.props} />
         <br />
@@ -103,6 +112,7 @@ export default class FacturaResults extends React.Component {
 }
 
 FacturaResults.propTypes = {
+  errorUnidades: React.PropTypes.string,
   isExamen: React.PropTypes.bool,
   detallado: React.PropTypes.bool.isRequired,
   rebaja: React.PropTypes.number.isRequired,

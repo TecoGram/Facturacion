@@ -10,7 +10,6 @@ import {
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import Delete from 'material-ui/svg-icons/action/delete';
-import FormattedDatePicker from '../lib/FormattedDatePicker';
 
 const black54p = '#757575';
 const noPaddingStyle = { padding: '0px' };
@@ -69,7 +68,6 @@ const RenderTableHeader = props => {
 export default class FacturaTable extends React.Component {
   renderRow = (product, i) => {
     const { isExamen, onFacturableChanged, onFacturableDeleted } = this.props;
-    const today = new Date();
 
     let regSanCol = (
       <TableRowColumn width={80} style={noPaddingStyle}>
@@ -91,11 +89,10 @@ export default class FacturaTable extends React.Component {
     );
     let fechaExpCol = (
       <TableRowColumn width={70} style={noPaddingStyle}>
-        <FormattedDatePicker
+        <TextField
           value={product.get('fechaExp')}
           hintText={'expiración'}
-          textFieldStyle={{ width: '70px', fontSize: '13px' }}
-          minDate={today}
+          style={{ width: '70px', fontSize: '13px' }}
           onChange={(event, date) => {
             onFacturableChanged(i, 'fechaExp', date);
           }}

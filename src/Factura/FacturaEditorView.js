@@ -109,6 +109,7 @@ export default class FacturaEditorView extends Component {
 
     const { isExamen, ventaKey, ajustes } = this.props;
 
+    const errorUnidades = errors && errors.unidades;
     const porcentajeDescuentoString = facturaData.get('descuento');
     const fleteString = facturaData.get('flete');
     const detallado = facturaData.get('detallado');
@@ -149,6 +150,7 @@ export default class FacturaEditorView extends Component {
               isExamen={isExamen}
             />
             <FacturaResults
+              errorUnidades={errorUnidades}
               subtotal={subtotal}
               rebaja={rebaja}
               impuestos={impuestos}

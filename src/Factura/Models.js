@@ -35,7 +35,7 @@ const productoAFacturable = producto => {
   facturable.lote = '';
   facturable.count = '1';
   facturable.precioVenta = '' + producto.precioVenta;
-  facturable.fechaExp = oneYearFromToday();
+  facturable.fechaExp = toReadableDate(oneYearFromToday());
   return facturable;
 };
 
@@ -45,7 +45,6 @@ const facturableAUnidad = facturable => {
   delete unidad.nombre;
   delete unidad.codigo;
   delete unidad.marca;
-  unidad.fechaExp = toReadableDate(unidad.fechaExp);
   return unidad;
 };
 

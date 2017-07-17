@@ -10,8 +10,9 @@ const errorStyle = {
 };
 export default class ServerErrorText extends React.Component {
   render() {
+    const mergedStyle = { ...errorStyle, ...this.props.style };
     return (
-      <div style={errorStyle}>
+      <div style={mergedStyle}>
         {this.props.children}
       </div>
     );

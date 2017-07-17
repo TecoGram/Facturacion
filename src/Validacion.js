@@ -125,12 +125,20 @@ const validarPorcentajeIVA = (iva, errors, inputs) => {
   else inputs.iva = iva;
 };
 
+//regext dates between 2010 and 2029
+const fechaRegex = /20(1|2)[0-9]-(0|1)[0-9]-[0-3][0-9]/i;
+const esFechaValida = dateString => fechaRegex.test(dateString);
+
 const validarUnidad = unidad => {
   const { producto, fechaExp, lote, count, precioVenta } = unidad;
 
   if (typeof producto !== 'number' || !validator.isInt('' + producto))
     return 'producto inválido';
-  if (typeof fechaExp !== 'string' || !validator.isDate(fechaExp))
+  if (
+    typeof fechaExp !== 'string' ||
+    !validator.isDate(fechaExp) ||
+    !esFechaValida(fechaExp)
+  )
     return 'fecha expiración inválida';
   if (typeof lote !== 'string') return 'lote inválido';
   if (!esEnteroValido(count)) return 'cantidad inválida';
@@ -147,7 +155,8 @@ const validarListaUnidades = (unidades, errors, inputs) => {
   const erroresDeListaUnidades = unidades.map(validarUnidad);
   const primerError = erroresDeListaUnidades.find(esUnError);
   if (primerError) {
-    const posicionDelPrimerError = erroresDeListaUnidades.indexOf(primerError);
+    const posicionDelPrimerError =
+      erroresDeListaUnidades.indexOf(primerError) + 1;
     errors.unidades = `Error en posición #${posicionDelPrimerError}: ${primerError}`;
     return;
   }

@@ -7,7 +7,7 @@ const chai = require('chai'),
 chai.use(require('chai-string'));
 
 const FacturaEditor = require('../../src/Factura/EditorState.js');
-const DateParser = require('../../src/DateParser.js');
+const Models = require('../../src/Factura/Models.js');
 const getState = FacturaEditor.getDefaultState;
 
 const crearProducto = () => {
@@ -200,7 +200,7 @@ describe('Factura Editor State', function() {
   describe('prepararFacturaParaGuardar', function() {
     let state;
 
-    before(function() {
+    beforeEach(function() {
       state = getState();
       const newProduct = crearProducto();
       const modificacion = FacturaEditor.agregarProductoComoFacturable(
@@ -210,6 +210,51 @@ describe('Factura Editor State', function() {
       const cambios = modificacion(state);
       state.facturables = cambios.facturables;
       state.cliente = { ruc: '0956676546' };
+    });
+
+    const testAnioInvalido = fechaExp => {
+      const facturable = Models.productoAFacturable(crearProducto());
+      facturable.fechaExp = fechaExp;
+      state.facturables = state.facturables.push(Immutable.Map(facturable));
+      const {
+        errors,
+        ventaRow,
+        prom,
+        msg,
+      } = FacturaEditor.prepararFacturaParaGuardar(state, false, 'emp');
+
+      expect(ventaRow).to.equal(null);
+      expect(prom).to.equal(null);
+      expect(msg).to.equal(null);
+      expect(errors).to.be.an('object');
+      expect(errors).to.have.ownProperty('unidades');
+    };
+
+    const testAnioValido = fechaExp => {
+      const facturable = Models.productoAFacturable(crearProducto());
+      facturable.fechaExp = fechaExp;
+      state.facturables = state.facturables.push(Immutable.Map(facturable));
+      const { errors } = FacturaEditor.prepararFacturaParaGuardar(
+        state,
+        false,
+        'emp'
+      );
+
+      expect(errors).to.be.an('object');
+      expect(errors).to.not.have.ownProperty('unidades');
+    };
+
+    it('retorna unicamente errores si el anio de fecha exp es muy alto', function() {
+      testAnioInvalido('20178-01-01');
+    });
+
+    it('retorna unicamente errors si el anio de fecha exp es muy bajo', function() {
+      testAnioInvalido('2001-01-01');
+    });
+
+    it('no reporta errores de unidades si el anio de fecha exp esta en el rango adecuado', function() {
+      testAnioValido('2016-02-21');
+      testAnioValido('2026-03-10');
     });
 
     it('retorna unicamente errores si fracasa al validar factura', function() {
@@ -234,7 +279,7 @@ describe('Factura Editor State', function() {
           producto: 1,
           count: '2',
           lote: 'AA',
-          fechaExp: DateParser.parseDBDate('2018-03-02'),
+          fechaExp: '2018-03-02',
           precioVenta: '12.99',
         })
       );
