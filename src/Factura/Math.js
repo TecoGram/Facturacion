@@ -1,12 +1,14 @@
+const limitTo2decimals = value => Math.round(value * 100) / 100;
+
 const calcularRebaja = (subtotal, porcentajeDescuento) => {
-  return subtotal * porcentajeDescuento / 100;
+  return limitTo2decimals(subtotal * porcentajeDescuento / 100);
 };
 
 const calcularImpuestos = (subtotal, rebaja, porcentajeIVA) => {
-  return (subtotal - rebaja) * porcentajeIVA / 100;
+  return limitTo2decimals((subtotal - rebaja) * porcentajeIVA / 100);
 };
 const calcularTotal = (subtotal, flete, impuestos, rebaja) => {
-  return subtotal + flete + impuestos - rebaja;
+  return limitTo2decimals(subtotal + flete + impuestos - rebaja);
 };
 
 const calcularTotalVentaRow = ventaRow => {
@@ -31,7 +33,7 @@ const calcularSubtotalImm = facturablesImm => {
     const recargo = precioVenta * count;
     subtotal += recargo;
   }
-  return subtotal;
+  return limitTo2decimals(subtotal);
 };
 
 const calcularValoresTotales = (

@@ -61,8 +61,8 @@ describe('Factura Editor State', function() {
 
       subtotal.should.equal(1.99);
       rebaja.should.be.closeTo(0.0597, 0.001);
-      impuestos.should.equal(0.270242);
-      total.should.be.closeTo(2.450542, 0.000001);
+      impuestos.should.equal(0.27);
+      total.should.equal(2.45);
     });
 
     it('asume cero flete si es un string vacio y cero descuento si es un string vacio', function() {
@@ -75,8 +75,8 @@ describe('Factura Editor State', function() {
 
       subtotal.should.equal(1.99);
       rebaja.should.equal(0);
-      impuestos.should.equal(0.2786);
-      total.should.equal(2.2686);
+      impuestos.should.equal(0.28);
+      total.should.equal(2.27);
     });
   });
 

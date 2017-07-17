@@ -183,10 +183,10 @@ describe('Facturacion Models', function() {
         10
       );
 
-      expect(subtotal).to.be.closeTo(113.95, 0.001);
-      expect(rebaja).to.be.closeTo(11.395, 0.001);
-      expect(impuestos).to.be.closeTo(14.358, 0.001);
-      expect(total).to.be.closeTo(119.9, 0.005);
+      expect(subtotal).to.equal(113.95);
+      expect(rebaja).to.equal(11.4);
+      expect(impuestos).to.equal(14.36);
+      expect(total).to.equal(119.9);
     });
   });
 

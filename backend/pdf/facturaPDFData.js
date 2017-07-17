@@ -17,14 +17,15 @@ const generarDetalleOpcionesDePago = (formaPago, total) => {
 const crearMatrizValoresTotales = (
   subtotal,
   flete,
+  porcentajeIVA,
+  descuento,
   impuestos,
   rebaja,
-  total,
-  porcentajeIVA
+  total
 ) => {
   const matrix = [];
-  matrix.push(['Descuento US', '$', Number(rebaja).toFixed(2)]);
   matrix.push(['Sub-Total', '$', Number(subtotal).toFixed(2)]);
+  matrix.push(['Descuento', `${descuento}%`, Number(rebaja).toFixed(2)]);
   if (porcentajeIVA === 0) matrix.push(['IVA', '0%', '0.00']);
   else matrix.push(['IVA', '%', '']);
   matrix.push(['Flete', '$', Number(flete).toFixed(2)]);
@@ -50,10 +51,11 @@ const fromVentaRow = ventaRow => {
   facturaPDFData.matrizValoresTotales = crearMatrizValoresTotales(
     subtotal,
     flete,
+    iva,
+    descuento,
     impuestos,
     rebaja,
-    total,
-    iva
+    total
   );
 
   return facturaPDFData;

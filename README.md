@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/GAumala/Facturacion.svg?branch=master)](https://travis-ci.org/GAumala/Facturacion) [![Coverage Status](https://coveralls.io/repos/github/GAumala/Facturacion/badge.svg?branch=master)](https://coveralls.io/github/GAumala/Facturacion?branch=master)
+[![Build Status](https://travis-ci.org/GAumala/Facturacion.svg?branch=master)](https://travis-ci.org/GAumala/Facturacion) [![Coverage Status](https://coveralls.io/repos/github/GAumala/Facturacion/badge.svg?branch=master)](https://coveralls.io/github/GAumala/Facturacion?branch=master) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
 Sistema de facturación web sencillo escrito con React, Node.js y SQLite 3.
 

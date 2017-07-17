@@ -40,6 +40,7 @@
     "validator": "^6.1.0"
   },
   "scripts": {
+    "lint": "eslint backend src test",
     "prettier": "gulp prettier",
     "server": "node backend/server.js",
     "start": "react-scripts start",
