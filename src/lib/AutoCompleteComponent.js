@@ -1,6 +1,6 @@
 import React from 'react';
 
-import AutoComplete from 'material-ui/AutoComplete'
+import AutoComplete from 'material-ui/AutoComplete';
 
 /**
 * Componente para AutoComplete. Cada vez que el usario escribe en el TextField,
@@ -22,7 +22,6 @@ import AutoComplete from 'material-ui/AutoComplete'
 * completo que devolvio el servidor como sugerencia.
 */
 export default class AutoCompleteComponent extends React.Component {
-
   static propTypes = {
     dataSourceConfig: React.PropTypes.object.isRequired,
     hintText: React.PropTypes.string.isRequired,
@@ -30,71 +29,69 @@ export default class AutoCompleteComponent extends React.Component {
     newDataPromise: React.PropTypes.func.isRequired,
     style: React.PropTypes.object,
     width: React.PropTypes.string.isRequired,
-  }
+  };
 
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       suggestions: [],
       text: '',
-    }
+    };
   }
 
-  reqNewData = (input) => {
-    const newDataPromise = this.props.newDataPromise
-    if(input.length === 0)
-      this.setState({ text: input, suggestions: [] })
+  reqNewData = input => {
+    const newDataPromise = this.props.newDataPromise;
+    if (input.length === 0) this.setState({ text: input, suggestions: [] });
     else {
-      this.setState({ text: input })
-      newDataPromise(input)
-      .then(
-        (resp) => { this.setState({ suggestions: resp.body }) },
-        () => { this.setState({ suggestions: [] }) }
-      )
+      this.setState({ text: input });
+      newDataPromise(input).then(
+        resp => {
+          this.setState({ suggestions: resp.body });
+        },
+        () => {
+          this.setState({ suggestions: [] });
+        }
+      );
     }
-  }
+  };
 
   clearAutoComplete = () => {
-    this.setState({ text: '', suggestions: []})
-  }
+    this.setState({ text: '', suggestions: [] });
+  };
 
-  onNewItemSelected = (selectedValue) => {
-    const onNewItemSelected = this.props.onNewItemSelected
-    const items = this.state.suggestions
-    const totalSuggestions = items.length
+  onNewItemSelected = selectedValue => {
+    const onNewItemSelected = this.props.onNewItemSelected;
+    const items = this.state.suggestions;
+    const totalSuggestions = items.length;
 
     if (typeof selectedValue === 'string' && totalSuggestions > 0) {
-      onNewItemSelected(items[0])
-      this.clearAutoComplete()
+      onNewItemSelected(items[0]);
+      this.clearAutoComplete();
     } else if (typeof selectedValue === 'object') {
-      onNewItemSelected(selectedValue)
-      this.clearAutoComplete()
+      onNewItemSelected(selectedValue);
+      this.clearAutoComplete();
     }
-  }
+  };
 
   render() {
-    const {
-      dataSourceConfig,
-      hintText,
-      width,
-    } = this.props
+    const { dataSourceConfig, hintText, width } = this.props;
 
-    const style = this.props.style || {}
-    style.width = width
+    const style = this.props.style || {};
+    style.width = width;
 
     return (
       <AutoComplete
         hintText={hintText}
         style={style}
-        textFieldStyle={{width: width}}
+        textFieldStyle={{ width: width }}
         filter={AutoComplete.noFilter}
         openOnFocus={false}
         dataSourceConfig={dataSourceConfig}
         dataSource={this.state.suggestions}
         searchText={this.state.text}
-        onUpdateInput={(searchText) => this.reqNewData(searchText) }
-        onNewRequest={ this.onNewItemSelected }
+        onUpdateInput={searchText => this.reqNewData(searchText)}
+        onNewRequest={this.onNewItemSelected}
       />
-    )
+    );
   }
 }

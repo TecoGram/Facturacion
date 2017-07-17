@@ -1,6 +1,6 @@
-const deepFreeze = require('deep-freeze')
-const { oneYearFromToday, toReadableDate } = require('../DateParser.js')
-const { calcularSubtotalImm } = require('./Math.js')
+const deepFreeze = require('deep-freeze');
+const { oneYearFromToday, toReadableDate } = require('../DateParser.js');
+const { calcularSubtotalImm } = require('./Math.js');
 
 const FormasDePago = deepFreeze([
   'EFECTIVO',
@@ -8,53 +8,60 @@ const FormasDePago = deepFreeze([
   'TARJETA DE CRÉDITO/DÉBITO',
   'TRANSFERENCIA',
   'OTRO',
-])
+]);
 
-const crearUnidadesRows = (facturablesImm) => {
-  const len = facturablesImm.size
-  const unidades = []
+const crearUnidadesRows = facturablesImm => {
+  const len = facturablesImm.size;
+  const unidades = [];
   for (let i = 0; i < len; i++) {
-    const facturableImm = facturablesImm.get(i)
-    const count = facturableImm.get('count')
+    const facturableImm = facturablesImm.get(i);
+    const count = facturableImm.get('count');
     for (let j = 0; j < count; j++)
       unidades.push({
         producto: facturableImm.get('rowid'),
         lote: facturableImm.get('lote'),
         fechaExp: facturableImm.get('fechaExp'),
-      })
+      });
   }
-  return unidades
-}
+  return unidades;
+};
 
+const productoAFacturable = producto => {
+  const facturable = Object.assign({}, producto);
+  facturable.producto = producto.rowid;
+  delete facturable.rowid;
+  delete facturable.precioDist;
+  delete facturable.nombreAscii;
+  facturable.lote = '';
+  facturable.count = '1';
+  facturable.precioVenta = '' + producto.precioVenta;
+  facturable.fechaExp = oneYearFromToday();
+  return facturable;
+};
 
-const productoAFacturable = (producto) => {
-  const facturable = Object.assign({}, producto)
-  facturable.producto = producto.rowid
-  delete facturable.rowid
-  delete facturable.precioDist
-  delete facturable.nombreAscii
-  facturable.lote = ''
-  facturable.count = '1'
-  facturable.precioVenta = '' + producto.precioVenta
-  facturable.fechaExp = oneYearFromToday()
-  return facturable
-}
+const facturableAUnidad = facturable => {
+  const unidad = Object.assign({}, facturable);
+  delete unidad.pagaIva;
+  delete unidad.nombre;
+  delete unidad.codigo;
+  delete unidad.marca;
+  unidad.fechaExp = toReadableDate(unidad.fechaExp);
+  return unidad;
+};
 
-const facturableAUnidad = (facturable) => {
-  const unidad = Object.assign({}, facturable)
-  delete unidad.pagaIva
-  delete unidad.nombre
-  delete unidad.codigo
-  delete unidad.marca
-  unidad.fechaExp = toReadableDate(unidad.fechaExp)
-  return unidad
-}
-
-const crearVentaRow = (clienteObj, medicoObj, facturaDataImm, facturablesImm, unidades,
-    empresa, isExamen, porcentajeIVA) => {
-  const subtotal = calcularSubtotalImm(facturablesImm)
-  let medicoId
-  if (medicoObj) medicoId = medicoObj.nombre
+const crearVentaRow = (
+  clienteObj,
+  medicoObj,
+  facturaDataImm,
+  facturablesImm,
+  unidades,
+  empresa,
+  isExamen,
+  porcentajeIVA
+) => {
+  const subtotal = calcularSubtotalImm(facturablesImm);
+  let medicoId;
+  if (medicoObj) medicoId = medicoObj.nombre;
   return {
     cliente: clienteObj.ruc,
     codigo: facturaDataImm.get('codigo'),
@@ -70,8 +77,8 @@ const crearVentaRow = (clienteObj, medicoObj, facturaDataImm, facturablesImm, un
     unidades: unidades,
     medico: medicoId,
     paciente: facturaDataImm.get('paciente'),
-  }
-}
+  };
+};
 
 module.exports = {
   crearUnidadesRows,
@@ -79,4 +86,4 @@ module.exports = {
   facturableAUnidad,
   FormasDePago,
   productoAFacturable,
-}
+};

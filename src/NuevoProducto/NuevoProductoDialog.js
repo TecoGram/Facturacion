@@ -3,91 +3,106 @@ import React from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
-import NuevoProductoForm from './NuevoProductoForm'
-import DialogState from './DialogState'
-import { insertarProducto, updateProducto } from '../api'
-import ServerErrorText from '../lib/formTable/ServerErrorText'
+import NuevoProductoForm from './NuevoProductoForm';
+import DialogState from './DialogState';
+import { insertarProducto, updateProducto } from '../api';
+import ServerErrorText from '../lib/formTable/ServerErrorText';
 
 export default class NuevoProductoDialog extends React.Component {
-
   constructor(props) {
-    super(props)
-    this.stateManager = new DialogState(props, (args) => this.setState(args))
-    this.state = this.stateManager.getDefaultState()
+    super(props);
+    this.stateManager = new DialogState(props, args => this.setState(args));
+    this.state = this.stateManager.getDefaultState();
   }
 
   cancelarDialog = () => {
-    this.stateManager.cancelarDialog()
+    this.stateManager.cancelarDialog();
   };
 
   updateData = (fieldName, newValue) => {
-    this.stateManager.updateData(fieldName, newValue, this.state)
-  }
+    this.stateManager.updateData(fieldName, newValue, this.state);
+  };
 
-  renderServerError = (errText) => {
+  renderServerError = errText => {
     if (errText)
       return (
-        <ServerErrorText>{errText}</ServerErrorText>
-      )
-    else return <div />
-  }
+        <ServerErrorText>
+          {errText}
+        </ServerErrorText>
+      );
+    else return <div />;
+  };
 
-  guardarProducto = (inputs) => {
+  guardarProducto = inputs => {
     const {
-      rowid, codigo, nombre, marca, precioDist, precioVenta, pagaIva,
-    } = inputs
+      rowid,
+      codigo,
+      nombre,
+      marca,
+      precioDist,
+      precioVenta,
+      pagaIva,
+    } = inputs;
 
-    const {
-        cerrarDialogConExito,
-        mostrarErrorDeServidor,
-      } = this.stateManager
+    const { cerrarDialogConExito, mostrarErrorDeServidor } = this.stateManager;
 
     const guardarAction = this.props.editar
-    ? updateProducto(rowid, codigo, nombre, marca, precioDist, precioVenta, pagaIva)
-    : insertarProducto(codigo, nombre, marca, precioDist, precioVenta, pagaIva)
-    const handleSuccess = () => cerrarDialogConExito(inputs.nombre)
+      ? updateProducto(
+          rowid,
+          codigo,
+          nombre,
+          marca,
+          precioDist,
+          precioVenta,
+          pagaIva
+        )
+      : insertarProducto(
+          codigo,
+          nombre,
+          marca,
+          precioDist,
+          precioVenta,
+          pagaIva
+        );
+    const handleSuccess = () => cerrarDialogConExito(inputs.nombre);
 
-    guardarAction.then(handleSuccess, mostrarErrorDeServidor)
-  }
-
+    guardarAction.then(handleSuccess, mostrarErrorDeServidor);
+  };
 
   validarDatos = () => {
-    const rawInputs = this.state.inputs
-    const inputs = this.stateManager.validarDatos(rawInputs)
-    if(inputs) {
-      inputs.rowid = rawInputs.rowid
-      this.guardarProducto(inputs)
+    const rawInputs = this.state.inputs;
+    const inputs = this.stateManager.validarDatos(rawInputs);
+    if (inputs) {
+      inputs.rowid = rawInputs.rowid;
+      this.guardarProducto(inputs);
     }
-  }
+  };
 
   componentDidMount() {
-    this.stateManager.revisarDataParaEditar()
+    this.stateManager.revisarDataParaEditar();
   }
 
-  componentWillReceiveProps = (nextProps) => {
-    this.stateManager.props = nextProps
-    this.stateManager.revisarDataParaEditar()
-  }
+  componentWillReceiveProps = nextProps => {
+    this.stateManager.props = nextProps;
+    this.stateManager.revisarDataParaEditar();
+  };
 
   render() {
-    const {
-      open,
-      editar,
-    } = this.props
+    const { open, editar } = this.props;
 
     const actions = [
       <FlatButton
         label="Cancelar"
         secondary={true}
-        onTouchTap={ this.cancelarDialog }
+        onTouchTap={this.cancelarDialog}
       />,
       <FlatButton
         label="Guardar"
         primary={true}
         keyboardFocused={true}
-        onTouchTap={ this.validarDatos }
+        onTouchTap={this.validarDatos}
       />,
-    ]
+    ];
 
     return (
       <Dialog
@@ -95,19 +110,23 @@ export default class NuevoProductoDialog extends React.Component {
         actions={actions}
         modal={false}
         open={open}
-        onRequestClose={this.handleClose} >
-        <NuevoProductoForm inputs={this.state.inputs} errors={this.state.errors}
-        updateData={this.updateData} editar={Boolean(editar)}/>
-        { this.renderServerError(this.state.serverError) }
+        onRequestClose={this.handleClose}
+      >
+        <NuevoProductoForm
+          inputs={this.state.inputs}
+          errors={this.state.errors}
+          updateData={this.updateData}
+          editar={Boolean(editar)}
+        />
+        {this.renderServerError(this.state.serverError)}
       </Dialog>
-    )
+    );
   }
 }
-
 
 NuevoProductoDialog.propTypes = {
   editar: React.PropTypes.object,
   open: React.PropTypes.bool.isRequired,
   cancelarDialog: React.PropTypes.func.isRequired,
   cerrarDialogConMsg: React.PropTypes.func.isRequired,
-}
+};

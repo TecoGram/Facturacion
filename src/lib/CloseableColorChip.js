@@ -2,7 +2,7 @@ import React from 'react';
 
 import Chip from 'material-ui/Chip';
 
-import { primaryColor } from '../CustomStyle'
+import { primaryColor } from '../CustomStyle';
 
 const chipStyle = {
   fontSize: '16px',
@@ -11,32 +11,28 @@ const chipStyle = {
   marginRight: '36px',
   display: 'inline-block',
   lineHeight: '24px',
-}
+};
 
 export default class CloseableColorChip extends React.Component {
-
   static propTypes = {
     text: React.PropTypes.string.isRequired,
     onRequestDelete: React.PropTypes.func,
     width: React.PropTypes.string,
-  }
+  };
 
   render() {
-    const {
-      width,
-      text,
-      onRequestDelete,
-    } = this.props
+    const { width, text, onRequestDelete } = this.props;
 
     return (
-      <div style={{...chipStyle, width}}>
+      <div style={{ ...chipStyle, width }}>
         <Chip
           backgroundColor={primaryColor}
-          labelStyle={{color: 'white'}}
-          onRequestDelete={onRequestDelete} >
-          { text }
+          labelStyle={{ color: 'white' }}
+          onRequestDelete={onRequestDelete}
+        >
+          {text}
         </Chip>
       </div>
-    )
+    );
   }
 }

@@ -1,67 +1,72 @@
-import React from 'react'
-import MaterialTable from '../lib/MaterialTable'
-import {
-  getFacturaURLByType,
-  findAllVentas, deleteVenta } from '../api'
+import React from 'react';
+import MaterialTable from '../lib/MaterialTable';
+import { getFacturaURLByType, findAllVentas, deleteVenta } from '../api';
 
-import ListState from './ListState'
+import ListState from './ListState';
 
-const ColumnTypes = MaterialTable.ColumnTypes
-const columns = ['Código', 'Empresa', 'Fecha', 'Cliente', 'Total']
-const keys = ['codigo', 'empresa', 'fecha', 'nombre', 'total']
-const columnTypes = [ColumnTypes.string, ColumnTypes.string, ColumnTypes.string, 
-  ColumnTypes.string, ColumnTypes.numeric]
-const searchHint = 'Buscar facturas...'
+const ColumnTypes = MaterialTable.ColumnTypes;
+const columns = ['Código', 'Empresa', 'Fecha', 'Cliente', 'Total'];
+const keys = ['codigo', 'empresa', 'fecha', 'nombre', 'total'];
+const columnTypes = [
+  ColumnTypes.string,
+  ColumnTypes.string,
+  ColumnTypes.string,
+  ColumnTypes.string,
+  ColumnTypes.numeric,
+];
+const searchHint = 'Buscar facturas...';
 
 export default class FacturasListView extends React.Component {
-
   constructor(props) {
-    super(props)
-    this.stateManager = new ListState(props, (args) => this.setState(args))
+    super(props);
+    this.stateManager = new ListState(props, args => this.setState(args));
     this.state = {
       rows: [],
-    }
+    };
   }
 
-  componentWillReceiveProps = (nextProps) => {
-    this.stateManager.props = nextProps
-  }
+  componentWillReceiveProps = nextProps => {
+    this.stateManager.props = nextProps;
+  };
 
-  openFacturaInNewTab = (index) => {
-    const { codigo, empresa, tipo } = this.state.rows[index]
-    const facturaURL = getFacturaURLByType(codigo, empresa, tipo)
-    window.open(facturaURL)
-  }
+  openFacturaInNewTab = index => {
+    const { codigo, empresa, tipo } = this.state.rows[index];
+    const facturaURL = getFacturaURLByType(codigo, empresa, tipo);
+    window.open(facturaURL);
+  };
 
-  openEditorPage = (index) => {
-    const { codigo, empresa, tipo } = this.state.rows[index]
-    this.stateManager.openEditorPage(codigo, empresa, tipo)
-  }
+  openEditorPage = index => {
+    const { codigo, empresa, tipo } = this.state.rows[index];
+    this.stateManager.openEditorPage(codigo, empresa, tipo);
+  };
 
-  deleteRow = (index) => {
-    const { codigo, empresa } = this.state.rows[index]
-    deleteVenta(codigo, empresa)
-      .then(() => { this.stateManager.deleteVenta(codigo, empresa) })
-  }
+  deleteRow = index => {
+    const { codigo, empresa } = this.state.rows[index];
+    deleteVenta(codigo, empresa).then(() => {
+      this.stateManager.deleteVenta(codigo, empresa);
+    });
+  };
 
-  requestData = (input) => {
-    findAllVentas(input)
-      .then((resp) => {
-        const listaVentas = resp.body
-        this.stateManager.colocarVentas(listaVentas)
-      }, (err) => {
+  requestData = input => {
+    findAllVentas(input).then(
+      resp => {
+        const listaVentas = resp.body;
+        this.stateManager.colocarVentas(listaVentas);
+      },
+      err => {
         if (err.status === 404) {
-          this.stateManager.colocarVentas([])
+          this.stateManager.colocarVentas([]);
         }
-      })
-  }
+      }
+    );
+  };
 
   componentDidMount() {
-    this.requestData('')
+    this.requestData('');
   }
 
-  render () {
-    const rows = this.state.rows
+  render() {
+    const rows = this.state.rows;
     return (
       <MaterialTable
         columns={columns}
@@ -74,13 +79,13 @@ export default class FacturasListView extends React.Component {
         onEditItem={this.openEditorPage}
         onOpenItem={this.openFacturaInNewTab}
         height={'450px'}
-        onQueryChanged={this.requestData}/>
-    )
+        onQueryChanged={this.requestData}
+      />
+    );
   }
-
 }
 
 FacturasListView.propTypes = {
   editarFactura: React.PropTypes.func.isRequired,
   editarFacturaExamen: React.PropTypes.func.isRequired,
-}
+};

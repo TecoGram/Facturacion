@@ -1,11 +1,11 @@
-import React, {Component, PropTypes} from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import Add from 'material-ui/svg-icons/content/add';
-import ExitToApp from 'material-ui/svg-icons/action/exit-to-app'
-import ViewList from 'material-ui/svg-icons/action/view-list'
+import ExitToApp from 'material-ui/svg-icons/action/exit-to-app';
+import ViewList from 'material-ui/svg-icons/action/view-list';
 import Drawer from 'material-ui/Drawer';
 import Divider from 'material-ui/Divider';
-import {Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui';
+import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
@@ -13,41 +13,42 @@ import IconButton from 'material-ui/IconButton';
 import Snackbar from 'material-ui/Snackbar';
 import NavigationMenu from 'material-ui/svg-icons/navigation/menu';
 
-
 import { bindActionCreators } from 'redux';
-import { connect, Provider } from 'react-redux'
+import { connect, Provider } from 'react-redux';
 
-import {
-  CLIENTE_DIALOG,
-  PRODUCTO_DIALOG,
-  MEDICO_DIALOG,
-} from './DialogTypes'
+import { CLIENTE_DIALOG, PRODUCTO_DIALOG, MEDICO_DIALOG } from './DialogTypes';
 import {
   NEW_FACTURA_PAGE,
   EDITAR_FACTURA_PAGE,
   NEW_FACTURA_EXAMEN_PAGE,
   EDITAR_FACTURA_EXAMEN_PAGE,
   FACTURA_LIST_PAGE,
-  CLIENTE_LIST_PAGE, PRODUCTO_LIST_PAGE } from './PageTypes'
+  CLIENTE_LIST_PAGE,
+  PRODUCTO_LIST_PAGE,
+} from './PageTypes';
 
-import ActionCreators from './ActionCreators'
-import CustomStyle from './CustomStyle'
-import {NuevaFacturaPage, EditarFacturaPage, NuevaFacturaExamenPage,
-  EditarFacturaExamenPage} from './Factura/Variantes'
-import NuevoClienteDialog from './NuevoCliente/NuevoClienteDialog'
-import NuevoProductoDialog from './NuevoProducto/NuevoProductoDialog'
-import NuevoMedicoDialog from './NuevoMedico/NuevoMedicoDialog'
-import FacturasListView from './FacturasList/FacturasListView'
-import ClientesListView from './ClientesList/ClientesListView'
-import ProductosListView from './ProductosList/ProductosListView'
-import store from './Store'
-import InitialStore from './InitialStore'
+import ActionCreators from './ActionCreators';
+import CustomStyle from './CustomStyle';
+import {
+  NuevaFacturaPage,
+  EditarFacturaPage,
+  NuevaFacturaExamenPage,
+  EditarFacturaExamenPage,
+} from './Factura/Variantes';
+import NuevoClienteDialog from './NuevoCliente/NuevoClienteDialog';
+import NuevoProductoDialog from './NuevoProducto/NuevoProductoDialog';
+import NuevoMedicoDialog from './NuevoMedico/NuevoMedicoDialog';
+import FacturasListView from './FacturasList/FacturasListView';
+import ClientesListView from './ClientesList/ClientesListView';
+import ProductosListView from './ProductosList/ProductosListView';
+import store from './Store';
+import InitialStore from './InitialStore';
 
-const toolbarTextColor = '#FFFFFF'
+const toolbarTextColor = '#FFFFFF';
 const toolbarTitleStyle = {
   color: toolbarTextColor,
   fontFamily: 'Roboto',
-}
+};
 
 function mapStateToProps(state) {
   return {
@@ -55,126 +56,124 @@ function mapStateToProps(state) {
     ajustes: state.ajustes,
     snackbar: state.snackbar,
     page: state.page,
-  }
+  };
 }
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(ActionCreators, dispatch);
 }
 
-const redirectEmpresa = (redirigirATeco) => {
-  if (redirigirATeco)
-    window.location = '/teco'
-  else
-    window.location = '/biocled'
-}
+const redirectEmpresa = redirigirATeco => {
+  if (redirigirATeco) window.location = '/teco';
+  else window.location = '/biocled';
+};
 
-const MainDrawer = (props) => {
-
-  const cp = (page) => {
-    props.onPageSelected(page)
-  }
+const MainDrawer = props => {
+  const cp = page => {
+    props.onPageSelected(page);
+  };
 
   return (
     <Drawer
       docked={false}
       width={200}
       open={props.open}
-      onRequestChange={props.handleChange}>
-      <MenuItem
-        onTouchTap={() => cp(NEW_FACTURA_PAGE)}
-        leftIcon={<Add />}>
+      onRequestChange={props.handleChange}
+    >
+      <MenuItem onTouchTap={() => cp(NEW_FACTURA_PAGE)} leftIcon={<Add />}>
         Factura
       </MenuItem>
       <MenuItem
         onTouchTap={() => cp(NEW_FACTURA_EXAMEN_PAGE)}
-        leftIcon={<Add />}>
+        leftIcon={<Add />}
+      >
         Factura Examen
       </MenuItem>
       <Divider />
       <MenuItem
         onTouchTap={() => cp(CLIENTE_LIST_PAGE)}
-        leftIcon={<ViewList />}>
+        leftIcon={<ViewList />}
+      >
         Clientes
       </MenuItem>
       <MenuItem
         onTouchTap={() => cp(FACTURA_LIST_PAGE)}
-        leftIcon={<ViewList />}>
+        leftIcon={<ViewList />}
+      >
         Facturas
       </MenuItem>
       <MenuItem
         onTouchTap={() => cp(PRODUCTO_LIST_PAGE)}
-        leftIcon={<ViewList />}>
+        leftIcon={<ViewList />}
+      >
         Productos
       </MenuItem>
       <Divider />
       <MenuItem
         onTouchTap={() => redirectEmpresa(true)}
-        leftIcon={<ExitToApp />}>
+        leftIcon={<ExitToApp />}
+      >
         TecoGram S.A.
       </MenuItem>
       <MenuItem
         onTouchTap={() => redirectEmpresa(false)}
-        leftIcon={<ExitToApp />}>
+        leftIcon={<ExitToApp />}
+      >
         Biocled
       </MenuItem>
     </Drawer>
-  )
-}
+  );
+};
 
 class MainSnackbar extends React.Component {
-
   shouldComponentUpdate(nextProps) {
-    if (this.props.data !== nextProps.data) return true
-    return false
+    if (this.props.data !== nextProps.data) return true;
+    return false;
   }
 
-  getDataFromProps = (props) => {
-    const data = props.data
-    let action, message, open, onActionTouchTap, duration
+  getDataFromProps = props => {
+    const data = props.data;
+    let action, message, open, onActionTouchTap, duration;
     if (data) {
-      open = true
-      message = data.message
+      open = true;
+      message = data.message;
       if (data.link) {
-        action = "ABRIR"
-        onActionTouchTap = () => window.open(data.link)
+        action = 'ABRIR';
+        onActionTouchTap = () => window.open(data.link);
       }
-      if (data.duration)
-        duration = data.duration
+      if (data.duration) duration = data.duration;
     } else {
-      open = false
-      message = ''
+      open = false;
+      message = '';
     }
 
-    return { action, message, open, onActionTouchTap, duration }
-  }
+    return { action, message, open, onActionTouchTap, duration };
+  };
 
-  render () {
+  render() {
     const {
       action,
       message,
       open,
       duration,
       onActionTouchTap,
-    } = this.getDataFromProps(this.props)
+    } = this.getDataFromProps(this.props);
 
     return (
-      <Snackbar open={open} message={message} action={action}
-      onActionTouchTap={onActionTouchTap} autoHideDuration={duration || 12000}/>
-    )
+      <Snackbar
+        open={open}
+        message={message}
+        action={action}
+        onActionTouchTap={onActionTouchTap}
+        autoHideDuration={duration || 12000}
+      />
+    );
   }
 }
 
 class MainToolbar extends Component {
-
   getIconStyles(props, context) {
-    const {
-      appBar,
-      toolbar,
-      button: {
-        iconButtonSize,
-      },
-    } = context.muiTheme;
+    const { appBar, toolbar, button: { iconButtonSize } } = context.muiTheme;
 
     const flatButtonSize = 36;
 
@@ -202,61 +201,84 @@ class MainToolbar extends Component {
   };
 
   render() {
+    const { iconButtonStyle, iconButtonIconStyle } = this.getIconStyles(
+      this.props,
+      this.context
+    );
 
-    const {
-      iconButtonStyle,
-      iconButtonIconStyle,
-    } = this.getIconStyles(this.props, this.context)
+    const { mostrarDialog, title, onLeftButtonClicked } = this.props;
 
-    const {
-      mostrarDialog,
-      title,
-      onLeftButtonClicked,
-    } = this.props
-
-    const appBar = this.context.muiTheme.appBar
+    const appBar = this.context.muiTheme.appBar;
 
     return (
-      <Toolbar style={{backgroundColor: appBar.color}}>
+      <Toolbar style={{ backgroundColor: appBar.color }}>
         <ToolbarGroup>
-          <IconButton style={iconButtonStyle} iconStyle={iconButtonIconStyle}
-            onTouchTap={onLeftButtonClicked}>
+          <IconButton
+            style={iconButtonStyle}
+            iconStyle={iconButtonIconStyle}
+            onTouchTap={onLeftButtonClicked}
+          >
             <NavigationMenu />
           </IconButton>
-          <ToolbarTitle text={title}
-          style={toolbarTitleStyle}/>
+          <ToolbarTitle text={title} style={toolbarTitleStyle} />
         </ToolbarGroup>
 
         <ToolbarGroup>
-          <IconMenu iconButtonElement={
-            <IconButton touch={true} style={iconButtonStyle} iconStyle={iconButtonIconStyle}>
-              <Add />
-            </IconButton> }
-            targetOrigin={{horizontal: 'right', vertical: 'top'}}
-            anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}>
-            <MenuItem primaryText="Nuevo Producto" onTouchTap={() =>
-              mostrarDialog(PRODUCTO_DIALOG)}/>
-            <MenuItem primaryText="Nuevo Cliente" onTouchTap={() =>
-              mostrarDialog(CLIENTE_DIALOG)}/>
-            <MenuItem primaryText="Nuevo Medico" onTouchTap={() =>
-              mostrarDialog(MEDICO_DIALOG)}/>
+          <IconMenu
+            iconButtonElement={
+              <IconButton
+                touch={true}
+                style={iconButtonStyle}
+                iconStyle={iconButtonIconStyle}
+              >
+                <Add />
+              </IconButton>
+            }
+            targetOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          >
+            <MenuItem
+              primaryText="Nuevo Producto"
+              onTouchTap={() => mostrarDialog(PRODUCTO_DIALOG)}
+            />
+            <MenuItem
+              primaryText="Nuevo Cliente"
+              onTouchTap={() => mostrarDialog(CLIENTE_DIALOG)}
+            />
+            <MenuItem
+              primaryText="Nuevo Medico"
+              onTouchTap={() => mostrarDialog(MEDICO_DIALOG)}
+            />
           </IconMenu>
-          <IconMenu iconButtonElement={
-            <IconButton touch={true} style={iconButtonStyle} iconStyle={iconButtonIconStyle}>
-            <ExitToApp />
-          </IconButton> }
-            targetOrigin={{horizontal: 'right', vertical: 'top'}}
-            anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}>
-            <MenuItem primaryText="TecoGram S.A." onTouchTap={() => {
-              redirectEmpresa(true)}} />
-            <MenuItem primaryText="Biocled" onTouchTap={() => {
-              redirectEmpresa(false)}} />
+          <IconMenu
+            iconButtonElement={
+              <IconButton
+                touch={true}
+                style={iconButtonStyle}
+                iconStyle={iconButtonIconStyle}
+              >
+                <ExitToApp />
+              </IconButton>
+            }
+            targetOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          >
+            <MenuItem
+              primaryText="TecoGram S.A."
+              onTouchTap={() => {
+                redirectEmpresa(true);
+              }}
+            />
+            <MenuItem
+              primaryText="Biocled"
+              onTouchTap={() => {
+                redirectEmpresa(false);
+              }}
+            />
           </IconMenu>
-
         </ToolbarGroup>
-
       </Toolbar>
-    )
+    );
   }
 }
 
@@ -267,7 +289,7 @@ class MainDialog extends Component {
       mostrarDialog,
       cancelarDialog,
       cerrarDialogConMsg,
-    } = this.props
+    } = this.props;
 
     const dialogProps = {
       open: dialogState.open,
@@ -275,21 +297,21 @@ class MainDialog extends Component {
       cancelarDialog,
       mostrarDialog,
       cerrarDialogConMsg,
-    }
-    switch(dialogState.value) {
+    };
+    switch (dialogState.value) {
       case CLIENTE_DIALOG:
-        return <NuevoClienteDialog {...dialogProps} />
+        return <NuevoClienteDialog {...dialogProps} />;
       case MEDICO_DIALOG:
-        return <NuevoMedicoDialog {...dialogProps} />
+        return <NuevoMedicoDialog {...dialogProps} />;
       case PRODUCTO_DIALOG:
-        return <NuevoProductoDialog {...dialogProps} />
+        return <NuevoProductoDialog {...dialogProps} />;
       default:
-        throw Error('Unknown dialog: ' + dialogState.value)
+        throw Error('Unknown dialog: ' + dialogState.value);
     }
   }
 }
 
-const SelectedPage = (props) => {
+const SelectedPage = props => {
   const {
     abrirLinkConSnackbar,
     mostrarErrorConSnackbar,
@@ -299,39 +321,69 @@ const SelectedPage = (props) => {
     editarProducto,
     editarFactura,
     editarFacturaExamen,
-  } = props
+  } = props;
 
-  const pageProps = { ...page.props, ajustes }
+  const pageProps = { ...page.props, ajustes };
 
   switch (page.type) {
     case NEW_FACTURA_PAGE:
-      return <NuevaFacturaPage abrirLinkConSnackbar={abrirLinkConSnackbar}
-        {...pageProps}/>
+      return (
+        <NuevaFacturaPage
+          abrirLinkConSnackbar={abrirLinkConSnackbar}
+          {...pageProps}
+        />
+      );
     case EDITAR_FACTURA_PAGE:
-      return <EditarFacturaPage abrirLinkConSnackbar={abrirLinkConSnackbar}
-        {...pageProps}/>
+      return (
+        <EditarFacturaPage
+          abrirLinkConSnackbar={abrirLinkConSnackbar}
+          {...pageProps}
+        />
+      );
     case NEW_FACTURA_EXAMEN_PAGE:
-      return <NuevaFacturaExamenPage abrirLinkConSnackbar={abrirLinkConSnackbar}
-        {...pageProps}/>
+      return (
+        <NuevaFacturaExamenPage
+          abrirLinkConSnackbar={abrirLinkConSnackbar}
+          {...pageProps}
+        />
+      );
     case EDITAR_FACTURA_EXAMEN_PAGE:
-      return <EditarFacturaExamenPage abrirLinkConSnackbar={abrirLinkConSnackbar}
-        {...pageProps}/>
+      return (
+        <EditarFacturaExamenPage
+          abrirLinkConSnackbar={abrirLinkConSnackbar}
+          {...pageProps}
+        />
+      );
     case FACTURA_LIST_PAGE:
-      return <FacturasListView editarFactura={editarFactura}
-        editarFacturaExamen={editarFacturaExamen} {...pageProps}/>
+      return (
+        <FacturasListView
+          editarFactura={editarFactura}
+          editarFacturaExamen={editarFacturaExamen}
+          {...pageProps}
+        />
+      );
     case CLIENTE_LIST_PAGE:
-      return <ClientesListView mostrarErrorConSnackbar={mostrarErrorConSnackbar}
-        editarCliente={editarCliente} {...pageProps}/>
+      return (
+        <ClientesListView
+          mostrarErrorConSnackbar={mostrarErrorConSnackbar}
+          editarCliente={editarCliente}
+          {...pageProps}
+        />
+      );
     case PRODUCTO_LIST_PAGE:
-      return <ProductosListView mostrarErrorConSnackbar={mostrarErrorConSnackbar}
-        editarProducto={editarProducto} {...pageProps}/>
+      return (
+        <ProductosListView
+          mostrarErrorConSnackbar={mostrarErrorConSnackbar}
+          editarProducto={editarProducto}
+          {...pageProps}
+        />
+      );
     default:
-      return null
+      return null;
   }
-}
+};
 
 class Main extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -339,18 +391,18 @@ class Main extends Component {
     };
   }
 
-  handleDrawerChange = (value) => {
+  handleDrawerChange = value => {
     this.setState({
       drawerOpen: value,
     });
   };
 
-  onPageSelected = (newPage) => {
+  onPageSelected = newPage => {
     this.setState({
       drawerOpen: false,
-    })
-    this.props.cambiarPagina(newPage, {})
-  }
+    });
+    this.props.cambiarPagina(newPage, {});
+  };
 
   render() {
     const {
@@ -367,14 +419,15 @@ class Main extends Component {
       ajustes,
       snackbar,
       page,
-    } = this.props
+    } = this.props;
 
     return (
-      <div style={{backgroundColor: '#ededed', height: 'inherit'}}>
+      <div style={{ backgroundColor: '#ededed', height: 'inherit' }}>
         <MainToolbar
           mostrarDialog={mostrarDialog}
           title={ajustes.empresa}
-          onLeftButtonClicked={() => this.handleDrawerChange(true)}/>
+          onLeftButtonClicked={() => this.handleDrawerChange(true)}
+        />
         <SelectedPage
           ajustes={ajustes}
           page={page}
@@ -383,19 +436,22 @@ class Main extends Component {
           editarFactura={editarFactura}
           editarFacturaExamen={editarFacturaExamen}
           abrirLinkConSnackbar={abrirLinkConSnackbar}
-          mostrarErrorConSnackbar={mostrarErrorConSnackbar} />
+          mostrarErrorConSnackbar={mostrarErrorConSnackbar}
+        />
         <MainDrawer
           open={this.state.drawerOpen}
           handleChange={this.handleDrawerChange}
-          onPageSelected={this.onPageSelected}/>
+          onPageSelected={this.onPageSelected}
+        />
         <MainDialog
           dialogState={dialog}
           cancelarDialog={cancelarDialog}
           mostrarDialog={mostrarDialog}
-          cerrarDialogConMsg={cerrarDialogConMsg}/>
-        <MainSnackbar data={snackbar}/>
+          cerrarDialogConMsg={cerrarDialogConMsg}
+        />
+        <MainSnackbar data={snackbar} />
       </div>
-    )
+    );
   }
 }
 /**
@@ -409,10 +465,10 @@ class Main extends Component {
 */
 export default class MainNavigationView extends Component {
   render() {
-    const MainComponent = connect(mapStateToProps, mapDispatchToProps) (Main)
-    const muiTheme = CustomStyle.getEmpresaTheme(InitialStore.ajustes.empresa)
+    const MainComponent = connect(mapStateToProps, mapDispatchToProps)(Main);
+    const muiTheme = CustomStyle.getEmpresaTheme(InitialStore.ajustes.empresa);
     return (
-      <Provider store={store} >
+      <Provider store={store}>
         <MuiThemeProvider muiTheme={muiTheme}>
           <MainComponent />
         </MuiThemeProvider>

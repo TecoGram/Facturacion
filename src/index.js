@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import injectTapEventPlugin from 'react-tap-event-plugin';
-import App from './App'
+import App from './App';
 
-import 'typeface-roboto'
-import './index.css'
+import 'typeface-roboto';
+import './index.css';
 
 injectTapEventPlugin();
 

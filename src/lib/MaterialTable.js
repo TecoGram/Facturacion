@@ -1,46 +1,55 @@
 import React from 'react';
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow,
-  TableRowColumn} from 'material-ui/Table';
-import PaperContainer from './PaperContainer'
-import IconTextFieldRow from './formTable/IconTextFieldRow'
+import {
+  Table,
+  TableBody,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableRowColumn,
+} from 'material-ui/Table';
+import PaperContainer from './PaperContainer';
+import IconTextFieldRow from './formTable/IconTextFieldRow';
 import IconButton from 'material-ui/IconButton';
 import ModeEdit from 'material-ui/svg-icons/editor/mode-edit';
 import Clear from 'material-ui/svg-icons/content/clear';
 import Search from 'material-ui/svg-icons/action/search';
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 
-const black54p = '#757575'
+const black54p = '#757575';
 
 const ButtonsColumn = (index, onEditItem, onDeleteItem, onOpenItem) => {
   const iconStyle = {
     display: 'inline-block',
-  }
+  };
 
-  let editCol = null
-  let deleteCol = null
-  let openCol = null
+  let editCol = null;
+  let deleteCol = null;
+  let openCol = null;
   if (onDeleteItem) {
-    deleteCol =
+    deleteCol = (
       <IconButton style={iconStyle} onTouchTap={() => onDeleteItem(index)}>
-        <Clear color={black54p}/>
+        <Clear color={black54p} />
       </IconButton>
+    );
   }
   if (onEditItem) {
-    editCol =
+    editCol = (
       <IconButton style={iconStyle} onTouchTap={() => onEditItem(index)}>
-        <ModeEdit color={black54p}/>
+        <ModeEdit color={black54p} />
       </IconButton>
+    );
   }
   if (onOpenItem) {
-    openCol =
+    openCol = (
       <IconButton style={iconStyle} onTouchTap={() => onOpenItem(index)}>
-        <OpenInNew color={black54p}/>
+        <OpenInNew color={black54p} />
       </IconButton>
+    );
   }
 
-  let buttons = null
+  let buttons = null;
   if (editCol || deleteCol || openCol) {
-    buttons =
+    buttons = (
       <TableRowColumn>
         <div>
           {openCol}
@@ -48,54 +57,53 @@ const ButtonsColumn = (index, onEditItem, onDeleteItem, onOpenItem) => {
           {deleteCol}
         </div>
       </TableRowColumn>
+    );
   }
 
-  return buttons
-}
+  return buttons;
+};
 
 class SearchBox extends React.Component {
-
   static propTypes = {
     hint: React.PropTypes.string.isRequired,
     onQueryChanged: React.PropTypes.func.isRequired,
-  }
+  };
 
-  constructor (props) {
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
       queryText: '',
-    }
+    };
   }
 
-  newQuery = (e) => {
-    const newValue = e.target.value
-    this.setState({queryText: newValue})
-    this.props.onQueryChanged(newValue)
-  }
+  newQuery = e => {
+    const newValue = e.target.value;
+    this.setState({ queryText: newValue });
+    this.props.onQueryChanged(newValue);
+  };
 
-  render () {
+  render() {
     const input = {
       icon: Search,
       hintText: this.props.hint,
       onChange: this.newQuery,
       value: this.state.queryText,
-    }
+    };
 
     const tableStyle = {
       width: 'auto',
       marginLeft: 'auto',
       marginRight: '0px',
-    }
+    };
 
     return (
       <table style={tableStyle}>
-        <tbody >
-          <IconTextFieldRow leftInput={input} inverted={true}/>
+        <tbody>
+          <IconTextFieldRow leftInput={input} inverted={true} />
         </tbody>
       </table>
-    )
+    );
   }
-
 }
 
 /**
@@ -126,12 +134,10 @@ class SearchBox extends React.Component {
 const _columnTypes = {
   string: 0,
   numeric: 1,
-}
-
+};
 
 export default class MaterialTable extends React.Component {
-
-  static ColumnTypes = Object.freeze(_columnTypes)
+  static ColumnTypes = Object.freeze(_columnTypes);
 
   static propTypes = {
     columns: React.PropTypes.array.isRequired,
@@ -145,7 +151,7 @@ export default class MaterialTable extends React.Component {
     onDeleteItem: React.PropTypes.func,
     onOpenItem: React.PropTypes.func,
     enableCheckbox: React.PropTypes.bool,
-  }
+  };
 
   renderTableRows = () => {
     const {
@@ -155,29 +161,33 @@ export default class MaterialTable extends React.Component {
       onDeleteItem,
       onEditItem,
       onOpenItem,
-    } = this.props
-    
-      
+    } = this.props;
+
     return rows.map((item, i) => {
-      const row = rows[i]
+      const row = rows[i];
       return (
-      <TableRow key={i}>
-        { 
-          keys.map((propName, j) => {
-            let dataToDisplay = row[propName] 
-            let columnStyle
-            if (columnTypes && columnTypes[j] === MaterialTable.ColumnTypes.numeric) {
-              dataToDisplay = Number(row[propName]).toFixed(2)
-              columnStyle = { textAlign: 'right' }
+        <TableRow key={i}>
+          {keys.map((propName, j) => {
+            let dataToDisplay = row[propName];
+            let columnStyle;
+            if (
+              columnTypes &&
+              columnTypes[j] === MaterialTable.ColumnTypes.numeric
+            ) {
+              dataToDisplay = Number(row[propName]).toFixed(2);
+              columnStyle = { textAlign: 'right' };
             }
-            return <TableRowColumn style={columnStyle} key={j}>{dataToDisplay}</TableRowColumn>
-          })
-        }
-        { ButtonsColumn(i, onEditItem, onDeleteItem, onOpenItem) }
-      </TableRow>
-      )
-    })
-  }
+            return (
+              <TableRowColumn style={columnStyle} key={j}>
+                {dataToDisplay}
+              </TableRowColumn>
+            );
+          })}
+          {ButtonsColumn(i, onEditItem, onDeleteItem, onOpenItem)}
+        </TableRow>
+      );
+    });
+  };
 
   render() {
     const {
@@ -187,32 +197,38 @@ export default class MaterialTable extends React.Component {
       onEditItem,
       onQueryChanged,
       searchHint,
-    } = this.props
+    } = this.props;
 
-    let columns = this.props.columns
+    let columns = this.props.columns;
     if (onEditItem || onDeleteItem) {
-      columns = [...columns, '']
+      columns = [...columns, ''];
     }
 
     return (
-      <div style={{height:'100%', overflow:'auto'}} >
+      <div style={{ height: '100%', overflow: 'auto' }}>
         <PaperContainer padding={'15px'}>
           <SearchBox hint={searchHint} onQueryChanged={onQueryChanged} />
           <Table selectable={enableCheckbox} height={height}>
-             <TableHeader displaySelectAll={enableCheckbox}
-               adjustForCheckbox={enableCheckbox}>
-               <TableRow>
-                 { columns.map((colName, i) => {
-                   return <TableHeaderColumn key={i}>{colName}</TableHeaderColumn>
-                 })}
+            <TableHeader
+              displaySelectAll={enableCheckbox}
+              adjustForCheckbox={enableCheckbox}
+            >
+              <TableRow>
+                {columns.map((colName, i) => {
+                  return (
+                    <TableHeaderColumn key={i}>
+                      {colName}
+                    </TableHeaderColumn>
+                  );
+                })}
               </TableRow>
-             </TableHeader>
-             <TableBody displayRowCheckbox={enableCheckbox}>
-              { this.renderTableRows() }
-             </TableBody>
+            </TableHeader>
+            <TableBody displayRowCheckbox={enableCheckbox}>
+              {this.renderTableRows()}
+            </TableBody>
           </Table>
         </PaperContainer>
       </div>
-    )
+    );
   }
 }

@@ -1,4 +1,4 @@
-function ajustes (state = {}) {
+function ajustes(state = {}) {
   return state;
 }
 

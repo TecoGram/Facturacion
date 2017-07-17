@@ -1,9 +1,9 @@
-const { validarCliente } = require('../Validacion.js')
+const { validarCliente } = require('../Validacion.js');
 
 class DialogState {
-  constructor (props, setStateFunc) {
-    this.setState = setStateFunc
-    this.props = props
+  constructor(props, setStateFunc) {
+    this.setState = setStateFunc;
+    this.props = props;
 
     this.validarDatos = this.validarDatos.bind(this);
     this.cerrarDialogConExito = this.cerrarDialogConExito.bind(this);
@@ -15,49 +15,50 @@ class DialogState {
   }
 
   validarDatos(inputs) {
-    const { errors, inputs: _inputs } = validarCliente(inputs)
-    if(errors) {
-      this.setState({errors: errors})
-      return null
+    const { errors, inputs: _inputs } = validarCliente(inputs);
+    if (errors) {
+      this.setState({ errors: errors });
+      return null;
     } else {
-      this.setState({errors: {}})
-      return _inputs
+      this.setState({ errors: {} });
+      return _inputs;
     }
   }
 
   getMensajeExito(nombre) {
-    if (this.props.editar)
-      return `Cliente actualizado: ${nombre}`
-    return `Nuevo cliente guardado: ${nombre}`
+    if (this.props.editar) return `Cliente actualizado: ${nombre}`;
+    return `Nuevo cliente guardado: ${nombre}`;
   }
 
   cerrarDialogConExito(nombre) {
-    const msg = this.getMensajeExito(nombre)
-    this.setState({inputs: {}, errors: {}, serverError: null})
-    this.props.cerrarDialogConMsg(msg)
+    const msg = this.getMensajeExito(nombre);
+    this.setState({ inputs: {}, errors: {}, serverError: null });
+    this.props.cerrarDialogConMsg(msg);
   }
 
-  mostrarErrorDeServidor (respError) {
-    this.setState({ serverError: 'Error al almacenar datos: ' + respError.response.text })
+  mostrarErrorDeServidor(respError) {
+    this.setState({
+      serverError: 'Error al almacenar datos: ' + respError.response.text,
+    });
   }
 
-  updateData (fieldName, newValue, state) {
-    const newData = Object.assign({}, state.inputs)
-    newData[fieldName] = newValue
-    const newErrors = Object.assign({}, state.errors)
-    newErrors[fieldName] = null
-    this.setState({inputs: newData, errors: newErrors})
+  updateData(fieldName, newValue, state) {
+    const newData = Object.assign({}, state.inputs);
+    newData[fieldName] = newValue;
+    const newErrors = Object.assign({}, state.errors);
+    newErrors[fieldName] = null;
+    this.setState({ inputs: newData, errors: newErrors });
   }
 
-  cancelarDialog () {
-    this.setState({inputs: {}, errors: {}, serverError: null})
-    this.props.cancelarDialog()
+  cancelarDialog() {
+    this.setState({ inputs: {}, errors: {}, serverError: null });
+    this.props.cancelarDialog();
   }
 
   revisarDataParaEditar() {
-    const editarData = this.props.editar
-    if (editarData) this.setState({ inputs: Object.assign({}, editarData )})
+    const editarData = this.props.editar;
+    if (editarData) this.setState({ inputs: Object.assign({}, editarData) });
   }
 }
 
-module.exports = DialogState
+module.exports = DialogState;

@@ -1,10 +1,10 @@
 import React from 'react';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
-import IconBox from '../IconBox'
+import IconBox from '../IconBox';
 
-const secondColStyle = { paddingLeft: '30px' }
-const secondInvColStyle = { paddingRight: '15px' }
+const secondColStyle = { paddingLeft: '30px' };
+const secondInvColStyle = { paddingRight: '15px' };
 
 const inputShape = React.PropTypes.shape({
   hintText: React.PropTypes.string,
@@ -13,24 +13,33 @@ const inputShape = React.PropTypes.shape({
   onChange: React.PropTypes.func.isRequired,
   icon: React.PropTypes.func.isRequired,
   disabled: React.PropTypes.bool,
-})
+});
 
 const boolInputShape = React.PropTypes.shape({
   hintText: React.PropTypes.string,
   value: React.PropTypes.bool.isRequired,
   onChange: React.PropTypes.func.isRequired,
-})
-const EmptyRow = (props) => {
-  return <tr><td><div style={{height: props.height}} /></td></tr>
+});
+const EmptyRow = props => {
+  return (
+    <tr>
+      <td>
+        <div style={{ height: props.height }} />
+      </td>
+    </tr>
+  );
+};
 
-}
+const IconColumn = props => {
+  return (
+    <td style={props.style}>
+      <IconBox icon={props.input.icon} />
+    </td>
+  );
+};
 
-const IconColumn = (props) => {
-  return <td style={props.style}><IconBox icon={props.input.icon}/></td>
-}
-
-const TextColumn = (props) => {
-  const input = props.input
+const TextColumn = props => {
+  const input = props.input;
   return (
     <td style={props.style}>
       <TextField
@@ -38,23 +47,25 @@ const TextColumn = (props) => {
         onChange={input.onChange}
         errorText={input.errorText}
         disabled={input.disabled}
-        value={input.value}/>
+        value={input.value}
+      />
     </td>
-  )
-}
+  );
+};
 
-const BoolColumn = (props) => {
-  const input = props.input
+const BoolColumn = props => {
+  const input = props.input;
   return (
     <td style={props.style} colSpan={2}>
       <Checkbox
         label={input.hintText}
         checked={input.value}
         disabled={input.disabled}
-        onCheck={input.onChange} />
+        onCheck={input.onChange}
+      />
     </td>
-  )
-}
+  );
+};
 
 /**
 * Componente para mostrar un TextField con un icono a su izquierda o derecha.
@@ -85,74 +96,74 @@ export default class IconTextFieldRow extends React.Component {
     leftInput: inputShape,
     rightInput: inputShape,
     boolInput: boolInputShape,
-  }
+  };
 
-  getFirstIconColumn = (leftInput) => {
-    return leftInput && <IconColumn input={leftInput}/>
-  }
+  getFirstIconColumn = leftInput => {
+    return leftInput && <IconColumn input={leftInput} />;
+  };
 
   getFirstTextColumn = (leftInput, inverted) => {
-    return leftInput &&
+    return (
+      leftInput &&
       <TextColumn
         style={inverted ? secondInvColStyle : undefined}
-        input={leftInput} />
-  }
+        input={leftInput}
+      />
+    );
+  };
 
   getSecondIconColumn = (rightInput, inverted) => {
-    return rightInput &&
+    return (
+      rightInput &&
       <IconColumn
         style={inverted ? undefined : secondColStyle}
-        input={rightInput} />
+        input={rightInput}
+      />
+    );
+  };
 
-  }
+  getSecondBoolColumn = rightInput => {
+    return (
+      rightInput &&
+      <BoolColumn input={rightInput} style={{ paddingLeft: '16px' }} />
+    );
+  };
 
-  getSecondBoolColumn = (rightInput) => {
-    return rightInput &&
-    <BoolColumn input={rightInput} style={{paddingLeft: '16px'}}/>
-  }
-
-  getSecondTextColumn = (rightInput) => {
-    return rightInput && <TextColumn input={rightInput} />
-  }
+  getSecondTextColumn = rightInput => {
+    return rightInput && <TextColumn input={rightInput} />;
+  };
 
   render() {
-    const {
-      empty,
-      inverted,
-      leftInput,
-      rightInput,
-      boolInput,
-    } = this.props
+    const { empty, inverted, leftInput, rightInput, boolInput } = this.props;
 
-    if (empty)
-      return <EmptyRow height={30} />
+    if (empty) return <EmptyRow height={30} />;
     if (boolInput) {
-      const textInput = leftInput || rightInput
+      const textInput = leftInput || rightInput;
       return (
         <tr>
-          { this.getFirstIconColumn(textInput) }
-          { this.getFirstTextColumn(textInput, false) }
-          { this.getSecondBoolColumn(boolInput) }
+          {this.getFirstIconColumn(textInput)}
+          {this.getFirstTextColumn(textInput, false)}
+          {this.getSecondBoolColumn(boolInput)}
         </tr>
-      )
+      );
     }
     if (inverted)
       return (
         <tr>
-          { this.getFirstTextColumn(leftInput, inverted) }
-          { this.getFirstIconColumn(leftInput) }
-          { this.getSecondTextColumn(rightInput) }
-          { this.getSecondIconColumn(rightInput, inverted) }
+          {this.getFirstTextColumn(leftInput, inverted)}
+          {this.getFirstIconColumn(leftInput)}
+          {this.getSecondTextColumn(rightInput)}
+          {this.getSecondIconColumn(rightInput, inverted)}
         </tr>
-      )
+      );
     else
       return (
         <tr>
-          { this.getFirstIconColumn(leftInput) }
-          { this.getFirstTextColumn(leftInput, inverted) }
-          { this.getSecondIconColumn(rightInput, inverted) }
-          { this.getSecondTextColumn(rightInput) }
+          {this.getFirstIconColumn(leftInput)}
+          {this.getFirstTextColumn(leftInput, inverted)}
+          {this.getSecondIconColumn(rightInput, inverted)}
+          {this.getSecondTextColumn(rightInput)}
         </tr>
-      )
+      );
   }
 }
