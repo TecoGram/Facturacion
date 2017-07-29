@@ -3,13 +3,6 @@ import { blue500, pink300 } from 'material-ui/styles/colors';
 
 const myTheme = color =>
   getMuiTheme({
-    appBar: {
-      textColor: '#FFFFFF',
-      color: color,
-    },
-    chip: {
-      backgroundColor: color,
-    },
     palette: {
       primary1Color: color,
     },
