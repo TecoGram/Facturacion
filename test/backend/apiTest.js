@@ -24,7 +24,7 @@ if (process.env.NODE_ENV !== 'test') {
 
 describe('server.js', function() {
   before('borrar base de datos de prueba', function(done) {
-    setup().then(() => done());
+    setup().then(() => done(), () => done()).catch(err => done(err));
   });
 
   it('crea el directorio /tmp/facturas/ durante startup', function() {

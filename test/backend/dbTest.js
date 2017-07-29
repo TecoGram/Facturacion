@@ -20,7 +20,7 @@ const setup = require('../../backend/scripts/setupDB.js');
 describe('metodos de dbAdmin.js', function() {
   before('borrar base de datos de prueba', function(done) {
     this.timeout(5000);
-    setup().then(() => done()).catch(err => done(err));
+    setup().then(() => done(), () => done()).catch(err => done(err));
   });
 
   describe('insertarProducto', function() {

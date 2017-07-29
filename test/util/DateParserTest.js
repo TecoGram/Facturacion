@@ -15,7 +15,7 @@ describe('DateParser', function() {
   describe('verVenta', function() {
     it(
       'Recibe el resultado del query que busca la informacion de una venta y' +
-        ' retorna un nuevo objeto con todas las fechas en string convertidas a objetos Date',
+        ' retorna un nuevo objeto con la fecha de la venta convertida a objeto Date',
       function() {
         const queryResp = {
           cliente: {
@@ -67,7 +67,7 @@ describe('DateParser', function() {
               count: 1,
               precioVenta: 11,
               lote: 'ert3',
-              fechaExp: new Date('2017/04/04'),
+              fechaExp: '2017-04-04',
             },
           ],
         };
@@ -79,8 +79,7 @@ describe('DateParser', function() {
         DateParser.toReadableDate(fechaVenta).should.be.equal('2017-01-06');
 
         const p1FechaExp = formattedResp.facturables[0].fechaExp;
-        p1FechaExp.toString().should.contain('Apr 04 2017');
-        DateParser.toReadableDate(p1FechaExp).should.be.equal('2017-04-04');
+        p1FechaExp.should.be.equal('2017-04-04');
       }
     );
 
@@ -142,20 +141,12 @@ describe('DateParser', function() {
             count: 1,
             precioVenta: 11,
             lote: 'ert3',
-            fechaExp: new Date('2017/04/04'),
+            fechaExp: '2017-04-04',
           },
         ],
       };
       const formattedResp = DateParser.verVenta(queryResp);
       formattedResp.should.be.eql(desiredResp);
-      const fechaVenta = formattedResp.facturaData.fecha;
-
-      fechaVenta.toString().should.contain('Jan 06 2017');
-      DateParser.toReadableDate(fechaVenta).should.be.equal('2017-01-06');
-
-      const p1FechaExp = formattedResp.facturables[0].fechaExp;
-      p1FechaExp.toString().should.contain('Apr 04 2017');
-      DateParser.toReadableDate(p1FechaExp).should.be.equal('2017-04-04');
     });
   });
 });
