@@ -2,8 +2,6 @@ import React from 'react';
 
 import Chip from 'material-ui/Chip';
 
-import { primaryColor } from '../CustomStyle';
-
 const chipStyle = {
   fontSize: '16px',
   width: '425px',
@@ -20,13 +18,17 @@ export default class CloseableColorChip extends React.Component {
     width: React.PropTypes.string,
   };
 
+  static contextTypes = {
+    muiTheme: React.PropTypes.object.isRequired,
+  };
+
   render() {
     const { width, text, onRequestDelete } = this.props;
 
     return (
       <div style={{ ...chipStyle, width }}>
         <Chip
-          backgroundColor={primaryColor}
+          backgroundColor={this.context.muiTheme.palette.primary1Color}
           labelStyle={{ color: 'white' }}
           onRequestDelete={onRequestDelete}
         >
