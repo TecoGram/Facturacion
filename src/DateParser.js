@@ -24,21 +24,12 @@ module.exports = {
     const { cliente, medico, facturaData, facturables } = resp;
     const _facturaData = Object.assign({}, facturaData);
     _facturaData.fecha = parseDBDate(facturaData.fecha);
-    const _facturables = [];
-
-    let i;
-    for (i = 0; i < facturables.length; i++) {
-      const p = facturables[i];
-      const _p = Object.assign({}, p);
-      _p.fechaExp = parseDBDate(p.fechaExp);
-      _facturables.push(_p);
-    }
 
     return {
       cliente,
       medico,
       facturaData: _facturaData,
-      facturables: _facturables,
+      facturables,
     };
   },
 };

@@ -14,6 +14,7 @@ const stringifyNumerosEnUnidades = unidades => {
     unidad.count = '' + unidad.count;
     unidad.precioVenta = '' + unidad.precioVenta;
   }
+
   return _unidades;
 };
 const formatVentaRowIntoFacturaData = ventaRow => {
