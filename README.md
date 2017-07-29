@@ -2,38 +2,55 @@
 
 Sistema de facturación web sencillo escrito con React, Node.js y SQLite 3.
 
-Se recomienda usar versiones actuales de Google Chrome (>=56) para el cliente.
+Se recomienda usar versiones actuales de Google Chrome (>=56) o Firefox (>= 54) para el cliente.
 
 ![screenshot1](https://cloud.githubusercontent.com/assets/5729175/24410708/5fa3bcaa-1399-11e7-9cf7-378244afe11d.png)
 
+## Dependencias
+
+Este sistema solo ha sido probado en Linux, debería de funcionar en cualquier distro que cumpla las siguientes dependencias:
+
+- Node.js (>= 6.6)
+- Yarn
+- SQLite 3
+
 ## Setup
 
-Primero, clona este repositorio e instala las dependencias
+Primero, clona este repositorio e instala el paquete.
 
 ```bash
 git clone https://github.com/GAumala/Facturacion
 cd Facturacion
-npm install
+yarn install 
 ```
 Segundo, crea la base de datos
 
 ```bash
-npm run init-db
+yarn init-db
 ```
 
 Tercero, crea el build de producción del React App.
 
 ```bash
-npm run build
+yarn build
 ```
 
 Ahora solo falta levantar el servidor
 
 ```bash
-npm run server
+yarn server
 ```
 
-Puedes entrar al sistema desde Google Chrome con la siguiente URL: http://localhost:8192
+Puedes entrar al sistema desde Google Chrome o Firefox con la siguiente URL: http://localhost:8192
+
+## Configurar actualizaciones automáticas
+
+Este repositorio incluye un [makefile](https://en.wikipedia.org/wiki/Makefile) con el cual se pueden detectar cambios en el código del frontend y generar un nuevo build. La idea es usarlo cada vez que haces `git pull`. Para configurar actualizaciones automáticas simplemente corre el siguiente script periodicamente, o tras encender el servidor:
+
+``` bash
+git pull origin master
+make
+```
 
 ______
 
