@@ -61,55 +61,6 @@ describe('metodos de dbAdmin.js', function() {
     });
   });
 
-  describe('findProductos', function() {
-    it('retorna un array con todos los productos existentes si se le pasa un string vacio', function(
-      done
-    ) {
-      db.findProductos('').then(function(productos) {
-        productos.should.be.an('array');
-        productos.length.should.equal(3);
-
-        //asegurar que estan los valores correctos
-        const primerProducto = productos[0];
-        primerProducto.marca.should.equal('TECO');
-        done();
-      });
-    });
-
-    it('puede buscar prodctos por nombre, si se le pasa un string no vacio como argumento', function(
-      done
-    ) {
-      db.findProductos('prod').then(function(productos) {
-        productos.should.be.an('array');
-        //Esto asume que en el describe anterior se ingresaron unicamente 3 productos
-        productos.length.should.be.equal(3);
-        productos[0].nombre.should.be.equal('producto Á');
-        productos[1].nombre.should.be.equal('producto B');
-        productos[2].nombre.should.be.equal('producto C');
-        done();
-      });
-    });
-
-    it('puede buscar prodctos por nombre, sin tener que escribir las tildes', function(
-      done
-    ) {
-      db.findProductos('producto a').then(function(productos) {
-        productos.should.be.an('array');
-        productos.length.should.be.equal(1);
-        productos[0].nombre.should.be.equal('producto Á');
-        done();
-      });
-    });
-
-    it('permite controlar el limite con el segundo argumento', function(done) {
-      db.findProductos('', 2).then(function(productos) {
-        productos.should.be.an('array');
-        productos.length.should.be.equal(2);
-        done();
-      });
-    });
-  });
-
   const cliente1 = {
     ruc: '0954236576001',
     nombre: 'Dr. Juan Pérez',
@@ -959,26 +910,6 @@ describe('metodos de dbAdmin.js', function() {
     });
   });
 
-  describe('updateProducto', function() {
-    const updateArgs = [1, 'fdrh2', 'producto Z', 'BIO', 19.99, 34.99, false];
-    it('actualiza un producto en la base de datos', function(done) {
-      db.updateProducto(...updateArgs).then(function(ids) {
-        ids.should.equal(1);
-        done();
-      });
-    });
-    it('retorna 0 en el callback si no encuentra un producto a actualizar', function(
-      done
-    ) {
-      const wrongArgs = [...updateArgs];
-      wrongArgs[0] = 99;
-      db.updateProducto(...wrongArgs).then(function(ids) {
-        ids.should.equal(0);
-        done();
-      });
-    });
-  });
-
   describe('updateCliente', function() {
     const updateArgs = [
       cliente1.ruc,
@@ -1002,27 +933,6 @@ describe('metodos de dbAdmin.js', function() {
       wrongArgs[0] = '999333';
       db.updateCliente(...wrongArgs).then(function(ids) {
         ids.should.equal(0);
-        done();
-      });
-    });
-  });
-
-  describe('deleteProducto', function() {
-    it('elimina un producto de la base de datos, si no ha sido facturado', function(
-      done
-    ) {
-      const itemABorrar = 1;
-      db.deleteProducto(itemABorrar).then(function(id) {
-        id.should.equal(1);
-        done();
-      });
-    });
-    it('retorna 0 en el callback si no encuentra un producto a borrar', function(
-      done
-    ) {
-      const itemABorrar = 15;
-      db.deleteProducto(itemABorrar).then(function(id) {
-        id.should.equal(0);
         done();
       });
     });
