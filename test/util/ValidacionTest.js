@@ -106,4 +106,33 @@ describe('Validacion', function() {
       expect(errors).to.be.null;
     });
   });
+
+  describe('validarUnidad', function() {
+    it('permite fechas de expiracion mayores al año 2020', function() {
+      const unidad = {
+        producto: 23,
+        fechaExp: '2020-01-01',
+        lote: 'AD-434',
+        count: '1',
+        precioVenta: '12.99',
+      };
+
+      const error = Validacion.validarUnidad(unidad);
+
+      expect(error).to.be.undefined;
+    });
+    it('NO permite fechas de expiracion mayores al año 2029', function() {
+      const unidad = {
+        producto: 23,
+        fechaExp: '2030-01-01',
+        lote: 'AD-434',
+        count: '1',
+        precioVenta: '12.99',
+      };
+
+      const error = Validacion.validarUnidad(unidad);
+
+      error.should.be.a('string');
+    });
+  });
 });

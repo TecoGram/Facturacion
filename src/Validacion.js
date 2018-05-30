@@ -350,6 +350,7 @@ module.exports = {
   validarCliente,
   validarMedico,
   validarProducto,
+  validarUnidad,
   validarVentaRow,
   validarVentaRowExamen,
 };
