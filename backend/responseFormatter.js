@@ -1,5 +1,5 @@
-const { calcularTotalVentaRow } = require('../src/Factura/Math.js');
-const { FormasDePago } = require('../src/Factura/Models.js');
+const { calcularTotalVentaRow } = require('../frontend/src/Factura/Math.js');
+const { FormasDePago } = require('../frontend/src/Factura/Models.js');
 
 const parsearBooleanSQLite = bool => {
   if (typeof bool === 'boolean') return bool;

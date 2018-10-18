@@ -6,7 +6,6 @@ gulp.task('prettier', () =>
   gulp
     .src([
       './src/**/*.js',
-      './backend/**/*.js',
       './test/**/*.js',
       './gulpfile.js',
     ])

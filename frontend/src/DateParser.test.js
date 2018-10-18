@@ -1,22 +1,21 @@
-/* eslint-env node, mocha */
-const DateParser = require('../../src/DateParser.js');
-const chai = require('chai');
-chai.should();
+/* eslint-env node, jest */
+const DateParser = require('./DateParser.js');
 
-describe('DateParser', function() {
-  describe('toReadableDate', function() {
-    it('convierte la fecha un Date object a String sin importar la zona horaria', function() {
+describe('DateParser', () => {
+  describe('toReadableDate', () => {
+    it('convierte la fecha un Date object a String sin importar la zona horaria', () => {
       const dbDate = '2016-12-25';
       const parsedDate = DateParser.parseDBDate(dbDate);
-      DateParser.toReadableDate(parsedDate).should.equal(dbDate);
+      const result = DateParser.toReadableDate(parsedDate);
+      expect(result).toEqual(dbDate);
     });
   });
 
-  describe('verVenta', function() {
+  describe('verVenta', () => {
     it(
       'Recibe el resultado del query que busca la informacion de una venta y' +
         ' retorna un nuevo objeto con la fecha de la venta convertida a objeto Date',
-      function() {
+      () => {
         const queryResp = {
           cliente: {
             ruc: '0937816882001',
@@ -72,18 +71,20 @@ describe('DateParser', function() {
           ],
         };
         const formattedResp = DateParser.verVenta(queryResp);
-        formattedResp.should.be.eql(desiredResp);
-        const fechaVenta = formattedResp.facturaData.fecha;
+        expect(formattedResp).toEqual(desiredResp);
 
-        fechaVenta.toString().should.contain('Jan 06 2017');
-        DateParser.toReadableDate(fechaVenta).should.be.equal('2017-01-06');
+        const fechaVenta = formattedResp.facturaData.fecha;
+        expect(fechaVenta.toString()).toContain('Jan 06 2017');
+
+        const readableDate = DateParser.toReadableDate(fechaVenta);
+        expect(readableDate).toEqual('2017-01-06');
 
         const p1FechaExp = formattedResp.facturables[0].fechaExp;
-        p1FechaExp.should.be.equal('2017-04-04');
+        expect(p1FechaExp).toEqual('2017-04-04');
       }
     );
 
-    it('En ventas examen tambien coloca el objeto medico de la misma forma que con cliente', function() {
+    it('En ventas examen tambien coloca el objeto medico de la misma forma que con cliente', () => {
       const queryResp = {
         cliente: {
           ruc: '0937816882001',
@@ -146,7 +147,7 @@ describe('DateParser', function() {
         ],
       };
       const formattedResp = DateParser.verVenta(queryResp);
-      formattedResp.should.be.eql(desiredResp);
+      expect(formattedResp).toEqual(desiredResp);
     });
   });
 });

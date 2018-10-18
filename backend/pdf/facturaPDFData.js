@@ -1,5 +1,5 @@
-const { calcularValoresTotales } = require('../../src/Factura/Math.js');
-const { FormasDePago } = require('../../src/Factura/Models.js');
+const { calcularValoresTotales } = require('../../frontend/src/Factura/Math.js');
+const { FormasDePago } = require('../../frontend/src/Factura/Models.js');
 
 const crearOpciondePagoConTotalPagado = (formaPagoIndex, total) => {
   return (opcion, index) => {

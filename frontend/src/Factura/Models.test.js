@@ -1,15 +1,12 @@
-/* eslint-env node, mocha */
-
+/* eslint-env node, jest */
 const Immutable = require('immutable');
-const chai = require('chai'),
-  expect = chai.expect;
 
-const FacturacionModels = require('../../src/Factura/Models.js');
-const FacturacionMath = require('../../src/Factura/Math.js');
-const DateParser = require('../../src/DateParser.js');
+const FacturacionModels = require('./Models.js');
+const FacturacionMath = require('./Math.js');
+const DateParser = require('../DateParser.js');
 
-describe('Facturacion Models', function() {
-  describe('crearVentaRow', function() {
+describe('Facturacion Models', () => {
+  describe('crearVentaRow', () => {
     const clienteObj = {
       ruc: '09455867443001',
     };
@@ -66,7 +63,7 @@ describe('Facturacion Models', function() {
 
     const empresa = 'TecoGram';
 
-    it('Genera la fila de una venta a partir de un mapa inmutable', function() {
+    it('Genera la fila de una venta a partir de un mapa inmutable', () => {
       const ventaRow = FacturacionModels.crearVentaRow(
         clienteObj,
         medicoObj,
@@ -77,37 +74,39 @@ describe('Facturacion Models', function() {
         false,
         14
       );
-      ventaRow.cliente.should.equal('09455867443001');
-      ventaRow.codigo.should.equal('0003235');
-      ventaRow.subtotal.should.equal(50);
-      ventaRow.descuento.should.equal('10');
-      ventaRow.empresa.should.equal(empresa);
-      ventaRow.iva.should.equal(14);
-      ventaRow.autorizacion.should.equal('5962');
-      ventaRow.flete.should.equal('');
-      ventaRow.detallado.should.be.true;
-      ventaRow.formaPago.should.equal('CONTADO');
-      ventaRow.fecha.should.equal('2016-11-26');
+
+      
+      expect(ventaRow.cliente).toEqual('09455867443001');
+      expect(ventaRow.codigo).toEqual('0003235');
+      expect(ventaRow.subtotal).toEqual(50);
+      expect(ventaRow.descuento).toEqual('10');
+      expect(ventaRow.empresa).toEqual(empresa);
+      expect(ventaRow.iva).toEqual(14);
+      expect(ventaRow.autorizacion).toEqual('5962');
+      expect(ventaRow.flete).toEqual('');
+      expect(ventaRow.detallado).toBe(true);
+      expect(ventaRow.formaPago).toEqual('CONTADO');
+      expect(ventaRow.fecha).toEqual('2016-11-26');
 
       const venta_unidades = ventaRow.unidades;
-      venta_unidades.length.should.equal(unidades.length);
+      expect(venta_unidades).toHaveLength(unidades.length);
 
       const primerItem = venta_unidades[0];
-      primerItem.producto.should.equal(1);
-      primerItem.lote.should.equal('asd3');
-      primerItem.fechaExp.should.equal(unidades[0].fechaExp);
-      primerItem.precioVenta.should.equal(10);
-      primerItem.count.should.equal(1);
+      expect(primerItem.producto).toEqual(1);
+      expect(primerItem.lote).toEqual('asd3');
+      expect(primerItem.fechaExp).toEqual(unidades[0].fechaExp);
+      expect(primerItem.precioVenta).toEqual(10);
+      expect(primerItem.count).toEqual(1);
 
       const segundoItem = venta_unidades[1];
-      segundoItem.producto.should.equal(2);
-      segundoItem.lote.should.equal('asd5');
-      segundoItem.fechaExp.should.equal(unidades[1].fechaExp);
-      segundoItem.precioVenta.should.equal(20);
-      segundoItem.count.should.equal(2);
+      expect(segundoItem.producto).toEqual(2);
+      expect(segundoItem.lote).toEqual('asd5');
+      expect(segundoItem.fechaExp).toEqual(unidades[1].fechaExp);
+      expect(segundoItem.precioVenta).toEqual(20);
+      expect(segundoItem.count).toEqual(2);
     });
 
-    it('Genera la fila de una venta con cero iva y detallado = false si es examen', function() {
+    it('Genera la fila de una venta con cero iva y detallado = false si es examen', () => {
       const ventaRow = FacturacionModels.crearVentaRow(
         clienteObj,
         medicoObj,
@@ -118,16 +117,16 @@ describe('Facturacion Models', function() {
         true,
         14
       );
-      ventaRow.detallado.should.be.false;
-      ventaRow.iva.should.equal(0);
+      expect(ventaRow.detallado).toBe(false);
+      expect(ventaRow.iva).toEqual(0);
     });
   });
 
-  describe('crearUnidadesRows', function() {
+  describe('crearUnidadesRows', () => {
     it(
       'Expande la lista de productos facturados para generar ' +
         'filas de unidades vendidas',
-      function() {
+      () => {
         const productos = Immutable.List.of(
           Immutable.Map({
             rowid: 1,
@@ -144,18 +143,18 @@ describe('Facturacion Models', function() {
         );
 
         const rows = FacturacionModels.crearUnidadesRows(productos);
-        rows.length.should.equal(5);
+        expect(rows.length).toEqual(5);
         rows.forEach((row, i) => {
-          expect(row).to.have.property('producto', i < 3 ? 1 : 4);
-          expect(row).to.have.property('lote');
-          expect(row).to.have.property('fechaExp');
+          expect(row.producto).toBe(i < 3 ? 1 : 4);
+          expect(row.lote).toBeTruthy();
+          expect(row.fechaExp).toBeTruthy();
         });
       }
     );
   });
 
-  describe('calcularValores', function() {
-    it('agrega los precio de venta multiplicado por la cantidad para calcular rubros de factura', function() {
+  describe('calcularValores', () => {
+    it('agrega los precio de venta multiplicado por la cantidad para calcular rubros de factura', () => {
       const productos = Immutable.List.of(
         Immutable.Map({
           rowid: 1,
@@ -183,15 +182,15 @@ describe('Facturacion Models', function() {
         10
       );
 
-      expect(subtotal).to.equal(113.95);
-      expect(rebaja).to.equal(11.4);
-      expect(impuestos).to.equal(14.36);
-      expect(total).to.equal(119.9);
+      expect(subtotal).toEqual(113.95);
+      expect(rebaja).toEqual(11.4);
+      expect(impuestos).toEqual(14.36);
+      expect(total).toEqual(119.9);
     });
   });
 
-  describe('productoAFacturable', function() {
-    it('convierte una fila de producto a un objeto facturable con valores por defecto', function() {
+  describe('productoAFacturable', () => {
+    it('convierte una fila de producto a un objeto facturable con valores por defecto', () => {
       const producto = {
         rowid: 14,
         nombre: 'Acido Urico',
@@ -204,21 +203,21 @@ describe('Facturacion Models', function() {
 
       const facturable = FacturacionModels.productoAFacturable(producto);
 
-      facturable.should.have.property('producto', producto.rowid);
-      facturable.should.not.have.property('rowid');
-      facturable.should.not.have.property('precioDist');
-      facturable.should.not.have.property('nombreAscii');
-      facturable.should.have.property('codigo');
-      facturable.should.have.property('nombre');
-      facturable.should.have.property('precioVenta', '' + producto.precioVenta);
-      facturable.should.have.property('fechaExp');
-      facturable.should.have.property('count', '1');
-      facturable.should.have.property('lote', '');
+      expect(facturable).toHaveProperty('producto', producto.rowid);
+      expect(facturable).not.toHaveProperty('rowid');
+      expect(facturable).not.toHaveProperty('precioDist');
+      expect(facturable).not.toHaveProperty('nombreAscii');
+      expect(facturable).toHaveProperty('codigo');
+      expect(facturable).toHaveProperty('nombre');
+      expect(facturable).toHaveProperty('precioVenta', '' + producto.precioVenta);
+      expect(facturable).toHaveProperty('fechaExp');
+      expect(facturable).toHaveProperty('count', '1');
+      expect(facturable).toHaveProperty('lote', '');
     });
   });
 
-  describe('facturable', function() {
-    it('convierte un objeto facturable a una fila de unidad con valores por defecto', function() {
+  describe('facturable', () => {
+    it('convierte un objeto facturable a una fila de unidad con valores por defecto', () => {
       const facturable = {
         producto: 1,
         nombre: 'Acido Urico',
@@ -232,14 +231,14 @@ describe('Facturacion Models', function() {
 
       const unidad = FacturacionModels.facturableAUnidad(facturable);
 
-      unidad.should.have.property('producto');
-      unidad.should.not.have.property('pagaIva');
-      unidad.should.not.have.property('codigo');
-      unidad.should.not.have.property('nombre');
-      unidad.should.have.property('precioVenta', facturable.precioVenta);
-      unidad.should.have.property('fechaExp');
-      unidad.should.have.property('count', 1);
-      unidad.should.have.property('lote', '');
+      expect(unidad).toHaveProperty('producto');
+      expect(unidad).not.toHaveProperty('pagaIva');
+      expect(unidad).not.toHaveProperty('codigo');
+      expect(unidad).not.toHaveProperty('nombre');
+      expect(unidad).toHaveProperty('precioVenta', facturable.precioVenta);
+      expect(unidad).toHaveProperty('fechaExp');
+      expect(unidad).toHaveProperty('count', 1);
+      expect(unidad).toHaveProperty('lote', '');
     });
   });
 });

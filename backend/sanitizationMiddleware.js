@@ -5,8 +5,8 @@ const {
   validarProducto,
   validarVentaRow,
   validarVentaRowExamen,
-} = require('../src/Validacion.js');
-const { FormasDePago } = require('../src/Factura/Models.js');
+} = require('../frontend/src/Validacion.js');
+const { FormasDePago } = require('../frontend/src/Factura/Models.js');
 
 const sendBadArgumentsResponse = (res, errors) => {
   res.status(400).send(errors);

@@ -19,22 +19,16 @@
     "react-scripts": "0.9.3"
   },
   "dependencies": {
-    "body-parser": "^1.15.2",
     "deep-freeze": "0.0.1",
-    "express": "^4.14.0",
     "fecha": "^2.3.0",
     "immutable": "^3.8.1",
-    "knex": "^0.12.6",
     "material-ui": "^0.18.7",
-    "normalize-for-search": "^2.0.1",
-    "pdfkit": "^0.8.0",
     "react": "15.4.2",
     "react-dom": "15.4.2",
     "react-redux": "^5.0.5",
     "react-router": "^2.8.1",
     "react-tap-event-plugin": "2.0.1",
     "redux": "^3.7.2",
-    "sqlite3": "^3.1.8",
     "superagent": "^2.3.0",
     "typeface-roboto": "0.0.22",
     "validator": "^6.1.0"
