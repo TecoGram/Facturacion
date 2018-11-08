@@ -152,12 +152,12 @@ export default class FacturaTable extends React.Component {
           width={50}
           style={{ padding: '0px', textOverflow: 'clip' }}
         >
-          <a style={{ marginRight: '34px' }}>
+          <span style={{ marginRight: '34px' }}>
             ${' '}
             {Number(product.get('precioVenta') * product.get('count')).toFixed(
               2
             )}
-          </a>
+          </span>
         </TableRowColumn>
 
         <TableRowColumn

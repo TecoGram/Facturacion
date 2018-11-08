@@ -28,7 +28,7 @@ import {
 } from './PageTypes';
 
 import ActionCreators from './ActionCreators';
-import CustomStyle from './CustomStyle';
+import * as CustomStyle from './CustomStyle';
 import {
   NuevaFacturaPage,
   EditarFacturaPage,
