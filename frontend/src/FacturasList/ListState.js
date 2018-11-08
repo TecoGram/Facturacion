@@ -1,4 +1,4 @@
-class ListState {
+export default class ListState {
   constructor(props, setStateFunc) {
     this.setState = setStateFunc;
     this.props = props;
@@ -30,4 +30,3 @@ class ListState {
   }
 }
 
-module.exports = ListState;

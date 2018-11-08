@@ -1,6 +1,6 @@
 const { validarProducto } = require('../Validacion.js');
 
-class DialogState {
+export default class DialogState {
   constructor(props, setStateFunc) {
     this.setState = setStateFunc;
     this.props = props;
@@ -74,5 +74,3 @@ class DialogState {
     }
   }
 }
-
-module.exports = DialogState;

@@ -1,6 +1,6 @@
 const { validarCliente } = require('../Validacion.js');
 
-class DialogState {
+export default class DialogState {
   constructor(props, setStateFunc) {
     this.setState = setStateFunc;
     this.props = props;
@@ -60,5 +60,3 @@ class DialogState {
     if (editarData) this.setState({ inputs: Object.assign({}, editarData) });
   }
 }
-
-module.exports = DialogState;
