@@ -40,7 +40,7 @@ const borrarTodasLasFilas = () =>
 module.exports = () => {
   return knex.schema.hasTable('productos').then(exists => {
     if (!exists) return crearTablas();
-    else return borrarTodasLasFilas();
+    return borrarTodasLasFilas();
   });
 };
 

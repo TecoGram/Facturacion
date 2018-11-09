@@ -5,20 +5,24 @@ const {
   validarProducto,
   validarVentaRow,
   validarVentaRowExamen
-} = require('../frontend/src/Validacion.js');
-const { FormasDePago } = require('../frontend/src/Factura/Models.js');
+} = require('../../frontend/src/Validacion.js');
+const { FormasDePago } = require('../../frontend/src/Factura/Models.js');
 
 const sendBadArgumentsResponse = (res, errors) => {
   res.status(400).send(errors);
 };
 
-const parsearNumerosEnUnidades = unidades => {
-  for (let i = 0; i < unidades.length; i++) {
-    const unidad = unidades[i];
-    unidad.count = Number(unidad.count);
-    unidad.precioVenta = Number(unidad.precioVenta);
-  }
+const setSafeData = (req, data) => {
+  // eslint-disable-next-line fp/no-mutation
+  req.safeData = data;
 };
+
+const parsearNumerosEnUnidades = unidades =>
+  unidades.map(unidad => ({
+    ...unidad,
+    count: Number(unidad.count),
+    precioVenta: Number(unidad.precioVenta)
+  }));
 
 module.exports = {
   validarBusqueda: (req, res, next) => {
@@ -34,8 +38,10 @@ module.exports = {
     if (errors) {
       sendBadArgumentsResponse(res, errors);
     } else {
-      inputs.descDefault = Number(inputs.descDefault);
-      req.safeData = inputs;
+      setSafeData(req, {
+        ...inputs,
+        descDefault: Number(inputs.descDefault)
+      });
       next();
     }
   },
@@ -45,8 +51,10 @@ module.exports = {
     if (errors) {
       sendBadArgumentsResponse(res, errors);
     } else {
-      inputs.comision = Number(inputs.comision);
-      req.safeData = inputs;
+      setSafeData(req, {
+        ...inputs,
+        comision: Number(inputs.comision)
+      });
       next();
     }
   },
@@ -56,10 +64,12 @@ module.exports = {
     if (errors) {
       sendBadArgumentsResponse(res, errors);
     } else {
-      inputs.precioDist = Number(inputs.precioDist);
-      inputs.precioVenta = Number(inputs.precioVenta);
-      if (req.url === '/producto/update') inputs.rowid = req.body.rowid;
-      req.safeData = inputs;
+      setSafeData(req, {
+        ...inputs,
+        precioDist: Number(inputs.precioDist),
+        precioVenta: Number(inputs.precioVenta),
+        rowid: req.url === '/producto/update' ? req.body.rowid : undefined
+      });
       next();
     }
   },
@@ -69,11 +79,13 @@ module.exports = {
     if (errors) {
       sendBadArgumentsResponse(res, errors);
     } else {
-      inputs.descuento = Number(inputs.descuento);
-      inputs.flete = Number(inputs.flete);
-      inputs.formaPago = FormasDePago.indexOf(inputs.formaPago.toUpperCase());
-      parsearNumerosEnUnidades(inputs.unidades);
-      req.safeData = inputs;
+      setSafeData(req, {
+        ...inputs,
+        descuento: Number(inputs.descuento),
+        flete: Number(inputs.flete),
+        formaPago: FormasDePago.indexOf(inputs.formaPago.toUpperCase()),
+        unidades: parsearNumerosEnUnidades(inputs.unidades)
+      });
       next();
     }
   },
@@ -83,10 +95,13 @@ module.exports = {
     if (errors) {
       sendBadArgumentsResponse(res, errors);
     } else {
-      inputs.descuento = Number(inputs.descuento);
-      inputs.formaPago = FormasDePago.indexOf(inputs.formaPago.toUpperCase());
-      parsearNumerosEnUnidades(inputs.unidades);
-      req.safeData = inputs;
+      // eslint-disable-next-line
+      setSafeData(req, {
+        ...inputs,
+        descuento: Number(inputs.descuento),
+        formaPago: FormasDePago.indexOf(inputs.formaPago.toUpperCase()),
+        unidades: parsearNumerosEnUnidades(inputs.unidades)
+      });
       next();
     }
   }

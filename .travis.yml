@@ -1,15 +1,12 @@
 language: node_js
 node_js:
-    - "6.9.0"
+    - "8"
 
-
-before_script:
-- "npm run build"
 
 script:
-- "npm run prettier"
-- "npm run lint"
-- "npm test"
-- "npm run istanbul"
-
-after_script: "killall -f node"
+- "cd frontend"
+- "yarn build"
+- "cd ../backend"
+- "yarn lint"
+- "yarn test"
+- "yarn integration --coverage"

@@ -57,15 +57,11 @@ module.exports = {
 
   verVenta: ventaQueryResp => {
     const { facturables } = ventaQueryResp.ventaRow;
-
-    let medicoObj;
-    if (ventaQueryResp.medico)
-      medicoObj = Object.assign({}, ventaQueryResp.medico);
-
     const facturablesFormateados = stringifyNumerosEnUnidades(facturables);
+
     return {
       cliente: Object.assign({}, ventaQueryResp.cliente),
-      medico: medicoObj,
+      medico: ventaQueryResp.medico && { ...ventaQueryResp.medico },
       facturaData: formatVentaRowIntoFacturaData(ventaQueryResp.ventaRow),
       facturables: facturablesFormateados
     };

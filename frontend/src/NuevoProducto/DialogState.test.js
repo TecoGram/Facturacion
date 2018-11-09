@@ -1,4 +1,4 @@
-const DialogState = require('./DialogState.js');
+import DialogState from './DialogState.js';
 
 let state;
 let stateManager;
@@ -13,7 +13,7 @@ const llenarStateConDatosCorrectos = () => {
     marca: 'TECO',
     precioDist: 9.99,
     precioVenta: 14.99,
-    pagaIva: true,
+    pagaIva: true
   };
 };
 
@@ -104,7 +104,7 @@ describe('PRODUCTO_DIALOG Dialog State', () => {
         marca: 'BIO',
         precioDist: 19.99,
         precioVenta: 24.99,
-        pagaIva: 0,
+        pagaIva: 0
       };
       const editarInputs = {
         rowid: 1,
@@ -113,7 +113,7 @@ describe('PRODUCTO_DIALOG Dialog State', () => {
         marca: 'BIO',
         precioDist: '19.99',
         precioVenta: '24.99',
-        pagaIva: false,
+        pagaIva: false
       };
       stateManager = new DialogState({ editar }, setStateFunc);
       stateManager.revisarDataParaEditar();

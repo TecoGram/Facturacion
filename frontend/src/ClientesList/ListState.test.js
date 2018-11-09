@@ -1,4 +1,4 @@
-const ListState = require('./ListState.js');
+import ListState from './ListState.js';
 
 let state;
 let stateManager;
@@ -15,8 +15,8 @@ describe('Clientes ListView State', () => {
     const resp = {
       body: [
         { ruc: '9999', nombre: 'Test 1' },
-        { ruc: '9994', nombre: 'Test 2' },
-      ],
+        { ruc: '9994', nombre: 'Test 2' }
+      ]
     };
     stateManager.colocarClientesDelResponse(resp);
     expect(state.rows).toEqual(resp.body);
@@ -56,8 +56,8 @@ describe('Clientes ListView State', () => {
       stateManager = new ListState({ mostrarErrorConSnackbar }, setStateFunc);
       const resp = {
         response: {
-          text: 'No se pudo borrar',
-        },
+          text: 'No se pudo borrar'
+        }
       };
       stateManager.mostrarError(resp);
       expect(errorMostrado).toEqual(resp.response.text);

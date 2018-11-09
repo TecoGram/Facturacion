@@ -1,6 +1,7 @@
 const request = require('superagent');
 
-const prefix = process.env.NODE_ENV === 'test' ? 'http://localhost:8192' : '';
+const prefix =
+  process.env.NODE_ENV === 'integration' ? 'http://localhost:8192' : '';
 
 const getFacturaURL = (codigo, empresa) => {
   return `${prefix}/venta/ver/${empresa}/${codigo}`;
@@ -29,7 +30,7 @@ module.exports = {
         email: email,
         telefono1: telefono1,
         telefono2: telefono2,
-        descDefault: descDefault,
+        descDefault: descDefault
       })
       .set('Accept', 'application/json');
   },
@@ -52,7 +53,7 @@ module.exports = {
         email: email,
         telefono1: telefono1,
         telefono2: telefono2,
-        descDefault: descDefault,
+        descDefault: descDefault
       })
       .set('Accept', 'application/json');
   },
@@ -81,7 +82,7 @@ module.exports = {
         email: email,
         comision,
         telefono1: telefono1,
-        telefono2: telefono2,
+        telefono2: telefono2
       })
       .set('Accept', 'application/json');
   },
@@ -106,7 +107,7 @@ module.exports = {
         marca: marca,
         precioDist: precioDist,
         precioVenta: precioVenta,
-        pagaIva: pagaIva,
+        pagaIva: pagaIva
       })
       .set('Accept', 'application/json');
   },
@@ -129,7 +130,7 @@ module.exports = {
         marca: marca,
         precioDist: precioDist,
         precioVenta: precioVenta,
-        pagaIva: pagaIva,
+        pagaIva: pagaIva
       })
       .set('Accept', 'application/json');
   },
@@ -218,5 +219,5 @@ module.exports = {
     if (tipo === 0) return getFacturaURL(codigo, empresa);
     if (tipo === 1) return getFacturaExamenURL(codigo, empresa);
     throw Error('tipo desconocido ' + tipo);
-  },
+  }
 };

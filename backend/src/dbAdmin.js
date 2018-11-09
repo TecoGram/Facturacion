@@ -1,13 +1,12 @@
 const knex = require('./db.js');
 const convertToAscii = require('normalize-for-search');
 
-const colocarVentaID = (unidades, codigo, empresa) => {
-  const len = unidades.length;
-  for (let i = 0; i < len; i++) {
-    unidades[i].codigoVenta = codigo;
-    unidades[i].empresaVenta = empresa;
-  }
-};
+const colocarVentaID = (unidades, codigoVenta, empresaVenta) =>
+  unidades.map(u => ({
+    ...u,
+    codigoVenta,
+    empresaVenta
+  }));
 
 const insertarVentaBase = (
   builder,
@@ -285,58 +284,46 @@ const getVentaPorTipo = (codigo, empresa, tipo) => {
 };
 
 const getFacturaData = (codigo, empresa, tipo) => {
-  let ventaRow, cliente;
   const p = getVentaPorTipo(codigo, empresa, tipo)
-    .then(ventas => {
-      if (ventas.length > 0) {
-        ventaRow = ventas[0];
-        return getCliente(ventaRow.cliente);
-      } else {
-        return Promise.reject({
-          errorCode: 404,
-          text: 'factura no encontrada'
-        });
-      }
+    .then(([ventaRow]) => {
+      if (ventaRow)
+        return getCliente(ventaRow.cliente).then(([cliente]) => ({
+          ventaRow,
+          cliente
+        }));
+      return Promise.reject({
+        errorCode: 404,
+        text: 'factura no encontrada'
+      });
     })
-    .then(clientes => {
-      if (clientes.length > 0) {
-        cliente = clientes[0];
-        return getFacturablesVenta(codigo, empresa);
-      } else {
-        return Promise.reject({
-          errorCode: 404,
-          text: 'cliente no encontrado'
-        });
-      }
+    .then(({ cliente, ventaRow }) => {
+      if (cliente)
+        return getFacturablesVenta(codigo, empresa).then(facturables => ({
+          ventaRow: { ...ventaRow, facturables },
+          cliente
+        }));
+
+      return Promise.reject({
+        errorCode: 404,
+        text: 'cliente no encontrado'
+      });
     });
 
-  if (tipo === 0)
-    return p.then(facturables => {
-      ventaRow.facturables = facturables;
-      return Promise.resolve({ ventaRow: ventaRow, cliente: cliente });
-    });
-  else
-    return p
-      .then(facturables => {
-        ventaRow.facturables = facturables;
-        return getExamenInfo(codigo, empresa);
-      })
-      .then(rows => {
-        if (rows.length > 0) {
-          const exInfo = rows[0];
-          const medico = {
-            nombre: exInfo.nombre,
-            nombreAscii: exInfo.nombreAscii
-          };
-          ventaRow.paciente = exInfo.paciente;
-          return Promise.resolve({ ventaRow, cliente, medico });
-        } else {
-          return Promise.reject({
-            errorCode: 404,
-            text: 'examen no encontrado'
-          });
-        }
+  if (tipo === 0) return p;
+  return p.then(({ ventaRow, cliente }) => {
+    return getExamenInfo(codigo, empresa).then(([exInfo]) => {
+      if (exInfo)
+        return {
+          ventaRow: { ...ventaRow, paciente: exInfo.paciente },
+          cliente,
+          medico: { nombre: exInfo.nombre, nombreAscii: exInfo.nombreAscii }
+        };
+      return Promise.reject({
+        errorCode: 404,
+        text: 'examen no encontrado'
       });
+    });
+  });
 };
 
 const buscarEnTabla = (tabla, columna, queryString, limit) => {
@@ -510,8 +497,10 @@ module.exports = {
         subtotal
       ).then(
         () => {
-          colocarVentaID(unidades, codigo, empresa);
-          return insertarNuevasUnidades(trx, unidades);
+          return insertarNuevasUnidades(
+            trx,
+            colocarVentaID(unidades, codigo, empresa)
+          );
         },
         err => {
           return Promise.reject(err);
@@ -553,8 +542,10 @@ module.exports = {
           return insertarExamenInfo(trx, medico, paciente, codigo, empresa);
         })
         .then(() => {
-          colocarVentaID(unidades, codigo, empresa);
-          return insertarNuevasUnidades(trx, unidades);
+          return insertarNuevasUnidades(
+            trx,
+            colocarVentaID(unidades, codigo, empresa)
+          );
         });
     });
   },
@@ -592,8 +583,10 @@ module.exports = {
           return deleteUnidadesVenta(trx, codigo, empresa);
         })
         .then(() => {
-          colocarVentaID(unidades, codigo, empresa);
-          return insertarNuevasUnidades(trx, unidades);
+          return insertarNuevasUnidades(
+            trx,
+            colocarVentaID(unidades, codigo, empresa)
+          );
         });
     });
   },
@@ -630,8 +623,10 @@ module.exports = {
           return updateExamenInfo(trx, medico, paciente, codigo, empresa);
         })
         .then(() => {
-          colocarVentaID(unidades, codigo, empresa);
-          return insertarNuevasUnidades(trx, unidades);
+          return insertarNuevasUnidades(
+            trx,
+            colocarVentaID(unidades, codigo, empresa)
+          );
         });
     });
   },
@@ -639,7 +634,7 @@ module.exports = {
   findAllVentas,
   findVentas: (keywords, tipo) => {
     if (tipo === 0) return findVentas(keywords);
-    else return findVentasExamen(keywords);
+    return findVentasExamen(keywords);
   },
 
   getFacturaData,

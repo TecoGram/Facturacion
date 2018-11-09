@@ -4,7 +4,9 @@
   "private": true,
   "proxy": "http://localhost:8192",
   "devDependencies": {
-    "prettier": "^1.5.3",
+    "husky": "^1.1.4",
+    "lint-staged": "^8.0.4",
+    "prettier": "^1.15.2",
     "react-scripts": "2.1.1"
   },
   "dependencies": {
@@ -24,6 +26,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "test": "react-scripts test",
     "build": "react-scripts build",
     "eject": "react-scripts eject"
   },
@@ -32,5 +35,16 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+   "src/**/*.{js,json,css,md}": [
+     "prettier --single-quote --write",
+     "git add"
+   ]
+ }
 }

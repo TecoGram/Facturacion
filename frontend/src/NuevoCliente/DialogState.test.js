@@ -1,4 +1,4 @@
-const DialogState = require('./DialogState.js');
+import DialogState from './DialogState.js';
 
 let state;
 let stateManager;
@@ -14,7 +14,7 @@ const llenarStateConDatosCorrectos = () => {
     correo: 'julio_mendoza@yahoo.com.ec',
     telefono1: '2645422',
     telefono2: '2876357',
-    descDefault: '0',
+    descDefault: '0'
   };
 };
 
@@ -23,7 +23,7 @@ describe('Cliente Dialog State', () => {
     state = {
       inputs: {},
       errors: {},
-      serverError: null,
+      serverError: null
     };
   });
 
@@ -86,7 +86,7 @@ describe('Cliente Dialog State', () => {
       expect(state).toEqual({
         inputs: {},
         errors: {},
-        serverError: null,
+        serverError: null
       });
     });
   });
@@ -112,7 +112,7 @@ describe('Cliente Dialog State', () => {
         correo: 'julio_mendoza@yahoo.com.ec',
         telefono1: '2645422',
         telefono2: '2876357',
-        descDefault: '0',
+        descDefault: '0'
       };
       stateManager = new DialogState({ editar }, setStateFunc);
       stateManager.revisarDataParaEditar();
