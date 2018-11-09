@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const defaultStore = require('../frontend/src/DefaultStore.js');
+const defaultStore = require('../../frontend/src/DefaultStore.js');
 
-const indexFilePath = path.join(__dirname, '../frontend/build/index.html');
+const indexFilePath = path.join(__dirname, '../../frontend/build/index.html');
 
 const crearStoreConNombreEmpresa = empresa => {
   const store = Object.assign({}, defaultStore);
