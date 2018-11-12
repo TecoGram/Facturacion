@@ -559,4 +559,9 @@ const server = app.listen(port, function() {
   console.log('Application listening on  port ' + port);
 });
 
-module.exports = server;
+module.exports = {
+  destroy: () => {
+    server.close();
+    db.close();
+  }
+};

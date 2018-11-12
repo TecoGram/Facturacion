@@ -1,21 +1,21 @@
-const {
-  serveBiocled,
-  serveTecogram
-} = require('./empresaMiddleware.js');
+const { serveBiocled, serveTecogram } = require('./empresaMiddleware.js');
 const ExpressResponse = require('./testing/mocks/ExpressResponse.js');
 
-const testEmpresaAsync = async (serveFunction) => new Promise((resolve, reject) => {
-  const res = new ExpressResponse();
-  serveFunction(null, res);
-  setTimeout(() => {
-    resolve(res.sentContent);
-  }, 20);
-})  
+const testEmpresaAsync = async serveFunction =>
+  new Promise((resolve, reject) => {
+    const res = new ExpressResponse();
+    serveFunction(null, res);
+    setTimeout(() => {
+      resolve(res.sentContent);
+    }, 20);
+  });
 
 describe('empresaMiddleware.js', () => {
   it('retorna html con el default state de teco', async () => {
     const sentContent = await testEmpresaAsync(serveTecogram);
-    expect(sentContent).toEqual(expect.stringMatching(/"empresa":"TecoGram S.A."/));
+    expect(sentContent).toEqual(
+      expect.stringMatching(/"empresa":"TecoGram S.A."/)
+    );
   });
 
   it('retorna html con el default state de biocled', async () => {

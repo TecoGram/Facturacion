@@ -1,6 +1,7 @@
 const request = require('superagent');
 
-const prefix = process.env.NODE_ENV === 'test' ? 'http://localhost:8192' : '';
+const prefix = process.env.NODE_ENV === 'integration' ? 'http://localhost:8192' : '';
+console.log('prefix', prefix)
 
 const getFacturaURL = (codigo, empresa) => {
   return `${prefix}/venta/ver/${empresa}/${codigo}`;

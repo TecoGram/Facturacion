@@ -11,13 +11,16 @@
     "express": "^4.16.4",
     "knex": "^0.15.2",
     "normalize-for-search": "^2.0.1",
-    "pdfkit": "^0.8.3"
+    "pdfkit": "^0.8.3",
+    "sqlite3": "^4.0.4"
   },
   "devDependencies": {
-    "criptext-js-tools": "^0.7.2"
-  }, "scripts": {
+    "criptext-js-tools": "^0.7.2",
+    "superagent": "^4.0.0-beta.5"
+  },
+  "scripts": {
     "test": "criptext-js-tools test",
     "lint": "criptext-js-tools lint",
-    "integration": "criptext-js-tools integration"
+    "integration": "NODE_ENV=integration criptext-js-tools integration"
   }
 }

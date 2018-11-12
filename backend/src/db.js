@@ -1,5 +1,5 @@
 const dbFile =
-  process.env.NODE_ENV === 'test' ? '/test.sqlite' : '/mydb.sqlite';
+  process.env.NODE_ENV === 'integration' ? '/test.sqlite' : '/mydb.sqlite';
 
 module.exports = require('knex')({
   client: 'sqlite3',
