@@ -1,4 +1,4 @@
-const ListState = require('./ListState.js');
+import ListState from './ListState.js';
 
 let state;
 const setStateFunc = funcArg => {
@@ -14,7 +14,7 @@ describe('Factura ListView State', () => {
     it('coloca la lista de ventas en el state venta del state', () => {
       const newVentas = [
         { codigo: '00435', empresa: 'TECO' },
-        { codigo: '00434', empresa: 'TECO' },
+        { codigo: '00434', empresa: 'TECO' }
       ];
       const stateManager = new ListState({}, setStateFunc);
       stateManager.colocarVentas(newVentas);
@@ -29,12 +29,12 @@ describe('Factura ListView State', () => {
     it('remueve una venta del state', () => {
       state.rows = [
         { codigo: '00435', empresa: 'TECO' },
-        { codigo: '00434', empresa: 'TECO' },
+        { codigo: '00434', empresa: 'TECO' }
       ];
       const stateManager = new ListState({}, setStateFunc);
       stateManager.deleteVenta('00434', 'TECO');
       expect(state).toEqual({
-        rows: [{ codigo: '00435', empresa: 'TECO' }],
+        rows: [{ codigo: '00435', empresa: 'TECO' }]
       });
     });
   });
@@ -48,7 +48,7 @@ describe('Factura ListView State', () => {
         },
         editarFacturaExamen: () => {
           success = false;
-        },
+        }
       };
       const stateManager = new ListState(props, setStateFunc);
       stateManager.openEditorPage('00546', 'TECO', 0);
@@ -63,7 +63,7 @@ describe('Factura ListView State', () => {
         },
         editarFacturaExamen: () => {
           success = true;
-        },
+        }
       };
       const stateManager = new ListState(props, setStateFunc);
       stateManager.openEditorPage('00546', 'TECO', 1);
@@ -78,7 +78,7 @@ describe('Factura ListView State', () => {
         },
         editarFacturaExamen: () => {
           success = false;
-        },
+        }
       };
       const stateManager = new ListState({}, setStateFunc);
       stateManager.props = props;
