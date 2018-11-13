@@ -7,7 +7,7 @@ describe('/medico/ endpoints', () => {
   afterAll(server.destroy);
 
   describe('/medico/new', () => {
-    it('retorna 200 al ingresar datos correctos', async () => {
+    it('retorna 200 al ingresar datos correctos', () =>
       api
         .insertarMedico(
           'Dr. Juan Coronel',
@@ -19,8 +19,7 @@ describe('/medico/ endpoints', () => {
         )
         .then(res => {
           expect(res.status).toBe(200);
-        });
-    });
+        }));
 
     it('retorna 500 al ingresar medico con un nombre ya existente', async () => {
       const res = await api.insertarMedico(
@@ -54,7 +53,7 @@ describe('/medico/ endpoints', () => {
 
   describe('/medico/find', () => {
     it('retorna 200 al encontrar medicos', async () => {
-      const res = await api.insertarMedico(
+      const res1 = await api.insertarMedico(
         'Dr. Julio Plaza',
         'Via a Samborondon km. 7.5 Urbanizacion Tornasol mz. 5 villa 20',
         'jplaza@outlook.com',
@@ -62,13 +61,14 @@ describe('/medico/ endpoints', () => {
         '2854345',
         '28654768'
       );
-      return api.findMedicos('pla').then(res => {
-        expect(res.status).toBe(200);
+      expect(res1.status).toBe(200);
 
-        const clientes = res.body;
-        expect(clientes).toHaveLength(1);
-        expect(clientes[0].nombre).toEqual('Dr. Julio Plaza');
-      });
+      const res2 = await api.findMedicos('pla');
+      expect(res2.status).toBe(200);
+
+      const clientes = res2.body;
+      expect(clientes).toHaveLength(1);
+      expect(clientes[0].nombre).toEqual('Dr. Julio Plaza');
     });
 
     it('retorna 404 si no encuentra medicos', () =>

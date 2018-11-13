@@ -20,15 +20,14 @@ describe('/producto/ endpoints', () => {
       expect(res.body).toHaveLength(1);
     });
 
-    it('retorna 422 al ingresar producto con un nombre ya existente', async () => {
+    it('retorna 422 al ingresar producto con un nombre ya existente', () =>
       api.insertarProducto('34tger5', 'Glyco', 'TECO', 39.99, 49.99, true).then(
         () => Promise.reject(new Error('expected to fail')),
         ({ response: res }) => {
           expect(res.status).toBe(422);
           expect(res.body.code).toEqual('SQLITE_CONSTRAINT');
         }
-      );
-    });
+      ));
   });
 
   describe('/producto/find', () => {
@@ -69,14 +68,75 @@ describe('/producto/ endpoints', () => {
       expect(res.body).toHaveLength(1);
     });
 
-    it('retorna 404 si no encuentra productos', async () => {
+    it('retorna 404 si no encuentra productos', () =>
       api.findProductos('xyz').then(
         () => Promise.reject('Expected to fail'),
         ({ response: res }) => {
           expect(res.status).toBe(404);
           expect(res.text).toEqual(expect.any(String));
         }
+      ));
+  });
+
+  describe('/producto/update', () => {
+    let productoId;
+    beforeAll(async () => {
+      const res = await api.insertarProducto(
+        'ryt126s4',
+        'HCG',
+        'TECO',
+        39.99,
+        49.99,
+        true
       );
+      expect(res.status).toBe(200);
+      productoId = res.body[0];
     });
+
+    it('retorna 200 al actualizar un producto exitosamente', async () => {
+      const res = await api.updateProducto(
+        productoId,
+        'ryt126s4',
+        'HCG',
+        'TECO',
+        39.99,
+        49.99,
+        true
+      );
+      expect(res.status).toBe(200);
+    });
+
+    it('retorna 404 al tratar de actualizar un producto inexistente', () =>
+      api
+        .updateProducto(998, 'ryt126s4', 'HCG', 'TECO', 39.99, 49.99, true)
+        .then(() => Promise.reject('Expected to fail'))
+        .catch(({ response: res }) => expect(res.status).toBe(404)));
+  });
+
+  describe('/producto/delete', () => {
+    let productoId;
+    beforeAll(async () => {
+      const res = await api.insertarProducto(
+        'ryt126s4',
+        'HCG Tirilla',
+        'TECO',
+        39.99,
+        49.99,
+        true
+      );
+      expect(res.status).toBe(200);
+      productoId = res.body[0];
+    });
+
+    it('retorna 200 al borrar un producto exitosamente', async () => {
+      const res = await api.deleteProducto(productoId);
+      expect(res.status).toBe(200);
+    });
+
+    it('retorna 404 al borrar un producto inexistente', () =>
+      api
+        .deleteProducto(productoId)
+        .then(() => Promise.reject('Expected to fail'))
+        .catch(({ response: res }) => expect(res.status).toBe(404)));
   });
 });

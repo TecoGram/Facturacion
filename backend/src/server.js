@@ -32,7 +32,7 @@ const app = Express();
 app.get('/', function(req, res) {
   res.redirect('/teco');
 });
-app.use('/', Express.static(path.join(__dirname, '../frontend/build')));
+app.use('/', Express.static(path.join(__dirname, '../../frontend/build')));
 app.use(bodyParser.json()); // for parsing application/json
 
 app.get('/teco', serveTecogram);

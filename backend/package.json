@@ -19,6 +19,7 @@
     "superagent": "^4.0.0-beta.5"
   },
   "scripts": {
+    "start": "node src/server.js",
     "test": "criptext-js-tools test",
     "lint": "criptext-js-tools lint",
     "integration": "NODE_ENV=integration criptext-js-tools integration"
