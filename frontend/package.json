@@ -20,7 +20,7 @@
     "react-router": "^2.8.1",
     "react-tap-event-plugin": "2.0.1",
     "redux": "^3.7.2",
-    "superagent": "^2.3.0",
+    "superagent": "^4.0.0-beta.5",
     "typeface-roboto": "0.0.22",
     "validator": "^6.1.0"
   },
@@ -42,9 +42,9 @@
     }
   },
   "lint-staged": {
-   "src/**/*.{js,json,css,md}": [
-     "prettier --single-quote --write",
-     "git add"
-   ]
- }
+    "src/**/*.{js,json,css,md}": [
+      "prettier --single-quote --write",
+      "git add"
+    ]
+  }
 }
