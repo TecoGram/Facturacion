@@ -4,11 +4,10 @@ const defaultStore = require('../../frontend/src/DefaultStore.js');
 
 const indexFilePath = path.join(__dirname, '../../frontend/build/index.html');
 
-const crearStoreConNombreEmpresa = empresa => {
-  const store = Object.assign({}, defaultStore);
-  store.ajustes.empresa = empresa;
-  return store;
-};
+const crearStoreConNombreEmpresa = empresa => ({
+  ...defaultStore,
+  ajustes: { ...defaultStore.ajustes, empresa }
+});
 
 const colocarStoreEnHtml = (html, store) => {
   const storePlaceholder = 'void 0';

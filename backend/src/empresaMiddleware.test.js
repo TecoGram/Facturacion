@@ -1,8 +1,8 @@
 const { serveBiocled, serveTecogram } = require('./empresaMiddleware.js');
 const ExpressResponse = require('./testing/mocks/ExpressResponse.js');
 
-const testEmpresaAsync = async serveFunction =>
-  new Promise((resolve, reject) => {
+const testEmpresaAsync = serveFunction =>
+  new Promise(resolve => {
     const res = new ExpressResponse();
     serveFunction(null, res);
     setTimeout(() => {

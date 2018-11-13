@@ -3,13 +3,10 @@ const {
 } = require('../../../frontend/src/Factura/Math.js');
 const { FormasDePago } = require('../../../frontend/src/Factura/Models.js');
 
-const crearOpciondePagoConTotalPagado = (formaPagoIndex, total) => {
-  return (opcion, index) => {
-    const nuevaOpcion = [opcion, null];
-    if (formaPagoIndex === index) nuevaOpcion[1] = Number(total).toFixed(2);
-    return nuevaOpcion;
-  };
-};
+const crearOpciondePagoConTotalPagado = (formaPagoIndex, total) => (
+  opcion,
+  index
+) => [opcion, formaPagoIndex === index ? Number(total).toFixed(2) : null];
 
 const generarDetalleOpcionesDePago = (formaPago, total) => {
   const func = crearOpciondePagoConTotalPagado(formaPago, total);
@@ -39,8 +36,7 @@ const crearMatrizValoresTotales = (
 };
 
 const fromVentaRow = ventaRow => {
-  const facturaPDFData = Object.assign({}, ventaRow);
-  const { subtotal, iva, descuento, flete, formaPago } = facturaPDFData;
+  const { subtotal, iva, descuento, flete, formaPago } = ventaRow;
   const { rebaja, impuestos, total } = calcularValoresTotales(
     subtotal,
     flete,
@@ -48,19 +44,20 @@ const fromVentaRow = ventaRow => {
     descuento
   );
 
-  facturaPDFData.total = total;
-  facturaPDFData.formasDePago = generarDetalleOpcionesDePago(formaPago, total);
-  facturaPDFData.matrizValoresTotales = crearMatrizValoresTotales(
-    subtotal,
-    flete,
-    iva,
-    descuento,
-    impuestos,
-    rebaja,
-    total
-  );
-
-  return facturaPDFData;
+  return {
+    ...ventaRow,
+    total,
+    formasDePago: generarDetalleOpcionesDePago(formaPago, total),
+    matrizValoresTotales: crearMatrizValoresTotales(
+      subtotal,
+      flete,
+      iva,
+      descuento,
+      impuestos,
+      rebaja,
+      total
+    )
+  };
 };
 
 module.exports = {

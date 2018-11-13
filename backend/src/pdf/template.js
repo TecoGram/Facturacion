@@ -126,12 +126,7 @@ const drawFacturableLine = (doc, facturable, detallado, pos) => {
   drawFacturableDescription(doc, facturable, detallado, linePos);
 };
 
-const drawRemainingFacturablesOnNextPage = (
-  doc,
-  detallado,
-  facturables,
-  startPos
-) => {
+const drawRemainingFacturablesOnNextPage = (doc, detallado, facturables) => {
   doc.addPage({
     margins: {
       left: 72,
@@ -141,27 +136,26 @@ const drawRemainingFacturablesOnNextPage = (
     }
   });
 
-  for (let i = startPos; i < facturables.length; i++) {
-    const facturable = facturables[i];
-    drawFacturableLine(doc, facturable, detallado, i + 1);
-  }
+  facturables.forEach((facturable, i) =>
+    drawFacturableLine(doc, facturable, detallado, i + 1)
+  );
 };
 
 const drawFacturablesDetails = (doc, facturables, detallado) => {
+  // eslint-disable-next-line fp/no-mutation
   doc.y = Y3_LINE + 9;
   try {
     doc.fontSize(8);
-    for (let i = 0; i < facturables.length; i++) {
-      const facturable = facturables[i];
+    facturables.forEach((facturable, i) => {
       const heightFactor = detallado ? 4 : 2;
       const facturableSeDesborda =
         doc.y + doc.currentLineHeight() * heightFactor > Y4_LINE;
       if (facturableSeDesborda) throw { indiceDeDesborde: i };
       drawFacturableLine(doc, facturable, detallado, i + 1);
-    }
+    });
   } catch (err) {
     if (err.indiceDeDesborde) return err.indiceDeDesborde;
-    else throw err;
+    throw err;
   } finally {
     doc.fontSize(12);
   }
@@ -188,6 +182,7 @@ const drawValueLine = (doc, valueLabel, valueSymbol, valueNumber) => {
 
 const drawTotalValues = (doc, facturaPDFData) => {
   doc.lineGap(7);
+  // eslint-disable-next-line fp/no-mutation
   doc.y = Y4_LINE + 15;
 
   const drawValueLineArgs = facturaPDFData.matrizValoresTotales;
@@ -212,6 +207,7 @@ const drawPaymentMethodColumn = (doc, boxHeight, methodName, totalPayed) => {
   const boxWidth = 35;
 
   doc.text(methodName, doc.x, textY);
+  // eslint-disable-next-line fp/no-mutation
   doc.x = doc.x + doc.widthOfString(methodName) + 5;
   doc.rect(doc.x, paymentMethodValueBoxY, boxWidth, boxHeight).stroke();
 
@@ -225,6 +221,7 @@ const drawPaymentMethodColumn = (doc, boxHeight, methodName, totalPayed) => {
       .fontSize(6);
   }
 
+  // eslint-disable-next-line fp/no-mutation
   doc.x = doc.x + boxWidth + 3;
 };
 
@@ -241,6 +238,7 @@ const drawPaymentAgreement = (doc, boxHeight) => {
 const drawPaymentMethodSubtitle = doc => {
   const textY = paymentMethodValueBoxY + 5;
   doc.text('FORMA DE PAGO:', doc.x, textY);
+  // eslint-disable-next-line fp/no-mutation
   doc.x = doc.x + doc.widthOfString('FORMA DE PAGO:') + 3;
 };
 
@@ -250,6 +248,7 @@ const drawPaymentMethodFooter = (doc, paymentMethods) => {
 
   doc.fontSize(6);
 
+  // eslint-disable-next-line fp/no-mutation
   doc.x = startX;
   drawPaymentMethodSubtitle(doc);
   paymentMethods.forEach(args => {
