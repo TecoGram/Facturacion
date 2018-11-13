@@ -1,12 +1,15 @@
 language: node_js
 node_js:
-    - "8"
+    - "10"
 
 
 script:
 - "cd frontend"
+- "yarn"
+- "yarn test"
 - "yarn build"
 - "cd ../backend"
+- "yarn"
 - "yarn lint"
 - "yarn test"
 - "yarn integration --coverage"
