@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/GAumala/Facturacion.svg?style=svg)](https://circleci.com/gh/GAumala/Facturacion) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![CircleCI](:https://circleci.com/gh/GAumala/Facturacion.svg?style=svg)](https://circleci.com/gh/GAumala/Facturacion) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
 Sistema de facturación web sencillo escrito con React, Node.js y SQLite 3.
 
@@ -52,4 +52,23 @@ Este repositorio incluye un [makefile](https://en.wikipedia.org/wiki/Makefile) c
 ``` bash
 git pull origin master
 make
+```
+
+## Configurar respaldos automáticos
+
+Es posible respaldar la base de datos con un servidor remoto usando `scp` si el usuario que corre la aplicación tiene llaves ssh autorizadas. 
+
+Para realizar un respaldo manual:
+
+``` bash
+# Hay que pasar la url de destino como parametro
+# La url debe tener el formato esperado por scp
+node src/scripts/backupDB.js user@myremoteserver.com:~
+```
+
+Para automatizar respaldos diarios basta con correr `crontab -e` y agregar esta línea:
+
+```
+# Respaldar todos los días a las 6 de la tarde 
+0 18 * * * /usr/bin/node /path/to/backupDB.js user@myremoteserver.com:~
 ```

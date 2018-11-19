@@ -449,9 +449,7 @@ module.exports = {
       return insertarNuevasUnidades(trx, unidadesConID);
     }),
 
-  insertarVentaExamen: (
-    ventaEx
-  ) =>
+  insertarVentaExamen: ventaEx =>
     knex.transaction(async trx => {
       const { unidades, medico, paciente, ...venta } = ventaEx;
       const ventaRow = {
