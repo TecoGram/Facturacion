@@ -29,7 +29,7 @@ const printError = errorString => {
 };
 
 const app = Express();
-app.get('/', function(req, res) {
+app.get('/', (req, res) => {
   res.redirect('/teco');
 });
 app.use('/', Express.static(path.join(__dirname, '../../frontend/build')));
@@ -38,7 +38,7 @@ app.use(bodyParser.json()); // for parsing application/json
 app.get('/teco', serveTecogram);
 app.get('/biocled', serveBiocled);
 
-app.post('/cliente/new', validarCliente, function(req, res) {
+app.post('/cliente/new', validarCliente, (req, res) => {
   const {
     ruc,
     nombre,
@@ -70,7 +70,7 @@ app.post('/cliente/new', validarCliente, function(req, res) {
   );
 });
 
-app.get('/cliente/find', function(req, res) {
+app.get('/cliente/find', (req, res) => {
   const q = req.query.q || '';
   db.findClientes(q).then(
     function(clientes) {
@@ -87,7 +87,7 @@ app.get('/cliente/find', function(req, res) {
   );
 });
 
-app.post('/cliente/update', validarCliente, function(req, res) {
+app.post('/cliente/update', validarCliente, (req, res) => {
   const {
     ruc,
     nombre,
@@ -118,7 +118,7 @@ app.post('/cliente/update', validarCliente, function(req, res) {
   ).then(handleSuccess, handleFailiure);
 });
 
-app.post('/cliente/delete/:id', function(req, res) {
+app.post('/cliente/delete/:id', (req, res) => {
   const ruc = req.params.id;
 
   const handleSuccess = function(deleteCount) {
@@ -137,7 +137,7 @@ app.post('/cliente/delete/:id', function(req, res) {
   db.deleteCliente(ruc).then(handleSuccess, handleFailiure);
 });
 
-app.post('/medico/new', validarMedico, function(req, res) {
+app.post('/medico/new', validarMedico, (req, res) => {
   const {
     nombre,
     direccion,
@@ -167,7 +167,7 @@ app.post('/medico/new', validarMedico, function(req, res) {
   );
 });
 
-app.get('/medico/find', function(req, res) {
+app.get('/medico/find', (req, res) => {
   const q = req.query.q || '';
   db.findMedicos(q).then(
     function(medicos) {
@@ -184,7 +184,7 @@ app.get('/medico/find', function(req, res) {
   );
 });
 
-app.post('/producto/new', validarProducto, function(req, res) {
+app.post('/producto/new', validarProducto, (req, res) => {
   const {
     codigo,
     nombre,
@@ -213,7 +213,7 @@ app.post('/producto/new', validarProducto, function(req, res) {
   );
 });
 
-app.get('/producto/find', validarBusqueda, function(req, res) {
+app.get('/producto/find', validarBusqueda, (req, res) => {
   const q = req.query.q || '';
   db.findProductos(q, req.query.limit).then(
     function(productos) {
@@ -230,7 +230,7 @@ app.get('/producto/find', validarBusqueda, function(req, res) {
   );
 });
 
-app.post('/producto/update', validarProducto, function(req, res) {
+app.post('/producto/update', validarProducto, (req, res) => {
   const {
     rowid,
     codigo,
@@ -261,7 +261,7 @@ app.post('/producto/update', validarProducto, function(req, res) {
   ).then(handleSuccess, handleFailiure);
 });
 
-app.post('/producto/delete/:id', function(req, res) {
+app.post('/producto/delete/:id', (req, res) => {
   const id = req.params.id;
 
   const handleSuccess = function(deleteCount) {
@@ -328,11 +328,11 @@ function verVenta(req, res, tipo) {
       );
 }
 
-app.get('/venta/ver/:empresa/:codigo', function(req, res) {
+app.get('/venta/ver/:empresa/:codigo', (req, res) => {
   verVenta(req, res, 0);
 });
 
-app.get('/venta_ex/ver/:empresa/:codigo', function(req, res) {
+app.get('/venta_ex/ver/:empresa/:codigo', (req, res) => {
   verVenta(req, res, 1);
 });
 
@@ -355,11 +355,11 @@ function deleteVenta(req, res) {
   );
 }
 
-app.post('/venta/delete/:empresa/:codigo', function(req, res) {
+app.post('/venta/delete/:empresa/:codigo', (req, res) => {
   deleteVenta(req, res);
 });
 
-app.post('/venta_ex/delete/:empresa/:codigo', function(req, res) {
+app.post('/venta_ex/delete/:empresa/:codigo', (req, res) => {
   deleteVenta(req, res);
 });
 
@@ -381,101 +381,58 @@ function findVentas(req, res, tipo, all) {
   );
 }
 
-app.get('/venta/find', function(req, res) {
+app.get('/venta/find', (req, res) => {
   findVentas(req, res, 0);
 });
 
-app.get('/venta_ex/find', function(req, res) {
+app.get('/venta_ex/find', (req, res) => {
   findVentas(req, res, 1);
 });
 
-app.get('/venta/findAll', function(req, res) {
+app.get('/venta/findAll', (req, res) => {
   findVentas(req, res, null, true);
 });
 
-app.post('/venta/new', validarVenta, function(req, res) {
-  const {
-    codigo,
-    cliente,
-    empresa,
-    fecha,
-    autorizacion,
-    formaPago,
-    detallado,
-    descuento,
-    iva,
-    flete,
-    subtotal,
-    unidades
-  } = req.safeData;
-  db.insertarVenta(
-    codigo,
-    empresa,
-    cliente,
-    fecha,
-    autorizacion,
-    formaPago,
-    detallado,
-    descuento,
-    iva,
-    flete,
-    subtotal,
-    unidades
-  ).then(
-    function() {
-      //OK!
-      res.status(200).send('OK');
-    },
-    function(error) {
-      //ERROR!
-      if (error.errno === CONSTRAINT_ERROR_SQLITE)
-        res.status(400).send('Ya existe una factura con ese código.');
-      else res.status(500).send(error);
-    }
-  );
-});
+const handleValidData = fn => async (req, res) => {
+  try {
+    const { status, resp } = await fn(req.safeData);
+    res.status(status).send(resp);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+};
 
-app.post('/venta_ex/new', validarVentaExamen, function(req, res) {
-  const {
-    codigo,
-    empresa,
-    cliente,
-    fecha,
-    autorizacion,
-    formaPago,
-    subtotal,
-    descuento,
-    unidades,
-    medico,
-    paciente
-  } = req.safeData;
-  db.insertarVentaExamen(
-    codigo,
-    empresa,
-    cliente,
-    fecha,
-    autorizacion,
-    formaPago,
-    descuento,
-    subtotal,
-    unidades,
-    medico,
-    paciente
-  ).then(
-    function() {
-      //OK!
-      res.status(200).send('OK');
-    },
-    function(error) {
-      //ERROR!
-      if (error.errno === CONSTRAINT_ERROR_SQLITE)
-        res.status(400).send('Ya existe una factura con ese código.');
-      else res.status(500).send(error);
-    }
-  );
-});
+app.post(
+  '/venta/new',
+  validarVenta,
+  handleValidData(data =>
+    db
+      .insertarVenta(data)
+      .then(() => ({ status: 200, resp: 'OK' }))
+      .catch(err => {
+        if (err.errno === CONSTRAINT_ERROR_SQLITE)
+          return { status: 400, resp: 'Ya existe una factura con ese código.' };
+        throw err;
+      })
+  )
+);
 
-app.post('/venta/update', validarVenta, function(req, res) {
+app.post(
+  '/venta_ex/new',
+  validarVentaExamen,
+  handleValidData(data =>
+    db
+      .insertarVentaExamen(data)
+      .then(() => ({ status: 200, resp: 'OK' }))
+      .catch(err => {
+        if (err.errno === CONSTRAINT_ERROR_SQLITE)
+          return { status: 400, resp: 'Ya existe una factura con ese código.' };
+        throw err;
+      })
+  )
+);
+
+app.post('/venta/update', validarVenta, (req, res) => {
   const {
     codigo,
     empresa,
@@ -516,7 +473,7 @@ app.post('/venta/update', validarVenta, function(req, res) {
     });
 });
 
-app.post('/venta_ex/update', validarVentaExamen, function(req, res) {
+app.post('/venta_ex/update', validarVentaExamen, (req, res) => {
   const {
     codigo,
     empresa,
