@@ -8,35 +8,8 @@ const colocarVentaID = (unidades, codigoVenta, empresaVenta) =>
     empresaVenta
   }));
 
-const insertarVentaBase = (
-  builder,
-  codigo,
-  empresa,
-  cliente,
-  fecha,
-  autorizacion,
-  formaPago,
-  detallado,
-  tipo,
-  descuento,
-  iva,
-  flete,
-  subtotal
-) => {
-  const q = builder.table('ventas').insert({
-    codigo: codigo,
-    empresa: empresa,
-    cliente: cliente,
-    fecha: fecha,
-    autorizacion: autorizacion,
-    formaPago: formaPago,
-    detallado: detallado,
-    tipo: tipo,
-    descuento: descuento,
-    iva: iva,
-    flete: flete,
-    subtotal: subtotal
-  });
+const insertarVentaBase = (builder, row) => {
+  const q = builder.table('ventas').insert(row);
   return q;
 };
 
@@ -466,89 +439,35 @@ module.exports = {
     return buscarEnTabla('medicos', 'nombreAscii', queryStringAscii);
   },
 
-  insertarVenta: (
-    codigo,
-    empresa,
-    cliente,
-    fecha,
-    autorizacion,
-    formaPago,
-    detallado,
-    descuento,
-    iva,
-    flete,
-    subtotal,
-    unidades
-  ) => {
-    return knex.transaction(trx => {
-      return insertarVentaBase(
-        trx,
-        codigo,
-        empresa,
-        cliente,
-        fecha,
-        autorizacion,
-        formaPago,
-        detallado,
-        0,
-        descuento,
-        iva,
-        flete,
-        subtotal
-      ).then(
-        () => {
-          return insertarNuevasUnidades(
-            trx,
-            colocarVentaID(unidades, codigo, empresa)
-          );
-        },
-        err => {
-          return Promise.reject(err);
-        }
-      );
-    });
-  },
+  insertarVenta: venta =>
+    knex.transaction(async trx => {
+      const { unidades, ...ventaRow } = venta;
+      await insertarVentaBase(trx, { ...ventaRow, tipo: 0 });
+
+      const { codigo, empresa } = ventaRow;
+      const unidadesConID = colocarVentaID(unidades, codigo, empresa);
+      return insertarNuevasUnidades(trx, unidadesConID);
+    }),
 
   insertarVentaExamen: (
-    codigo,
-    empresa,
-    cliente,
-    fecha,
-    autorizacion,
-    formaPago,
-    descuento,
-    subtotal,
-    unidades,
-    medico,
-    paciente
-  ) => {
-    return knex.transaction(trx => {
-      return insertarVentaBase(
-        trx,
-        codigo,
-        empresa,
-        cliente,
-        fecha,
-        autorizacion,
-        formaPago,
-        false,
-        1,
-        descuento,
-        0,
-        0,
-        subtotal
-      )
-        .then(() => {
-          return insertarExamenInfo(trx, medico, paciente, codigo, empresa);
-        })
-        .then(() => {
-          return insertarNuevasUnidades(
-            trx,
-            colocarVentaID(unidades, codigo, empresa)
-          );
-        });
-    });
-  },
+    ventaEx
+  ) =>
+    knex.transaction(async trx => {
+      const { unidades, medico, paciente, ...venta } = ventaEx;
+      const ventaRow = {
+        ...venta,
+        detallado: false,
+        tipo: 1,
+        iva: 0,
+        flete: 0
+      };
+      await insertarVentaBase(trx, ventaRow);
+
+      const { codigo, empresa } = ventaRow;
+      const unidadesConID = colocarVentaID(unidades, codigo, empresa);
+      await insertarExamenInfo(trx, medico, paciente, codigo, empresa);
+      return insertarNuevasUnidades(trx, unidadesConID);
+    }),
 
   updateVenta: (
     codigo,
