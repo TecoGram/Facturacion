@@ -72,3 +72,35 @@ Para automatizar respaldos diarios basta con correr `crontab -e` y agregar esta 
 # Respaldar todos los días a las 6 de la tarde 
 0 18 * * * /usr/bin/node /path/to/backupDB.js user@myremoteserver.com:~
 ```
+
+## Autostart
+
+Si el servidor es una computadora personal que se apaga al final de cada día es muy util levantar el servidor automáticamente cada vez que se enciende la computadora. Para esto podemos usar [XDG Autostart](https://wiki.archlinux.org/index.php/XDG_Autostart).
+
+El archivo `backend/scripts/autostart.template.sh` es un script que realiza las siguentes tareas en orden:
+
+- Busca actualizaciones
+- respalda la base de datos
+- levanta el servidor en background
+
+Para usarlo, solo es necesario que lo copies a algún lugar de tu path y reemplazes las variables declaradas al inicio para que se ajusten a tu configuración
+
+```
+sudo cp backend/scripts/autostart.template.sh /usr/bin/facturacion
+# editar variables
+sudo vim /usr/bin/facturacion
+
+# correr script
+facturacion
+``` 
+
+Finalmente, se puede agregar una entrada de escritorio a `$XDG_CONFIG_HOME/autostart` (`~/.config/autostart` de manera predeterminada) para que el entorno de escritorio corra el script al inicializar el sistema.
+
+``` 
+[Desktop Entry]
+
+Type=Application
+Version=1.0
+Name=facturacion
+Exec=facturacion
+```
