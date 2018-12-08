@@ -13,47 +13,6 @@ const crearTablaProductos = table => {
   table.unique('nombre');
 };
 
-const crearTablaClientes = table => {
-  table.string('ruc', 13).primary();
-  table.string('nombreAscii', 50).index();
-  table.string('nombre', 50);
-  table.string('direccion', 60);
-  table.string('email', 10);
-  table.string('telefono1', 10);
-  table.string('telefono2', 10);
-  table.int('descDefault');
-};
-
-const crearTablaMedicos = table => {
-  table.string('nombreAscii', 50).primary();
-  table.string('nombre', 50);
-  table.string('direccion', 60);
-  table.string('email', 10);
-  table.integer('comision');
-  table.string('telefono1', 10);
-  table.string('telefono2', 10);
-};
-
-const crearTablaVentas = table => {
-  table.string('codigo', 10);
-  table.string('empresa', 10);
-  table.string('cliente', 13);
-  table.date('fecha').index();
-  table.string('autorizacion', 10);
-  //el valor es un indice de Factura/Models.FormasDePago
-  table.integer('formaPago');
-  table.boolean('detallado');
-  //tipo 0 para productos, 1 para examenes
-  table.integer('tipo');
-  table.integer('descuento');
-  table.integer('iva');
-  table.float('flete');
-  table.float('subtotal');
-
-  table.primary('codigo', 'empresa');
-  table.foreign('cliente').references('clientes.ruc');
-};
-
 const crearTablaStock = table => {
   table
     .integer('producto')
@@ -65,25 +24,75 @@ const crearTablaStock = table => {
   table.foreign('producto').references('productos.rowid');
 };
 
+const crearTablaClientes = table => {
+  table.integer('rowid').primary();
+  table
+    .string('ruc', 13)
+    .unique()
+    .notNullable();
+  table
+    .string('nombreAscii', 50)
+    .notNullable()
+    .index();
+  table.string('nombre', 50).notNullable();
+  table.string('direccion', 60);
+  table.string('email', 10);
+  table.string('telefono1', 10);
+  table.string('telefono2', 10);
+  table.int('descDefault');
+  // 1 para ruc, 2 para cedula
+  table.int('tipo').notNullable();
+};
+
+const crearTablaMedicos = table => {
+  table.integer('rowid').primary();
+  table.string('nombreAscii', 50).unique();
+  table.string('nombre', 50);
+  table.string('direccion', 60);
+  table.string('email', 10);
+  table.integer('comision');
+  table.string('telefono1', 10);
+  table.string('telefono2', 10);
+};
+
+const crearTablaVentas = table => {
+  table.integer('rowid').primary();
+  table.string('codigo', 10);
+  table.string('empresa', 10).notNullable();
+  table.integer('cliente');
+  table.date('fecha').index();
+  table.string('autorizacion', 10);
+  //el valor es un indice de Factura/Models.FormasDePago
+  table.integer('formaPago');
+  table.boolean('detallado');
+  //tipo 0 para productos, 1 para examenes
+  table.integer('tipo');
+  table.integer('descuento');
+  table.integer('iva');
+  table.float('flete');
+  table.float('subtotal').notNullable();
+
+  table.unique(['codigo', 'empresa']);
+  table.foreign('cliente').references('clientes.rowid');
+};
+
 const crearTablaExamenInfo = table => {
-  table.string('medico_id', 50);
-  table.string('codigoVenta', 10);
-  table.string('empresaVenta', 10);
+  table.integer('medicoId');
+  table.integer('ventaId');
   table.string('paciente', 50);
   table.string('pacienteAscii', 50);
 
-  table.foreign('medico_id').references('medicos.nombreAscii');
+  table.foreign('medicoId').references('medicos.rowid');
   table
-    .foreign(['codigoVenta', 'empresaVenta'])
-    .references(['codigo', 'empresa'])
+    .foreign('ventaId')
+    .references('rowid')
     .inTable('ventas')
     .onDelete('CASCADE');
 };
 
 const crearTablaUnidades = table => {
   table.integer('producto');
-  table.string('codigoVenta', 10);
-  table.string('empresaVenta', 10);
+  table.integer('ventaId');
   table.string('lote', 10);
   table.float('precioVenta');
   table.integer('count');
@@ -91,12 +100,11 @@ const crearTablaUnidades = table => {
 
   table.foreign('producto').references('productos.rowid');
   table
-    .foreign(['codigoVenta', 'empresaVenta'])
-    .references(['codigo', 'empresa'])
+    .foreign('ventaId')
+    .references('rowid')
     .inTable('ventas')
     .onDelete('CASCADE');
 };
-
 const borrarTablaClientes = () => knex('clientes').truncate();
 const borrarTablaExamenInfo = () => knex('examen_info').truncate();
 const borrarTablaMedicos = () => knex('medicos').truncate();
