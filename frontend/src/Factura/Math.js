@@ -1,11 +1,11 @@
 const limitTo2decimals = value => Math.round(value * 100) / 100;
 
 const calcularRebaja = (subtotal, porcentajeDescuento) => {
-  return limitTo2decimals(subtotal * porcentajeDescuento / 100);
+  return limitTo2decimals((subtotal * porcentajeDescuento) / 100);
 };
 
 const calcularImpuestos = (subtotal, rebaja, porcentajeIVA) => {
-  return limitTo2decimals((subtotal - rebaja) * porcentajeIVA / 100);
+  return limitTo2decimals(((subtotal - rebaja) * porcentajeIVA) / 100);
 };
 const calcularTotal = (subtotal, flete, impuestos, rebaja) => {
   return limitTo2decimals(subtotal + flete + impuestos - rebaja);
@@ -16,23 +16,19 @@ const calcularTotalVentaRow = ventaRow => {
     subtotal,
     flete,
     iva: porcentajeIVA,
-    descuento: porcentajeDescuento,
+    descuento: porcentajeDescuento
   } = ventaRow;
   const rebaja = calcularRebaja(subtotal, porcentajeDescuento);
   const impuestos = calcularImpuestos(subtotal, rebaja, porcentajeIVA);
   return calcularTotal(subtotal, flete, impuestos, rebaja);
 };
 
-const calcularSubtotalImm = facturablesImm => {
-  let subtotal = 0;
-  const len = facturablesImm.size;
-  for (let i = 0; i < len; i++) {
-    const facturableImm = facturablesImm.get(i);
-    const precioVenta = parseFloat(facturableImm.get('precioVenta'));
-    const count = parseInt(facturableImm.get('count'), 10);
-    const recargo = precioVenta * count;
-    subtotal += recargo;
-  }
+const calcularSubtotal = facturables => {
+  const subtotal = facturables.reduce((sub, facturable) => {
+    const precioVenta = parseFloat(facturable.precioVenta);
+    const count = parseInt(facturable.count, 10);
+    return sub + precioVenta * count;
+  }, 0);
   return limitTo2decimals(subtotal);
 };
 
@@ -51,17 +47,17 @@ const calcularValoresTotales = (
     rebaja,
     flete,
     impuestos,
-    total,
+    total
   });
 };
 
-const calcularValoresFacturablesImm = (
-  facturablesImm,
+const calcularValoresFacturables = (
+  facturables,
   flete,
   porcentajeIVA,
   porcentajeDescuento
 ) => {
-  const subtotal = calcularSubtotalImm(facturablesImm);
+  const subtotal = calcularSubtotal(facturables);
   return calcularValoresTotales(
     subtotal,
     flete,
@@ -71,8 +67,8 @@ const calcularValoresFacturablesImm = (
 };
 
 module.exports = {
-  calcularSubtotalImm,
+  calcularSubtotal,
   calcularTotalVentaRow,
-  calcularValoresFacturablesImm,
-  calcularValoresTotales,
+  calcularValoresFacturables,
+  calcularValoresTotales
 };

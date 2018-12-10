@@ -27,7 +27,7 @@ const txtMargin = '35px';
 const codigoTextStyle = {
   width: '90px',
   verticalAlign: 'top',
-  marginRight: txtMargin,
+  marginRight: txtMargin
 };
 
 const fechaStyle = { display: 'inline-block' };
@@ -38,7 +38,7 @@ const CodigoText = props => {
 
   const myProps = {
     hintText: 'Código',
-    style: codigoTextStyle,
+    style: codigoTextStyle
   };
 
   if (ventaKey) {
@@ -59,7 +59,7 @@ const FechaText = props => {
   const myProps = {
     hintText: 'Fecha',
     style: fechaStyle,
-    textFieldStyle: fechaTextStyle,
+    textFieldStyle: fechaTextStyle
   };
 
   myProps.value = data.fecha;
@@ -87,7 +87,7 @@ const ClienteInput = props => {
     return (
       <ClienteAutoComplete
         width={width}
-        errorText={errors.get('cliente')}
+        errorText={errors.cliente}
         onNewItemSelected={onNewCliente}
       />
     );
@@ -222,7 +222,8 @@ export default class FacturaForm extends Component {
                   value={data.descuento}
                   errorText={errors.descuento}
                   onChange={event =>
-                    onDataChanged('descuento', event.target.value)}
+                    onDataChanged('descuento', event.target.value)
+                  }
                   style={{ width: '35px' }}
                   inputStyle={{ textAlign: 'right' }}
                 />
@@ -240,11 +241,12 @@ export default class FacturaForm extends Component {
                   value={data.autorizacion}
                   errorText={errors.autorizacion}
                   onChange={event =>
-                    onDataChanged('autorizacion', event.target.value)}
+                    onDataChanged('autorizacion', event.target.value)
+                  }
                   style={{
                     verticalAlign: 'top',
                     width: '140px',
-                    marginRight: txtMargin,
+                    marginRight: txtMargin
                   }}
                 />
               </td>
@@ -262,7 +264,8 @@ export default class FacturaForm extends Component {
                   filter={AutoComplete.caseInsensitiveFilter}
                   onUpdateInput={text => onDataChanged('formaPago', text)}
                   onNewRequest={chosenReq =>
-                    onDataChanged('formaPago', chosenReq)}
+                    onDataChanged('formaPago', chosenReq)
+                  }
                   style={{ width: '140px' }}
                   textFieldStyle={{ width: '140px' }}
                 />
@@ -279,9 +282,9 @@ FacturaForm.propTypes = {
   data: React.PropTypes.object.isRequired,
   errors: React.PropTypes.object.isRequired,
   onDataChanged: React.PropTypes.func.isRequired,
-  isExamen: React.PropTypes.bool,
+  isExamen: React.PropTypes.bool
 };
 
 FacturaForm.defaultProps = {
-  isExamen: false,
+  isExamen: false
 };

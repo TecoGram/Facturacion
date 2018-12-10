@@ -7,41 +7,44 @@ const DateParser = require('../DateParser.js');
 
 describe('Facturacion Models', () => {
   describe('crearVentaRow', () => {
-    const clienteObj = {
-      ruc: '09455867443001',
+    const clienteRow = {
+      rowid: 1,
+      ruc: '09455867443001'
     };
-    const medicoObj = {
-      nombre: 'John Smith',
+    const medicoRow = {
+      rowid: 1,
+      nombre: 'John Smith'
     };
 
-    const facturaData = Immutable.Map({
+    const facturaData = {
       codigo: '0003235',
       descuento: '10',
       autorizacion: '5962',
       formaPago: 'CONTADO',
       detallado: true,
       flete: '',
-      fecha: new Date(2016, 10, 26),
-    });
+      fecha: new Date(2016, 10, 26)
+    };
 
-    const facturables = Immutable.List.of(
-      Immutable.Map({
+    const facturables = [
+      {
         producto: 1,
         lote: 'asd3',
         fechaExp: DateParser.parseDBDate('2017-02-02'), //Fecha como la pone la DB
         count: 1,
         precioVenta: 10,
-        pagaIva: true,
-      }),
-      Immutable.Map({
+        pagaIva: true
+      },
+      {
         producto: 2,
         lote: 'asd5',
         fechaExp: DateParser.oneYearFromToday(), //fecha como la pone FacturarView por default
         count: 2,
         precioVenta: 20,
-        pagaIva: true,
-      })
-    );
+        pagaIva: true
+      }
+    ];
+
     const unidades = [
       {
         producto: 1,
@@ -49,7 +52,7 @@ describe('Facturacion Models', () => {
         fechaExp: DateParser.parseDBDate('2017-02-02'), //Fecha como la pone la DB
         count: 1,
         precioVenta: 10,
-        pagaIva: true,
+        pagaIva: true
       },
       {
         producto: 2,
@@ -57,26 +60,25 @@ describe('Facturacion Models', () => {
         fechaExp: DateParser.oneYearFromToday(), //fecha como la pone FacturarView por default
         count: 2,
         precioVenta: 20,
-        pagaIva: true,
-      },
+        pagaIva: true
+      }
     ];
 
     const empresa = 'TecoGram';
 
     it('Genera la fila de una venta a partir de un mapa inmutable', () => {
-      const ventaRow = FacturacionModels.crearVentaRow(
-        clienteObj,
-        medicoObj,
+      const ventaRow = FacturacionModels.crearVentaRow({
+        clienteRow,
+        medicoRow,
         facturaData,
         facturables,
         unidades,
         empresa,
-        false,
-        14
-      );
+        isExamen: false,
+        porcentajeIVA: 14
+      });
 
-      
-      expect(ventaRow.cliente).toEqual('09455867443001');
+      expect(ventaRow.cliente).toEqual(1);
       expect(ventaRow.codigo).toEqual('0003235');
       expect(ventaRow.subtotal).toEqual(50);
       expect(ventaRow.descuento).toEqual('10');
@@ -107,16 +109,17 @@ describe('Facturacion Models', () => {
     });
 
     it('Genera la fila de una venta con cero iva y detallado = false si es examen', () => {
-      const ventaRow = FacturacionModels.crearVentaRow(
-        clienteObj,
-        medicoObj,
+      const ventaRow = FacturacionModels.crearVentaRow({
+        clienteRow,
+        medicoRow,
         facturaData,
         facturables,
         unidades,
         empresa,
-        true,
-        14
-      );
+        isExamen: true,
+        porcentajeIVA: 14
+      });
+
       expect(ventaRow.detallado).toBe(false);
       expect(ventaRow.iva).toEqual(0);
     });
@@ -127,20 +130,20 @@ describe('Facturacion Models', () => {
       'Expande la lista de productos facturados para generar ' +
         'filas de unidades vendidas',
       () => {
-        const productos = Immutable.List.of(
-          Immutable.Map({
+        const productos = [
+          {
             rowid: 1,
             count: 3,
             lote: '3456f',
-            fechaExp: '2017-11-26',
-          }),
-          Immutable.Map({
+            fechaExp: '2017-11-26'
+          },
+          {
             rowid: 4,
             count: 2,
             lote: '3tf6f',
-            fechaExp: '2017-11-26',
-          })
-        );
+            fechaExp: '2017-11-26'
+          }
+        ];
 
         const rows = FacturacionModels.crearUnidadesRows(productos);
         expect(rows.length).toEqual(5);
@@ -155,32 +158,27 @@ describe('Facturacion Models', () => {
 
   describe('calcularValores', () => {
     it('agrega los precio de venta multiplicado por la cantidad para calcular rubros de factura', () => {
-      const productos = Immutable.List.of(
-        Immutable.Map({
+      const productos = [
+        {
           rowid: 1,
           count: 3,
           precioVenta: '25.99',
-          pagaIva: true,
-        }),
-        Immutable.Map({
+          pagaIva: true
+        },
+        {
           rowid: 4,
           count: 2,
           precioVenta: '17.99',
-          pagaIva: true,
-        })
-      );
+          pagaIva: true
+        }
+      ];
 
       const {
         subtotal,
         rebaja,
         impuestos,
-        total,
-      } = FacturacionMath.calcularValoresFacturablesImm(
-        productos,
-        2.99,
-        14,
-        10
-      );
+        total
+      } = FacturacionMath.calcularValoresFacturables(productos, 2.99, 14, 10);
 
       expect(subtotal).toEqual(113.95);
       expect(rebaja).toEqual(11.4);
@@ -198,7 +196,7 @@ describe('Facturacion Models', () => {
         pagaIva: true,
         precioDist: 19.99,
         precioVenta: 29.99,
-        codigo: 'asdf',
+        codigo: 'asdf'
       };
 
       const facturable = FacturacionModels.productoAFacturable(producto);
@@ -209,7 +207,10 @@ describe('Facturacion Models', () => {
       expect(facturable).not.toHaveProperty('nombreAscii');
       expect(facturable).toHaveProperty('codigo');
       expect(facturable).toHaveProperty('nombre');
-      expect(facturable).toHaveProperty('precioVenta', '' + producto.precioVenta);
+      expect(facturable).toHaveProperty(
+        'precioVenta',
+        '' + producto.precioVenta
+      );
       expect(facturable).toHaveProperty('fechaExp');
       expect(facturable).toHaveProperty('count', '1');
       expect(facturable).toHaveProperty('lote', '');
@@ -226,7 +227,7 @@ describe('Facturacion Models', () => {
         codigo: 'asdf',
         fechaExp: new Date(),
         count: 1,
-        lote: '',
+        lote: ''
       };
 
       const unidad = FacturacionModels.facturableAUnidad(facturable);

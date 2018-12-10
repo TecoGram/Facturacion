@@ -4,29 +4,29 @@ const {
   insertarVenta,
   updateVenta,
   insertarVentaExamen,
-  updateVentaExamen,
+  updateVentaExamen
 } = require('../api.js');
 const DateParser = require('../DateParser.js');
 const {
   crearVentaRow,
   facturableAUnidad,
-  productoAFacturable,
+  productoAFacturable
 } = require('./Models.js');
 const {
   esFacturablePropValido,
   esFacturaDataPropValido,
   validarVentaRow,
-  validarVentaRowExamen,
+  validarVentaRowExamen
 } = require('../Validacion.js');
 const { parseFormInt, parseFormFloat } = require('../FormNumberPaser.js');
-const { calcularValoresFacturablesImm } = require('./Math.js');
+const { calcularValoresFacturables } = require('./Math.js');
 
 const getDefaultState = () => {
   return {
-    cliente: null,
-    medico: null,
-    errors: Immutable.Map(),
-    facturaData: Immutable.Map({
+    clienteRow: null,
+    medicoRow: null,
+    errors: {},
+    facturaData: {
       codigo: '',
       fecha: new Date(),
       descuento: '',
@@ -34,41 +34,33 @@ const getDefaultState = () => {
       formaPago: '',
       flete: '',
       detallado: true,
-      paciente: '',
-    }),
-    facturables: Immutable.List(),
+      paciente: ''
+    },
+    facturables: []
   };
 };
 
 const agregarProductoComoFacturable = producto => {
   return prevState => {
-    const facturable = Immutable.Map(productoAFacturable(producto));
-    return { facturables: prevState.facturables.push(facturable) };
+    const facturable = productoAFacturable(producto);
+    return { facturables: [...prevState.facturables, facturable] };
   };
 };
 
 const calcularValoresTotales = (
-  facturablesImm,
+  facturables,
   fleteString,
   porcentajeIVA,
   porcentajeDescuentoString
 ) => {
   const flete = parseFormFloat(fleteString);
   const porcentajeDescuento = parseFormInt(porcentajeDescuentoString);
-  return calcularValoresFacturablesImm(
-    facturablesImm,
+  return calcularValoresFacturables(
+    facturables,
     flete,
     porcentajeIVA,
     porcentajeDescuento
   );
-};
-
-const convertirFacturablesImmAUnidades = facturablesImm => {
-  return facturablesImm
-    .map(facturableImm => {
-      return facturableAUnidad(facturableImm.toJS());
-    })
-    .toJS();
 };
 
 const selectGuardarPromise = (editar, isExamen, ventaRow) => {
@@ -86,7 +78,7 @@ const crearGuardarPromiseYMensaje = (editar, isExamen, ventaRow) => {
     errors: null,
     prom,
     msg,
-    ventaRow,
+    ventaRow
   };
 };
 
@@ -96,8 +88,8 @@ const editarFacturaExistente = verVentaResp => {
     return {
       cliente: resp.cliente,
       medico: resp.medico,
-      facturaData: Immutable.fromJS(resp.facturaData),
-      facturables: Immutable.fromJS(resp.facturables),
+      facturaData: resp.facturaData,
+      facturables: resp.facturables
     };
   };
 };
@@ -106,9 +98,11 @@ const modificarValorEnFacturable = (index, propKey, newPropValue) => {
   if (esFacturablePropValido(propKey, newPropValue)) {
     return prevState => {
       const facturables = prevState.facturables;
-      const updatedFacturables = facturables.update(index, facturable =>
-        facturable.set(propKey, newPropValue)
-      );
+      const updatedFacturables = [
+        ...facturables.slice(0, index),
+        { ...facturables[index], [propKey]: newPropValue },
+        ...facturables.slice(index + 1)
+      ];
       return { facturables: updatedFacturables };
     };
   }
@@ -118,37 +112,41 @@ const modificarValorEnFacturable = (index, propKey, newPropValue) => {
 const modificarValorEnFacturaData = (dataKey, newDataValue) => {
   if (!esFacturaDataPropValido(dataKey, newDataValue)) return null;
   return prevState => {
-    return { facturaData: prevState.facturaData.set(dataKey, newDataValue) };
+    const newFacturaData = {
+      ...prevState.facturaData,
+      [dataKey]: newDataValue
+    };
+    return { facturaData: newFacturaData };
   };
 };
 
 const puedeGuardarFactura = (state, isExamen) => {
-  if (!state.cliente) return false;
-  if (state.facturables.isEmpty()) return false;
-  if (isExamen && !state.medico) return false;
+  if (!state.clienteRow) return false;
+  if (state.facturables.length === 0) return false;
+  if (isExamen && !state.medicoRow) return false;
   return true;
 };
 
-const prepararFacturaParaGuardar = (
+const prepararFacturaParaGuardar = ({
   state,
   editar,
   empresa,
   isExamen,
   porcentajeIVA
-) => {
-  const { cliente, medico, facturables, facturaData } = state;
+}) => {
+  const { clienteRow, medicoRow, facturables, facturaData } = state;
 
-  const unidades = convertirFacturablesImmAUnidades(facturables);
-  const ventaRow = crearVentaRow(
-    cliente,
-    medico,
+  const unidades = facturables.map(facturableAUnidad);
+  const ventaRow = crearVentaRow({
+    clienteRow,
+    medicoRow,
     facturaData,
     facturables,
     unidades,
     empresa,
     isExamen,
     porcentajeIVA
-  );
+  });
   const { errors } = isExamen
     ? validarVentaRowExamen(ventaRow)
     : validarVentaRow(ventaRow);
@@ -158,7 +156,12 @@ const prepararFacturaParaGuardar = (
 
 const removeFacturableAt = index => {
   return prevState => {
-    return { facturables: prevState.facturables.remove(index) };
+    return {
+      facturables: [
+        ...facturables.slice(0, index),
+        ...facturables.slice(index + 1)
+      ]
+    };
   };
 };
 
@@ -172,5 +175,5 @@ module.exports = {
   puedeGuardarFactura,
   prepararFacturaParaGuardar,
   removeFacturableAt,
-  selectGuardarPromise,
+  selectGuardarPromise
 };

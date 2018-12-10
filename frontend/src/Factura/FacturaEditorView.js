@@ -8,7 +8,7 @@ import {
   getFacturaURL,
   getFacturaExamenURL,
   verVenta,
-  verVentaExamen,
+  verVentaExamen
 } from '../api';
 import {
   agregarProductoComoFacturable,
@@ -19,7 +19,7 @@ import {
   modificarValorEnFacturable,
   puedeGuardarFactura,
   prepararFacturaParaGuardar,
-  removeFacturableAt,
+  removeFacturableAt
 } from './EditorState';
 
 export default class FacturaEditorView extends Component {
@@ -96,12 +96,11 @@ export default class FacturaEditorView extends Component {
     const isExamen = this.props.isExamen;
     const obtenerFacturaInfo = isExamen ? verVentaExamen : verVenta;
     if (facturaAEditar)
-      obtenerFacturaInfo(
-        facturaAEditar.codigo,
-        facturaAEditar.empresa
-      ).then(resp => {
-        this.setState(editarFacturaExistente(resp));
-      });
+      obtenerFacturaInfo(facturaAEditar.codigo, facturaAEditar.empresa).then(
+        resp => {
+          this.setState(editarFacturaExistente(resp));
+        }
+      );
   }
 
   render() {
@@ -110,9 +109,9 @@ export default class FacturaEditorView extends Component {
     const { isExamen, ventaKey, ajustes } = this.props;
 
     const errorUnidades = errors && errors.unidades;
-    const porcentajeDescuentoString = facturaData.get('descuento');
-    const fleteString = facturaData.get('flete');
-    const detallado = facturaData.get('detallado');
+    const porcentajeDescuentoString = facturaData.descuento;
+    const fleteString = facturaData.flete;
+    const detallado = facturaData.detallado;
     const porcentajeIVA = ajustes.iva;
     const { subtotal, rebaja, impuestos, total } = calcularValoresTotales(
       facturables,
@@ -128,11 +127,11 @@ export default class FacturaEditorView extends Component {
             style={{
               marginTop: '24px',
               marginLeft: '36px',
-              marginRight: '36px',
+              marginRight: '36px'
             }}
           >
             <FacturaForm
-              data={facturaData.toJS()}
+              data={facturaData}
               errors={errors}
               cliente={cliente}
               medico={medico}
@@ -175,10 +174,10 @@ FacturaEditorView.propTypes = {
   isExamen: React.PropTypes.bool,
   ventaKey: React.PropTypes.shape({
     codigo: React.PropTypes.string.isRequired,
-    empresa: React.PropTypes.string.isRequired,
-  }),
+    empresa: React.PropTypes.string.isRequired
+  })
 };
 
 FacturaEditorView.defaultProps = {
-  isExamen: false,
+  isExamen: false
 };

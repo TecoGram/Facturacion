@@ -1,30 +1,27 @@
 const deepFreeze = require('deep-freeze');
 const { oneYearFromToday, toReadableDate } = require('../DateParser.js');
-const { calcularSubtotalImm } = require('./Math.js');
+const { calcularSubtotal } = require('./Math.js');
 
 const FormasDePago = deepFreeze([
   'EFECTIVO',
   'DINERO ELECTRÓNICO',
   'TARJETA DE CRÉDITO/DÉBITO',
   'TRANSFERENCIA',
-  'OTRO',
+  'OTRO'
 ]);
 
-const crearUnidadesRows = facturablesImm => {
-  const len = facturablesImm.size;
-  const unidades = [];
-  for (let i = 0; i < len; i++) {
-    const facturableImm = facturablesImm.get(i);
-    const count = facturableImm.get('count');
-    for (let j = 0; j < count; j++)
-      unidades.push({
-        producto: facturableImm.get('rowid'),
-        lote: facturableImm.get('lote'),
-        fechaExp: facturableImm.get('fechaExp'),
-      });
-  }
-  return unidades;
-};
+const crearUnidadesRows = facturables =>
+  facturables.reduce(
+    (acc, facturable) =>
+      acc.concat(
+        Array(facturable.count).fill({
+          producto: facturable.rowid,
+          lote: facturable.lote,
+          fechaExp: facturable.lote
+        })
+      ),
+    []
+  );
 
 const productoAFacturable = producto => {
   const facturable = Object.assign({}, producto);
@@ -48,34 +45,32 @@ const facturableAUnidad = facturable => {
   return unidad;
 };
 
-const crearVentaRow = (
-  clienteObj,
-  medicoObj,
-  facturaDataImm,
-  facturablesImm,
+const crearVentaRow = ({
+  clienteRow,
+  medicoRow,
+  facturaData,
+  facturables,
   unidades,
   empresa,
   isExamen,
   porcentajeIVA
-) => {
-  const subtotal = calcularSubtotalImm(facturablesImm);
-  let medicoId;
-  if (medicoObj) medicoId = medicoObj.nombre;
+}) => {
+  const subtotal = calcularSubtotal(facturables);
   return {
-    cliente: clienteObj.ruc,
-    codigo: facturaDataImm.get('codigo'),
-    descuento: facturaDataImm.get('descuento'),
+    cliente: (clienteRow || {}).rowid,
+    medico: (medicoRow || {}).rowid,
+    codigo: facturaData.codigo,
+    descuento: facturaData.descuento,
     empresa: empresa,
-    autorizacion: facturaDataImm.get('autorizacion'),
-    formaPago: facturaDataImm.get('formaPago'),
-    fecha: toReadableDate(facturaDataImm.get('fecha')),
-    detallado: isExamen ? false : facturaDataImm.get('detallado'),
-    flete: facturaDataImm.get('flete'),
+    autorizacion: facturaData.autorizacion,
+    formaPago: facturaData.formaPago,
+    fecha: toReadableDate(facturaData.fecha),
+    detallado: isExamen ? false : facturaData.detallado,
+    flete: facturaData.flete,
     iva: isExamen ? 0 : porcentajeIVA,
     subtotal: subtotal,
     unidades: unidades,
-    medico: medicoId,
-    paciente: facturaDataImm.get('paciente'),
+    paciente: facturaData.paciente
   };
 };
 
@@ -84,5 +79,5 @@ module.exports = {
   crearVentaRow,
   facturableAUnidad,
   FormasDePago,
-  productoAFacturable,
+  productoAFacturable
 };

@@ -1,17 +1,17 @@
-const Immutable = require('immutable')
+const Immutable = require('immutable');
 const FacturaEditor = require('./EditorState.js');
 const Models = require('./Models.js');
 const getState = FacturaEditor.getDefaultState;
 
 const crearProducto = () => {
   return {
-    rowid: 0,
+    rowid: 1,
     codigo: 'AA',
     nombre: 'A',
     marca: 'TECO',
     precioDist: 0.99,
     precioVenta: 1.99,
-    pagaIva: true,
+    pagaIva: true
   };
 };
 
@@ -25,7 +25,7 @@ describe('Factura Editor State', () => {
       );
       expect(typeof modificacion).toEqual('function');
       const cambios = modificacion(state);
-      expect(cambios.facturables.size).toEqual(1);
+      expect(cambios.facturables.length).toEqual(1);
     });
   });
 
@@ -44,7 +44,7 @@ describe('Factura Editor State', () => {
         subtotal,
         rebaja,
         impuestos,
-        total,
+        total
       } = FacturaEditor.calcularValoresTotales(
         state.facturables,
         '0.25',
@@ -63,7 +63,7 @@ describe('Factura Editor State', () => {
         subtotal,
         rebaja,
         impuestos,
-        total,
+        total
       } = FacturaEditor.calcularValoresTotales(state.facturables, '', 14, '');
 
       expect(subtotal).toEqual(1.99);
@@ -78,27 +78,27 @@ describe('Factura Editor State', () => {
       const state = getState();
       const verVentaResp = {
         body: {
-          cliente: '0956658756',
+          cliente: { rowid: 1 },
           facturaData: {
             codigo: '004356',
-            fecha: '2017-03-02',
+            fecha: '2017-03-02'
           },
           facturables: [
             {
               nombre: 'A',
               count: 2,
-              fechaExp: '2018-03-02',
-            },
-          ],
-        },
+              fechaExp: '2018-03-02'
+            }
+          ]
+        }
       };
       const modificacion = FacturaEditor.editarFacturaExistente(verVentaResp);
       expect(typeof modificacion).toEqual('function');
 
       const cambios = modificacion(state);
       expect(cambios.cliente).toEqual(verVentaResp.body.cliente);
-      expect(cambios.facturaData).toEqual(expect.any(Immutable.Map));
-      expect(cambios.facturables).toEqual(expect.any(Immutable.List));
+      expect(cambios.facturaData).toEqual(expect.any(Object));
+      expect(cambios.facturables).toEqual(expect.any(Array));
     });
   });
 
@@ -113,7 +113,7 @@ describe('Factura Editor State', () => {
       );
       expect(typeof modificacion).toEqual('function');
       const cambios = modificacion(state);
-      expect(cambios.facturables.get(0).get(propKey)).toEqual(newPropValue);
+      expect(cambios.facturables[0][propKey]).toEqual(newPropValue);
     };
 
     beforeEach(() => {
@@ -162,7 +162,7 @@ describe('Factura Editor State', () => {
       );
       expect(typeof modificacion).toEqual('function');
       const cambios = modificacion(state);
-      expect(cambios.facturaData.get('descuento')).toEqual('50');
+      expect(cambios.facturaData.descuento).toEqual('50');
     });
 
     it('retorna null si se le pasa un valor invalido de descuento', () => {
@@ -178,7 +178,7 @@ describe('Factura Editor State', () => {
     it('retorna true si tiene cliente y por lo menos 1 item facturable', () => {
       const state = getState();
       expect(FacturaEditor.puedeGuardarFactura(state, false)).toBe(false);
-      state.cliente = { ruc: '0956676546' };
+      state.clienteRow = { rowid: 1 };
       expect(FacturaEditor.puedeGuardarFactura(state, false)).toBe(false);
       state.facturables = Immutable.List.of(crearProducto());
       expect(FacturaEditor.puedeGuardarFactura(state, false)).toBe(true);
@@ -187,11 +187,11 @@ describe('Factura Editor State', () => {
     it('en facturas examen, retorna true si tiene cliente, medico y por lo menos 1 item facturable', () => {
       const state = getState();
       expect(FacturaEditor.puedeGuardarFactura(state, true)).toBe(false);
-      state.cliente = { ruc: '0956676546' };
+      state.clienteRow = { rowid: 1 };
       expect(FacturaEditor.puedeGuardarFactura(state, true)).toEqual(false);
-      state.facturables = Immutable.List.of(crearProducto());
+      state.facturables = [crearProducto()];
       expect(FacturaEditor.puedeGuardarFactura(state, true)).toEqual(false);
-      state.medico = { nombre: 'Noguchi' };
+      state.medicoRow = { rowid: 1 };
       expect(FacturaEditor.puedeGuardarFactura(state, true)).toEqual(true);
     });
   });
@@ -208,19 +208,26 @@ describe('Factura Editor State', () => {
       expect(typeof modificacion).toEqual('function');
       const cambios = modificacion(state);
       state.facturables = cambios.facturables;
-      state.cliente = { ruc: '0956676546' };
+      state.clienteRow = { rowid: 1 };
     });
 
     const testAnioInvalido = fechaExp => {
       const facturable = Models.productoAFacturable(crearProducto());
       facturable.fechaExp = fechaExp;
-      state.facturables = state.facturables.push(Immutable.Map(facturable));
+      state.facturaData.formaPago = 'EFECTIVO';
+      state.facturables = [facturable];
+
       const {
         errors,
         ventaRow,
         prom,
-        msg,
-      } = FacturaEditor.prepararFacturaParaGuardar(state, false, 'emp');
+        msg
+      } = FacturaEditor.prepararFacturaParaGuardar({
+        state,
+        editar: false,
+        empresa: 'emp',
+        porcentajeIVA: 12
+      });
 
       expect(ventaRow).toEqual(null);
       expect(prom).toEqual(null);
@@ -232,15 +239,16 @@ describe('Factura Editor State', () => {
     const testAnioValido = fechaExp => {
       const facturable = Models.productoAFacturable(crearProducto());
       facturable.fechaExp = fechaExp;
-      state.facturables = state.facturables.push(Immutable.Map(facturable));
-      const { errors } = FacturaEditor.prepararFacturaParaGuardar(
+      state.facturaData.formaPago = 'EFECTIVO';
+      state.facturables = [facturable];
+      const { errors } = FacturaEditor.prepararFacturaParaGuardar({
         state,
-        false,
-        'emp'
-      );
+        editar: false,
+        empresa: 'emp',
+        porcentajeIVA: 12
+      });
 
-      expect(errors).toEqual(expect.any(Object));
-      expect(errors.unidades).toBeUndefined();
+      expect(errors).toBe(null);
     };
 
     it('retorna unicamente errores si el anio de fecha exp es muy alto', () => {
@@ -261,47 +269,51 @@ describe('Factura Editor State', () => {
         errors,
         ventaRow,
         prom,
-        msg,
-      } = FacturaEditor.prepararFacturaParaGuardar(state, false, 'emp');
+        msg
+      } = FacturaEditor.prepararFacturaParaGuardar({
+        state,
+        editar: false,
+        empresa: 'emp'
+      });
 
       expect(ventaRow).toEqual(null);
       expect(prom).toEqual(null);
       expect(msg).toEqual(null);
       expect(errors).toEqual(expect.any(Object));
       expect(errors.formaPago).toBeTruthy();
-      expect(errors.codigo).toBeTruthy();
     });
 
     it('retorna unicamente prom, msg y ventaRow si logra validar factura nueva', () => {
-      const facturables = Immutable.List.of(
-        Immutable.Map({
+      const facturables = [
+        {
           producto: 1,
           count: '2',
           lote: 'AA',
           fechaExp: '2018-03-02',
-          precioVenta: '12.99',
-        })
-      );
+          precioVenta: '12.99'
+        }
+      ];
 
-      state.facturaData = state.facturaData
-        .set('codigo', '00657')
-        .set('formaPago', 'EFECTIVO')
-        .set('paciente', 'Paul Vaso');
+      state.facturaData = state.facturaData;
+      state.facturaData.codigo = '00657';
+      state.facturaData.formaPago = 'EFECTIVO';
+      state.facturaData.paciente = 'Paul Vaso';
+
       state.facturables = facturables;
-      state.medico = { nombre: 'John Smith' };
+      state.medicoRow = { rowid: 1 };
 
       const {
         errors,
         ventaRow,
         prom,
-        msg,
-      } = FacturaEditor.prepararFacturaParaGuardar(
+        msg
+      } = FacturaEditor.prepararFacturaParaGuardar({
         state,
-        false,
-        'emp',
-        true,
-        14
-      );
+        editar: false,
+        empresa: 'emp',
+        isExamen: true,
+        porcentajeIVA: 12
+      });
 
       expect(errors).toBeNull();
       expect(prom.url.endsWith('/venta_ex/new')).toBe(true);
@@ -312,22 +324,22 @@ describe('Factura Editor State', () => {
     });
 
     it('retorna unicamente prom, msg y ventaRow si logra validar factura editada', () => {
-      state.facturaData = state.facturaData
-        .set('codigo', '00657')
-        .set('formaPago', 'EFECTIVO');
+      state.facturaData.codigo = '00657';
+      state.facturaData.formaPago = 'EFECTIVO';
+      state.medicoRow = { rowid: 1 };
 
       const {
         errors,
         ventaRow,
         prom,
-        msg,
-      } = FacturaEditor.prepararFacturaParaGuardar(
+        msg
+      } = FacturaEditor.prepararFacturaParaGuardar({
         state,
-        true,
-        'emp',
-        false,
-        14
-      );
+        editar: true,
+        empresa: 'emp',
+        isExamen: false,
+        porcentajeIVA: 14
+      });
 
       expect(errors).toBeNull();
       expect(prom.url.endsWith('/venta/update')).toBe(true);

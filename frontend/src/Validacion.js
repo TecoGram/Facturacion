@@ -24,11 +24,11 @@ const eitherErrorsOrInputs = (errors, inputs) => {
   if (isEmptyObj(errors))
     return {
       errors: null,
-      inputs: inputs,
+      inputs: inputs
     };
   return {
     errors: errors,
-    inputs: null,
+    inputs: null
   };
 };
 
@@ -143,6 +143,191 @@ const validarUnidad = unidad => {
   if (typeof lote !== 'string') return 'lote inválido';
   if (!esEnteroValido(count)) return 'cantidad inválida';
   if (!esNumeroValido(precioVenta)) return 'precio de venta inválido';
+};
+
+const array = ({ item }) => (ctx, value) => {
+  if (!value.length || value.length === 0) {
+    return new Error(`${ctx.name} debe ser un arreglo válido, no vacío`);
+  }
+
+  const itemValidatorFn = object({ schema: item });
+  const newValue = value.map((v, index) =>
+    itemValidatorFn({ name: `#${index}` }, v)
+  );
+
+  const itemErrors = newValue.filter(i => i instanceof Error);
+
+  if (itemErrors.length > 0) {
+    const error = itemErrors[0];
+    const index = newValue.indexOf(error);
+    const originalMsg = itemErrors[0].message;
+    return new Error(
+      `Item inválido en "${ctx.name}#${index}" , ${originalMsg}`
+    );
+  }
+
+  return newValue;
+};
+
+const primaryKey = () => (ctx, value) => {
+  if (typeof value !== 'number' || !validator.isInt('' + value, { min: 1 }))
+    return new Error(`"${ctx.name}" debe de ser una clave primaria`);
+
+  return value;
+};
+
+const dateString = () => (ctx, value) => {
+  if (!value) return new Error(`"${ctx.name}" es requerido.`);
+
+  if (
+    typeof value !== 'string' ||
+    !validator.isDate(value) ||
+    !esFechaValida(value)
+  )
+    return new Error(`"${ctx.name}" debe ser una fecha con forma "YYYY-MM-dd"`);
+
+  return value;
+};
+
+const string = ({ fallback } = {}) => (ctx, value) => {
+  if (!value) {
+    if (fallback || fallback === '') return fallback;
+    return new Error(`"${ctx.name}" es requerido`);
+  }
+
+  if (typeof value !== 'string')
+    return new Error(`"${ctx.name}" debe de ser un string`);
+
+  return value;
+};
+
+const bool = () => (ctx, value) => {
+  if (typeof value !== 'boolean')
+    return new Error(`"${ctx.name}" debe de ser boolean`);
+
+  return value;
+};
+
+const either = ({ opts, transform, abrv }) => (ctx, value) => {
+  if (!value)
+    return abrv
+      ? new Error('obligatorio')
+      : new Error(`"${ctx.name}" es obligatorio`);
+  const newValue = transform ? transform(value) : value;
+
+  if (!opts.includes(newValue))
+    return abrv
+      ? new Error('Inválido')
+      : new Error(`"${value}" no es una opción válida para "${ctx.name}"`);
+
+  return newValue;
+};
+
+const int = ({ fallback, max, min, abrv } = {}) => (ctx, value) => {
+  const { name } = ctx;
+
+  if (!value) {
+    if (fallback || fallback === 0) return fallback;
+
+    return abrv
+      ? new Error('Obligatorio')
+      : new Error(`"${name}" es requerido`);
+  }
+
+  if (typeof value === 'string') return int()(ctx, parseInt(value, 10));
+
+  const bounds = max ? { min: min || 0, max: max } : { min: min || 0 };
+  if (typeof value !== 'number' || !validator.isInt('' + value, bounds))
+    return abrv
+      ? new Error('Inválido')
+      : new Error(`"${name}" debe de ser un entero`);
+
+  return value;
+};
+
+const float = ({ fallback, min, max } = {}) => (ctx, value) => {
+  if (!value) {
+    if (fallback || fallback === 0) return fallback;
+    return new Error(`"${ctx.name}" es requerido`);
+  }
+
+  if (typeof value === 'string') return float()(ctx, parseFloat(value, 10));
+
+  const bounds = max ? { min: min || 0, max: max } : { min: min || 0 };
+  if (typeof value !== 'number' || !validator.isFloat('' + value, bounds))
+    return new Error(`"${ctx.name}" debe de ser un float`);
+
+  return value;
+};
+
+const numericString = ({ fallback, abrv, minLen, maxLen } = {}) => (
+  ctx,
+  value
+) => {
+  if (!value) {
+    if (fallback || fallback === '') return fallback;
+
+    return abrv
+      ? new Error(`Obligatorio`)
+      : new Error(`"${ctx.name}" es requerido`);
+  }
+
+  if (typeof value !== 'string')
+    return abrv
+      ? new Error(`Inválido`)
+      : new Error(`"${ctx.name}" debe de ser tipo string`);
+
+  const min = minLen || 1;
+  if (value.length < min || (maxLen && value.length > maxLen))
+    return abrv
+      ? new Error(`Inválido`)
+      : new Error(`"${ctx.name}" debe de ser tipo string`);
+
+  if (!validator.isNumeric(value))
+    return abrv
+      ? new Error(`Inválido`)
+      : new Error(`"${ctx.name}" debe de ser una cadena de dígitos`);
+
+  return value;
+};
+
+const validateObjectWithSchema = (schema, data) => {
+  const keys = Object.keys(schema);
+  return keys.reduce((res, dataKey) => {
+    const validatorFn = schema[dataKey];
+    const rawValue = data[dataKey];
+    res[dataKey] = validatorFn({ name: dataKey }, rawValue);
+    return res;
+  }, {});
+};
+const object = ({ schema }) => (ctx, value) => {
+  const validated = validateObjectWithSchema(schema, value);
+  const errorKey = Object.keys(validated).find(
+    key => validated[key] instanceof Error
+  );
+  if (errorKey) return validated[errorKey];
+
+  return validated;
+};
+
+const validateFormWithSchema = (schema, data) => {
+  const validated = validateObjectWithSchema(schema, data);
+  const output = Object.keys(validated).reduce(
+    (res, key) => {
+      const maybeError = validated[key];
+      if (maybeError instanceof Error) {
+        res.inputs = null;
+        res.errors[key] = maybeError.message;
+      } else if (res.inputs != null) {
+        res.inputs[key] = maybeError;
+      }
+      return res;
+    },
+    { inputs: {}, errors: {} }
+  );
+
+  if (output.inputs != null) output.errors = null;
+  return output;
 };
 
 const validarListaUnidades = (unidades, errors, inputs) => {
@@ -279,59 +464,52 @@ const validarProducto = formData => {
   return eitherErrorsOrInputs(errors, inputs);
 };
 
+const unidadSchema = Object.freeze({
+  producto: primaryKey(),
+  fechaExp: dateString(),
+  lote: string({ fallback: '' }),
+  count: int({ min: 1 }),
+  precioVenta: float()
+});
+
 const validarVentaRow = formData => {
-  const codigo = formData.codigo || '';
-  const fecha = formData.fecha || '';
-  const descuento = formData.descuento || '';
-  const iva = formData.iva;
-  const flete = String(formData.flete || '0');
-  const autorizacion = formData.autorizacion || '';
-  const formaPago = formData.formaPago || '';
-  const cliente = formData.cliente || '';
+  const schema = {
+    codigo: numericString({ fallback: '' }),
+    fecha: dateString(),
+    descuento: int({ fallback: 0, max: 100, abrv: true }),
+    iva: int({ max: 30 }),
+    empresa: string(),
+    flete: float({ fallback: 0 }),
+    subtotal: float({ fallback: 0 }),
+    autorizacion: string({ fallback: '' }),
+    formaPago: either({ opts: FormasDePago, abrv: true }),
+    cliente: primaryKey(),
+    detallado: bool(),
+    unidades: array({ item: unidadSchema })
+  };
 
-  let errors = {};
-  let inputs = {};
-
-  validarCodigoFactura(codigo, errors, inputs);
-  validarFecha(fecha, errors, inputs);
-  validarString(formData.empresa, errors, inputs, 'empresa');
-  validarDescuentoSmall(descuento, errors, inputs);
-  validarPorcentajeIVA(iva, errors, inputs);
-  validarFormaPago(formaPago, errors, inputs);
-  validarRUC(cliente, errors, inputs, 'cliente');
-  validarBoolean(formData.detallado, errors, inputs, 'detallado');
-  validarNumeroIngresado(flete, errors, inputs, 'flete');
-  validarNumeroCalculado(formData.subtotal, errors, inputs, 'subtotal');
-  validarListaUnidades(formData.unidades, errors, inputs);
-  inputs.autorizacion = autorizacion;
-
-  return eitherErrorsOrInputs(errors, inputs);
+  const res = validateFormWithSchema(schema, formData);
+  return res;
 };
 
 const validarVentaRowExamen = formData => {
-  const codigo = formData.codigo || '';
-  const fecha = formData.fecha || '';
-  const descuento = String(formData.descuento || '0');
-  const autorizacion = formData.autorizacion || '';
-  const formaPago = formData.formaPago || '';
-  const cliente = formData.cliente || '';
+  const schema = {
+    codigo: numericString({ fallback: '' }),
+    fecha: dateString(),
+    descuento: int({ fallback: 0, max: 100, abrv: true }),
+    empresa: string(),
+    flete: float({ fallback: 0 }),
+    subtotal: float({ fallback: 0 }),
+    autorizacion: string({ fallback: '' }),
+    formaPago: either({ opts: FormasDePago, abrv: true }),
+    cliente: primaryKey(),
+    medico: primaryKey(),
+    paciente: string(),
+    detallado: bool(),
+    unidades: array({ item: unidadSchema })
+  };
 
-  let errors = {};
-  let inputs = {};
-
-  validarCodigoFactura(codigo, errors, inputs);
-  validarString(formData.empresa, errors, inputs, 'empresa');
-  validarFecha(fecha, errors, inputs);
-  validarDescuentoSmall(descuento, errors, inputs);
-  validarFormaPago(formaPago, errors, inputs);
-  validarRUC(cliente, errors, inputs, 'cliente');
-  validarNumeroCalculado(formData.subtotal, errors, inputs, 'subtotal');
-  validarListaUnidades(formData.unidades, errors, inputs);
-  validarString(formData.paciente, errors, inputs, 'paciente');
-  validarString(formData.medico, errors, inputs, 'medico');
-  inputs.autorizacion = autorizacion;
-
-  return eitherErrorsOrInputs(errors, inputs);
+  return validateFormWithSchema(schema, formData);
 };
 
 const validarBusqueda = (q, limit) => {
@@ -352,5 +530,5 @@ module.exports = {
   validarProducto,
   validarUnidad,
   validarVentaRow,
-  validarVentaRowExamen,
+  validarVentaRowExamen
 };
