@@ -72,7 +72,7 @@ const crearTablaVentas = table => {
   table.float('flete');
   table.float('subtotal').notNullable();
 
-  table.unique(['codigo', 'empresa']);
+  table.index(['codigo', 'empresa']);
   table.foreign('cliente').references('clientes.rowid');
 };
 

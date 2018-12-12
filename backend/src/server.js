@@ -12,9 +12,11 @@ const formatter = require('./responseFormatter.js');
 const {
   validarBusqueda,
   validarCliente,
+  validarClienteUpdate,
   validarMedico,
   validarProducto,
   validarVenta,
+  validarVentaUpdate,
   validarVentaExamen
 } = require('./sanitizationMiddleware.js');
 const { serveTecogram, serveBiocled } = require('./empresaMiddleware.js');
@@ -39,30 +41,12 @@ app.get('/teco', serveTecogram);
 app.get('/biocled', serveBiocled);
 
 app.post('/cliente/new', validarCliente, (req, res) => {
-  const {
-    ruc,
-    nombre,
-    direccion,
-    email,
-    telefono1,
-    telefono2,
-    descDefault
-  } = req.safeData;
-
-  db.insertarCliente(
-    ruc,
-    nombre,
-    direccion,
-    email,
-    telefono1,
-    telefono2,
-    descDefault
-  ).then(
-    function() {
+  db.insertarCliente(req.safeData).then(
+    rowid => {
       //OK!
-      res.status(200).send('OK');
+      res.status(200).send({ rowid });
     },
-    function(err) {
+    err => {
       //ERROR!
       printError('db error: ' + err);
       res.status(422).send(err);
@@ -87,7 +71,7 @@ app.get('/cliente/find', (req, res) => {
   );
 });
 
-app.post('/cliente/update', validarCliente, (req, res) => {
+app.post('/cliente/update', validarClienteUpdate, (req, res) => {
   const {
     ruc,
     nombre,
@@ -104,6 +88,7 @@ app.post('/cliente/update', validarCliente, (req, res) => {
   };
 
   const handleFailiure = function(err) {
+    console.log(err);
     res.status(500).send(err);
   };
 
@@ -408,7 +393,7 @@ app.post(
   handleValidData(data =>
     db
       .insertarVenta(data)
-      .then(() => ({ status: 200, resp: 'OK' }))
+      .then(rowid => ({ status: 200, resp: { rowid } }))
       .catch(err => {
         if (err.errno === CONSTRAINT_ERROR_SQLITE)
           return { status: 400, resp: 'Ya existe una factura con ese código.' };
@@ -432,42 +417,15 @@ app.post(
   )
 );
 
-app.post('/venta/update', validarVenta, (req, res) => {
-  const {
-    codigo,
-    empresa,
-    cliente,
-    fecha,
-    autorizacion,
-    formaPago,
-    detallado,
-    descuento,
-    iva,
-    flete,
-    subtotal,
-    unidades
-  } = req.safeData;
-
-  db.updateVenta(
-    codigo,
-    empresa,
-    cliente,
-    fecha,
-    autorizacion,
-    formaPago,
-    detallado,
-    descuento,
-    iva,
-    flete,
-    subtotal,
-    unidades
-  )
+app.post('/venta/update', validarVentaUpdate, (req, res) => {
+  db.updateVenta(req.safeData)
     .then(function() {
       //OK!
       res.status(200).send('OK');
     })
     .catch(function(error) {
       //ERROR!
+      console.log(error);
       res.status(500);
       res.send(error);
     });

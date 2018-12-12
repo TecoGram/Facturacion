@@ -8,41 +8,36 @@ describe('/cliente/ endpoints', () => {
 
   describe('/cliente/new', () => {
     it('retorna 200 al ingresar datos correctos', async () => {
-      const resp = await api.insertarCliente(
-        '0937816882001',
-        'Dr. Julio Mendoza',
-        'Avenida Juan Tanca Marengo y Gomez Gould',
-        'julio_mendoza@yahoo.com.ec',
-        '2645422',
-        '2876357',
-        '0'
-      );
+      const resp = await api.insertarCliente({
+        ruc: '0937816882001',
+        nombre: 'Dr. Julio Mendoza',
+        direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
+        email: 'julio_mendoza@yahoo.com.ec',
+        telefono1: '2645422',
+        telefono2: '2876357',
+        descDefault: '0',
+        tipo: 1
+      });
       expect(resp.status).toBe(200);
     });
 
     it('retorna 422 al ingresar cliente con un ruc ya existente', () => {
-      const ruc = '0937826892001';
-      return api
-        .insertarCliente(
-          ruc,
-          'Eduardo Villacreses',
+      const cliente = {
+        ruc: '0914816792001',
+        nombre: 'Eduardo Villacreses',
+        direccion:
           'Via a Samborondon km. 7.5 Urbanizacion Tornasol mz. 5 villa 20',
-          'edu_vc@outlook.com',
-          '2854345',
-          '28654768',
-          '5'
-        )
+        email: 'edu_vc@outlook.com',
+        telefono1: '2854345',
+        telefono2: '28654768',
+        descDefault: '5',
+        tipo: 1
+      };
+      return api
+        .insertarCliente(cliente)
         .then(res => {
           expect(res.status).toBe(200);
-          return api.insertarCliente(
-            ruc,
-            'Eduardo Villacreses',
-            'Via a Samborondon km. 7.5 Urbanizacion Tornasol mz. 5 villa 20',
-            'edu_vc@outlook.com',
-            '2854345',
-            '28654768',
-            '5'
-          );
+          return api.insertarCliente(cliente);
         })
         .then(() => Promise.reject(new Error('Expected to fail')))
         .catch(err => {
@@ -58,15 +53,16 @@ describe('/cliente/ endpoints', () => {
 
   describe('/cliente/find', () => {
     it('retorna 200 al encontrar clientes', async () => {
-      const res1 = await api.insertarCliente(
-        '0931816898001',
-        'Xavier Jaramillo',
-        'Pedro Carbo y Sucre',
-        'xjaramillo@gmail.com',
-        '2854345',
-        '28654768',
-        '5'
-      );
+      const res1 = await api.insertarCliente({
+        ruc: '0931816898001',
+        nombre: 'Xavier Jaramillo',
+        direccion: 'Pedro Carbo y Sucre',
+        email: 'xjaramillo@gmail.com',
+        telefono1: '2854345',
+        telefono2: '28654768',
+        descDefault: '5',
+        tipo: 1
+      });
       expect(res1.status).toBe(200);
 
       const res2 = await api.findClientes('xa');
@@ -88,58 +84,66 @@ describe('/cliente/ endpoints', () => {
   });
 
   describe('/cliente/update', () => {
+    let rowid;
     beforeAll(async () => {
-      const res = await api.insertarCliente(
-        '0957126889001',
-        'Dr. Julio Mendoza',
-        'Avenida Juan Tanca Marengo y Gomez Gould',
-        'julio_mendoza@yahoo.com.ec',
-        '2645422',
-        '2876357',
-        '0'
-      );
+      const res = await api.insertarCliente({
+        ruc: '0957126889001',
+        nombre: 'Dr. Julio Mendoza',
+        direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
+        email: 'julio_mendoza@yahoo.com.ec',
+        telefono1: '2645422',
+        telefono2: '2876357',
+        descDefault: '0',
+        tipo: 1
+      });
       expect(res.status).toBe(200);
+      rowid = res.body.rowid;
     });
 
     it('retorna 200 al actualizar un cliente exitosamente', async () => {
-      const res = await api.updateCliente(
-        '0957126889001',
-        'Dr. Julian Mendoza',
-        'Avenida Juan Tanca Marengo y Gomez Gould',
-        'julio_mendoza@yahoo.com.ec',
-        '2645422',
-        '2876357',
-        '0'
-      );
+      const res = await api.updateCliente({
+        rowid,
+        ruc: '0957126889001',
+        nombre: 'Dr. Julian Mendoza',
+        direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
+        email: 'julio_mendoza@yahoo.com.ec',
+        telefono1: '2645422',
+        telefono2: '2876357',
+        descDefault: '0',
+        tipo: 1
+      });
       expect(res.status).toBe(200);
     });
 
     it('retorna 404 al tratar de actualizar un producto inexistente', () =>
       api
-        .updateCliente(
-          '0837126889001',
-          'Dr. Julian Mendoza',
-          'Avenida Juan Tanca Marengo y Gomez Gould',
-          'julio_mendoza@yahoo.com.ec',
-          '2645422',
-          '2876357',
-          '0'
-        )
+        .updateCliente({
+          rowid,
+          ruc: '0837126889001',
+          nombre: 'Dr. Julian Mendoza',
+          direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
+          email: 'julio_mendoza@yahoo.com.ec',
+          telefono1: '2645422',
+          telefono2: '2876357',
+          descDefault: '0',
+          tipo: 1
+        })
         .then(() => Promise.reject('Expected to fail'))
         .catch(({ response: res }) => expect(res.status).toBe(404)));
   });
 
   describe('/cliente/delete', () => {
     beforeAll(async () => {
-      const res = await api.insertarCliente(
-        '0927326569001',
-        'Dr. Julio Mendoza',
-        'Avenida Juan Tanca Marengo y Gomez Gould',
-        'julio_mendoza@yahoo.com.ec',
-        '2645422',
-        '2876357',
-        '0'
-      );
+      const res = await api.insertarCliente({
+        ruc: '0927326569001',
+        nombre: 'Dr. Julio Mendoza',
+        direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
+        email: 'julio_mendoza@yahoo.com.ec',
+        telefono1: '2645422',
+        telefono2: '2876357',
+        descDefault: '0',
+        tipo: 1
+      });
       expect(res.status).toBe(200);
     });
 

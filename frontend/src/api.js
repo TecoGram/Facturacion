@@ -12,49 +12,17 @@ const getFacturaExamenURL = (codigo, empresa) => {
 };
 
 module.exports = {
-  insertarCliente: (
-    ruc,
-    nombre,
-    direccion,
-    email,
-    telefono1,
-    telefono2,
-    descDefault
-  ) => {
+  insertarCliente: row => {
     return request
       .post(prefix + '/cliente/new')
-      .send({
-        ruc: ruc,
-        nombre: nombre,
-        direccion: direccion,
-        email: email,
-        telefono1: telefono1,
-        telefono2: telefono2,
-        descDefault: descDefault
-      })
+      .send(row)
       .set('Accept', 'application/json');
   },
 
-  updateCliente: (
-    ruc,
-    nombre,
-    direccion,
-    email,
-    telefono1,
-    telefono2,
-    descDefault
-  ) => {
+  updateCliente: row => {
     return request
       .post(prefix + '/cliente/update')
-      .send({
-        ruc: ruc,
-        nombre: nombre,
-        direccion: direccion,
-        email: email,
-        telefono1: telefono1,
-        telefono2: telefono2,
-        descDefault: descDefault
-      })
+      .send(row)
       .set('Accept', 'application/json');
   },
 

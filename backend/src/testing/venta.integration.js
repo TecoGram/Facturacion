@@ -15,10 +15,20 @@ const fetchUnidad = async name => {
   return unidad;
 };
 
+const baseClienteRow = Object.freeze({
+  ruc: '0937816882001',
+  nombre: 'Dr. Julio Mendoza',
+  direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
+  email: 'julio_mendoza@yahoo.com.ec',
+  telefono1: '2645422',
+  telefono2: '2876357',
+  descDefault: '0',
+  tipo: 1
+});
 const baseVentaRow = Object.freeze({
   codigo: '9999999',
   empresa: 'TecoGram S.A.',
-  cliente: '0937816882001',
+  cliente: 1,
   fecha: '2016-11-26',
   autorizacion: '',
   formaPago: 'EFECTIVO',
@@ -41,15 +51,7 @@ describe('/venta/ endpoints', () => {
         49.99,
         true
       ),
-      api.insertarCliente(
-        '0937816882001',
-        'Dr. Julio Mendoza',
-        'Avenida Juan Tanca Marengo y Gomez Gould',
-        'julio_mendoza@yahoo.com.ec',
-        '2645422',
-        '2876357',
-        '0'
-      )
+      api.insertarCliente(baseClienteRow)
     ]);
     responses.forEach(res => expect(res.status).toEqual(200));
   });
@@ -84,23 +86,6 @@ describe('/venta/ endpoints', () => {
       });
       expect(res2.status).toBe(200);
     });
-
-    it('retorna 400 al ingresar datos duplicados', async () => {
-      const unidad = await fetchUnidad('Glyco');
-      const newVentaRow = {
-        ...baseVentaRow,
-        codigo: '9999997',
-        unidades: [unidad]
-      };
-
-      const res1 = await api.insertarVenta(newVentaRow);
-      expect(res1.status).toBe(200);
-
-      return api
-        .insertarVenta(newVentaRow)
-        .then(() => Promise.reject('Expected to fail'))
-        .catch(({ response: res }) => expect(res.status).toBe(400));
-    });
   });
 
   describe('/venta/update', () => {
@@ -117,6 +102,7 @@ describe('/venta/ endpoints', () => {
 
       const editedVentaRow = {
         ...newVentaRow,
+        rowid: res1.body.rowid,
         autorization: '12345',
         formaPago: 'TRANSFERENCIA'
       };
@@ -157,7 +143,7 @@ describe('/venta/ endpoints', () => {
         })
       );
       expect(facturables).toHaveLength(1);
-      expect(cliente.ruc).toEqual(ventaRow.cliente);
+      expect(cliente.rowid).toEqual(ventaRow.cliente);
     });
 
     it('retorna 404 si la factura solicitada no existe', () =>

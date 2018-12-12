@@ -189,7 +189,7 @@ const dateString = () => (ctx, value) => {
   return value;
 };
 
-const string = ({ fallback } = {}) => (ctx, value) => {
+const string = ({ fallback, maxLen } = {}) => (ctx, value) => {
   if (!value) {
     if (fallback || fallback === '') return fallback;
     return new Error(`"${ctx.name}" es requerido`);
@@ -197,6 +197,37 @@ const string = ({ fallback } = {}) => (ctx, value) => {
 
   if (typeof value !== 'string')
     return new Error(`"${ctx.name}" debe de ser un string`);
+
+  return value;
+};
+
+const email = ({ fallback } = {}) => (ctx, value) => {
+  if (!value) {
+    if (fallback || fallback === '') return fallback;
+    return new Error(`"${ctx.name}" es requerido`);
+  }
+
+  if (typeof value !== 'string')
+    return new Error(`"${ctx.name}" debe de ser un string`);
+
+  if (!validator.isEmpty(value) && !validator.isEmail(value))
+    errors.email = 'e-mail inválido';
+
+  return value;
+};
+
+const phone = ({ fallback } = {}) => (ctx, value) => {
+  if (!value) {
+    if (fallback || fallback === '') return fallback;
+    return new Error(`"${ctx.name}" es requerido`);
+  }
+
+  if (typeof value !== 'string')
+    return new Error(`"${ctx.name}" debe de ser un string`);
+
+  const invalidPhoneChar = usesCharset(value, phoneCharset);
+  if (invalidPhoneChar)
+    return new Error(`caracter inválido en ${ctx.name}: '${invalidPhoneChar}'`);
 
   return value;
 };
@@ -223,7 +254,8 @@ const either = ({ opts, transform, abrv }) => (ctx, value) => {
   return newValue;
 };
 
-const int = ({ fallback, max, min, abrv } = {}) => (ctx, value) => {
+const int = (args = {}) => (ctx, value) => {
+  const { fallback, max, min, abrv } = args;
   const { name } = ctx;
 
   if (!value) {
@@ -234,7 +266,7 @@ const int = ({ fallback, max, min, abrv } = {}) => (ctx, value) => {
       : new Error(`"${name}" es requerido`);
   }
 
-  if (typeof value === 'string') return int()(ctx, parseInt(value, 10));
+  if (typeof value === 'string') return int(args)(ctx, parseInt(value, 10));
 
   const bounds = max ? { min: min || 0, max: max } : { min: min || 0 };
   if (typeof value !== 'number' || !validator.isInt('' + value, bounds))
@@ -245,7 +277,8 @@ const int = ({ fallback, max, min, abrv } = {}) => (ctx, value) => {
   return value;
 };
 
-const float = ({ fallback, min, max } = {}) => (ctx, value) => {
+const float = (args = {}) => (ctx, value) => {
+  const { fallback, min, max } = args;
   if (!value) {
     if (fallback || fallback === 0) return fallback;
     return new Error(`"${ctx.name}" es requerido`);
@@ -402,29 +435,6 @@ const validarFormaPago = (formaPago, errors, inputs) => {
   else inputs.formaPago = formaPago;
 };
 
-const validarCliente = formData => {
-  const ruc = formData.ruc || '';
-  const nombre = formData.nombre || '';
-  const direccion = formData.direccion || '';
-  const email = formData.email || '';
-  const telefono1 = formData.telefono1 || '';
-  const telefono2 = formData.telefono2 || '';
-  const descDefault = String(formData.descDefault || '0');
-
-  const errors = {};
-  const inputs = {};
-
-  validarRUC(ruc, errors, inputs, 'ruc');
-  validarNombre(nombre, errors, inputs);
-  validarDireccion(direccion, errors, inputs);
-  validarEmail(email, errors, inputs);
-  validarTelefono(telefono1, errors, inputs, 'telefono1');
-  validarTelefono(telefono2, errors, inputs, 'telefono2');
-  validarDescuentoDefault(descDefault, errors, inputs);
-
-  return eitherErrorsOrInputs(errors, inputs);
-};
-
 const validarMedico = formData => {
   const nombre = formData.nombre || '';
   const email = formData.email || '';
@@ -472,25 +482,44 @@ const unidadSchema = Object.freeze({
   precioVenta: float()
 });
 
-const validarVentaRow = formData => {
-  const schema = {
-    codigo: numericString({ fallback: '' }),
-    fecha: dateString(),
-    descuento: int({ fallback: 0, max: 100, abrv: true }),
-    iva: int({ max: 30 }),
-    empresa: string(),
-    flete: float({ fallback: 0 }),
-    subtotal: float({ fallback: 0 }),
-    autorizacion: string({ fallback: '' }),
-    formaPago: either({ opts: FormasDePago, abrv: true }),
-    cliente: primaryKey(),
-    detallado: bool(),
-    unidades: array({ item: unidadSchema })
-  };
-
-  const res = validateFormWithSchema(schema, formData);
-  return res;
+const getSchemaExcludingKeys = (schema, keys) => {
+  const copiedSchema = { ...schema };
+  keys.forEach(key => {
+    delete copiedSchema[key];
+  });
+  return copiedSchema;
 };
+const ventaSchema = {
+  rowid: primaryKey(),
+  codigo: numericString({ fallback: '' }),
+  fecha: dateString(),
+  descuento: int({ fallback: 0, max: 100, abrv: true }),
+  iva: int({ max: 30 }),
+  empresa: string(),
+  flete: float({ fallback: 0 }),
+  subtotal: float({ fallback: 0 }),
+  autorizacion: string({ fallback: '' }),
+  formaPago: either({ opts: FormasDePago, abrv: true }),
+  cliente: primaryKey(),
+  detallado: bool(),
+  unidades: array({ item: unidadSchema })
+};
+
+const ventaInsertSchema = getSchemaExcludingKeys(ventaSchema, ['rowid']);
+
+const clienteRowSchema = {
+  rowid: primaryKey(),
+  ruc: numericString(),
+  nombre: string(),
+  direccion: string({ fallback: '' }),
+  email: email(),
+  telefono1: phone(),
+  telefono2: phone({ fallback: '' }),
+  descDefault: int({ fallback: 0, min: 0, max: 100 }),
+  tipo: either({ opts: [1, 2, 3] })
+};
+
+clienteInsertSchema = getSchemaExcludingKeys(clienteRowSchema, ['rowid']);
 
 const validarVentaRowExamen = formData => {
   const schema = {
@@ -525,10 +554,13 @@ module.exports = {
   esFacturablePropValido,
   esFacturaDataPropValido,
   validarBusqueda,
-  validarCliente,
   validarMedico,
   validarProducto,
   validarUnidad,
-  validarVentaRow,
-  validarVentaRowExamen
+  validarVentaRowExamen,
+  validateFormWithSchema,
+  ventaSchema,
+  ventaInsertSchema,
+  clienteRowSchema,
+  clienteInsertSchema
 };

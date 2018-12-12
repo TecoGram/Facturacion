@@ -1,45 +1,19 @@
 const knex = require('./db.js');
 const convertToAscii = require('normalize-for-search');
 
-const colocarVentaID = (unidades, codigoVenta, empresaVenta) =>
-  unidades.map(u => ({
-    ...u,
-    codigoVenta,
-    empresaVenta
-  }));
+const colocarVentaID = (unidades, ventaId) =>
+  unidades.map(u => ({ ...u, ventaId }));
 
 const insertarVentaBase = (builder, row) => {
   const q = builder.table('ventas').insert(row);
   return q;
 };
 
-const updateVenta = (
-  builder,
-  codigo,
-  empresa,
-  cliente,
-  fecha,
-  autorizacion,
-  formaPago,
-  detallado,
-  descuento,
-  iva,
-  flete,
-  subtotal
-) => {
+const updateVenta = (builder, row) => {
+  const { rowid } = row;
   return builder('ventas')
-    .where({ codigo, empresa })
-    .update({
-      cliente: cliente,
-      fecha: fecha,
-      autorizacion: autorizacion,
-      formaPago: formaPago,
-      detallado: detallado,
-      flete: flete,
-      descuento: descuento,
-      iva: iva,
-      subtotal: subtotal
-    });
+    .where({ rowid })
+    .update(row);
 };
 
 const updateVentaExamen = (
@@ -107,9 +81,9 @@ const deleteCliente = ruc => {
     .del();
 };
 
-const deleteUnidadesVenta = (builder, codigo, empresa) => {
+const deleteUnidadesVenta = (builder, ventaId) => {
   return builder('unidades')
-    .where({ codigoVenta: codigo, empresaVenta: empresa })
+    .where({ ventaId })
     .del();
 };
 
@@ -147,6 +121,7 @@ const findVentas = nombreCliente => {
   const nombreClienteAscii = convertToAscii(nombreCliente);
   return knex
     .select(
+      'ventas.rowid',
       'codigo',
       'empresa',
       'fecha',
@@ -158,12 +133,12 @@ const findVentas = nombreCliente => {
       'flete',
       'detallado',
       'subtotal',
-      'tipo'
+      'ventas.tipo'
     )
     .from('ventas')
-    .join('clientes', { 'ventas.cliente': 'clientes.ruc' })
+    .join('clientes', { 'ventas.cliente': 'clientes.rowid' })
     .where('nombreAscii', 'like', `%${nombreClienteAscii}%`)
-    .where('tipo', 0)
+    .where('ventas.tipo', 0)
     .orderBy('fecha', 'desc')
     .limit(50);
 };
@@ -220,14 +195,14 @@ const findVentasExamen = nombre => {
     .limit(50);
 };
 
-const getCliente = ruc => {
+const getCliente = rowid => {
   return knex
     .select('*')
     .from('clientes')
-    .where('ruc', ruc);
+    .where({ rowid });
 };
 
-const getFacturablesVenta = (codigo, empresa) => {
+const getFacturablesVenta = ventaId => {
   return knex
     .select(
       'productos.nombre',
@@ -242,7 +217,7 @@ const getFacturablesVenta = (codigo, empresa) => {
     )
     .from('unidades')
     .join('productos', { 'unidades.producto': 'productos.rowid' })
-    .where({ codigoVenta: codigo, empresaVenta: empresa });
+    .where({ ventaId });
 };
 
 const getVentaPorTipo = (codigo, empresa, tipo) => {
@@ -271,7 +246,7 @@ const getFacturaData = (codigo, empresa, tipo) => {
     })
     .then(({ cliente, ventaRow }) => {
       if (cliente)
-        return getFacturablesVenta(codigo, empresa).then(facturables => ({
+        return getFacturablesVenta(ventaRow.rowid).then(facturables => ({
           ventaRow: { ...ventaRow, facturables },
           cliente
         }));
@@ -387,26 +362,13 @@ module.exports = {
     return buscarEnTabla('productos', 'nombreAscii', queryStringAscii, limit);
   },
 
-  insertarCliente: (
-    ruc,
-    nombre,
-    direccion,
-    email,
-    telefono1,
-    telefono2,
-    descDefault
-  ) => {
-    const nombreAscii = convertToAscii(nombre);
-    return knex.table('clientes').insert({
-      ruc: ruc,
-      nombreAscii: nombreAscii,
-      nombre: nombre,
-      direccion: direccion,
-      email: email,
-      telefono1: telefono1,
-      telefono2: telefono2,
-      descDefault: descDefault
+  insertarCliente: async row => {
+    const nombreAscii = convertToAscii(row.nombre);
+    const [rowid] = await knex.table('clientes').insert({
+      ...row,
+      nombreAscii
     });
+    return rowid;
   },
 
   findClientes: queryString => {
@@ -442,11 +404,11 @@ module.exports = {
   insertarVenta: venta =>
     knex.transaction(async trx => {
       const { unidades, ...ventaRow } = venta;
-      await insertarVentaBase(trx, { ...ventaRow, tipo: 0 });
+      const [ventaId] = await insertarVentaBase(trx, { ...ventaRow, tipo: 0 });
 
-      const { codigo, empresa } = ventaRow;
-      const unidadesConID = colocarVentaID(unidades, codigo, empresa);
-      return insertarNuevasUnidades(trx, unidadesConID);
+      const unidadesConID = colocarVentaID(unidades, ventaId);
+      await insertarNuevasUnidades(trx, unidadesConID);
+      return ventaId;
     }),
 
   insertarVentaExamen: ventaEx =>
@@ -467,43 +429,16 @@ module.exports = {
       return insertarNuevasUnidades(trx, unidadesConID);
     }),
 
-  updateVenta: (
-    codigo,
-    empresa,
-    cliente,
-    fecha,
-    autorizacion,
-    formaPago,
-    detallado,
-    descuento,
-    iva,
-    flete,
-    subtotal,
-    unidades
-  ) => {
+  updateVenta: args => {
+    const { unidades, ...row } = args;
+    const ventaId = row.rowid;
     return knex.transaction(trx => {
-      return updateVenta(
-        trx,
-        codigo,
-        empresa,
-        cliente,
-        fecha,
-        autorizacion,
-        formaPago,
-        detallado,
-        descuento,
-        iva,
-        flete,
-        subtotal
-      )
+      return updateVenta(trx, row)
         .then(() => {
-          return deleteUnidadesVenta(trx, codigo, empresa);
+          return deleteUnidadesVenta(trx, ventaId);
         })
         .then(() => {
-          return insertarNuevasUnidades(
-            trx,
-            colocarVentaID(unidades, codigo, empresa)
-          );
+          return insertarNuevasUnidades(trx, colocarVentaID(unidades, ventaId));
         });
     });
   },
