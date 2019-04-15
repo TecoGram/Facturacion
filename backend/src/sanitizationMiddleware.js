@@ -2,14 +2,14 @@ const {
   validarBusqueda,
   validarMedico,
   validarProducto,
-  validarVentaRowExamen,
   validateFormWithSchema,
   clienteInsertSchema,
   clienteRowSchema,
   ventaInsertSchema,
-  ventaSchema
+  ventaSchema,
+  ventaExamenInsertSchema,
+  ventaExamenSchema
 } = require('../../frontend/src/Validacion.js');
-const { FormasDePago } = require('../../frontend/src/Factura/Models.js');
 
 const sendBadArgumentsResponse = (res, errors) => {
   res.status(400).send(errors);
@@ -20,15 +20,9 @@ const setSafeData = (req, data) => {
   req.safeData = data;
 };
 
-const parsearNumerosEnUnidades = unidades =>
-  unidades.map(unidad => ({
-    ...unidad,
-    count: Number(unidad.count),
-    precioVenta: Number(unidad.precioVenta)
-  }));
-
 const validationMiddleware = (schema, key = 'body') => (req, res, next) => {
   const { inputs, errors } = validateFormWithSchema(schema, req[key]);
+  //console.log('validacion', req[key], errors);
   if (errors) {
     sendBadArgumentsResponse(res, errors);
   } else {
@@ -79,19 +73,6 @@ module.exports = {
 
   validarVenta: validationMiddleware(ventaInsertSchema),
   validarVentaUpdate: validationMiddleware(ventaSchema),
-  validarVentaExamen: function(req, res, next) {
-    const { inputs, errors } = validarVentaRowExamen(req.body);
-    if (errors) {
-      sendBadArgumentsResponse(res, errors);
-    } else {
-      // eslint-disable-next-line
-      setSafeData(req, {
-        ...inputs,
-        descuento: Number(inputs.descuento),
-        formaPago: FormasDePago.indexOf(inputs.formaPago.toUpperCase()),
-        unidades: parsearNumerosEnUnidades(inputs.unidades)
-      });
-      next();
-    }
-  }
+  validarVentaExamen: validationMiddleware(ventaExamenInsertSchema),
+  validarVentaExamenUpdate: validationMiddleware(ventaExamenSchema)
 };

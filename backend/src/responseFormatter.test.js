@@ -39,7 +39,7 @@ describe('responseFormatter', () => {
         cliente: '0937816882001',
         fecha: '2016-11-26',
         autorizacion: '',
-        formaPago: 0,
+        formaPago: 'efectivo',
         subtotal: 19.99,
         detallado: 1,
         descuento: 0,

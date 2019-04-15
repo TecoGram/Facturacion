@@ -1,4 +1,4 @@
-const { validarCliente } = require('../Validacion.js');
+const { validarClienteInsert } = require('../Validacion.js');
 
 export default class DialogState {
   constructor(props, setStateFunc) {
@@ -15,7 +15,7 @@ export default class DialogState {
   }
 
   validarDatos(inputs) {
-    const { errors, inputs: _inputs } = validarCliente(inputs);
+    const { errors, inputs: _inputs } = validarClienteInsert(inputs);
     if (errors) {
       this.setState({ errors: errors });
       return null;
@@ -38,7 +38,7 @@ export default class DialogState {
 
   mostrarErrorDeServidor(respError) {
     this.setState({
-      serverError: 'Error al almacenar datos: ' + respError.response.text,
+      serverError: 'Error al almacenar datos: ' + respError.response.text
     });
   }
 

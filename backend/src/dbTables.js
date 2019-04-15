@@ -62,8 +62,8 @@ const crearTablaVentas = table => {
   table.integer('cliente');
   table.date('fecha').index();
   table.string('autorizacion', 10);
-  //el valor es un indice de Factura/Models.FormasDePago
-  table.integer('formaPago');
+  //el valor es un codigo caracteres de datil
+  table.string('formaPago');
   table.boolean('detallado');
   //tipo 0 para productos, 1 para examenes
   table.integer('tipo');
@@ -75,6 +75,13 @@ const crearTablaVentas = table => {
   table.index(['codigo', 'empresa']);
   table.foreign('cliente').references('clientes.rowid');
 };
+
+const crearTablaComprobantes = table => {
+  table.increments('rowid').primary();
+  table.integer('ventaId').notNullable();
+
+  table.foreign('ventaId').references('ventas.rowid');
+}
 
 const crearTablaExamenInfo = table => {
   table.integer('medicoId');

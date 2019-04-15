@@ -15,11 +15,11 @@ const fetchUnidad = async name => {
   return unidad;
 };
 
-const baseVentaRow = Object.freeze({
+const baseVentaEx = Object.freeze({
   codigo: '9999999',
   empresa: 'TecoGram S.A.',
-  cliente: '0937816882001',
-  medico: 'Dr. Juan Coronel',
+  cliente: 1,
+  medico: 1,
   paciente: 'Carlos Armijos',
   fecha: '2016-11-26',
   autorizacion: '',
@@ -40,15 +40,16 @@ describe('/venta_ex/ endpoints', () => {
         49.99,
         false
       ),
-      api.insertarCliente(
-        '0937816882001',
-        'Dr. Julio Mendoza',
-        'Avenida Juan Tanca Marengo y Gomez Gould',
-        'julio_mendoza@yahoo.com.ec',
-        '2645422',
-        '2876357',
-        '0'
-      ),
+      api.insertarCliente({
+        ruc: '0937816882001',
+        nombre: 'Dr. Julio Mendoza',
+        direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
+        email: 'julio_mendoza@yahoo.com.ec',
+        telefono1: '2645422',
+        telefono2: '2876357',
+        descDefault: '0',
+        tipo: 1
+      }),
       api.insertarMedico(
         'Dr. Juan Coronel',
         'Avenida Leopoldo Carrera Calvo 493',
@@ -66,7 +67,7 @@ describe('/venta_ex/ endpoints', () => {
     it('retorna 200 al ingresar datos correctos', async () => {
       const unidad = await fetchUnidad('examen');
       const newVentaRow = {
-        ...baseVentaRow,
+        ...baseVentaEx,
         unidades: [unidad]
       };
 
@@ -77,7 +78,7 @@ describe('/venta_ex/ endpoints', () => {
     it('retorna 400 al ingresar datos duplicados', async () => {
       const unidad = await fetchUnidad('examen');
       const newVentaRow = {
-        ...baseVentaRow,
+        ...baseVentaEx,
         codigo: '9999998',
         unidades: [unidad]
       };
@@ -96,16 +97,18 @@ describe('/venta_ex/ endpoints', () => {
     it('retorna 200 al ingresar datos correctos', async () => {
       const unidad = await fetchUnidad('examen');
       const newVentaRow = {
-        ...baseVentaRow,
+        ...baseVentaEx,
         codigo: '9999997',
         unidades: [unidad]
       };
 
       const res1 = await api.insertarVentaExamen(newVentaRow);
       expect(res1.status).toBe(200);
+      const rowid = res1.body.rowid;
 
       const editedVenta = {
         ...newVentaRow,
+        rowid,
         autorizacion: '12345679',
         paciente: 'Vicente Hernandez'
       };
@@ -116,7 +119,7 @@ describe('/venta_ex/ endpoints', () => {
 
   describe('/venta_ex/ver/:empresa/:codigo', () => {
     const ventaRow = {
-      ...baseVentaRow,
+      ...baseVentaEx,
       codigo: '9999996'
     };
 
@@ -147,7 +150,7 @@ describe('/venta_ex/ endpoints', () => {
         })
       );
       expect(facturables).toHaveLength(1);
-      expect(cliente.ruc).toEqual(ventaRow.cliente);
+      expect(cliente.rowid).toEqual(ventaRow.cliente);
     });
 
     it('retorna 404 si la factura solicitada no existe', () =>
@@ -166,7 +169,7 @@ describe('/venta_ex/ endpoints', () => {
       const responses = await Promise.all(
         codigos.map(codigo =>
           api.insertarVentaExamen({
-            ...baseVentaRow,
+            ...baseVentaEx,
             codigo,
             unidades: [unidad]
           })
@@ -192,7 +195,7 @@ describe('/venta_ex/ endpoints', () => {
 
   describe('/venta_ex/delete', () => {
     const ventaRow = {
-      ...baseVentaRow,
+      ...baseVentaEx,
       codigo: '9999990'
     };
     beforeAll(async () => {

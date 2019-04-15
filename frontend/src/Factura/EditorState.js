@@ -15,8 +15,8 @@ const {
 const {
   esFacturablePropValido,
   esFacturaDataPropValido,
-  validarVentaRow,
-  validarVentaRowExamen
+  validarVentaInsert,
+  validarVentaExamenInsert
 } = require('../Validacion.js');
 const { parseFormInt, parseFormFloat } = require('../FormNumberPaser.js');
 const { calcularValoresFacturables } = require('./Math.js');
@@ -148,8 +148,8 @@ const prepararFacturaParaGuardar = ({
     porcentajeIVA
   });
   const { errors } = isExamen
-    ? validarVentaRowExamen(ventaRow)
-    : validarVentaRow(ventaRow);
+    ? validarVentaExamenInsert(ventaRow)
+    : validarVentaInsert(ventaRow);
   if (errors) return { errors, prom: null, msg: null, ventaRow: null };
   else return crearGuardarPromiseYMensaje(editar, isExamen, ventaRow);
 };

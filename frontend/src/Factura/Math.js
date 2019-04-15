@@ -11,6 +11,19 @@ const calcularTotal = (subtotal, flete, impuestos, rebaja) => {
   return limitTo2decimals(subtotal + flete + impuestos - rebaja);
 };
 
+const calcularValoresItem = ({
+  count,
+  precioVenta,
+  porcentajeIVA,
+  descuento
+}) => {
+  const preImporte = limitTo2decimals(count * precioVenta);
+  const rebaja = limitTo2decimals(descuento * preImporte);
+  const importe = limitTo2decimals(preImporte - rebaja);
+  const impuesto = limitTo2decimals(importe * porcentajeIVA);
+  return { importe, impuesto, rebaja };
+};
+
 const calcularTotalVentaRow = ventaRow => {
   const {
     subtotal,
@@ -69,6 +82,7 @@ const calcularValoresFacturables = (
 module.exports = {
   calcularSubtotal,
   calcularTotalVentaRow,
+  calcularValoresItem,
   calcularValoresFacturables,
   calcularValoresTotales
 };

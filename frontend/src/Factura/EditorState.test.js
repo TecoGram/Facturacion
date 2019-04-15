@@ -239,7 +239,7 @@ describe('Factura Editor State', () => {
     const testAnioValido = fechaExp => {
       const facturable = Models.productoAFacturable(crearProducto());
       facturable.fechaExp = fechaExp;
-      state.facturaData.formaPago = 'EFECTIVO';
+      state.facturaData.formaPago = 'efectivo';
       state.facturables = [facturable];
       const { errors } = FacturaEditor.prepararFacturaParaGuardar({
         state,
@@ -296,7 +296,7 @@ describe('Factura Editor State', () => {
 
       state.facturaData = state.facturaData;
       state.facturaData.codigo = '00657';
-      state.facturaData.formaPago = 'EFECTIVO';
+      state.facturaData.formaPago = 'efectivo';
       state.facturaData.paciente = 'Paul Vaso';
 
       state.facturables = facturables;
@@ -325,7 +325,7 @@ describe('Factura Editor State', () => {
 
     it('retorna unicamente prom, msg y ventaRow si logra validar factura editada', () => {
       state.facturaData.codigo = '00657';
-      state.facturaData.formaPago = 'EFECTIVO';
+      state.facturaData.formaPago = 'efectivo';
       state.medicoRow = { rowid: 1 };
 
       const {

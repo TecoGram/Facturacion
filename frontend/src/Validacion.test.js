@@ -8,18 +8,23 @@ describe('Validacion', () => {
         nombre: 'Gustavo Quinteros',
         telefono1: '566543',
         direccion: 'calle 34',
+        email: 'gquinteros@gmail.com',
+        tipo: 1
       };
 
-      const { errors, inputs } = Validacion.validarCliente(cliente);
+      const { errors, inputs } = Validacion.validarClienteInsert(cliente);
 
       expect(errors).toBeNull();
-      expect(inputs.ruc).toEqual(expect.any(String));
-      expect(inputs.nombre).toEqual(expect.any(String));
-      expect(inputs.telefono1).toEqual(expect.any(String));
-      expect(inputs.telefono2).toEqual(expect.any(String));
-      expect(inputs.direccion).toEqual(expect.any(String));
-      expect(inputs.email).toEqual(expect.any(String));
-      expect(inputs.descDefault).toEqual(expect.any(String));
+      expect(inputs).toEqual({
+        ruc: '0954678865001',
+        nombre: 'Gustavo Quinteros',
+        telefono1: '566543',
+        telefono2: '',
+        direccion: 'calle 34',
+        email: 'gquinteros@gmail.com',
+        tipo: 1,
+        descDefault: 0
+      });
     });
   });
 
@@ -29,7 +34,7 @@ describe('Validacion', () => {
         nombre: 'Gustavo Quinteros',
         telefono1: '566543',
         direccion: 'calle 34',
-        comision: '10',
+        comision: '10'
       };
 
       const { errors, inputs } = Validacion.validarMedico(cliente);
@@ -52,7 +57,7 @@ describe('Validacion', () => {
         codigo: 'AD-434',
         precioVenta: '12.99',
         precioFab: '5.99',
-        pagaIva: true,
+        pagaIva: true
       };
 
       const { errors, inputs } = Validacion.validarProducto(producto);
@@ -72,7 +77,7 @@ describe('Validacion', () => {
         codigo: 'AD-434',
         precioVenta: '12.99',
         precioFab: '5.99',
-        pagaIva: true,
+        pagaIva: true
       };
       const res1 = Validacion.validarProducto(producto1);
       expect(res1.inputs.pagaIva).toBe(true);
@@ -82,7 +87,7 @@ describe('Validacion', () => {
         codigo: 'AD-434',
         precioVenta: '12.99',
         precioFab: '5.99',
-        pagaIva: false,
+        pagaIva: false
       };
       const res2 = Validacion.validarProducto(producto2);
       expect(res2.inputs.pagaIva).toBe(false);
@@ -107,7 +112,7 @@ describe('Validacion', () => {
         fechaExp: '2020-01-01',
         lote: 'AD-434',
         count: '1',
-        precioVenta: '12.99',
+        precioVenta: '12.99'
       };
 
       const error = Validacion.validarUnidad(unidad);
@@ -120,7 +125,7 @@ describe('Validacion', () => {
         fechaExp: '2030-01-01',
         lote: 'AD-434',
         count: '1',
-        precioVenta: '12.99',
+        precioVenta: '12.99'
       };
 
       const error = Validacion.validarUnidad(unidad);

@@ -30,6 +30,11 @@ const codigoTextStyle = {
   marginRight: txtMargin
 };
 
+const formasDePagoDataSource = Object.keys(FormasDePago).map(key => ({
+  text: FormasDePago[key],
+  value: key
+}));
+
 const fechaStyle = { display: 'inline-block' };
 const fechaTextStyle = { width: '90px', marginRight: txtMargin };
 
@@ -258,7 +263,7 @@ export default class FacturaForm extends Component {
                 <AutoComplete
                   hintText="Forma de pago"
                   searchText={data.formaPago}
-                  dataSource={FormasDePago}
+                  dataSource={formasDePagoDataSource}
                   openOnFocus={true}
                   errorText={errors.formaPago}
                   filter={AutoComplete.caseInsensitiveFilter}

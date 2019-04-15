@@ -59,8 +59,8 @@ const crearTablaVentas = table => {
   table.integer('cliente');
   table.date('fecha').index();
   table.string('autorizacion', 10);
-  //el valor es un indice de Factura/Models.FormasDePago
-  table.integer('formaPago');
+  //el valor es un key de Factura/Models.FormasDePago
+  table.string('formaPago');
   table.boolean('detallado');
   //tipo 0 para productos, 1 para examenes
   table.integer('tipo');
@@ -103,6 +103,13 @@ const crearTablaUnidades = table => {
     .onDelete('CASCADE');
 };
 
+const crearTablaComprobantes = table => {
+  table.increments('rowid').primary();
+  table.integer('ventaId').notNullable();
+
+  table.foreign('ventaId').references('ventas.rowid');
+}
+
 const copyClientes = async () => {
   const oldClientes = await knex.select().from('clientes');
   const newClientes = oldClientes.map(o => ({
@@ -126,11 +133,22 @@ const copyClientes = async () => {
   return clientesMap;
 };
 
+const convertFormaPagoIndexToKey = index => {
+  switch (index) {
+    case 0: return 'efectivo';
+    case 1: return 'dinero_electronico_ec';
+    case 2: return 'tarjeta_legacy';
+    case 3: return 'transferencias';
+  }
+  return 'otros';
+}
+
 const copyVentas = async clientesMap => {
   const oldVentas = await knex.select().from('ventas');
   const newVentas = oldVentas.map(v => ({
     ...v,
     cliente: clientesMap[v.cliente]
+    formaPago: convertFormaPagoIndexToKey(v.formaPago)
   }));
 
   await insertAsChunks({
@@ -191,6 +209,7 @@ const run = async () => {
     .createTable('temp_ventas', crearTablaVentas)
     .createTable('temp_examen_info', crearTablaExamenInfo)
     .createTable('temp_unidades', crearTablaUnidades);
+    .createTable('comprobantes', crearTablaComprobantes);
   const clientesMap = await copyClientes();
   const ventasMap = await copyVentas(clientesMap);
   await Promise.all([copyExamenInfoRows(ventasMap), copyUnidades(ventasMap)]);

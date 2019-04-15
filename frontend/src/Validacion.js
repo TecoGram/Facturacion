@@ -240,7 +240,7 @@ const bool = () => (ctx, value) => {
 };
 
 const either = ({ opts, transform, abrv }) => (ctx, value) => {
-  if (!value)
+  if (value === undefined || value === null)
     return abrv
       ? new Error('obligatorio')
       : new Error(`"${ctx.name}" es obligatorio`);
@@ -499,7 +499,10 @@ const ventaSchema = {
   flete: float({ fallback: 0 }),
   subtotal: float({ fallback: 0 }),
   autorizacion: string({ fallback: '' }),
-  formaPago: either({ opts: FormasDePago, abrv: true }),
+  formaPago: either({
+    opts: Object.keys(FormasDePago),
+    abrv: true
+  }),
   cliente: primaryKey(),
   detallado: bool(),
   unidades: array({ item: unidadSchema })
@@ -519,27 +522,30 @@ const clienteRowSchema = {
   tipo: either({ opts: [1, 2, 3] })
 };
 
-clienteInsertSchema = getSchemaExcludingKeys(clienteRowSchema, ['rowid']);
+const clienteInsertSchema = getSchemaExcludingKeys(clienteRowSchema, ['rowid']);
 
-const validarVentaRowExamen = formData => {
-  const schema = {
-    codigo: numericString({ fallback: '' }),
-    fecha: dateString(),
-    descuento: int({ fallback: 0, max: 100, abrv: true }),
-    empresa: string(),
-    flete: float({ fallback: 0 }),
-    subtotal: float({ fallback: 0 }),
-    autorizacion: string({ fallback: '' }),
-    formaPago: either({ opts: FormasDePago, abrv: true }),
-    cliente: primaryKey(),
-    medico: primaryKey(),
-    paciente: string(),
-    detallado: bool(),
-    unidades: array({ item: unidadSchema })
-  };
-
-  return validateFormWithSchema(schema, formData);
+const ventaExamenSchema = {
+  rowid: primaryKey(),
+  codigo: numericString({ fallback: '' }),
+  fecha: dateString(),
+  descuento: int({ fallback: 0, max: 100, abrv: true }),
+  empresa: string(),
+  flete: float({ fallback: 0 }),
+  subtotal: float({ fallback: 0 }),
+  autorizacion: string({ fallback: '' }),
+  formaPago: either({
+    opts: Object.keys(FormasDePago),
+    abrv: true
+  }),
+  cliente: primaryKey(),
+  medico: primaryKey(),
+  paciente: string(),
+  unidades: array({ item: unidadSchema })
 };
+
+const ventaExamenInsertSchema = getSchemaExcludingKeys(ventaExamenSchema, [
+  'rowid'
+]);
 
 const validarBusqueda = (q, limit) => {
   const errors = {};
@@ -550,17 +556,28 @@ const validarBusqueda = (q, limit) => {
   return errors;
 };
 
+const validarVentaExamenInsert = data =>
+  validateFormWithSchema(ventaExamenInsertSchema, data);
+const validarVentaInsert = data =>
+  validateFormWithSchema(ventaInsertSchema, data);
+const validarClienteInsert = data =>
+  validateFormWithSchema(clienteInsertSchema, data);
+
 module.exports = {
   esFacturablePropValido,
   esFacturaDataPropValido,
+  validarClienteInsert,
   validarBusqueda,
   validarMedico,
   validarProducto,
   validarUnidad,
-  validarVentaRowExamen,
+  validarVentaInsert,
+  validarVentaExamenInsert,
   validateFormWithSchema,
   ventaSchema,
   ventaInsertSchema,
+  ventaExamenSchema,
+  ventaExamenInsertSchema,
   clienteRowSchema,
   clienteInsertSchema
 };

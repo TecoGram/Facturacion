@@ -8,7 +8,7 @@ describe('FacturaPDF', () => {
         iva: 2,
         descuento: 3,
         flete: 0,
-        formaPago: 0
+        formaPago: 'efectivo'
       };
 
       const expectedMatrix = [

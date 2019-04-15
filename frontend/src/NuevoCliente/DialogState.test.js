@@ -11,9 +11,10 @@ const llenarStateConDatosCorrectos = () => {
     ruc: '0937816882001',
     nombre: 'Dr. Julio Mendoza',
     direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
-    correo: 'julio_mendoza@yahoo.com.ec',
+    email: 'julio_mendoza@yahoo.com.ec',
     telefono1: '2645422',
     telefono2: '2876357',
+    tipo: 1,
     descDefault: '0'
   };
 };

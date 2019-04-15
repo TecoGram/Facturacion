@@ -17,7 +17,8 @@ const {
   validarProducto,
   validarVenta,
   validarVentaUpdate,
-  validarVentaExamen
+  validarVentaExamen,
+  validarVentaExamenUpdate
 } = require('./sanitizationMiddleware.js');
 const { serveTecogram, serveBiocled } = require('./empresaMiddleware.js');
 const CONSTRAINT_ERROR_SQLITE = 19;
@@ -408,8 +409,9 @@ app.post(
   handleValidData(data =>
     db
       .insertarVentaExamen(data)
-      .then(() => ({ status: 200, resp: 'OK' }))
+      .then(rowid => ({ status: 200, resp: { rowid } }))
       .catch(err => {
+        console.log('error ', err);
         if (err.errno === CONSTRAINT_ERROR_SQLITE)
           return { status: 400, resp: 'Ya existe una factura con ese código.' };
         throw err;
@@ -431,39 +433,15 @@ app.post('/venta/update', validarVentaUpdate, (req, res) => {
     });
 });
 
-app.post('/venta_ex/update', validarVentaExamen, (req, res) => {
-  const {
-    codigo,
-    empresa,
-    cliente,
-    fecha,
-    autorizacion,
-    formaPago,
-    subtotal,
-    descuento,
-    unidades,
-    medico,
-    paciente
-  } = req.safeData;
-  db.updateVentaExamen(
-    codigo,
-    empresa,
-    cliente,
-    fecha,
-    autorizacion,
-    formaPago,
-    descuento,
-    subtotal,
-    unidades,
-    medico,
-    paciente
-  )
+app.post('/venta_ex/update', validarVentaExamenUpdate, (req, res) => {
+  db.updateVentaExamen(req.safeData)
     .then(function() {
       //OK!
       res.status(200).send('OK');
     })
     .catch(function(error) {
       //ERROR!
+      console.log('error', error);
       res.status(500);
       res.send(error);
     });
