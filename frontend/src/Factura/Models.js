@@ -15,6 +15,12 @@ const FormasDePago = deepFreeze({
   otros: 'OTRO'
 });
 
+const TiposID = deepFreeze({
+  ruc: 'RUC',
+  cedula: 'CEDULA',
+  consumidor_final: 'CONSUMIDOR FINAL'
+});
+
 const crearUnidadesRows = facturables =>
   facturables.reduce(
     (acc, facturable) =>
@@ -84,5 +90,6 @@ module.exports = {
   crearVentaRow,
   facturableAUnidad,
   FormasDePago,
-  productoAFacturable
+  productoAFacturable,
+  TiposID
 };

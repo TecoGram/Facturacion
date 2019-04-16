@@ -1,10 +1,10 @@
 const {
+  getClienteInsertSchemaByIdType,
+  getClienteRowSchemaByIdType,
   validarBusqueda,
   validarMedico,
   validarProducto,
   validateFormWithSchema,
-  clienteInsertSchema,
-  clienteRowSchema,
   ventaInsertSchema,
   ventaSchema,
   ventaExamenInsertSchema,
@@ -31,6 +31,21 @@ const validationMiddleware = (schema, key = 'body') => (req, res, next) => {
   }
 };
 
+const validarClienteMiddleware = ({ isInsert }) => (req, res, next) => {
+  const { body } = req;
+  const getSchemaFn = isInsert
+    ? getClienteInsertSchemaByIdType
+    : getClienteRowSchemaByIdType;
+  const schema = getSchemaFn(body.tipo);
+  const { inputs, errors } = validateFormWithSchema(schema, body);
+  if (errors) {
+    sendBadArgumentsResponse(res, errors);
+  } else {
+    setSafeData(req, inputs);
+    next();
+  }
+};
+
 module.exports = {
   validarBusqueda: (req, res, next) => {
     const q = req.query.q;
@@ -40,8 +55,8 @@ module.exports = {
     else next();
   },
 
-  validarCliente: validationMiddleware(clienteInsertSchema),
-  validarClienteUpdate: validationMiddleware(clienteRowSchema),
+  validarCliente: validarClienteMiddleware({ isInsert: true }),
+  validarClienteUpdate: validarClienteMiddleware({ isInsert: false }),
 
   validarMedico: function(req, res, next) {
     const { inputs, errors } = validarMedico(req.body);

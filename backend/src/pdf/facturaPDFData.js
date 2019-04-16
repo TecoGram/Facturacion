@@ -1,21 +1,28 @@
 const {
   calcularValoresTotales
 } = require('../../../frontend/src/Factura/Math.js');
-const { FormasDePago } = require('../../../frontend/src/Factura/Models.js');
 
 const generarDetalleOpcionesDePago = (selectedFPKey, totalNumber) => {
   const total = Number(totalNumber).toFixed(2);
-  const tarjetaOptions = ['tarjeta_legacy', 'tarjeta_debito', 'tarjeta_credito'];
+  const tarjetaOptions = [
+    'tarjeta_legacy',
+    'tarjeta_debito',
+    'tarjeta_credito'
+  ];
   return [
-    [ 'EFECTIVO', 'efectivo' === selectedFPKey ? total : null ],
-    [ 'DINERO ELECTRÓNICO', 'dinero_electronico_ec' === selectedFPKey ? total : null ],
-    [ 'TARJETA DE CRÉDITO/DÉBITO', tarjetaOptions.includes(selectedFPKey) ? total : null ],
-    [ 'TRANSFERENCIA', 'transferencia' === selectedFPKey ? total : null ],
-    [ 'OTRO', 'otros' === selectedFPKey ? total : null ],
-  ]
-}
-   
-  
+    ['EFECTIVO', 'efectivo' === selectedFPKey ? total : null],
+    [
+      'DINERO ELECTRÓNICO',
+      'dinero_electronico_ec' === selectedFPKey ? total : null
+    ],
+    [
+      'TARJETA DE CRÉDITO/DÉBITO',
+      tarjetaOptions.includes(selectedFPKey) ? total : null
+    ],
+    ['TRANSFERENCIA', 'transferencia' === selectedFPKey ? total : null],
+    ['OTRO', 'otros' === selectedFPKey ? total : null]
+  ];
+};
 
 const crearMatrizValoresTotales = (
   subtotal,

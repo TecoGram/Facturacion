@@ -4,25 +4,25 @@ describe('Validacion', () => {
   describe('validarCliente', () => {
     it('retorna unicamente "inputs" si el cliente es correcto', () => {
       const cliente = {
-        ruc: '0954678865001',
+        id: '0954678865001',
         nombre: 'Gustavo Quinteros',
         telefono1: '566543',
         direccion: 'calle 34',
         email: 'gquinteros@gmail.com',
-        tipo: 1
+        tipo: 'ruc'
       };
 
       const { errors, inputs } = Validacion.validarClienteInsert(cliente);
 
       expect(errors).toBeNull();
       expect(inputs).toEqual({
-        ruc: '0954678865001',
+        id: '0954678865001',
         nombre: 'Gustavo Quinteros',
         telefono1: '566543',
         telefono2: '',
         direccion: 'calle 34',
         email: 'gquinteros@gmail.com',
-        tipo: 1,
+        tipo: 'ruc',
         descDefault: 0
       });
     });

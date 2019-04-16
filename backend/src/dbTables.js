@@ -26,10 +26,7 @@ const crearTablaStock = table => {
 
 const crearTablaClientes = table => {
   table.integer('rowid').primary();
-  table
-    .string('ruc', 13)
-    .unique()
-    .notNullable();
+  table.string('id', 13).notNullable();
   table
     .string('nombreAscii', 50)
     .notNullable()
@@ -40,8 +37,10 @@ const crearTablaClientes = table => {
   table.string('telefono1', 10);
   table.string('telefono2', 10);
   table.int('descDefault');
-  // 1 para ruc, 2 para cedula
-  table.int('tipo').notNullable();
+  // tipo es un valor de Models.tipoID
+  table.string('tipo').notNullable();
+
+  table.unique(['tipo', 'id']);
 };
 
 const crearTablaMedicos = table => {
@@ -72,7 +71,7 @@ const crearTablaVentas = table => {
   table.float('flete');
   table.float('subtotal').notNullable();
 
-  table.index(['codigo', 'empresa']);
+  table.index(['empresa', 'codigo']);
   table.foreign('cliente').references('clientes.rowid');
 };
 
@@ -81,7 +80,7 @@ const crearTablaComprobantes = table => {
   table.integer('ventaId').notNullable();
 
   table.foreign('ventaId').references('ventas.rowid');
-}
+};
 
 const crearTablaExamenInfo = table => {
   table.integer('medicoId');
@@ -130,6 +129,7 @@ module.exports = {
   borrarTablaVentas,
 
   crearTablaClientes,
+  crearTablaComprobantes,
   crearTablaExamenInfo,
   crearTablaMedicos,
   crearTablaProductos,

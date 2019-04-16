@@ -16,14 +16,14 @@ const fetchUnidad = async name => {
 };
 
 const baseClienteRow = Object.freeze({
-  ruc: '0937816882001',
+  id: '0937816882001',
   nombre: 'Dr. Julio Mendoza',
   direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
   email: 'julio_mendoza@yahoo.com.ec',
   telefono1: '2645422',
   telefono2: '2876357',
   descDefault: '0',
-  tipo: 1
+  tipo: 'ruc'
 });
 const baseVentaRow = Object.freeze({
   codigo: '9999999',
@@ -31,7 +31,7 @@ const baseVentaRow = Object.freeze({
   cliente: 1,
   fecha: '2016-11-26',
   autorizacion: '',
-  formaPago: 'EFECTIVO',
+  formaPago: 'efectivo',
   detallado: false,
   flete: 0,
   subtotal: 19.99,
@@ -104,7 +104,7 @@ describe('/venta/ endpoints', () => {
         ...newVentaRow,
         rowid: res1.body.rowid,
         autorization: '12345',
-        formaPago: 'TRANSFERENCIA'
+        formaPago: 'transferencia'
       };
       const res2 = await api.updateVenta(editedVentaRow);
       expect(res2.status).toBe(200);
@@ -176,9 +176,11 @@ describe('/venta/ endpoints', () => {
 
     it('no permite borrar clientes facturados', () =>
       api
-        .deleteCliente('0937816882001')
+        .deleteCliente('ruc', '0937816882001')
         .then(() => Promise.reject('Expected to fail'))
-        .catch(({ response: res }) => expect(res.status).toBe(400)));
+        .catch(({ response: res }) => {
+          expect(res.status).toBe(400);
+        }));
   });
 
   describe('/venta/find', () => {

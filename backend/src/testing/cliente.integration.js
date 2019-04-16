@@ -9,21 +9,21 @@ describe('/cliente/ endpoints', () => {
   describe('/cliente/new', () => {
     it('retorna 200 al ingresar datos correctos', async () => {
       const resp = await api.insertarCliente({
-        ruc: '0937816882001',
+        id: '0937816882001',
         nombre: 'Dr. Julio Mendoza',
         direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
         email: 'julio_mendoza@yahoo.com.ec',
         telefono1: '2645422',
         telefono2: '2876357',
         descDefault: '0',
-        tipo: 1
+        tipo: 'ruc'
       });
       expect(resp.status).toBe(200);
     });
 
     it('retorna 422 al ingresar cliente con un ruc ya existente', () => {
       const cliente = {
-        ruc: '0914816792001',
+        id: '0914816792001',
         nombre: 'Eduardo Villacreses',
         direccion:
           'Via a Samborondon km. 7.5 Urbanizacion Tornasol mz. 5 villa 20',
@@ -31,7 +31,7 @@ describe('/cliente/ endpoints', () => {
         telefono1: '2854345',
         telefono2: '28654768',
         descDefault: '5',
-        tipo: 1
+        tipo: 'ruc'
       };
       return api
         .insertarCliente(cliente)
@@ -54,14 +54,14 @@ describe('/cliente/ endpoints', () => {
   describe('/cliente/find', () => {
     it('retorna 200 al encontrar clientes', async () => {
       const res1 = await api.insertarCliente({
-        ruc: '0931816898001',
+        id: '0931816898001',
         nombre: 'Xavier Jaramillo',
         direccion: 'Pedro Carbo y Sucre',
         email: 'xjaramillo@gmail.com',
         telefono1: '2854345',
         telefono2: '28654768',
         descDefault: '5',
-        tipo: 1
+        tipo: 'ruc'
       });
       expect(res1.status).toBe(200);
 
@@ -87,14 +87,14 @@ describe('/cliente/ endpoints', () => {
     let rowid;
     beforeAll(async () => {
       const res = await api.insertarCliente({
-        ruc: '0957126889001',
+        id: '0957126889001',
         nombre: 'Dr. Julio Mendoza',
         direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
         email: 'julio_mendoza@yahoo.com.ec',
         telefono1: '2645422',
         telefono2: '2876357',
         descDefault: '0',
-        tipo: 1
+        tipo: 'ruc'
       });
       expect(res.status).toBe(200);
       rowid = res.body.rowid;
@@ -103,14 +103,14 @@ describe('/cliente/ endpoints', () => {
     it('retorna 200 al actualizar un cliente exitosamente', async () => {
       const res = await api.updateCliente({
         rowid,
-        ruc: '0957126889001',
+        id: '0957126889001',
         nombre: 'Dr. Julian Mendoza',
         direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
         email: 'julio_mendoza@yahoo.com.ec',
         telefono1: '2645422',
         telefono2: '2876357',
         descDefault: '0',
-        tipo: 1
+        tipo: 'ruc'
       });
       expect(res.status).toBe(200);
     });
@@ -119,14 +119,14 @@ describe('/cliente/ endpoints', () => {
       api
         .updateCliente({
           rowid,
-          ruc: '0837126889001',
+          id: '0837126889001',
           nombre: 'Dr. Julian Mendoza',
           direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
           email: 'julio_mendoza@yahoo.com.ec',
           telefono1: '2645422',
           telefono2: '2876357',
           descDefault: '0',
-          tipo: 1
+          tipo: 'ruc'
         })
         .then(() => Promise.reject('Expected to fail'))
         .catch(({ response: res }) => expect(res.status).toBe(404)));
@@ -135,26 +135,26 @@ describe('/cliente/ endpoints', () => {
   describe('/cliente/delete', () => {
     beforeAll(async () => {
       const res = await api.insertarCliente({
-        ruc: '0927326569001',
+        id: '0927326569001',
         nombre: 'Dr. Julio Mendoza',
         direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
         email: 'julio_mendoza@yahoo.com.ec',
         telefono1: '2645422',
         telefono2: '2876357',
         descDefault: '0',
-        tipo: 1
+        tipo: 'ruc'
       });
       expect(res.status).toBe(200);
     });
 
     it('retorna 200 al borrar un cliente exitosamente', async () => {
-      const res = await api.deleteCliente('0927326569001');
+      const res = await api.deleteCliente('ruc', '0927326569001');
       expect(res.status).toBe(200);
     });
 
     it('retorna 404 al borrar un cliente inexistente', () =>
       api
-        .deleteCliente('0933333333001')
+        .deleteCliente('ruc', '0933333333001')
         .then(() => Promise.reject('Expected to fail'))
         .catch(({ response: res }) => expect(res.status).toBe(404)));
   });

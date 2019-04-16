@@ -30,8 +30,8 @@ module.exports = {
     return request.get(prefix + '/cliente/find?q=' + queryString).send();
   },
 
-  deleteCliente: ruc => {
-    return request.post(prefix + `/cliente/delete/${ruc}`).send();
+  deleteCliente: (tipo, id) => {
+    return request.post(prefix + `/cliente/delete/${tipo}/${id}`).send();
   },
 
   insertarMedico: (

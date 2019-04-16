@@ -23,7 +23,7 @@ const baseVentaEx = Object.freeze({
   paciente: 'Carlos Armijos',
   fecha: '2016-11-26',
   autorizacion: '',
-  formaPago: 'EFECTIVO',
+  formaPago: 'efectivo',
   subtotal: 19.99,
   descuento: 0
 });
@@ -41,14 +41,14 @@ describe('/venta_ex/ endpoints', () => {
         false
       ),
       api.insertarCliente({
-        ruc: '0937816882001',
+        id: '0937816882001',
         nombre: 'Dr. Julio Mendoza',
         direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
         email: 'julio_mendoza@yahoo.com.ec',
         telefono1: '2645422',
         telefono2: '2876357',
         descDefault: '0',
-        tipo: 1
+        tipo: 'ruc'
       }),
       api.insertarMedico(
         'Dr. Juan Coronel',
@@ -58,7 +58,7 @@ describe('/venta_ex/ endpoints', () => {
         '2448272',
         '2885685'
       )
-    ]);
+    ]).catch(err => console.log('setup error: ' + err));
     responses.forEach(res => expect(res.status).toEqual(200));
   });
   afterAll(server.destroy);

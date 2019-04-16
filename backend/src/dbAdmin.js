@@ -74,9 +74,9 @@ const deleteProducto = rowid => {
     .del();
 };
 
-const deleteCliente = ruc => {
+const deleteCliente = (tipo, id) => {
   return knex('clientes')
-    .where({ ruc })
+    .where({ tipo, id })
     .del();
 };
 
@@ -122,7 +122,7 @@ const findVentas = nombreCliente => {
       'codigo',
       'empresa',
       'fecha',
-      'ruc',
+      'clientes.id',
       'nombre',
       'iva',
       'descuento',
@@ -147,7 +147,7 @@ const findAllVentas = nombreCliente => {
       'codigo',
       'empresa',
       'fecha',
-      'ruc',
+      'clientes.id',
       'nombre',
       'iva',
       'descuento',
@@ -158,7 +158,7 @@ const findAllVentas = nombreCliente => {
       'tipo'
     )
     .from('ventas')
-    .join('clientes', { 'ventas.cliente': 'clientes.ruc' })
+    .join('clientes', { 'ventas.cliente': 'clientes.rowid' })
     .where('nombreAscii', 'like', `%${nombreClienteAscii}%`)
     .orderBy('fecha', 'desc')
     .limit(50);
@@ -303,28 +303,13 @@ const updateProducto = (
     });
 };
 
-const updateCliente = (
-  ruc,
-  nombre,
-  direccion,
-  email,
-  telefono1,
-  telefono2,
-  descDefault
-) => {
+const updateCliente = row => {
+  const { nombre, tipo, id } = row;
   const nombreAscii = convertToAscii(nombre);
   return knex
     .table('clientes')
-    .where({ ruc })
-    .update({
-      nombreAscii: nombreAscii,
-      nombre: nombre,
-      direccion: direccion,
-      email: email,
-      telefono1: telefono1,
-      telefono2: telefono2,
-      descDefault: descDefault
-    });
+    .where({ tipo, id })
+    .update({ ...row, nombreAscii });
 };
 
 module.exports = {

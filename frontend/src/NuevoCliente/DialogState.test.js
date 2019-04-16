@@ -8,13 +8,13 @@ const setStateFunc = arg => {
 
 const llenarStateConDatosCorrectos = () => {
   state.inputs = {
-    ruc: '0937816882001',
+    id: '0937816882001',
     nombre: 'Dr. Julio Mendoza',
     direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
     email: 'julio_mendoza@yahoo.com.ec',
     telefono1: '2645422',
     telefono2: '2876357',
-    tipo: 1,
+    tipo: 'ruc',
     descDefault: '0'
   };
 };

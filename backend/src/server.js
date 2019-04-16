@@ -28,7 +28,7 @@ const facturaDir = pdfutils.createTemporaryDir('facturas/');
 
 const printError = errorString => {
   //don't print errors in tests. Tests should print errors from the response
-  if (process.env.NODE_ENV !== 'test') console.error(errorString);
+  if (process.env.NODE_ENV !== 'integration') console.error(errorString);
 };
 
 const app = Express();
@@ -73,39 +73,28 @@ app.get('/cliente/find', (req, res) => {
 });
 
 app.post('/cliente/update', validarClienteUpdate, (req, res) => {
-  const {
-    ruc,
-    nombre,
-    direccion,
-    email,
-    telefono1,
-    telefono2,
-    descDefault
-  } = req.safeData;
-
   const handleSuccess = function(updateCount) {
     if (updateCount === 0) res.status(404).send('Cliente no encontrado');
     else res.status(200).send('Cliente actualizado');
   };
 
   const handleFailiure = function(err) {
+    if (err.errno === CONSTRAINT_ERROR_SQLITE)
+      res
+        .status(400)
+        .send('Error: El identificador del cliente debe ser único.');
+
     console.log(err);
     res.status(500).send(err);
   };
 
-  db.updateCliente(
-    ruc,
-    nombre,
-    direccion,
-    email,
-    telefono1,
-    telefono2,
-    descDefault
-  ).then(handleSuccess, handleFailiure);
+  db.updateCliente(req.safeData).then(handleSuccess, handleFailiure);
 });
 
-app.post('/cliente/delete/:id', (req, res) => {
-  const ruc = req.params.id;
+app.post('/cliente/delete/:tipo/:id', (req, res) => {
+  const { params } = req;
+  const tipo = params.tipo || '';
+  const id = params.id || '';
 
   const handleSuccess = function(deleteCount) {
     if (deleteCount === 0) res.status(404).send('Cliente no encontrado');
@@ -120,7 +109,7 @@ app.post('/cliente/delete/:id', (req, res) => {
     else res.status(422).send(err);
   };
 
-  db.deleteCliente(ruc).then(handleSuccess, handleFailiure);
+  db.deleteCliente(tipo, id).then(handleSuccess, handleFailiure);
 });
 
 app.post('/medico/new', validarMedico, (req, res) => {

@@ -1,5 +1,5 @@
 const validator = require('validator');
-const { FormasDePago } = require('./Factura/Models.js');
+const { FormasDePago, TiposID } = require('./Factura/Models.js');
 
 const campo_obligatorio = 'Este campo es obligatorio';
 const campo_obligatorio_min = 'obligatorio';
@@ -293,7 +293,7 @@ const float = (args = {}) => (ctx, value) => {
   return value;
 };
 
-const numericString = ({ fallback, abrv, minLen, maxLen } = {}) => (
+const numericString = ({ fallback, abrv, len, minLen, maxLen } = {}) => (
   ctx,
   value
 ) => {
@@ -311,10 +311,18 @@ const numericString = ({ fallback, abrv, minLen, maxLen } = {}) => (
       : new Error(`"${ctx.name}" debe de ser tipo string`);
 
   const min = minLen || 1;
-  if (value.length < min || (maxLen && value.length > maxLen))
+  if (len && value.length !== len)
     return abrv
       ? new Error(`Inválido`)
-      : new Error(`"${ctx.name}" debe de ser tipo string`);
+      : new Error(`"${ctx.name}" debe tener exactamente ${len} caracteres.`);
+  else if (maxLen && value.length > maxLen)
+    return abrv
+      ? new Error(`Inválido`)
+      : new Error(`"${ctx.name}" debe de tener menos de ${maxLen} caracteres.`);
+  else if (value.length < minLen)
+    return abrv
+      ? new Error(`Inválido`)
+      : new Error(`"${ctx.name}" debe de tener más de ${mon} caracteres.`);
 
   if (!validator.isNumeric(value))
     return abrv
@@ -512,14 +520,14 @@ const ventaInsertSchema = getSchemaExcludingKeys(ventaSchema, ['rowid']);
 
 const clienteRowSchema = {
   rowid: primaryKey(),
-  ruc: numericString(),
+  id: numericString(),
   nombre: string(),
   direccion: string({ fallback: '' }),
   email: email(),
   telefono1: phone(),
   telefono2: phone({ fallback: '' }),
   descDefault: int({ fallback: 0, min: 0, max: 100 }),
-  tipo: either({ opts: [1, 2, 3] })
+  tipo: either({ opts: Object.keys(TiposID) })
 };
 
 const clienteInsertSchema = getSchemaExcludingKeys(clienteRowSchema, ['rowid']);
@@ -556,14 +564,42 @@ const validarBusqueda = (q, limit) => {
   return errors;
 };
 
+const getExpectedIDLength = idType => {
+  switch (idType) {
+    case 'ruc':
+      return 13;
+    case 'cedula':
+      return 10;
+  }
+  // retorna undefined si recibe tipo desconocido
+  // porque no hay limite
+};
+
+const getClienteInsertSchemaByIdType = idType => {
+  const len = getExpectedIDLength(idType);
+  return {
+    ...clienteInsertSchema,
+    id: numericString({ len })
+  };
+};
+
+const getClienteRowSchemaByIdType = idType => {
+  const len = getExpectedIDLength(idType);
+  return {
+    ...clienteRowSchema,
+    id: numericString({ len })
+  };
+};
 const validarVentaExamenInsert = data =>
   validateFormWithSchema(ventaExamenInsertSchema, data);
 const validarVentaInsert = data =>
   validateFormWithSchema(ventaInsertSchema, data);
 const validarClienteInsert = data =>
-  validateFormWithSchema(clienteInsertSchema, data);
+  validateFormWithSchema(getClienteInsertSchemaByIdType(data.tipo), data);
 
 module.exports = {
+  getClienteInsertSchemaByIdType,
+  getClienteRowSchemaByIdType,
   esFacturablePropValido,
   esFacturaDataPropValido,
   validarClienteInsert,
