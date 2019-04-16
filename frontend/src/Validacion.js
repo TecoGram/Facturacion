@@ -436,13 +436,6 @@ const validarFecha = (fecha, errors, inputs) => {
   else inputs.fecha = fecha;
 };
 
-const validarFormaPago = (formaPago, errors, inputs) => {
-  if (validator.isEmpty(formaPago)) errors.formaPago = campo_obligatorio_min;
-  else if (!FormasDePago.includes(formaPago.toUpperCase()))
-    errors.formaPago = invalido;
-  else inputs.formaPago = formaPago;
-};
-
 const validarMedico = formData => {
   const nombre = formData.nombre || '';
   const email = formData.email || '';
@@ -490,6 +483,14 @@ const unidadSchema = Object.freeze({
   precioVenta: float()
 });
 
+const pagoSchema = Object.freeze({
+  formaPago: either({
+    opts: Object.keys(FormasDePago),
+    abrv: true
+  }),
+  valor: float()
+});
+
 const getSchemaExcludingKeys = (schema, keys) => {
   const copiedSchema = { ...schema };
   keys.forEach(key => {
@@ -506,13 +507,11 @@ const ventaSchema = {
   empresa: string(),
   flete: float({ fallback: 0 }),
   subtotal: float({ fallback: 0 }),
+  guia: string({ fallback: '' }),
   autorizacion: string({ fallback: '' }),
-  formaPago: either({
-    opts: Object.keys(FormasDePago),
-    abrv: true
-  }),
   cliente: primaryKey(),
   detallado: bool(),
+  pagos: array({ item: pagoSchema }),
   unidades: array({ item: unidadSchema })
 };
 
@@ -541,13 +540,11 @@ const ventaExamenSchema = {
   flete: float({ fallback: 0 }),
   subtotal: float({ fallback: 0 }),
   autorizacion: string({ fallback: '' }),
-  formaPago: either({
-    opts: Object.keys(FormasDePago),
-    abrv: true
-  }),
+  guia: string({ fallback: '' }),
   cliente: primaryKey(),
   medico: primaryKey(),
   paciente: string(),
+  pagos: array({ item: pagoSchema }),
   unidades: array({ item: unidadSchema })
 };
 

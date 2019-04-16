@@ -1,6 +1,6 @@
 const deepFreeze = require('deep-freeze');
 const { oneYearFromToday, toReadableDate } = require('../DateParser.js');
-const { calcularSubtotal } = require('./Math.js');
+const { calcularValoresTotales, calcularSubtotal } = require('./Math.js');
 
 const FormasDePago = deepFreeze({
   efectivo: 'EFECTIVO',
@@ -66,18 +66,26 @@ const crearVentaRow = ({
   isExamen,
   porcentajeIVA
 }) => {
+  const { descuento, formaPago } = facturaData;
+  const flete = facturaData.flete || 0;
   const subtotal = calcularSubtotal(facturables);
+  const { total: valor } = calcularValoresTotales(
+    subtotal,
+    flete,
+    porcentajeIVA,
+    descuento
+  );
   return {
     cliente: (clienteRow || {}).rowid,
     medico: (medicoRow || {}).rowid,
     codigo: facturaData.codigo,
-    descuento: facturaData.descuento,
+    descuento: descuento,
     empresa: empresa,
     autorizacion: facturaData.autorizacion,
-    formaPago: facturaData.formaPago,
+    pagos: [{ formaPago, valor }],
     fecha: toReadableDate(facturaData.fecha),
     detallado: isExamen ? false : facturaData.detallado,
-    flete: facturaData.flete,
+    flete: flete,
     iva: isExamen ? 0 : porcentajeIVA,
     subtotal: subtotal,
     unidades: unidades,

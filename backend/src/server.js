@@ -385,6 +385,7 @@ app.post(
       .insertarVenta(data)
       .then(rowid => ({ status: 200, resp: { rowid } }))
       .catch(err => {
+        console.log('venta err', err);
         if (err.errno === CONSTRAINT_ERROR_SQLITE)
           return { status: 400, resp: 'Ya existe una factura con ese código.' };
         throw err;

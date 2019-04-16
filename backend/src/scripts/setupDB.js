@@ -14,6 +14,7 @@ const {
   crearTablaMedicos,
   crearTablaProductos,
   crearTablaStock,
+  crearTablaPagos,
   crearTablaUnidades,
   crearTablaVentas
 } = require('../dbTables.js');
@@ -26,6 +27,7 @@ const crearTablas = () =>
     .createTable('ventas', crearTablaVentas)
     .createTable('stock', crearTablaStock)
     .createTable('examen_info', crearTablaExamenInfo)
+    .createTable('pagos', crearTablaPagos)
     .createTable('unidades', crearTablaUnidades);
 
 const borrarTodasLasFilas = () =>

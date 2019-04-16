@@ -31,12 +31,12 @@ const baseVentaRow = Object.freeze({
   cliente: 1,
   fecha: '2016-11-26',
   autorizacion: '',
-  formaPago: 'efectivo',
   detallado: false,
   flete: 0,
   subtotal: 19.99,
   descuento: 0,
-  iva: 12
+  iva: 12,
+  pagos: [{ formaPago: 'efectivo', valor: 22.39 }]
 });
 
 describe('/venta/ endpoints', () => {

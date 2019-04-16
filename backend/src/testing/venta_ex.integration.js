@@ -23,7 +23,7 @@ const baseVentaEx = Object.freeze({
   paciente: 'Carlos Armijos',
   fecha: '2016-11-26',
   autorizacion: '',
-  formaPago: 'efectivo',
+  pagos: [{ formaPago: 'efectivo', valor: 22.39 }],
   subtotal: 19.99,
   descuento: 0
 });

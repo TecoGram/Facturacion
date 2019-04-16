@@ -61,8 +61,7 @@ const crearTablaVentas = table => {
   table.integer('cliente');
   table.date('fecha').index();
   table.string('autorizacion', 10);
-  //el valor es un codigo caracteres de datil
-  table.string('formaPago');
+  table.string('guia', 20);
   table.boolean('detallado');
   //tipo 0 para productos, 1 para examenes
   table.integer('tipo');
@@ -75,11 +74,26 @@ const crearTablaVentas = table => {
   table.foreign('cliente').references('clientes.rowid');
 };
 
+const crearTablaPagos = table => {
+  table.integer('ventaId').notNullable();
+  //el valor es un codigo caracteres de datil
+  table.string('formaPago', 15);
+  table.float('valor');
+
+  table
+    .foreign('ventaId')
+    .references('ventas.rowid')
+    .onDelete('CASCADE');
+};
+
 const crearTablaComprobantes = table => {
   table.increments('rowid').primary();
   table.integer('ventaId').notNullable();
 
-  table.foreign('ventaId').references('ventas.rowid');
+  table
+    .foreign('ventaId')
+    .references('ventas.rowid')
+    .onDelete('CASCADE');
 };
 
 const crearTablaExamenInfo = table => {
@@ -134,6 +148,7 @@ module.exports = {
   crearTablaMedicos,
   crearTablaProductos,
   crearTablaStock,
+  crearTablaPagos,
   crearTablaUnidades,
   crearTablaVentas
 };

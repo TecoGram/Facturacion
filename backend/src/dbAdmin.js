@@ -16,31 +16,8 @@ const updateVenta = (builder, row) => {
     .update(row);
 };
 
-const updateVentaExamen = (
-  builder,
-  codigo,
-  empresa,
-  cliente,
-  fecha,
-  autorizacion,
-  formaPago,
-  descuento,
-  subtotal
-) => {
-  return updateVenta(
-    builder,
-    codigo,
-    empresa,
-    cliente,
-    fecha,
-    autorizacion,
-    formaPago,
-    false,
-    descuento,
-    0,
-    0,
-    subtotal
-  );
+const updateVentaExamen = (builder, row) => {
+  return updateVenta(builder, { ...row, detallado: false, tipo: 0, iva: 0 });
 };
 
 const updateExamenInfo = (builder, { ventaId, medicoId, paciente }) => {
@@ -84,6 +61,16 @@ const deleteUnidadesVenta = (builder, ventaId) => {
   return builder('unidades')
     .where({ ventaId })
     .del();
+};
+
+const deletePagosVenta = (builder, ventaId) => {
+  return builder('pagos')
+    .where({ ventaId })
+    .del();
+};
+
+const insertarPagos = (builder, pagos) => {
+  return builder.table('pagos').insert(pagos);
 };
 
 const insertarNuevasUnidades = (builder, listaDeUnidades) => {
@@ -312,6 +299,9 @@ const updateCliente = row => {
     .update({ ...row, nombreAscii });
 };
 
+const insertarPagosPorVenta = (trx, ventaId, pagos) =>
+  insertarPagos(trx, pagos.map(p => ({ ...p, ventaId })));
+
 module.exports = {
   close: () => {
     knex.destroy();
@@ -382,17 +372,18 @@ module.exports = {
 
   insertarVenta: venta =>
     knex.transaction(async trx => {
-      const { unidades, ...ventaRow } = venta;
+      const { unidades, pagos, ...ventaRow } = venta;
       const [ventaId] = await insertarVentaBase(trx, { ...ventaRow, tipo: 0 });
 
       const unidadesConID = colocarVentaID(unidades, ventaId);
+      await insertarPagosPorVenta(trx, ventaId, pagos);
       await insertarNuevasUnidades(trx, unidadesConID);
       return ventaId;
     }),
 
   insertarVentaExamen: ventaEx =>
     knex.transaction(async trx => {
-      const { unidades, medico: medicoId, paciente, ...venta } = ventaEx;
+      const { unidades, medico: medicoId, paciente, pagos, ...venta } = ventaEx;
       const ventaRow = {
         ...venta,
         detallado: false,
@@ -403,32 +394,39 @@ module.exports = {
       const [ventaId] = await insertarVentaBase(trx, ventaRow);
       const unidadesConID = colocarVentaID(unidades, ventaId);
       await insertarExamenInfo(trx, { medicoId, paciente, ventaId });
+      await insertarPagosPorVenta(trx, ventaId, pagos);
       await insertarNuevasUnidades(trx, unidadesConID);
       return ventaId;
     }),
 
-  updateVenta: args => {
-    const { unidades, ...row } = args;
-    const ventaId = row.rowid;
-    return knex.transaction(trx => {
-      return updateVenta(trx, row)
-        .then(() => {
-          return deleteUnidadesVenta(trx, ventaId);
-        })
-        .then(() => {
-          return insertarNuevasUnidades(trx, colocarVentaID(unidades, ventaId));
-        });
+  updateVenta: venta => {
+    return knex.transaction(async trx => {
+      const { unidades, pagos, ...row } = venta;
+      const ventaId = row.rowid;
+      await updateVenta(trx, row);
+      await deleteUnidadesVenta(trx, ventaId);
+      await deletePagosVenta(trx, ventaId);
+      await insertarNuevasUnidades(trx, colocarVentaID(unidades, ventaId));
+      await insertarPagosPorVenta(trx, ventaId, pagos);
     });
   },
 
   updateVentaExamen: ventaEx => {
     return knex.transaction(async trx => {
-      const { unidades, medico: medicoId, paciente, ...ventaExRow } = ventaEx;
+      const {
+        unidades,
+        medico: medicoId,
+        paciente,
+        pagos,
+        ...ventaExRow
+      } = ventaEx;
       const { rowid: ventaId } = ventaExRow;
       await updateVentaExamen(trx, ventaExRow);
       await deleteUnidadesVenta(trx, ventaId);
+      await deletePagosVenta(trx, ventaId);
       await updateExamenInfo(trx, { medicoId, paciente, ventaId });
-      insertarNuevasUnidades(trx, colocarVentaID(unidades, ventaId));
+      await insertarNuevasUnidades(trx, colocarVentaID(unidades, ventaId));
+      await insertarPagosPorVenta(trx, ventaId, pagos);
     });
   },
 

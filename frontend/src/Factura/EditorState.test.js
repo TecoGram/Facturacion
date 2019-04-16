@@ -279,8 +279,11 @@ describe('Factura Editor State', () => {
       expect(ventaRow).toEqual(null);
       expect(prom).toEqual(null);
       expect(msg).toEqual(null);
-      expect(errors).toEqual(expect.any(Object));
-      expect(errors.formaPago).toBeTruthy();
+      expect(errors).toEqual(
+        expect.objectContaining({
+          iva: expect.any(String)
+        })
+      );
     });
 
     it('retorna unicamente prom, msg y ventaRow si logra validar factura nueva', () => {
