@@ -1,13 +1,80 @@
 const knex = require('../db.js');
+const { crearTablaClientes, crearTablaMedicos } = require('../dbTables.js');
 const {
-  crearTablaClientes,
-  crearTablaMedicos,
-  crearTablaVentas,
-  crearTablaExamenInfo,
-  crearTablaUnidades,
-  crearTablaComprobantes
-} = require('../dbTables.js');
+  calcularTotalVentaRow
+} = require('../../../frontend/src/Factura/Math.js');
 
+const crearTablaVentas = table => {
+  table.integer('rowid').primary();
+  table.string('codigo', 10);
+  table.string('empresa', 10).notNullable();
+  table.integer('cliente');
+  table.date('fecha').index();
+  table.string('autorizacion', 10);
+  table.string('guia', 20);
+  table.boolean('detallado');
+  //tipo 0 para productos, 1 para examenes
+  table.integer('tipo');
+  table.integer('descuento');
+  table.integer('iva');
+  table.float('flete');
+  table.float('subtotal').notNullable();
+
+  table.index(['empresa', 'codigo']);
+  table.foreign('cliente').references('temp_clientes.rowid');
+};
+
+const crearTablaPagos = table => {
+  table.integer('ventaId').notNullable();
+  //el valor es un codigo caracteres de datil
+  table.string('formaPago', 15);
+  table.float('valor');
+
+  table
+    .foreign('ventaId')
+    .references('temp_ventas.rowid')
+    .onDelete('CASCADE');
+};
+
+const crearTablaComprobantes = table => {
+  table.increments('rowid').primary();
+  table.integer('ventaId').notNullable();
+
+  table
+    .foreign('ventaId')
+    .references('temp_ventas.rowid')
+    .onDelete('CASCADE');
+};
+
+const crearTablaExamenInfo = table => {
+  table.integer('medicoId');
+  table.integer('ventaId');
+  table.string('paciente', 50);
+  table.string('pacienteAscii', 50);
+
+  table.foreign('medicoId').references('temp_medicos.rowid');
+  table
+    .foreign('ventaId')
+    .references('rowid')
+    .inTable('temp_ventas')
+    .onDelete('CASCADE');
+};
+
+const crearTablaUnidades = table => {
+  table.integer('producto');
+  table.integer('ventaId');
+  table.string('lote', 10);
+  table.float('precioVenta');
+  table.integer('count');
+  table.date('fechaExp');
+
+  table.foreign('producto').references('productos.rowid');
+  table
+    .foreign('ventaId')
+    .references('rowid')
+    .inTable('temp_ventas')
+    .onDelete('CASCADE');
+};
 /* eslint-disable fp/no-let, fp/no-loops, fp/no-mutation */
 const splitIntoChunks = (array, maxSize) => {
   let copied = 0;
@@ -31,9 +98,10 @@ const insertAsChunks = ({ array, tableName, maxSize }) => {
 
 const copyClientes = async () => {
   const oldClientes = await knex.select().from('clientes');
-  const newClientes = oldClientes.map(o => ({
-    ...o,
-    tipo: o.ruc.length === 13 ? 'ruc' : 'cedula'
+  const newClientes = oldClientes.map(({ ruc, ...c }) => ({
+    ...c,
+    tipo: ruc.length === 13 ? 'ruc' : 'cedula',
+    id: ruc
   }));
 
   await insertAsChunks({
@@ -46,7 +114,7 @@ const copyClientes = async () => {
     .select(['rowid', 'id'])
     .from('temp_clientes');
   const clientesMap = insertedClientes.reduce((res, row) => {
-    return { ...res, [row.ruc]: row.rowid };
+    return { ...res, [row.id]: row.rowid };
   }, {});
 
   return clientesMap;
@@ -68,16 +136,15 @@ const convertFormaPagoIndexToKey = index => {
 
 const copyVentas = async clientesMap => {
   const oldVentas = await knex.select().from('ventas');
-  const newVentas = oldVentas.map(v => ({
+  const newVentas = oldVentas.map(({ formaPago, ...v }) => ({
     ...v,
-    cliente: clientesMap[v.cliente],
-    formaPago: convertFormaPagoIndexToKey(v.formaPago)
+    cliente: clientesMap[v.cliente]
   }));
 
   await insertAsChunks({
     array: newVentas,
     tableName: 'temp_ventas',
-    maxSize: 80
+    maxSize: 3
   });
 
   const insertedVentas = await knex
@@ -86,6 +153,19 @@ const copyVentas = async clientesMap => {
   const ventasMap = insertedVentas.reduce((res, row) => {
     return { ...res, [row.empresa + row.codigo]: row.rowid };
   }, {});
+
+  const pagos = oldVentas.map(v => ({
+    ventaId: ventasMap[v.empresa + v.codigo],
+    formaPago: convertFormaPagoIndexToKey(v.formaPago),
+    valor: calcularTotalVentaRow(v)
+  }));
+
+  await insertAsChunks({
+    array: pagos,
+    tableName: 'pagos',
+    maxSize: 300
+  });
+
   return ventasMap;
 };
 
@@ -132,6 +212,7 @@ const run = async () => {
     .createTable('temp_ventas', crearTablaVentas)
     .createTable('temp_examen_info', crearTablaExamenInfo)
     .createTable('temp_unidades', crearTablaUnidades)
+    .createTable('pagos', crearTablaPagos)
     .createTable('comprobantes', crearTablaComprobantes);
   const clientesMap = await copyClientes();
   const ventasMap = await copyVentas(clientesMap);
