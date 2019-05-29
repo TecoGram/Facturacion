@@ -2,17 +2,17 @@ const formatter = require('./responseFormatter.js');
 
 describe('responseFormatter', () => {
   describe('formatFindVentas', () => {
-    it("Recibe un array de objetos con campo 'total' y formatea este campo para que solo tenga 2 numeros decimales.", () => {
+    it("Recibe un array de objetos con campo 'subtotal' y formatea este campo para mostrar dolares con 2 numeros decimales.", () => {
       const arr = [
-        { subtotal: 23.34596, iva: 12, descuento: 0, flete: 0, detallado: 0 },
+        { subtotal: 233459, iva: 12, descuento: 0, flete: 0, detallado: 0 },
         {
-          subtotal: 12.5612,
+          subtotal: 125612,
           iva: 12,
           descuento: 0,
           flete: 0,
           detallado: false
         },
-        { subtotal: 657.9998, iva: 12, descuento: 0, flete: 0, detallado: 1 }
+        { subtotal: 6579998, iva: 12, descuento: 0, flete: 0, detallado: 1 }
       ];
       const formatted = formatter.findVentas(arr);
 
@@ -40,7 +40,7 @@ describe('responseFormatter', () => {
         fecha: '2016-11-26',
         autorizacion: '',
         formaPago: 'efectivo',
-        subtotal: 19.99,
+        subtotal: 199900,
         detallado: 1,
         descuento: 0,
         iva: 2,
@@ -49,7 +49,7 @@ describe('responseFormatter', () => {
           {
             nombre: 'TGO 8x50',
             count: 1,
-            precioVenta: 11,
+            precioVenta: 110000,
             lote: 'ert3',
             fechaExp: '2017-04-04'
           }
@@ -73,9 +73,9 @@ describe('responseFormatter', () => {
         autorizacion: '',
         descuento: '0',
         detallado: true,
-        flete: '0',
+        flete: '0.00',
         formaPago: 'EFECTIVO',
-        subtotal: 19.99,
+        subtotal: '19.99',
         total: '20.39',
         medico: undefined,
         paciente: undefined
@@ -93,7 +93,7 @@ describe('responseFormatter', () => {
         {
           nombre: 'TGO 8x50',
           count: '1',
-          precioVenta: '11',
+          precioVenta: '11.00',
           lote: 'ert3',
           fechaExp: '2017-04-04'
         }

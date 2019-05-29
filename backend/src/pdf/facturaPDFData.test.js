@@ -4,7 +4,7 @@ describe('FacturaPDF', () => {
   describe('fromVentaRow', () => {
     it('coloca la matriz de valores totales y un array con el detalle de formas de pago a una instancia de ventaRow', () => {
       const ventaRow = {
-        subtotal: 10,
+        subtotal: 100000,
         iva: 2,
         descuento: 3,
         flete: 0,
@@ -31,7 +31,7 @@ describe('FacturaPDF', () => {
       const facturaPDFData = FacturaPDFData.fromVentaRow(ventaRow);
       expect(facturaPDFData.matrizValoresTotales).toEqual(expectedMatrix);
       expect(facturaPDFData.formasDePago).toEqual(expectedFormasDePago);
-      expect(facturaPDFData.total).toEqual(9.89);
+      expect(facturaPDFData.total).toEqual(98940);
     });
   });
 });

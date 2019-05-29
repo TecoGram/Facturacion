@@ -6,8 +6,8 @@ const crearTablaProductos = table => {
   table.string('nombreAscii', 50);
   table.string('nombre', 50);
   table.string('marca', 30);
-  table.float('precioDist');
-  table.float('precioVenta');
+  table.integer('precioDist');
+  table.integer('precioVenta');
   table.boolean('pagaIva');
 
   table.unique('nombre');
@@ -36,7 +36,7 @@ const crearTablaClientes = table => {
   table.string('email', 10);
   table.string('telefono1', 10);
   table.string('telefono2', 10);
-  table.int('descDefault');
+  table.integer('descDefault');
   // tipo es un valor de Models.tipoID
   table.string('tipo').notNullable();
 
@@ -67,8 +67,8 @@ const crearTablaVentas = table => {
   table.integer('tipo');
   table.integer('descuento');
   table.integer('iva');
-  table.float('flete');
-  table.float('subtotal').notNullable();
+  table.integer('flete');
+  table.integer('subtotal').notNullable();
 
   table.index(['empresa', 'codigo']);
   table.foreign('cliente').references('clientes.rowid');
@@ -78,7 +78,7 @@ const crearTablaPagos = table => {
   table.integer('ventaId').notNullable();
   //el valor es un codigo caracteres de datil
   table.string('formaPago', 15);
-  table.float('valor');
+  table.integer('valor');
 
   table
     .foreign('ventaId')
@@ -114,7 +114,7 @@ const crearTablaUnidades = table => {
   table.integer('producto');
   table.integer('ventaId');
   table.string('lote', 10);
-  table.float('precioVenta');
+  table.integer('precioVenta');
   table.integer('count');
   table.date('fechaExp');
 

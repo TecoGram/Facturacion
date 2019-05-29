@@ -12,8 +12,8 @@ describe('/producto/ endpoints', () => {
         'rytertg663433g',
         'Glyco',
         'TECO',
-        39.99,
-        49.99,
+        399900,
+        499900,
         true
       );
       expect(res.status).toEqual(200);
@@ -21,7 +21,7 @@ describe('/producto/ endpoints', () => {
     });
 
     it('retorna 422 al ingresar producto con un nombre ya existente', () =>
-      api.insertarProducto('34tger5', 'Glyco', 'TECO', 39.99, 49.99, true).then(
+      api.insertarProducto('34tger5', 'Glyco', 'TECO', 399900, 499900, true).then(
         () => Promise.reject(new Error('expected to fail')),
         ({ response: res }) => {
           expect(res.status).toBe(422);
@@ -37,16 +37,16 @@ describe('/producto/ endpoints', () => {
           'rytertg663433g',
           'TGO 8x50',
           'TECO',
-          39.99,
-          49.99,
+          399900,
+          499900,
           true
         ),
         api.insertarProducto(
           'rytertg663433g',
           'TGP 8x50',
           'TECO',
-          39.99,
-          49.99,
+          399900,
+          499900,
           true
         )
       ]);
@@ -85,8 +85,8 @@ describe('/producto/ endpoints', () => {
         'ryt126s4',
         'HCG',
         'TECO',
-        39.99,
-        49.99,
+        399900,
+        499900,
         true
       );
       expect(res.status).toBe(200);
@@ -99,8 +99,8 @@ describe('/producto/ endpoints', () => {
         'ryt126s4',
         'HCG',
         'TECO',
-        39.99,
-        49.99,
+        399900,
+        499900,
         true
       );
       expect(res.status).toBe(200);
@@ -108,7 +108,7 @@ describe('/producto/ endpoints', () => {
 
     it('retorna 404 al tratar de actualizar un producto inexistente', () =>
       api
-        .updateProducto(998, 'ryt126s4', 'HCG', 'TECO', 39.99, 49.99, true)
+        .updateProducto(998, 'ryt126s4', 'HCG', 'TECO', 399900, 499900, true)
         .then(() => Promise.reject('Expected to fail'))
         .catch(({ response: res }) => expect(res.status).toBe(404)));
   });
@@ -120,8 +120,8 @@ describe('/producto/ endpoints', () => {
         'ryt126s4',
         'HCG Tirilla',
         'TECO',
-        39.99,
-        49.99,
+        399900,
+        499900,
         true
       );
       expect(res.status).toBe(200);

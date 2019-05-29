@@ -1,6 +1,7 @@
 const deepFreeze = require('deep-freeze');
 const { oneYearFromToday, toReadableDate } = require('../DateParser.js');
 const { calcularValoresTotales, calcularSubtotal } = require('./Math.js');
+const Money = require('./Money.js');
 
 const FormasDePago = deepFreeze({
   efectivo: 'EFECTIVO',
@@ -42,7 +43,7 @@ const productoAFacturable = producto => {
   delete facturable.nombreAscii;
   facturable.lote = '';
   facturable.count = '1';
-  facturable.precioVenta = '' + producto.precioVenta;
+  facturable.precio = Money.print(producto.precioVenta);
   facturable.fechaExp = toReadableDate(oneYearFromToday());
   return facturable;
 };
@@ -64,7 +65,7 @@ const crearVentaRow = ({
   unidades,
   empresa,
   isExamen,
-  porcentajeIVA
+  iva
 }) => {
   const { descuento, formaPago } = facturaData;
   const flete = facturaData.flete || 0;
@@ -72,7 +73,7 @@ const crearVentaRow = ({
   const { total: valor } = calcularValoresTotales(
     subtotal,
     flete,
-    porcentajeIVA,
+    iva,
     descuento
   );
   return {
@@ -86,7 +87,7 @@ const crearVentaRow = ({
     fecha: toReadableDate(facturaData.fecha),
     detallado: isExamen ? false : facturaData.detallado,
     flete: flete,
-    iva: isExamen ? 0 : porcentajeIVA,
+    iva: isExamen ? 0 : iva,
     subtotal: subtotal,
     unidades: unidades,
     paciente: facturaData.paciente

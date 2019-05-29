@@ -1,5 +1,3 @@
-const Immutable = require('immutable');
-
 const {
   insertarVenta,
   updateVenta,
@@ -18,8 +16,9 @@ const {
   validarVentaInsert,
   validarVentaExamenInsert
 } = require('../Validacion.js');
-const { parseFormInt, parseFormFloat } = require('../FormNumberPaser.js');
+const { parseFormInt } = require('../FormNumberPaser.js');
 const { calcularValoresFacturables } = require('./Math.js');
+const Money = require('./Money.js');
 
 const getDefaultState = () => {
   return {
@@ -50,17 +49,12 @@ const agregarProductoComoFacturable = producto => {
 const calcularValoresTotales = (
   facturables,
   fleteString,
-  porcentajeIVA,
+  iva,
   porcentajeDescuentoString
 ) => {
-  const flete = parseFormFloat(fleteString);
-  const porcentajeDescuento = parseFormInt(porcentajeDescuentoString);
-  return calcularValoresFacturables(
-    facturables,
-    flete,
-    porcentajeIVA,
-    porcentajeDescuento
-  );
+  const flete = Money.fromString(fleteString);
+  const descuento = parseFormInt(porcentajeDescuentoString);
+  return calcularValoresFacturables(facturables, flete, iva, descuento);
 };
 
 const selectGuardarPromise = (editar, isExamen, ventaRow) => {
@@ -132,7 +126,7 @@ const prepararFacturaParaGuardar = ({
   editar,
   empresa,
   isExamen,
-  porcentajeIVA
+  iva
 }) => {
   const { clienteRow, medicoRow, facturables, facturaData } = state;
 
@@ -145,7 +139,7 @@ const prepararFacturaParaGuardar = ({
     unidades,
     empresa,
     isExamen,
-    porcentajeIVA
+    iva
   });
   const { errors } = isExamen
     ? validarVentaExamenInsert(ventaRow)
@@ -156,6 +150,7 @@ const prepararFacturaParaGuardar = ({
 
 const removeFacturableAt = index => {
   return prevState => {
+    const { facturables } = prevState;
     return {
       facturables: [
         ...facturables.slice(0, index),

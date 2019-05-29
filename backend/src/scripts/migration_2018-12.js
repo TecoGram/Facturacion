@@ -4,6 +4,19 @@ const {
   calcularTotalVentaRow
 } = require('../../../frontend/src/Factura/Math.js');
 
+const crearTablaProductos = table => {
+  table.integer('rowid').primary();
+  table.string('codigo', 10);
+  table.string('nombreAscii', 50);
+  table.string('nombre', 50);
+  table.string('marca', 30);
+  table.integer('precioDist');
+  table.integer('precioVenta');
+  table.boolean('pagaIva');
+
+  table.unique('nombre');
+};
+
 const crearTablaVentas = table => {
   table.integer('rowid').primary();
   table.string('codigo', 10);
@@ -17,8 +30,8 @@ const crearTablaVentas = table => {
   table.integer('tipo');
   table.integer('descuento');
   table.integer('iva');
-  table.float('flete');
-  table.float('subtotal').notNullable();
+  table.integer('flete');
+  table.integer('subtotal').notNullable();
 
   table.index(['empresa', 'codigo']);
   table.foreign('cliente').references('temp_clientes.rowid');
@@ -28,7 +41,7 @@ const crearTablaPagos = table => {
   table.integer('ventaId').notNullable();
   //el valor es un codigo caracteres de datil
   table.string('formaPago', 15);
-  table.float('valor');
+  table.integer('valor');
 
   table
     .foreign('ventaId')
@@ -64,11 +77,14 @@ const crearTablaUnidades = table => {
   table.integer('producto');
   table.integer('ventaId');
   table.string('lote', 10);
-  table.float('precioVenta');
+  table.integer('precioVenta');
   table.integer('count');
   table.date('fechaExp');
 
-  table.foreign('producto').references('productos.rowid');
+  table
+    .foreign('producto')
+    .references('rowid')
+    .inTable('temp_productos');
   table
     .foreign('ventaId')
     .references('rowid')
@@ -134,11 +150,15 @@ const convertFormaPagoIndexToKey = index => {
   return 'otros';
 };
 
+const float2int = f => Math.floor(f * 10000);
+
 const copyVentas = async clientesMap => {
   const oldVentas = await knex.select().from('ventas');
   const newVentas = oldVentas.map(({ formaPago, ...v }) => ({
     ...v,
-    cliente: clientesMap[v.cliente]
+    cliente: clientesMap[v.cliente],
+    flete: float2int(v.flete),
+    subtotal: float2int(v.subtotal)
   }));
 
   await insertAsChunks({
@@ -189,24 +209,43 @@ const copyExamenInfoRows = async ventasMap => {
 };
 
 const copyUnidades = async ventasMap => {
-  const oldRows = knex.select().from('unidades');
+  const oldRows = await knex.select().from('unidades');
   const newRows = oldRows.map(oldRow => {
     const { codigoVenta, empresaVenta, ...o } = oldRow;
     const ventaId = ventasMap[empresaVenta + codigoVenta];
+    const precioVenta = float2int(o.precioVenta);
     return {
       ...o,
-      ventaId
+      ventaId,
+      precioVenta
     };
   });
   await insertAsChunks({
     array: newRows,
     tableName: 'temp_unidades',
-    maxSize: 140
+    maxSize: 120
+  });
+};
+const copyProductos = async ventasMap => {
+  const oldRows = await knex.select().from('productos');
+  const newRows = oldRows.map(oldRow => {
+    const { precioVenta, precioDist, ...o } = oldRow;
+    return {
+      ...o,
+      precioVenta: float2int(precioVenta),
+      precioDist: float2int(precioDist)
+    };
+  });
+  await insertAsChunks({
+    array: newRows,
+    tableName: 'temp_productos',
+    maxSize: 120
   });
 };
 
 const run = async () => {
   await knex.schema
+    .createTable('temp_productos', crearTablaProductos)
     .createTable('temp_clientes', crearTablaClientes)
     .createTable('temp_medicos', crearTablaMedicos)
     .createTable('temp_ventas', crearTablaVentas)
@@ -214,6 +253,7 @@ const run = async () => {
     .createTable('temp_unidades', crearTablaUnidades)
     .createTable('pagos', crearTablaPagos)
     .createTable('comprobantes', crearTablaComprobantes);
+  await copyProductos();
   const clientesMap = await copyClientes();
   const ventasMap = await copyVentas(clientesMap);
   await Promise.all([copyExamenInfoRows(ventasMap), copyUnidades(ventasMap)]);
@@ -224,11 +264,13 @@ const run = async () => {
     .dropTable('ventas')
     .dropTable('medicos')
     .dropTable('clientes')
+    .dropTable('productos')
     .renameTable('temp_unidades', 'unidades')
     .renameTable('temp_examen_info', 'examen_info')
     .renameTable('temp_ventas', 'ventas')
     .renameTable('temp_medicos', 'medicos')
-    .renameTable('temp_clientes', 'clientes');
+    .renameTable('temp_clientes', 'clientes')
+    .renameTable('temp_productos', 'productos');
 };
 
 run()

@@ -10,7 +10,7 @@ import {
   verVenta,
   verVentaExamen
 } from '../api';
-import {
+const {
   agregarProductoComoFacturable,
   calcularValoresTotales,
   editarFacturaExistente,
@@ -20,7 +20,7 @@ import {
   puedeGuardarFactura,
   prepararFacturaParaGuardar,
   removeFacturableAt
-} from './EditorState';
+} = require('./EditorState.js');
 
 export default class FacturaEditorView extends Component {
   constructor(props) {

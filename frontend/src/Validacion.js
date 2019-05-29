@@ -2,8 +2,6 @@ const validator = require('validator');
 const { FormasDePago, TiposID } = require('./Factura/Models.js');
 
 const campo_obligatorio = 'Este campo es obligatorio';
-const campo_obligatorio_min = 'obligatorio';
-const invalido = 'inválido';
 const porcentaje_invalido = 'No está entre 0 y 100';
 
 const phoneCharset = '1234567890-+()';
@@ -47,11 +45,6 @@ const esEnteroValido = enteroString => {
   return enteroString === '' || validator.isInt(enteroString, { min: 0 });
 };
 
-const validarString = (str, errors, inputs, key) => {
-  if (typeof str === 'string' && str.length > 0) inputs[key] = str;
-  else errors[key] = `${key} es un argumento erróneo`;
-};
-
 const esFacturaDataPropValido = (propKey, newPropValue) => {
   switch (propKey) {
     case 'descuento':
@@ -74,36 +67,9 @@ const esFacturablePropValido = (propKey, newPropValue) => {
   }
 };
 
-const validarBoolean = (bool, errors, inputs, key) => {
-  if (typeof bool === 'boolean') inputs[key] = bool;
-  else errors[key] = `${key} debe de ser boolean (true|false)`;
-};
-
-const validarNumeroCalculado = (num, errors, inputs, key) => {
-  if (typeof num === 'number' && num >= 0) inputs[key] = num;
-  else errors[key] = `${key} debe de ser un número real no negativo`;
-};
-
-const validarNumeroIngresado = (num, errors, inputs, key) => {
-  if (!esNumeroValido(num))
-    errors[key] = `${key} debe ser un número real no negativo`;
-  else inputs[key] = num;
-};
-
-const validarRUC = (ruc, errors, inputs, key) => {
-  if (validator.isEmpty(ruc)) errors[key] = campo_obligatorio;
-  else if (!validator.isNumeric(ruc)) errors[key] = 'RUC inválido';
-  else inputs[key] = ruc;
-};
-
 const validarNombre = (nombre, errors, inputs) => {
   if (validator.isEmpty(nombre)) errors.nombre = campo_obligatorio;
   else inputs.nombre = nombre;
-};
-
-const validarDireccion = (direccion, errors, inputs) => {
-  if (validator.isEmpty(direccion)) errors.direccion = campo_obligatorio;
-  else inputs.direccion = direccion;
 };
 
 const validarEmail = (email, errors, inputs) => {
@@ -117,12 +83,6 @@ const validarTelefono = (telefonoValue, errors, inputs, telefonoKey) => {
   if (invalidPhoneChar)
     errors[telefonoKey] = 'caracter inválido: ' + invalidPhoneChar;
   else inputs[telefonoKey] = telefonoValue;
-};
-
-const validarPorcentajeIVA = (iva, errors, inputs) => {
-  if (typeof iva !== 'number' || iva < 0 || iva > 30)
-    errors.iva = 'porcentaje iva inválido.';
-  else inputs.iva = iva;
 };
 
 //regext dates between 2010 and 2029
@@ -211,7 +171,7 @@ const email = ({ fallback } = {}) => (ctx, value) => {
     return new Error(`"${ctx.name}" debe de ser un string`);
 
   if (!validator.isEmpty(value) && !validator.isEmail(value))
-    errors.email = 'e-mail inválido';
+    return new Error('e-mail inválido');
 
   return value;
 };
@@ -322,7 +282,7 @@ const numericString = ({ fallback, abrv, len, minLen, maxLen } = {}) => (
   else if (value.length < minLen)
     return abrv
       ? new Error(`Inválido`)
-      : new Error(`"${ctx.name}" debe de tener más de ${mon} caracteres.`);
+      : new Error(`"${ctx.name}" debe de tener más de ${min} caracteres.`);
 
   if (!validator.isNumeric(value))
     return abrv
@@ -371,35 +331,6 @@ const validateFormWithSchema = (schema, data) => {
   return output;
 };
 
-const validarListaUnidades = (unidades, errors, inputs) => {
-  if (!unidades.length || unidades.length === 0) {
-    errors.unidades = 'unidades debe ser un arreglo válido, no vacío';
-    return;
-  }
-
-  const esUnError = item => item;
-  const erroresDeListaUnidades = unidades.map(validarUnidad);
-  const primerError = erroresDeListaUnidades.find(esUnError);
-  if (primerError) {
-    const posicionDelPrimerError =
-      erroresDeListaUnidades.indexOf(primerError) + 1;
-    errors.unidades = `Error en posición #${posicionDelPrimerError}: ${primerError}`;
-    return;
-  }
-
-  inputs.unidades = unidades;
-};
-
-const validarDescuentoDefault = (descDefault, errors, inputs) => {
-  if (!esPorcentajeValido(descDefault))
-    errors.descDefault = 'descuento inválido. ' + porcentaje_invalido;
-  else inputs.descDefault = descDefault;
-};
-
-const validarDescuentoSmall = (descuento, errors, inputs) => {
-  if (!esPorcentajeValido(descuento)) errors.descuento = invalido;
-  else inputs.descuento = descuento;
-};
 const validarComision = (comision, errors, inputs) => {
   if (!validator.isInt(comision, percentageOpts))
     errors.comision = 'comision inválida. ' + porcentaje_invalido;
@@ -422,18 +353,6 @@ const validarPrecioVenta = (precioVenta, errors, inputs) => {
   if (validator.isEmpty(precioVenta)) errors.precioVenta = campo_obligatorio;
   else if (!validator.isDecimal(precioVenta)) errors.precioVenta = precioVenta;
   else inputs.precioVenta = precioVenta;
-};
-
-const validarCodigoFactura = (codigo, errors, inputs) => {
-  if (validator.isEmpty(codigo)) errors.codigo = campo_obligatorio_min;
-  else if (!validator.isNumeric(codigo)) errors.codigo = invalido;
-  else inputs.codigo = codigo;
-};
-
-const validarFecha = (fecha, errors, inputs) => {
-  if (validator.isEmpty(fecha)) errors.fecha = campo_obligatorio_min;
-  else if (!validator.isDate(fecha)) errors.fecha = invalido;
-  else inputs.fecha = fecha;
 };
 
 const validarMedico = formData => {
@@ -567,6 +486,8 @@ const getExpectedIDLength = idType => {
       return 13;
     case 'cedula':
       return 10;
+    default:
+      return undefined;
   }
   // retorna undefined si recibe tipo desconocido
   // porque no hay limite

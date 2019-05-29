@@ -4,17 +4,18 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
 import NuevoMedicoForm from './NuevoMedicoForm';
-import { validarMedico } from '../Validacion';
 import { insertarMedico } from '../api';
 import ServerErrorText from '../lib/formTable/ServerErrorText';
 
 import { NUEVO_MEDICO_DIALOG_CLOSED } from '../DialogTypes';
 
+const { validarMedico } = require('../Validacion');
+
 export default class NuevoMedicoDialog extends React.Component {
   state = {
     inputs: {},
     errors: {},
-    serverError: null,
+    serverError: null
   };
 
   cancelarDialog = () => {
@@ -31,12 +32,7 @@ export default class NuevoMedicoDialog extends React.Component {
   };
 
   renderServerError = errText => {
-    if (errText)
-      return (
-        <ServerErrorText>
-          {errText}
-        </ServerErrorText>
-      );
+    if (errText) return <ServerErrorText>{errText}</ServerErrorText>;
     else return <div />;
   };
 
@@ -60,7 +56,7 @@ export default class NuevoMedicoDialog extends React.Component {
       },
       err => {
         this.setState({
-          serverError: 'Error al almacenar datos: ' + err.response.text,
+          serverError: 'Error al almacenar datos: ' + err.response.text
         });
       }
     );
@@ -90,7 +86,7 @@ export default class NuevoMedicoDialog extends React.Component {
         primary={true}
         keyboardFocused={true}
         onTouchTap={this.validarDatos}
-      />,
+      />
     ];
 
     return (

@@ -9,8 +9,8 @@ const crearProducto = () => {
     codigo: 'AA',
     nombre: 'A',
     marca: 'TECO',
-    precioDist: 0.99,
-    precioVenta: 1.99,
+    precioDist: '0.99',
+    precioVenta: '1.99',
     pagaIva: true
   };
 };
@@ -39,6 +39,7 @@ describe('Factura Editor State', () => {
       );
       state.facturables = modificacion(state).facturables;
     });
+
     it('parsea los stings de flete y descuento y calcula los valores de la factura', () => {
       const {
         subtotal,
@@ -52,10 +53,9 @@ describe('Factura Editor State', () => {
         '3'
       );
 
-      expect(subtotal).toEqual(1.99);
-      //rebaja.should.be.closeTo(0.0597, 0.001);
-      expect(impuestos).toEqual(0.27);
-      expect(total).toEqual(2.45);
+      expect(subtotal).toEqual(19900);
+      expect(impuestos).toEqual(2702);
+      expect(total).toEqual(24505);
     });
 
     it('asume cero flete si es un string vacio y cero descuento si es un string vacio', () => {
@@ -66,10 +66,10 @@ describe('Factura Editor State', () => {
         total
       } = FacturaEditor.calcularValoresTotales(state.facturables, '', 14, '');
 
-      expect(subtotal).toEqual(1.99);
+      expect(subtotal).toEqual(19900);
       expect(rebaja).toEqual(0);
-      expect(impuestos).toEqual(0.28);
-      expect(total).toEqual(2.27);
+      expect(impuestos).toEqual(2786);
+      expect(total).toEqual(22686);
     });
   });
 
@@ -226,7 +226,7 @@ describe('Factura Editor State', () => {
         state,
         editar: false,
         empresa: 'emp',
-        porcentajeIVA: 12
+        iva: 12
       });
 
       expect(ventaRow).toEqual(null);
@@ -245,7 +245,7 @@ describe('Factura Editor State', () => {
         state,
         editar: false,
         empresa: 'emp',
-        porcentajeIVA: 12
+        iva: 12
       });
 
       expect(errors).toBe(null);
@@ -315,7 +315,7 @@ describe('Factura Editor State', () => {
         editar: false,
         empresa: 'emp',
         isExamen: true,
-        porcentajeIVA: 12
+        iva: 12
       });
 
       expect(errors).toBeNull();
@@ -341,7 +341,7 @@ describe('Factura Editor State', () => {
         editar: true,
         empresa: 'emp',
         isExamen: false,
-        porcentajeIVA: 14
+        iva: 14
       });
 
       expect(errors).toBeNull();

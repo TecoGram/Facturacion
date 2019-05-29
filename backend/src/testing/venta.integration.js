@@ -33,10 +33,10 @@ const baseVentaRow = Object.freeze({
   autorizacion: '',
   detallado: false,
   flete: 0,
-  subtotal: 19.99,
+  subtotal: 199900,
   descuento: 0,
   iva: 12,
-  pagos: [{ formaPago: 'efectivo', valor: 22.39 }]
+  pagos: [{ formaPago: 'efectivo', valor: 223900 }]
 });
 
 describe('/venta/ endpoints', () => {
@@ -47,8 +47,8 @@ describe('/venta/ endpoints', () => {
         'rytertg663433g',
         'Glyco',
         'TECO',
-        39.99,
-        49.99,
+        399900,
+        499900,
         true
       ),
       api.insertarCliente(baseClienteRow)

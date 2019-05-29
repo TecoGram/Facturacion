@@ -1,9 +1,10 @@
 const {
   calcularValoresTotales
 } = require('../../../frontend/src/Factura/Math.js');
+const Money = require('../../../frontend/src/Factura/Money.js');
 
 const generarDetalleOpcionesDePago = (selectedFPKey, totalNumber) => {
-  const total = Number(totalNumber).toFixed(2);
+  const total = Money.print(totalNumber);
   const tarjetaOptions = [
     'tarjeta_legacy',
     'tarjeta_debito',
@@ -27,22 +28,22 @@ const generarDetalleOpcionesDePago = (selectedFPKey, totalNumber) => {
 const crearMatrizValoresTotales = (
   subtotal,
   flete,
-  porcentajeIVA,
+  iva,
   descuento,
   impuestos,
   rebaja,
   total
 ) => {
   const matrix = [];
-  matrix.push(['Sub-Total', '$', Number(subtotal).toFixed(2)]);
-  matrix.push(['Descuento', `${descuento}%`, Number(rebaja).toFixed(2)]);
-  if (porcentajeIVA === 0) matrix.push(['IVA', '0%', '0.00']);
+  matrix.push(['Sub-Total', '$', Money.print(subtotal)]);
+  matrix.push(['Descuento', `${descuento}%`, Money.print(rebaja)]);
+  if (iva === 0) matrix.push(['IVA', '0%', '0.00']);
   else matrix.push(['IVA', '%', '']);
-  matrix.push(['Flete', '$', Number(flete).toFixed(2)]);
-  if (porcentajeIVA > 0)
-    matrix.push(['IVA', `${porcentajeIVA}%`, Number(impuestos).toFixed(2)]);
+  matrix.push(['Flete', '$', Money.print(flete)]);
+  if (iva > 0)
+    matrix.push(['IVA', `${iva}%`, Money.print(impuestos)]);
   else matrix.push(['IVA', '%', '']);
-  matrix.push(['Total US', '$', Number(total).toFixed(2)]);
+  matrix.push(['Total US', '$', Money.print(total)]);
   return matrix;
 };
 

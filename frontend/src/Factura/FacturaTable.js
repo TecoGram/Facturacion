@@ -5,11 +5,12 @@ import {
   TableHeader,
   TableHeaderColumn,
   TableRow,
-  TableRowColumn,
+  TableRowColumn
 } from 'material-ui/Table';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import Delete from 'material-ui/svg-icons/action/delete';
+import Math from './Math.js';
 
 const black54p = '#757575';
 const noPaddingStyle = { padding: '0px' };
@@ -66,18 +67,18 @@ const RenderTableHeader = props => {
 };
 
 export default class FacturaTable extends React.Component {
-  renderRow = (product, i) => {
+  renderRow = (facturable, i) => {
     const { isExamen, onFacturableChanged, onFacturableDeleted } = this.props;
 
     let regSanCol = (
       <TableRowColumn width={80} style={noPaddingStyle}>
-        {product.get('codigo')}
+        {facturable.codigo}
       </TableRowColumn>
     );
     let loteCol = (
       <TableRowColumn width={60} style={noPaddingStyle}>
         <TextField
-          value={product.get('lote')}
+          value={facturable.lote}
           style={{ width: '50px' }}
           name={'lote'}
           inputStyle={{ textAlign: 'right', fontSize: '13px' }}
@@ -90,7 +91,7 @@ export default class FacturaTable extends React.Component {
     let fechaExpCol = (
       <TableRowColumn width={70} style={noPaddingStyle}>
         <TextField
-          value={product.get('fechaExp')}
+          value={facturable.fechaExp}
           hintText={'expiración'}
           style={{ width: '70px', fontSize: '13px' }}
           onChange={(event, date) => {
@@ -116,7 +117,7 @@ export default class FacturaTable extends React.Component {
         {regSanCol}
 
         <TableRowColumn width={170} style={noPaddingStyle}>
-          {product.get('nombre')}
+          {facturable.nombre}
         </TableRowColumn>
 
         {loteCol}
@@ -124,7 +125,7 @@ export default class FacturaTable extends React.Component {
         <TableRowColumn width={40} style={noPaddingStyle}>
           <TextField
             style={{ width: '28px' }}
-            value={product.get('count')}
+            value={facturable.count}
             name={'count'}
             inputStyle={{ textAlign: 'right', fontSize: '13px' }}
             onChange={event => {
@@ -140,7 +141,7 @@ export default class FacturaTable extends React.Component {
           <TextField
             style={{ width: '50px' }}
             name={'precio'}
-            value={product.get('precioVenta')}
+            value={facturable.precio}
             onChange={event => {
               onFacturableChanged(i, 'precioVenta', event.target.value);
             }}
@@ -153,10 +154,7 @@ export default class FacturaTable extends React.Component {
           style={{ padding: '0px', textOverflow: 'clip' }}
         >
           <span style={{ marginRight: '34px' }}>
-            ${' '}
-            {Number(product.get('precioVenta') * product.get('count')).toFixed(
-              2
-            )}
+            $ {Math.calcularImporteFacturable(facturable)}
           </span>
         </TableRowColumn>
 
@@ -188,9 +186,9 @@ FacturaTable.propTypes = {
   isExamen: React.PropTypes.bool,
   items: React.PropTypes.object.isRequired,
   onFacturableChanged: React.PropTypes.func.isRequired,
-  onFacturableDeleted: React.PropTypes.func.isRequired,
+  onFacturableDeleted: React.PropTypes.func.isRequired
 };
 
 FacturaTable.defaultProps = {
-  isExamen: false,
+  isExamen: false
 };

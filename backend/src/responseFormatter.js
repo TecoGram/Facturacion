@@ -1,5 +1,6 @@
 const { calcularTotalVentaRow } = require('../../frontend/src/Factura/Math.js');
 const { FormasDePago } = require('../../frontend/src/Factura/Models.js');
+const Money = require('../../frontend/src/Factura/Money.js');
 
 const parsearBooleanSQLite = bool => {
   if (typeof bool === 'boolean') return bool;
@@ -11,7 +12,7 @@ const stringifyNumerosEnUnidades = unidades =>
   unidades.map(unidad => ({
     ...unidad,
     count: '' + unidad.count,
-    precioVenta: '' + unidad.precioVenta
+    precioVenta: Money.print(unidad.precioVenta)
   }));
 
 const formatVentaRowIntoFacturaData = ventaRow => {
@@ -37,11 +38,11 @@ const formatVentaRowIntoFacturaData = ventaRow => {
     detallado: parsearBooleanSQLite(detallado), //examenes no tienen detallado
     fecha: fecha,
     descuento: '' + descuento,
-    subtotal: subtotal,
+    subtotal: Money.print(subtotal),
     autorizacion: autorizacion,
-    flete: '' + flete,
+    flete: Money.print(flete),
     formaPago: FormasDePago[formaPago],
-    total: new Number(calcularTotalVentaRow(ventaRow)).toFixed(2)
+    total: Money.print(calcularTotalVentaRow(ventaRow))
   };
 };
 
