@@ -1,4 +1,4 @@
-const { validarClienteInsert } = require('../Validacion.js');
+import { validarClienteInsert } from 'facturacion_common/src/Validacion.js';
 
 export default class DialogState {
   constructor(props, setStateFunc) {

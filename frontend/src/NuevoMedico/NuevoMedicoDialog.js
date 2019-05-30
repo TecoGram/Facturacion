@@ -3,13 +3,13 @@ import React from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
+import { insertarMedico } from 'facturacion_common/src/api';
+import { validarMedico } from 'facturacion_common/src/Validacion';
+
 import NuevoMedicoForm from './NuevoMedicoForm';
-import { insertarMedico } from '../api';
 import ServerErrorText from '../lib/formTable/ServerErrorText';
 
 import { NUEVO_MEDICO_DIALOG_CLOSED } from '../DialogTypes';
-
-const { validarMedico } = require('../Validacion');
 
 export default class NuevoMedicoDialog extends React.Component {
   state = {

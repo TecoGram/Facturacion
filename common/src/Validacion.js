@@ -1,5 +1,5 @@
 const validator = require('validator');
-const { FormasDePago, TiposID } = require('./Factura/Models.js');
+const { FormasDePago, TiposID } = require('./Models.js');
 
 const campo_obligatorio = 'Este campo es obligatorio';
 const porcentaje_invalido = 'No está entre 0 y 100';
@@ -486,7 +486,7 @@ const getExpectedIDLength = idType => {
       return 13;
     case 'cedula':
       return 10;
-    default:
+    default: 
       return undefined;
   }
   // retorna undefined si recibe tipo desconocido

@@ -1,7 +1,7 @@
 import React from 'react';
-import MaterialTable from '../lib/MaterialTable';
-import { findClientes, deleteCliente } from '../api';
+import { findClientes, deleteCliente } from 'facturacion_common/src/api';
 
+import MaterialTable from '../lib/MaterialTable';
 import ListState from './ListState';
 
 const columns = ['RUC', 'Nombre', 'Teléfono 1', 'Teléfono 2'];
@@ -13,7 +13,7 @@ export default class ClientesListView extends React.Component {
     super(props);
     this.stateManager = new ListState(props, args => this.setState(args));
     this.state = {
-      rows: [],
+      rows: []
     };
   }
 
@@ -65,5 +65,5 @@ export default class ClientesListView extends React.Component {
 
 ClientesListView.propTypes = {
   mostrarErrorConSnackbar: React.PropTypes.func.isRequired,
-  editarCliente: React.PropTypes.func.isRequired,
+  editarCliente: React.PropTypes.func.isRequired
 };

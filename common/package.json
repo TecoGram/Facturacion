@@ -1,0 +1,18 @@
+{
+  "name": "facturacion_common",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "criptext-js-tools": "^0.7.2"
+  },
+  "dependencies": {
+    "deep-freeze": "^0.0.1",
+    "fecha": "2.3.1",
+    "superagent": "^5.0.5",
+    "validator": "6.3.0"
+  },
+  "scripts": {
+    "test": "criptext-js-tools test"
+  }
+}

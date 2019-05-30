@@ -1,4 +1,4 @@
-const { validarProducto } = require('../Validacion.js');
+import { validarProducto } from 'facturacion_common/src/Validacion.js';
 
 export default class DialogState {
   constructor(props, setStateFunc) {
@@ -18,7 +18,7 @@ export default class DialogState {
     return {
       inputs: { pagaIva: true },
       errors: {},
-      serverError: null,
+      serverError: null
     };
   }
 
@@ -51,7 +51,7 @@ export default class DialogState {
 
   mostrarErrorDeServidor(respError) {
     this.setState({
-      serverError: 'Error al almacenar datos: ' + respError.response.text,
+      serverError: 'Error al almacenar datos: ' + respError.response.text
     });
   }
 

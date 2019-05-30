@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { findProductos } from '../api.js';
+import { findProductos } from 'facturacion_common/src/api.js';
 import AutoCompleteComponent from '../lib/AutoCompleteComponent';
 
 const dataSourceConfig = {
   text: 'nombre',
-  value: 'nombre',
+  value: 'nombre'
 };
 
 export default class ProductoAutoComplete extends React.Component {

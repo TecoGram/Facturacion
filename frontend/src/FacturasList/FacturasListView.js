@@ -1,7 +1,11 @@
 import React from 'react';
-import MaterialTable from '../lib/MaterialTable';
-import { getFacturaURLByType, findAllVentas, deleteVenta } from '../api';
+import {
+  getFacturaURLByType,
+  findAllVentas,
+  deleteVenta
+} from 'facturacion_common/src/api';
 
+import MaterialTable from '../lib/MaterialTable';
 import ListState from './ListState';
 
 const ColumnTypes = MaterialTable.ColumnTypes;
@@ -12,7 +16,7 @@ const columnTypes = [
   ColumnTypes.string,
   ColumnTypes.string,
   ColumnTypes.string,
-  ColumnTypes.numeric,
+  ColumnTypes.numeric
 ];
 const searchHint = 'Buscar facturas...';
 
@@ -21,7 +25,7 @@ export default class FacturasListView extends React.Component {
     super(props);
     this.stateManager = new ListState(props, args => this.setState(args));
     this.state = {
-      rows: [],
+      rows: []
     };
   }
 
@@ -87,5 +91,5 @@ export default class FacturasListView extends React.Component {
 
 FacturasListView.propTypes = {
   editarFactura: React.PropTypes.func.isRequired,
-  editarFacturaExamen: React.PropTypes.func.isRequired,
+  editarFacturaExamen: React.PropTypes.func.isRequired
 };

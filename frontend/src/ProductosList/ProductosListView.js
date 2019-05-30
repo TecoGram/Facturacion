@@ -1,7 +1,7 @@
 import React from 'react';
-import MaterialTable from '../lib/MaterialTable';
-import { findProductos, deleteProducto } from '../api';
+import { findProductos, deleteProducto } from 'facturacion_common/src/api';
 
+import MaterialTable from '../lib/MaterialTable';
 import ListState from './ListState';
 
 const ColumnTypes = MaterialTable.ColumnTypes;
@@ -11,7 +11,7 @@ const columnTypes = [
   ColumnTypes.string,
   ColumnTypes.string,
   ColumnTypes.string,
-  ColumnTypes.numeric,
+  ColumnTypes.numeric
 ];
 const searchHint = 'Buscar productos...';
 
@@ -20,14 +20,14 @@ export default class ProductosListView extends React.Component {
     super(props);
     this.stateManager = new ListState(props, args => this.setState(args));
     this.state = {
-      rows: [],
+      rows: []
     };
   }
 
   requestData = input => {
     const {
       colocarListaVacia,
-      colocarProductosDelResponse,
+      colocarProductosDelResponse
     } = this.stateManager;
     findProductos(input, 50).then(
       colocarProductosDelResponse,
@@ -79,5 +79,5 @@ export default class ProductosListView extends React.Component {
 
 ProductosListView.propTypes = {
   mostrarErrorConSnackbar: React.PropTypes.func.isRequired,
-  editarProducto: React.PropTypes.func.isRequired,
+  editarProducto: React.PropTypes.func.isRequired
 };

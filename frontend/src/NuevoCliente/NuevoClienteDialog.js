@@ -5,7 +5,7 @@ import FlatButton from 'material-ui/FlatButton';
 
 import NuevoClienteForm from './NuevoClienteForm';
 import DialogState from './DialogState';
-import { insertarCliente, updateCliente } from '../api';
+import { insertarCliente, updateCliente } from 'facturacion_common/src/api';
 import ServerErrorText from '../lib/formTable/ServerErrorText';
 
 export default class NuevoClienteDialog extends React.Component {
@@ -15,7 +15,7 @@ export default class NuevoClienteDialog extends React.Component {
     this.state = {
       inputs: {},
       errors: {},
-      serverError: null,
+      serverError: null
     };
   }
 
@@ -28,12 +28,7 @@ export default class NuevoClienteDialog extends React.Component {
   };
 
   renderServerError = errText => {
-    if (errText)
-      return (
-        <ServerErrorText>
-          {errText}
-        </ServerErrorText>
-      );
+    if (errText) return <ServerErrorText>{errText}</ServerErrorText>;
     else return <div />;
   };
 
@@ -45,7 +40,7 @@ export default class NuevoClienteDialog extends React.Component {
       email,
       telefono1,
       telefono2,
-      descDefault,
+      descDefault
     } = inputs;
 
     const { cerrarDialogConExito, mostrarErrorDeServidor } = this.stateManager;
@@ -95,7 +90,7 @@ export default class NuevoClienteDialog extends React.Component {
         primary={true}
         keyboardFocused={true}
         onTouchTap={this.validarDatos}
-      />,
+      />
     ];
 
     return (
@@ -122,5 +117,5 @@ NuevoClienteDialog.propTypes = {
   editar: React.PropTypes.object,
   open: React.PropTypes.bool.isRequired,
   cancelarDialog: React.PropTypes.func.isRequired,
-  cerrarDialogConMsg: React.PropTypes.func.isRequired,
+  cerrarDialogConMsg: React.PropTypes.func.isRequired
 };

@@ -10,7 +10,7 @@ import {
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import Delete from 'material-ui/svg-icons/action/delete';
-import Math from './Math.js';
+import Math from 'facturacion_common/src/Math.js';
 
 const black54p = '#757575';
 const noPaddingStyle = { padding: '0px' };

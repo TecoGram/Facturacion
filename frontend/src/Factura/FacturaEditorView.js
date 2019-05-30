@@ -9,7 +9,7 @@ import {
   getFacturaExamenURL,
   verVenta,
   verVentaExamen
-} from '../api';
+} from 'facturacion_common/src/api';
 const {
   agregarProductoComoFacturable,
   calcularValoresTotales,

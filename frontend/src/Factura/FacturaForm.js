@@ -20,7 +20,7 @@ import CloseableColorChip from '../lib/CloseableColorChip';
 import FormattedDatePicker from '../lib/FormattedDatePicker';
 import IconBox from '../lib/IconBox';
 
-import { FormasDePago } from './Models';
+import { FormasDePago } from 'facturacion_common/src/Models';
 
 const autoCompleteWidth = '425px';
 const txtMargin = '35px';

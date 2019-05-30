@@ -1,5 +1,5 @@
 const deepFreeze = require('deep-freeze');
-const { oneYearFromToday, toReadableDate } = require('../DateParser.js');
+const { oneYearFromToday, toReadableDate } = require('./DateParser.js');
 const { calcularValoresTotales, calcularSubtotal } = require('./Math.js');
 const Money = require('./Money.js');
 

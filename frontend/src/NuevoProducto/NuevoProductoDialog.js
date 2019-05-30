@@ -3,9 +3,10 @@ import React from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
+import { insertarProducto, updateProducto } from 'facturacion_common/src/api';
+
 import NuevoProductoForm from './NuevoProductoForm';
 import DialogState from './DialogState';
-import { insertarProducto, updateProducto } from '../api';
 import ServerErrorText from '../lib/formTable/ServerErrorText';
 
 export default class NuevoProductoDialog extends React.Component {
@@ -24,12 +25,7 @@ export default class NuevoProductoDialog extends React.Component {
   };
 
   renderServerError = errText => {
-    if (errText)
-      return (
-        <ServerErrorText>
-          {errText}
-        </ServerErrorText>
-      );
+    if (errText) return <ServerErrorText>{errText}</ServerErrorText>;
     else return <div />;
   };
 
@@ -41,7 +37,7 @@ export default class NuevoProductoDialog extends React.Component {
       marca,
       precioDist,
       precioVenta,
-      pagaIva,
+      pagaIva
     } = inputs;
 
     const { cerrarDialogConExito, mostrarErrorDeServidor } = this.stateManager;
@@ -101,7 +97,7 @@ export default class NuevoProductoDialog extends React.Component {
         primary={true}
         keyboardFocused={true}
         onTouchTap={this.validarDatos}
-      />,
+      />
     ];
 
     return (
@@ -128,5 +124,5 @@ NuevoProductoDialog.propTypes = {
   editar: React.PropTypes.object,
   open: React.PropTypes.bool.isRequired,
   cancelarDialog: React.PropTypes.func.isRequired,
-  cerrarDialogConMsg: React.PropTypes.func.isRequired,
+  cerrarDialogConMsg: React.PropTypes.func.isRequired
 };

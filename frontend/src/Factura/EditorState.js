@@ -1,26 +1,26 @@
-const {
+import {
   insertarVenta,
   updateVenta,
   insertarVentaExamen,
   updateVentaExamen
-} = require('../api.js');
-const DateParser = require('../DateParser.js');
-const {
+} from 'facturacion_common/src/api.js';
+import DateParser from 'facturacion_common/src/DateParser.js';
+import {
   crearVentaRow,
   facturableAUnidad,
   productoAFacturable
-} = require('./Models.js');
-const {
+} from 'facturacion_common/src/Models.js';
+import {
   esFacturablePropValido,
   esFacturaDataPropValido,
   validarVentaInsert,
   validarVentaExamenInsert
-} = require('../Validacion.js');
-const { parseFormInt } = require('../FormNumberPaser.js');
-const { calcularValoresFacturables } = require('./Math.js');
-const Money = require('./Money.js');
+} from 'facturacion_common/src/Validacion.js';
+import { parseFormInt } from 'facturacion_common/src/FormNumberPaser.js';
+import { calcularValoresFacturables } from 'facturacion_common/src/Math.js';
+import Money from 'facturacion_common/src/Money.js';
 
-const getDefaultState = () => {
+export const getDefaultState = () => {
   return {
     clienteRow: null,
     medicoRow: null,
@@ -39,14 +39,14 @@ const getDefaultState = () => {
   };
 };
 
-const agregarProductoComoFacturable = producto => {
+export const agregarProductoComoFacturable = producto => {
   return prevState => {
     const facturable = productoAFacturable(producto);
     return { facturables: [...prevState.facturables, facturable] };
   };
 };
 
-const calcularValoresTotales = (
+export const calcularValoresTotales = (
   facturables,
   fleteString,
   iva,
@@ -57,7 +57,7 @@ const calcularValoresTotales = (
   return calcularValoresFacturables(facturables, flete, iva, descuento);
 };
 
-const selectGuardarPromise = (editar, isExamen, ventaRow) => {
+export const selectGuardarPromise = (editar, isExamen, ventaRow) => {
   if (editar && isExamen) return updateVentaExamen(ventaRow);
   if (isExamen) return insertarVentaExamen(ventaRow);
   if (editar) return updateVenta(ventaRow);
@@ -76,7 +76,7 @@ const crearGuardarPromiseYMensaje = (editar, isExamen, ventaRow) => {
   };
 };
 
-const editarFacturaExistente = verVentaResp => {
+export const editarFacturaExistente = verVentaResp => {
   const resp = DateParser.verVenta(verVentaResp.body);
   return () => {
     return {
@@ -88,7 +88,7 @@ const editarFacturaExistente = verVentaResp => {
   };
 };
 
-const modificarValorEnFacturable = (index, propKey, newPropValue) => {
+export const modificarValorEnFacturable = (index, propKey, newPropValue) => {
   if (esFacturablePropValido(propKey, newPropValue)) {
     return prevState => {
       const facturables = prevState.facturables;
@@ -103,7 +103,7 @@ const modificarValorEnFacturable = (index, propKey, newPropValue) => {
   return null;
 };
 
-const modificarValorEnFacturaData = (dataKey, newDataValue) => {
+export const modificarValorEnFacturaData = (dataKey, newDataValue) => {
   if (!esFacturaDataPropValido(dataKey, newDataValue)) return null;
   return prevState => {
     const newFacturaData = {
@@ -114,14 +114,14 @@ const modificarValorEnFacturaData = (dataKey, newDataValue) => {
   };
 };
 
-const puedeGuardarFactura = (state, isExamen) => {
+export const puedeGuardarFactura = (state, isExamen) => {
   if (!state.clienteRow) return false;
   if (state.facturables.length === 0) return false;
   if (isExamen && !state.medicoRow) return false;
   return true;
 };
 
-const prepararFacturaParaGuardar = ({
+export const prepararFacturaParaGuardar = ({
   state,
   editar,
   empresa,
@@ -148,7 +148,7 @@ const prepararFacturaParaGuardar = ({
   else return crearGuardarPromiseYMensaje(editar, isExamen, ventaRow);
 };
 
-const removeFacturableAt = index => {
+export const removeFacturableAt = index => {
   return prevState => {
     const { facturables } = prevState;
     return {
@@ -158,17 +158,4 @@ const removeFacturableAt = index => {
       ]
     };
   };
-};
-
-module.exports = {
-  agregarProductoComoFacturable,
-  calcularValoresTotales,
-  editarFacturaExistente,
-  getDefaultState,
-  modificarValorEnFacturaData,
-  modificarValorEnFacturable,
-  puedeGuardarFactura,
-  prepararFacturaParaGuardar,
-  removeFacturableAt,
-  selectGuardarPromise
 };

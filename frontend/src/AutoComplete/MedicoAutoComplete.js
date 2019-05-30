@@ -1,17 +1,17 @@
 import React from 'react';
 
-import { findMedicos } from '../api.js';
+import { findMedicos } from 'facturacion_common/src/api.js';
 import AutoCompleteComponent from '../lib/AutoCompleteComponent';
 
 const dataSourceConfig = {
   text: 'nombre',
-  value: 'nombre',
+  value: 'nombre'
 };
 
 export default class MedicoAutoComplete extends React.Component {
   static propTypes = {
     width: React.PropTypes.string.isRequired,
-    onNewItemSelected: React.PropTypes.func.isRequired,
+    onNewItemSelected: React.PropTypes.func.isRequired
   };
 
   render() {
