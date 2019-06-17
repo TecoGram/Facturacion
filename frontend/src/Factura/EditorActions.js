@@ -1,0 +1,12 @@
+export const getDefaultState = Symbol('getDefaultState');
+export const guardarFactura = Symbol('guardarFactura');
+export const updateFacturaInput = Symbol('updateFacturaInput');
+export const updateUnidadInput = Symbol('updateUnidadInput');
+export const setCliente = Symbol('setCliente');
+export const setMedico = Symbol('setMedico');
+export const agregarProducto = Symbol('agregarProducto');
+export const getFacturaExistente = Symbol('getFacturaExistente');
+export const abortInsert = Symbol('abortInsert');
+export const editarFactura = Symbol('editarFactura');
+export const removeUnidad = Symbol('removeUnidad');
+export const updatePagos = Symbol('updatePagos');

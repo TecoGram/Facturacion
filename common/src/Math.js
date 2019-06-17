@@ -15,18 +15,16 @@ const calcularTotalVentaRow = ventaRow => {
   return subtotal + flete + impuestos - rebaja;
 };
 
-const calcularSubtotal = facturables => {
-  const subtotal = facturables.reduce((sub, facturable) => {
-    const precioVenta = Money.fromString(facturable.precioVenta);
-    const count = parseInt(facturable.count, 10);
-    return sub + precioVenta * count;
+const calcularSubtotal = unidades => {
+  const subtotal = unidades.reduce((sub, unidad) => {
+    return sub + unidad.precioVenta * unidad.count;
   }, 0);
   return Math.floor(subtotal);
 };
 
 const calcularValoresTotales = (subtotal, flete, iva, descuento) => {
-  const rebaja = Math.floor((subtotal * descuento) / 100);
-  const impuestos = Math.floor(((subtotal - rebaja) * iva) / 100);
+  const rebaja = Math.floor(subtotal * descuento / 100);
+  const impuestos = Math.floor((subtotal - rebaja) * iva / 100);
   const total = subtotal + flete + impuestos - rebaja;
 
   return Object.freeze({
@@ -38,8 +36,8 @@ const calcularValoresTotales = (subtotal, flete, iva, descuento) => {
   });
 };
 
-const calcularValoresFacturables = (facturables, flete, iva, descuento) => {
-  const subtotal = calcularSubtotal(facturables);
+const calcularValoresFacturables = ({unidades, flete, iva, descuento}) => {
+  const subtotal = calcularSubtotal(unidades);
   return calcularValoresTotales(subtotal, flete, iva, descuento);
 };
 

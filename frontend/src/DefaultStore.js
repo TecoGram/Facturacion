@@ -4,16 +4,18 @@ const { CLIENTE_DIALOG } = require('../src/DialogTypes.js');
 module.exports = {
   dialog: {
     value: CLIENTE_DIALOG,
-    editar: null,
-    open: false,
+    dialogParams: {
+      editar: null,
+      open: false
+    }
   },
   ajustes: {
     empresa: 'TecoGram S.A.',
-    iva: 12,
+    iva: 12
   },
   snackbar: null,
   page: {
     type: NEW_FACTURA_PAGE,
-    props: {},
-  },
+    props: {}
+  }
 };

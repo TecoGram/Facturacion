@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import AutoComplete from 'material-ui/AutoComplete';
 import TextField from 'material-ui/TextField';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import AddShoppingCart from 'material-ui/svg-icons/action/add-shopping-cart';
 import Info from 'material-ui/svg-icons/action/info';
 import Loyalty from 'material-ui/svg-icons/action/loyalty';
-import Payment from 'material-ui/svg-icons/action/payment';
 import Person from 'material-ui/svg-icons/social/person';
-import Receipt from 'material-ui/svg-icons/action/receipt';
 import Today from 'material-ui/svg-icons/action/today';
 import LocalHospital from 'material-ui/svg-icons/maps/local-hospital';
 import LocalShipping from 'material-ui/svg-icons/maps/local-shipping';
@@ -20,43 +18,10 @@ import CloseableColorChip from '../lib/CloseableColorChip';
 import FormattedDatePicker from '../lib/FormattedDatePicker';
 import IconBox from '../lib/IconBox';
 
-import { FormasDePago } from 'facturacion_common/src/Models';
-
 const autoCompleteWidth = '425px';
 const txtMargin = '35px';
-const codigoTextStyle = {
-  width: '90px',
-  verticalAlign: 'top',
-  marginRight: txtMargin
-};
-
-const formasDePagoDataSource = Object.keys(FormasDePago).map(key => ({
-  text: FormasDePago[key],
-  value: key
-}));
-
 const fechaStyle = { display: 'inline-block' };
-const fechaTextStyle = { width: '90px', marginRight: txtMargin };
-
-const CodigoText = props => {
-  const { ventaKey, data, errors, onDataChanged } = props;
-
-  const myProps = {
-    hintText: 'Código',
-    style: codigoTextStyle
-  };
-
-  if (ventaKey) {
-    myProps.disabled = true;
-    myProps.value = ventaKey.codigo;
-  } else {
-    myProps.value = data.codigo;
-    myProps.errorText = errors.codigo;
-    myProps.onChange = event => onDataChanged('codigo', event.target.value);
-  }
-
-  return <TextField {...myProps} />;
-};
+const fechaTextStyle = { width: '140px', marginRight: txtMargin };
 
 const FechaText = props => {
   const { errors, data, onDataChanged } = props;
@@ -83,9 +48,7 @@ const ClienteInput = props => {
         text={cliente.nombre}
         width={width}
         icon={Person}
-        onRequestDelete={() => {
-          onNewCliente(null);
-        }}
+        onRequestDelete={() => onNewCliente(null)}
       />
     );
   else
@@ -107,9 +70,7 @@ const MedicoInput = props => {
         text={medico.nombre}
         width={width}
         icon={LocalHospital}
-        onRequestDelete={() => {
-          onNewMedico(null);
-        }}
+        onRequestDelete={() => onNewMedico(null)}
       />
     );
   else
@@ -171,7 +132,13 @@ const PacienteDataRow = props => {
 
 export default class FacturaForm extends Component {
   render() {
-    const { data, errors, onDataChanged, isExamen } = this.props;
+    const {
+      abrirPagosForUpdate,
+      data,
+      errors,
+      onDataChanged,
+      isExamen
+    } = this.props;
 
     let formHeight = '130px';
     let pacienteRow = null;
@@ -198,13 +165,6 @@ export default class FacturaForm extends Component {
               </td>
 
               <td>
-                <IconBox icon={Receipt} />
-              </td>
-              <td>
-                <CodigoText {...this.props} />
-              </td>
-
-              <td>
                 <IconBox icon={LocalShipping} />
               </td>
               <td>
@@ -213,7 +173,7 @@ export default class FacturaForm extends Component {
                   value={data.flete}
                   errorText={errors.flete}
                   onChange={event => onDataChanged('flete', event.target.value)}
-                  style={{ width: '50px', marginRight: txtMargin }}
+                  style={{ width: '80px', marginRight: txtMargin }}
                   inputStyle={{ textAlign: 'right' }}
                 />
               </td>
@@ -255,24 +215,11 @@ export default class FacturaForm extends Component {
                   }}
                 />
               </td>
-
               <td>
-                <IconBox icon={Payment} />
-              </td>
-              <td>
-                <AutoComplete
-                  hintText="Forma de pago"
-                  searchText={data.formaPago}
-                  dataSource={formasDePagoDataSource}
-                  openOnFocus={true}
-                  errorText={errors.formaPago}
-                  filter={AutoComplete.caseInsensitiveFilter}
-                  onUpdateInput={text => onDataChanged('formaPago', text)}
-                  onNewRequest={chosenReq =>
-                    onDataChanged('formaPago', chosenReq)
-                  }
-                  style={{ width: '140px' }}
-                  textFieldStyle={{ width: '140px' }}
+                <RaisedButton
+                  label="Pagos"
+                  primary={true}
+                  onTouchTap={abrirPagosForUpdate}
                 />
               </td>
             </tr>
@@ -287,6 +234,7 @@ FacturaForm.propTypes = {
   data: React.PropTypes.object.isRequired,
   errors: React.PropTypes.object.isRequired,
   onDataChanged: React.PropTypes.func.isRequired,
+  abrirPagosForUpdate: React.PropTypes.func.isRequired,
   isExamen: React.PropTypes.bool
 };
 

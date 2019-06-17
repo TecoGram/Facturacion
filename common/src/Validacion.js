@@ -1,5 +1,7 @@
 const validator = require('validator');
+
 const { FormasDePago, TiposID } = require('./Models.js');
+const Money = require('./Money.js')
 
 const campo_obligatorio = 'Este campo es obligatorio';
 const porcentaje_invalido = 'No está entre 0 y 100';
@@ -45,25 +47,49 @@ const esEnteroValido = enteroString => {
   return enteroString === '' || validator.isInt(enteroString, { min: 0 });
 };
 
-const esFacturaDataPropValido = (propKey, newPropValue) => {
-  switch (propKey) {
-    case 'descuento':
-      return esPorcentajeValido(newPropValue);
-    case 'flete':
-      return esNumeroValido(newPropValue);
+const sanitizarDinero = dineroString => {
+  if (!esNumeroValido(dineroString))
+    return null;
+
+  const dotPosition = dineroString.indexOf('.');
+
+  if (dotPosition > 0 && dineroString.length > 2 && dotPosition < dineroString.length - 3)
+    return null; // demasiados decimales
+
+  const dinero = Money.fromString(dineroString);
+  if (dinero === NaN)
+    return null;
+  return dinero;
+};
+
+const sanitizarFacturaInput = (key, value) => {
+  switch (key) {
+    case 'descuento': {
+      if (esPorcentajeValido(value))
+        return parseInt(value, 10)
+      return null;
+    }
+    case 'flete': {
+      return sanitizarDinero(value);
+    }
     default:
-      return true;
+      return value;
   }
 };
 
-const esFacturablePropValido = (propKey, newPropValue) => {
-  switch (propKey) {
-    case 'count':
-      return esEnteroValido(newPropValue);
-    case 'precioVenta':
-      return esNumeroValido(newPropValue);
+const sanitizarUnidadInput = (key, value) => {
+  switch (key) {
+    case 'count': {
+      if (esEnteroValido(value)) 
+        return parseInt(value, 10);
+      return null;
+    }
+    case 'precioVenta':{
+      return sanitizarDinero(value);
+    }
+
     default:
-      return true;
+      return value;
   }
 };
 
@@ -105,7 +131,12 @@ const validarUnidad = unidad => {
   if (!esNumeroValido(precioVenta)) return 'precio de venta inválido';
 };
 
-const array = ({ item }) => (ctx, value) => {
+const array = ({ item, fallback }) => (ctx, value) => {
+  if (!value) {
+    if (fallback || fallback === []) return fallback;
+    return new Error(`"${ctx.name}" es requerido`);
+  }
+
   if (!value.length || value.length === 0) {
     return new Error(`${ctx.name} debe ser un arreglo válido, no vacío`);
   }
@@ -421,20 +452,22 @@ const ventaSchema = {
   rowid: primaryKey(),
   codigo: numericString({ fallback: '' }),
   fecha: dateString(),
-  descuento: int({ fallback: 0, max: 100, abrv: true }),
+  descuento: int({ fallback: 0, min: 0, max: 100, abrv: true }),
   iva: int({ max: 30 }),
   empresa: string(),
-  flete: float({ fallback: 0 }),
-  subtotal: float({ fallback: 0 }),
+  flete: int({ min: 0, fallback: 0 }),
+  subtotal: int({ min: 0 }),
   guia: string({ fallback: '' }),
   autorizacion: string({ fallback: '' }),
   cliente: primaryKey(),
   detallado: bool(),
-  pagos: array({ item: pagoSchema }),
+  pagos: array({ item: pagoSchema, fallback: [] }),
   unidades: array({ item: unidadSchema })
 };
 
 const ventaInsertSchema = getSchemaExcludingKeys(ventaSchema, ['rowid']);
+
+const facturaSchema = getSchemaExcludingKeys(ventaSchema, ['rowid', 'pagos']);
 
 const clienteRowSchema = {
   rowid: primaryKey(),
@@ -510,6 +543,9 @@ const getClienteRowSchemaByIdType = idType => {
 };
 const validarVentaExamenInsert = data =>
   validateFormWithSchema(ventaExamenInsertSchema, data);
+const validarFactura = data =>
+  validateFormWithSchema(facturaSchema, data);
+
 const validarVentaInsert = data =>
   validateFormWithSchema(ventaInsertSchema, data);
 const validarClienteInsert = data =>
@@ -518,8 +554,7 @@ const validarClienteInsert = data =>
 module.exports = {
   getClienteInsertSchemaByIdType,
   getClienteRowSchemaByIdType,
-  esFacturablePropValido,
-  esFacturaDataPropValido,
+  validarFactura,
   validarClienteInsert,
   validarBusqueda,
   validarMedico,
@@ -528,10 +563,14 @@ module.exports = {
   validarVentaInsert,
   validarVentaExamenInsert,
   validateFormWithSchema,
+  facturaSchema,
   ventaSchema,
   ventaInsertSchema,
   ventaExamenSchema,
   ventaExamenInsertSchema,
   clienteRowSchema,
-  clienteInsertSchema
+  clienteInsertSchema,
+  sanitizarDinero,
+  sanitizarFacturaInput,
+  sanitizarUnidadInput
 };

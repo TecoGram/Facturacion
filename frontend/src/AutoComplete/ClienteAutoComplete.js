@@ -5,7 +5,7 @@ import AutoCompleteComponent from '../lib/AutoCompleteComponent';
 
 const dataSourceConfig = {
   text: 'nombre',
-  value: 'ruc'
+  value: 'id'
 };
 
 export default class ClienteAutoComplete extends React.Component {

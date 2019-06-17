@@ -3,6 +3,8 @@ import React from 'react';
 import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
 
+import Money from 'facturacion_common/src/Money.js';
+
 import ServerErrorText from '../lib/formTable/ServerErrorText';
 
 const ivaLabel = porcentajeIVA => `IVA ${porcentajeIVA}%: $`;
@@ -10,26 +12,26 @@ const nuevoLabel = 'Generar Factura';
 const editarLabel = 'Guardar Cambios';
 const errorMsgStyle = {
   fontSize: '14px',
-  textAlign: 'left',
+  textAlign: 'left'
 };
 
 const ResultsTable = props => {
-  const { isExamen, subtotal, rebaja, impuestos, total, porcentajeIVA } = props;
+  const { isExamen, porcentajeIVA } = props;
+  const subtotal = Money.print(props.subtotal);
+  const rebaja = Money.print(props.rebaja);
+  const impuestos = Money.print(props.impuestos);
+  const total = Money.print(props.total);
 
-  const ivaRow = isExamen
-    ? null
-    : <tr>
-        <td>
-          <strong>
-            {ivaLabel(porcentajeIVA)}
-          </strong>
-        </td>
-        <td>
-          {Number(impuestos).toFixed(2)}
-        </td>
-      </tr>;
+  const ivaRow = isExamen ? null : (
+    <tr>
+      <td>
+        <strong>{ivaLabel(porcentajeIVA)}</strong>
+      </td>
+      <td>{impuestos}</td>
+    </tr>
+  );
   return (
-    <div>
+    <div style={{ float: 'right' }}>
       <table
         style={{ width: 'auto', display: 'inline-table', textAlign: 'right' }}
       >
@@ -38,26 +40,20 @@ const ResultsTable = props => {
             <td>
               <strong>Subtotal: $</strong>
             </td>
-            <td style={{ paddingLeft: '20px' }}>
-              {Number(subtotal).toFixed(2)}
-            </td>
+            <td style={{ paddingLeft: '20px' }}>{subtotal}</td>
           </tr>
           {ivaRow}
           <tr>
             <td>
               <strong>Descuento: $</strong>
             </td>
-            <td>
-              {Number(rebaja).toFixed(2)}
-            </td>
+            <td>{rebaja}</td>
           </tr>
           <tr>
             <td>
               <strong>Total: $</strong>
             </td>
-            <td>
-              {Number(total).toFixed(2)}
-            </td>
+            <td>{total}</td>
           </tr>
         </tbody>
       </table>
@@ -82,23 +78,24 @@ const FacturaDetalladaCheckbox = props => {
 };
 
 const GuardarFacturaButton = props => {
-  const { nuevo, guardarButtonDisabled, onGuardarClick } = props;
+  const { nuevo, guardarButtonDisabled, onGuardarClick, subtotal } = props;
   const label = nuevo ? nuevoLabel : editarLabel;
   return (
     <div style={{ textAlign: 'center' }}>
       <RaisedButton
         label={label}
         primary={true}
-        onTouchTap={onGuardarClick}
+        onTouchTap={() => onGuardarClick(subtotal)}
         disabled={guardarButtonDisabled}
       />
     </div>
   );
 };
+
 export default class FacturaResults extends React.Component {
   render() {
     return (
-      <div style={{ width: '100%', paddingTop: '6px', textAlign: 'right' }}>
+      <div style={{ width: '100%', paddingTop: '6px' }}>
         <ServerErrorText style={errorMsgStyle}>
           {this.props.errorUnidades}
         </ServerErrorText>
@@ -122,9 +119,9 @@ FacturaResults.propTypes = {
   onGuardarClick: React.PropTypes.func,
   onFacturaDataChanged: React.PropTypes.func.isRequired,
   nuevo: React.PropTypes.bool.isRequired,
-  porcentajeIVA: React.PropTypes.number,
+  porcentajeIVA: React.PropTypes.number
 };
 
 FacturaResults.defaultProps = {
-  isExamen: false,
+  isExamen: false
 };

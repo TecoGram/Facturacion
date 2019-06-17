@@ -1,0 +1,155 @@
+import React from 'react';
+import { Table, TableBody, TableRow, TableRowColumn } from 'material-ui/Table';
+import Clear from 'material-ui/svg-icons/content/clear';
+import Payment from 'material-ui/svg-icons/action/payment';
+import TextField from 'material-ui/TextField';
+import AutoComplete from 'material-ui/AutoComplete';
+import IconButton from 'material-ui/IconButton';
+import FlatButton from 'material-ui/FlatButton';
+import * as Actions from './Actions.js';
+
+import { FormasDePago } from 'facturacion_common/src/Models.js';
+import Money from 'facturacion_common/src/Money.js';
+
+const formasDePago = Object.keys(FormasDePago).map(key => ({
+  text: FormasDePago[key],
+  value: key
+}));
+
+const black54p = '#757575';
+
+const newUniqueIdGenerator = () => {
+  let i = 0;
+  return () => i++;
+};
+
+const iconStyle = {
+  display: 'inline-block'
+};
+const noPaddingStyle = { padding: '0px' };
+
+const getNewId = newUniqueIdGenerator();
+
+const renderRow = props => ({ key, formaPagoText, valorText }, i) => {
+  const { submitAction } = props;
+  const onValorChange = event => {
+    submitAction({
+      type: Actions.updateValor,
+      valorText: event.target.value,
+      index: i
+    });
+  };
+
+  const onFormaPagoTextChanged = (newText, array) => {
+    const selectedItem = array.find(({ text }) => newText === text);
+
+    const formaPagoText = selectedItem ? selectedItem.text : newText;
+    const formaPago = selectedItem ? selectedItem.value : undefined;
+
+    submitAction({
+      type: Actions.updateFormaPago,
+      formaPagoText,
+      formaPago,
+      index: i
+    });
+  };
+
+  const onDelete = () => {
+    submitAction({
+      type: Actions.removerPago,
+      index: i
+    });
+  };
+
+  return (
+    <TableRow key={key}>
+      <TableRowColumn width={260} style={noPaddingStyle}>
+        <AutoComplete
+          hintText="Forma de pago"
+          dataSource={formasDePago}
+          openOnFocus={true}
+          filter={AutoComplete.caseInsensitiveFilter}
+          onUpdateInput={onFormaPagoTextChanged}
+          searchText={formaPagoText}
+          style={{ width: '250px' }}
+          textFieldStyle={{ width: '250px' }}
+        />
+      </TableRowColumn>
+      <TableRowColumn width={60} style={noPaddingStyle}>
+        <TextField
+          style={{ width: '50px' }}
+          hintText={'$'}
+          value={valorText}
+          name={'valor'}
+          inputStyle={{ textAlign: 'right', fontSize: '13px' }}
+          onChange={onValorChange}
+        />
+      </TableRowColumn>
+      <TableRowColumn>
+        <IconButton style={iconStyle} onTouchTap={onDelete}>
+          <Clear color={black54p} />
+        </IconButton>
+      </TableRowColumn>
+    </TableRow>
+  );
+};
+
+const AgregarPagoButton = props => {
+  const { submitAction } = props;
+
+  const onClick = () => {
+    submitAction({
+      type: Actions.agregarPago,
+      key: getNewId()
+    });
+  };
+
+  return (
+    <FlatButton
+      label="Agregar Pago"
+      labelPosition="before"
+      primary={true}
+      onClick={onClick}
+      icon={<Payment />}
+    />
+  );
+};
+
+const totalMsg = ({ pagos, total }) => {
+  if (pagos.length === 0) return 'Por favor agrega almenos un pago.';
+
+  const totalPagado = pagos.reduce((res, item) => {
+    if (!item.valor) return res;
+
+    return res + item.valor;
+  }, 0);
+
+  const totalPagadoStr = Money.print(totalPagado);
+  const totalStr = Money.print(total);
+  return `Pagado $${totalPagadoStr}/${totalStr}.`;
+};
+
+const FooterMessage = props => {
+  const { errorMsg, pagos, total } = props;
+  if (errorMsg) return <p style={{ color: '#f44336' }}>{errorMsg}</p>;
+
+  return <p>{totalMsg({ pagos, total })}</p>;
+};
+
+const PagosForm = props => {
+  const { pagos, submitAction } = props;
+  return (
+    <div>
+      <AgregarPagoButton submitAction={submitAction} />
+
+      <Table height={'200px'} selectable={false}>
+        <TableBody displayRowCheckbox={false}>
+          {pagos.map(renderRow(props))}
+        </TableBody>
+      </Table>
+      <FooterMessage {...props} />
+    </div>
+  );
+};
+
+export default PagosForm;

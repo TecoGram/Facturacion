@@ -13,6 +13,7 @@ import {
 import {
   esFacturablePropValido,
   esFacturaDataPropValido,
+  validarFactura,
   validarVentaInsert,
   validarVentaExamenInsert
 } from 'facturacion_common/src/Validacion.js';
@@ -26,11 +27,9 @@ export const getDefaultState = () => {
     medicoRow: null,
     errors: {},
     facturaData: {
-      codigo: '',
       fecha: new Date(),
       descuento: '',
       autorizacion: '',
-      formaPago: '',
       flete: '',
       detallado: true,
       paciente: ''
@@ -46,7 +45,7 @@ export const agregarProductoComoFacturable = producto => {
   };
 };
 
-export const calcularValoresTotales = (
+export const calcularFacturaEditorResults = (
   facturables,
   fleteString,
   iva,
@@ -121,14 +120,9 @@ export const puedeGuardarFactura = (state, isExamen) => {
   return true;
 };
 
-export const prepararFacturaParaGuardar = ({
-  state,
-  editar,
-  empresa,
-  isExamen,
-  iva
-}) => {
+export const prepararFacturaParaGuardar = (state, config) => {
   const { clienteRow, medicoRow, facturables, facturaData } = state;
+  const { editar, empresa, isExamen, iva } = config;
 
   const unidades = facturables.map(facturableAUnidad);
   const ventaRow = crearVentaRow({
@@ -141,7 +135,7 @@ export const prepararFacturaParaGuardar = ({
     isExamen,
     iva
   });
-  const { errors } = isExamen
+  const { errors } = config.isExamen
     ? validarVentaExamenInsert(ventaRow)
     : validarVentaInsert(ventaRow);
   if (errors) return { errors, prom: null, msg: null, ventaRow: null };

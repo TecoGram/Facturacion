@@ -4,121 +4,116 @@ import PaperContainer from '../lib/PaperContainer';
 import FacturaForm from './FacturaForm';
 import FacturaTable from './FacturaTable';
 import FacturaResults from './FacturaResults';
-import {
-  getFacturaURL,
-  getFacturaExamenURL,
-  verVenta,
-  verVentaExamen
-} from 'facturacion_common/src/api';
-const {
-  agregarProductoComoFacturable,
-  calcularValoresTotales,
-  editarFacturaExistente,
-  getDefaultState,
-  modificarValorEnFacturaData,
-  modificarValorEnFacturable,
-  puedeGuardarFactura,
-  prepararFacturaParaGuardar,
-  removeFacturableAt
-} = require('./EditorState.js');
+import { getFacturaURL, getFacturaExamenURL } from 'facturacion_common/src/api';
+import * as Actions from './EditorActions.js';
+import { createReducer, getDefaultState } from './EditorReducers.js';
+import { updateState } from '../Arch.js';
+import { calcularValoresFacturables } from 'facturacion_common/src/Math.js';
 
 export default class FacturaEditorView extends Component {
   constructor(props) {
     super(props);
+    this.createReducer = createReducer;
     this.state = getDefaultState();
   }
 
-  onFacturaDataChanged = (key, newValue) => {
-    const modificacion = modificarValorEnFacturaData(key, newValue);
-    if (modificacion != null) this.setState(modificacion);
+  onFacturaInputChanged = (key, value) => {
+    updateState(this, { type: Actions.updateFacturaInput, key, value });
   };
 
-  onFacturableChanged = (index, key, newValue) => {
-    const modificacion = modificarValorEnFacturable(index, key, newValue);
-    if (modificacion != null) this.setState(modificacion);
+  onFacturableChanged = (index, key, value) => {
+    updateState(this, { type: Actions.updateUnidadInput, index, key, value });
   };
 
   onFacturableDeleted = index => {
-    this.setState(removeFacturableAt(index));
+    updateState(this, { type: Actions.removeUnidad, index });
   };
 
-  onNewCliente = newCliente => {
-    this.setState({ cliente: newCliente });
-    if (newCliente && newCliente.descDefault > 0)
-      this.onFacturaDataChanged('descuento', '' + newCliente.descDefault);
+  onNewCliente = clienteRow => {
+    updateState(this, { type: Actions.setCliente, clienteRow });
   };
 
-  onNewMedico = newMedico => {
-    this.setState({ medico: newMedico });
+  onNewMedico = medicoRow => {
+    updateState(this, { type: Actions.setMedico, medicoRow });
   };
 
-  onNewProductFromKeyboard = newProduct => {
-    this.setState(agregarProductoComoFacturable(newProduct));
+  onNewProductFromKeyboard = productoRow => {
+    updateState(this, { type: Actions.agregarProducto, productoRow });
   };
 
-  resetearEditorYMostrarResultado = (ventaGuardada, msg) => {
-    this.setState(getDefaultState());
-    const pdfLink = this.props.isExamen
-      ? getFacturaExamenURL(ventaGuardada.codigo, ventaGuardada.empresa)
-      : getFacturaURL(ventaGuardada.codigo, ventaGuardada.empresa);
-    window.open(pdfLink);
-    this.props.abrirLinkConSnackbar(msg, pdfLink);
-  };
+  getInsertOkMsg = editar =>
+    editar
+      ? 'La factura se editó exitosamente'
+      : 'La factura se guardó exitosamente';
 
-  guardarFacturaAsync = (guardarPromise, ventaAGuardar, guardadoExitoMsg) => {
-    guardarPromise
-      .then(() => {
-        this.resetearEditorYMostrarResultado(ventaAGuardar, guardadoExitoMsg);
-      })
-      .catch(err => {
-        console.error('error ', err.status, err.response.text);
-      });
-  };
-
-  onGenerarFacturaClick = () => {
+  onGenerarFacturaClick = subtotal => {
     const { empresa, iva } = this.props.ajustes;
-    const editar = this.props.ventaKey;
-    const isExamen = this.props.isExamen;
+    const { isExamen, ventaKey } = this.props;
+    const editar = !!ventaKey;
 
-    const { errors, msg, prom, ventaRow } = prepararFacturaParaGuardar(
-      this.state,
-      editar,
-      empresa,
-      isExamen,
-      iva
-    );
-    if (errors) this.setState({ errors: errors });
-    else this.guardarFacturaAsync(prom, ventaRow, msg);
+    const config = { empresa, iva, isExamen, editar };
+    const callback = ({ success, ...extras }) => {
+      if (!success) {
+        this.props.abrirLinkConSnackbar(extras.msg);
+        return;
+      }
+
+      const pdfLink = isExamen
+        ? getFacturaExamenURL(ventaKey)
+        : getFacturaURL(ventaKey);
+      window.open(pdfLink);
+      const msg = this.getInsertOkMsg(editar);
+      this.props.abrirLinkConSnackbar(msg, pdfLink);
+    };
+
+    updateState(this, {
+      type: Actions.guardarFactura,
+      config,
+      subtotal,
+      callback
+    });
   };
 
   componentDidMount() {
-    const facturaAEditar = this.props.ventaKey;
-    const isExamen = this.props.isExamen;
-    const obtenerFacturaInfo = isExamen ? verVentaExamen : verVenta;
-    if (facturaAEditar)
-      obtenerFacturaInfo(facturaAEditar.codigo, facturaAEditar.empresa).then(
-        resp => {
-          this.setState(editarFacturaExistente(resp));
-        }
-      );
+    const { ventaKey, isExamen } = this.props;
+    updateState(this, {
+      type: Actions.getFacturaExistente,
+      ventaKey,
+      isExamen
+    });
   }
 
+  abrirPagosForUpdate = total => {
+    this.props.abrirPagos({
+      total,
+      originalPagos: this.state.pagos,
+      onSaveData: pagos =>
+        updateState(this, {
+          type: Actions.updatePagos,
+          pagos
+        })
+    });
+  };
+
   render() {
-    const { cliente, errors, facturables, facturaData, medico } = this.state;
+    const { clienteRow, errors, unidades, inputs, medicoRow } = this.state;
 
     const { isExamen, ventaKey, ajustes } = this.props;
 
+    // se permite usar string vacio como 0 asi que
+    // hay que sanitizar
+    const descuento = inputs.descuento === '' ? 0 : inputs.descuento;
+    const flete = inputs.flete === '' ? 0 : inputs.flete;
+
     const errorUnidades = errors && errors.unidades;
-    const porcentajeDescuentoString = facturaData.descuento;
-    const fleteString = facturaData.flete;
-    const detallado = facturaData.detallado;
-    const porcentajeIVA = ajustes.iva;
-    const { subtotal, rebaja, impuestos, total } = calcularValoresTotales(
-      facturables,
-      fleteString,
-      isExamen ? 0 : porcentajeIVA,
-      porcentajeDescuentoString
-    );
+    const detallado = inputs.detallado;
+    const iva = isExamen ? 0 : ajustes.iva;
+    const { subtotal, rebaja, impuestos, total } = calcularValoresFacturables({
+      unidades,
+      descuento,
+      iva,
+      flete
+    });
 
     return (
       <div style={{ height: '100%', overflow: 'auto' }}>
@@ -131,19 +126,20 @@ export default class FacturaEditorView extends Component {
             }}
           >
             <FacturaForm
-              data={facturaData}
+              data={inputs}
               errors={errors}
-              cliente={cliente}
-              medico={medico}
-              onDataChanged={this.onFacturaDataChanged}
+              cliente={clienteRow}
+              medico={medicoRow}
+              onDataChanged={this.onFacturaInputChanged}
               ventaKey={ventaKey}
               onNewMedico={this.onNewMedico}
               onNewCliente={this.onNewCliente}
               onNewProduct={this.onNewProductFromKeyboard}
+              abrirPagosForUpdate={() => this.abrirPagosForUpdate(total)}
               isExamen={isExamen}
             />
             <FacturaTable
-              items={facturables}
+              items={unidades}
               onFacturableChanged={this.onFacturableChanged}
               onFacturableDeleted={this.onFacturableDeleted}
               isExamen={isExamen}
@@ -154,12 +150,12 @@ export default class FacturaEditorView extends Component {
               rebaja={rebaja}
               impuestos={impuestos}
               total={total}
-              porcentajeIVA={porcentajeIVA}
+              porcentajeIVA={iva}
               detallado={detallado}
               onGuardarClick={this.onGenerarFacturaClick}
-              onFacturaDataChanged={this.onFacturaDataChanged}
+              onFacturaDataChanged={this.onFacturaInputChanged}
               nuevo={!ventaKey}
-              guardarButtonDisabled={!puedeGuardarFactura(this.state, isExamen)}
+              guardarButtonDisabled={false}
               isExamen={isExamen}
             />
           </div>
@@ -170,7 +166,9 @@ export default class FacturaEditorView extends Component {
 }
 
 FacturaEditorView.propTypes = {
+  abrirPagos: React.PropTypes.func.isRequired,
   abrirLinkConSnackbar: React.PropTypes.func.isRequired,
+  mostrarErrorConSnackbar: React.PropTypes.func.isRequired,
   isExamen: React.PropTypes.bool,
   ventaKey: React.PropTypes.shape({
     codigo: React.PropTypes.string.isRequired,

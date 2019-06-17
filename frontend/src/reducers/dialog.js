@@ -1,6 +1,6 @@
 const {
   CAMBIAR_DIALOG_ACTION,
-  CERRAR_DIALOG_CON_MSG_ACTION,
+  CERRAR_DIALOG_CON_MSG_ACTION
 } = require('../ActionTypes');
 
 function dialog(state = {}, action) {
@@ -8,14 +8,15 @@ function dialog(state = {}, action) {
     case CAMBIAR_DIALOG_ACTION:
       return {
         value: action.value || state.value,
-        editar: action.open ? action.editar : null,
-        open: action.open,
+        dialogParams: action.dialogParams
       };
     case CERRAR_DIALOG_CON_MSG_ACTION:
       return {
         value: action.value || state.value,
-        editar: null,
-        open: action.open,
+        dialogParams: {
+          editar: null,
+          open: false
+        }
       };
     default: {
       return state;

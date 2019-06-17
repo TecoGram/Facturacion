@@ -1,4 +1,4 @@
-const actionCreators = require('../ActionCreators.js');
+import actionCreators from '../ActionCreators.js';
 const defaultStore = require('../DefaultStore.js');
 const dialogReducer = require('./dialog.js');
 const { CLIENTE_DIALOG, PRODUCTO_DIALOG } = require('../DialogTypes.js');
@@ -10,14 +10,18 @@ describe('dialog reducer', () => {
   });
 
   it('cambia todos los atributos del state con mostrarDialog action', () => {
-    const action = actionCreators.mostrarDialog(CLIENTE_DIALOG, true);
+    const action = actionCreators.mostrarDialog(CLIENTE_DIALOG, {
+      editar: true
+    });
     const newState = dialogReducer(state, action);
 
     expect(newState).not.toBe(state);
     expect(newState).toEqual({
       value: CLIENTE_DIALOG,
-      editar: true,
-      open: true,
+      dialogParams: {
+        editar: true,
+        open: true
+      }
     });
   });
 
@@ -28,8 +32,9 @@ describe('dialog reducer', () => {
     expect(newState).not.toBe(state);
     expect(newState).toEqual({
       value: CLIENTE_DIALOG,
-      editar: null,
-      open: false,
+      dialogParams: {
+        open: false
+      }
     });
   });
 
@@ -41,8 +46,10 @@ describe('dialog reducer', () => {
     expect(newState).not.toBe(state);
     expect(newState).toEqual({
       value: CLIENTE_DIALOG,
-      editar: ruc,
-      open: true,
+      dialogParams: {
+        editar: ruc,
+        open: true
+      }
     });
   });
 
@@ -54,8 +61,10 @@ describe('dialog reducer', () => {
     expect(newState).not.toBe(state);
     expect(newState).toEqual({
       value: PRODUCTO_DIALOG,
-      editar: editarObj,
-      open: true,
+      dialogParams: {
+        editar: editarObj,
+        open: true
+      }
     });
   });
 
@@ -67,8 +76,10 @@ describe('dialog reducer', () => {
     expect(newState).not.toBe(state);
     expect(newState).toEqual({
       value: state.value,
-      editar: state.editar,
-      open: false,
+      dialogParams: {
+        editar: state.editar,
+        open: false
+      }
     });
   });
 
@@ -80,8 +91,10 @@ describe('dialog reducer', () => {
     expect(newState).not.toBe(state);
     expect(newState).toEqual({
       value: state.value,
-      editar: state.editar,
-      open: false,
+      dialogParams: {
+        editar: null,
+        open: false
+      }
     });
   });
 });

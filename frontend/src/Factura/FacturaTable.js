@@ -184,7 +184,7 @@ export default class FacturaTable extends React.Component {
 
 FacturaTable.propTypes = {
   isExamen: React.PropTypes.bool,
-  items: React.PropTypes.object.isRequired,
+  items: React.PropTypes.array.isRequired,
   onFacturableChanged: React.PropTypes.func.isRequired,
   onFacturableDeleted: React.PropTypes.func.isRequired
 };
