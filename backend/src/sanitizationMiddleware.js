@@ -9,7 +9,7 @@ const {
   ventaSchema,
   ventaExamenInsertSchema,
   ventaExamenSchema
-} = require('../../frontend/src/Validacion.js');
+} = require('facturacion_common/src/Validacion.js');
 
 const sendBadArgumentsResponse = (res, errors) => {
   res.status(400).send(errors);

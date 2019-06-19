@@ -1,8 +1,8 @@
 const request = require('superagent');
-const api = require('../../../frontend/src/api.js');
+const api = require('facturacion_common/src/api.js');
 const server = require('../server.js');
 const setup = require('../scripts/setupDB.js');
-const FacturacionModels = require('../../../frontend/src/Factura/Models');
+const FacturacionModels = require('facturacion_common/src/Models.js');
 
 const fetchUnidad = async name => {
   const res = await api.findProductos(name);

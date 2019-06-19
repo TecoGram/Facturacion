@@ -48,7 +48,7 @@ import FacturasListView from './FacturasList/FacturasListView';
 import ClientesListView from './ClientesList/ClientesListView';
 import ProductosListView from './ProductosList/ProductosListView';
 import store from './Store';
-import InitialStore from './InitialStore';
+import appSettings from './Ajustes';
 
 const toolbarTextColor = '#FFFFFF';
 const toolbarTitleStyle = {
@@ -474,7 +474,7 @@ export default class MainNavigationView extends Component {
       mapStateToProps,
       mapDispatchToProps
     )(Main);
-    const muiTheme = CustomStyle.getEmpresaTheme(InitialStore.ajustes.empresa);
+    const muiTheme = CustomStyle.getEmpresaTheme(appSettings.empresa);
     return (
       <Provider store={store}>
         <MuiThemeProvider muiTheme={muiTheme}>

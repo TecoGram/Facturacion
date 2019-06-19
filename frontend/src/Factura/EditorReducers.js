@@ -10,6 +10,7 @@ import {
 } from 'facturacion_common/src/DateParser.js';
 import * as Actions from './EditorActions.js';
 import API from 'facturacion_common/src/api.js';
+import Money from 'facturacion_common/src/Money.js';
 import DateParser from 'facturacion_common/src/DateParser.js';
 
 export const getDefaultState = () => ({
@@ -116,7 +117,30 @@ const updateUnidadInput = ({ index, key, value }) => state => {
   const sanitizedValue = sanitizarUnidadInput(key, value);
   if (sanitizedValue != null) {
     const newUnidades = [...unidades];
-    newUnidades[index] = { ...unidades[index], [key]: sanitizedValue };
+    switch (key) {
+      case 'count': {
+        newUnidades[index] = {
+          ...unidades[index],
+          countText: value,
+          count: sanitizedValue
+        };
+        break;
+      }
+      case 'precioVenta': {
+        newUnidades[index] = {
+          ...unidades[index],
+          precioVentaText: value,
+          precioVenta: sanitizedValue
+        };
+        break;
+      }
+      default: {
+        newUnidades[index] = {
+          ...unidades[index],
+          [key]: sanitizedValue
+        };
+      }
+    }
     return { ...state, unidades: newUnidades };
   }
   return state;
@@ -126,6 +150,8 @@ const agregarProducto = params => state => {
   const { precioDist, nombreAscii, rowid, ...unidad } = params.productoRow;
   unidad.lote = '';
   unidad.count = 1;
+  unidad.countText = '1';
+  unidad.precioVentaText = Money.print(unidad.precioVenta);
   unidad.producto = rowid;
   unidad.fechaExp = toReadableDate(oneYearFromToday());
 

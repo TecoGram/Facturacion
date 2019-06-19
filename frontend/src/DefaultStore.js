@@ -9,10 +9,6 @@ module.exports = {
       open: false
     }
   },
-  ajustes: {
-    empresa: 'TecoGram S.A.',
-    iva: 12
-  },
   snackbar: null,
   page: {
     type: NEW_FACTURA_PAGE,

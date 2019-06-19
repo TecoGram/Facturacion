@@ -1,7 +1,7 @@
 const {
   calcularValoresTotales
-} = require('../../../frontend/src/Factura/Math.js');
-const Money = require('../../../frontend/src/Factura/Money.js');
+} = require('facturacion_common/src/Math.js');
+const Money = require('facturacion_common/src/Money.js');
 
 const generarDetalleOpcionesDePago = (selectedFPKey, totalNumber) => {
   const total = Money.print(totalNumber);

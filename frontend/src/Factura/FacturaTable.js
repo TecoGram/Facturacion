@@ -125,7 +125,7 @@ export default class FacturaTable extends React.Component {
         <TableRowColumn width={40} style={noPaddingStyle}>
           <TextField
             style={{ width: '28px' }}
-            value={facturable.count}
+            value={facturable.countText}
             name={'count'}
             inputStyle={{ textAlign: 'right', fontSize: '13px' }}
             onChange={event => {
@@ -141,7 +141,7 @@ export default class FacturaTable extends React.Component {
           <TextField
             style={{ width: '50px' }}
             name={'precio'}
-            value={facturable.precio}
+            value={facturable.precioVentaText}
             onChange={event => {
               onFacturableChanged(i, 'precioVenta', event.target.value);
             }}

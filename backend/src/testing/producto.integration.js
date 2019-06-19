@@ -1,4 +1,5 @@
-const api = require('../../../frontend/src/api.js');
+const api = require('facturacion_common/src/api.js');
+
 const server = require('../server.js');
 const setup = require('../scripts/setupDB.js');
 
