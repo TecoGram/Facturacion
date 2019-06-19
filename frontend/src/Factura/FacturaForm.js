@@ -217,7 +217,7 @@ export default class FacturaForm extends Component {
               </td>
               <td>
                 <RaisedButton
-                  label="Pagos"
+                  label="Editar pagos"
                   primary={true}
                   onTouchTap={abrirPagosForUpdate}
                 />

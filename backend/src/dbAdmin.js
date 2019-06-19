@@ -39,9 +39,9 @@ const getExamenInfo = ventaId => {
     .where({ ventaId });
 };
 
-const deleteVenta = (codigo, empresa) => {
+const deleteVenta = (rowid) => {
   return knex('ventas')
-    .where({ codigo, empresa })
+    .where({ rowid })
     .del();
 };
 
@@ -87,18 +87,11 @@ const insertarExamenInfo = (builder, { medicoId, paciente, ventaId }) => {
   });
 };
 
-const getVenta = (codigo, empresa) => {
+const getVenta = (rowid) => {
   return knex
     .select('*')
     .from('ventas')
-    .where({ codigo: codigo, empresa: empresa, tipo: 0 });
-};
-
-const getVentaExamen = (codigo, empresa) => {
-  return knex
-    .select('*')
-    .from('ventas')
-    .where({ empresa: empresa, codigo: codigo, tipo: 1 });
+    .where({ rowid });
 };
 
 const findVentas = nombreCliente => {
@@ -201,19 +194,19 @@ const getFacturablesVenta = ventaId => {
     .where({ ventaId });
 };
 
-const getVentaPorTipo = (codigo, empresa, tipo) => {
+const getVentaPorTipo = (id, tipo) => {
   switch (tipo) {
     case 0:
-      return getVenta(codigo, empresa);
+      return getVenta(id, empresa);
     case 1:
-      return getVentaExamen(codigo, empresa);
+      return getVenta(id, empresa);
     default:
       throw Error('Tipo de venta desconocido');
   }
 };
 
-const getFacturaData = (codigo, empresa, tipo) => {
-  const p = getVentaPorTipo(codigo, empresa, tipo)
+const getFacturaData = (id, tipo) => {
+  const p = getVenta(id)
     .then(([ventaRow]) => {
       if (ventaRow)
         return getCliente(ventaRow.cliente).then(([cliente]) => ({

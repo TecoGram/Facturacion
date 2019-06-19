@@ -256,13 +256,13 @@ app.post('/producto/delete/:id', (req, res) => {
 });
 
 function verVenta(req, res, tipo) {
-  const { codigo, empresa } = req.params;
-  const facturaFileName = codigo + empresa + '.pdf';
+  const { id } = req.params;
+  const facturaFileName = id + '.pdf';
 
   if (
     req.headers.accept === 'application/json' //send json
   )
-    db.getFacturaData(codigo, empresa, tipo).then(
+    db.getFacturaData(id, tipo).then(
       function(resp) {
         //OK!!
         res.status(200).send(formatter.verVenta(resp));
@@ -274,7 +274,7 @@ function verVenta(req, res, tipo) {
     );
   //send pdf
   else
-    db.getFacturaData(codigo, empresa, tipo)
+    db.getFacturaData(id, tipo)
       .then(
         function(resp) {
           //OK!!
@@ -303,23 +303,23 @@ function verVenta(req, res, tipo) {
       );
 }
 
-app.get('/venta/ver/:empresa/:codigo', (req, res) => {
+app.get('/venta/ver/:id', (req, res) => {
   verVenta(req, res, 0);
 });
 
-app.get('/venta_ex/ver/:empresa/:codigo', (req, res) => {
+app.get('/venta_ex/ver/:id', (req, res) => {
   verVenta(req, res, 1);
 });
 
-function deleteVenta(req, res) {
-  const { codigo, empresa } = req.params;
-  db.deleteVenta(codigo, empresa).then(
+app.post('/venta/delete/:id', (req, res) => {
+  const { id } = req.params;
+  db.deleteVenta(id).then(
     function(deletions) {
       if (deletions === 0)
         res
           .status(404)
           .send(
-            `Factura con codigo: ${codigo} y empresa: ${empresa} no encontrada}`
+            `Factura con id: ${id} no encontrada`
           );
       else res.status(200).send('OK');
     },
@@ -328,14 +328,6 @@ function deleteVenta(req, res) {
       res.status(500).send(err);
     }
   );
-}
-
-app.post('/venta/delete/:empresa/:codigo', (req, res) => {
-  deleteVenta(req, res);
-});
-
-app.post('/venta_ex/delete/:empresa/:codigo', (req, res) => {
-  deleteVenta(req, res);
 });
 
 function findVentas(req, res, tipo, all) {

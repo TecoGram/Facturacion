@@ -3,12 +3,8 @@ const request = require('superagent');
 const prefix =
   process.env.NODE_ENV === 'integration' ? 'http://localhost:8192' : '';
 
-const getFacturaURL = (codigo, empresa) => {
-  return `${prefix}/venta/ver/${empresa}/${codigo}`;
-};
-
-const getFacturaExamenURL = (codigo, empresa) => {
-  return `${prefix}/venta_ex/ver/${empresa}/${codigo}`;
+const getFacturaURL = (id) => {
+  return `${prefix}/venta/ver/${id}`;
 };
 
 module.exports = {
@@ -153,39 +149,26 @@ module.exports = {
     return request.get(prefix + '/venta/findAll?q=' + queryString).send();
   },
 
-  verVenta: (codigo, empresa) => {
+  verVenta: (id) => {
     return request
-      .get(prefix + `/venta/ver/${empresa}/${codigo}`)
+      .get(prefix + `/venta/ver/${id}`)
       .send()
       .set('Accept', 'application/json');
   },
 
-  verVentaExamen: (codigo, empresa) => {
+  verVentaExamen: (id) => {
     return request
-      .get(prefix + `/venta_ex/ver/${empresa}/${codigo}`)
+      .get(prefix + `/venta_ex/ver/${id}`)
       .send()
       .set('Accept', 'application/json');
   },
 
-  deleteVenta: (codigo, empresa) => {
+  deleteVenta: (id) => {
     return request
-      .post(prefix + `/venta/delete/${empresa}/${codigo}`)
-      .send()
-      .set('Accept', 'application/json');
-  },
-
-  deleteVentaExamen: (codigo, empresa) => {
-    return request
-      .post(prefix + `/venta_ex/delete/${empresa}/${codigo}`)
+      .post(prefix + `/venta/delete/${id}`)
       .send()
       .set('Accept', 'application/json');
   },
 
   getFacturaURL,
-  getFacturaExamenURL,
-  getFacturaURLByType: (codigo, empresa, tipo) => {
-    if (tipo === 0) return getFacturaURL(codigo, empresa);
-    if (tipo === 1) return getFacturaExamenURL(codigo, empresa);
-    throw Error('tipo desconocido ' + tipo);
-  }
 };

@@ -4,7 +4,7 @@ import PaperContainer from '../lib/PaperContainer';
 import FacturaForm from './FacturaForm';
 import FacturaTable from './FacturaTable';
 import FacturaResults from './FacturaResults';
-import { getFacturaURL, getFacturaExamenURL } from 'facturacion_common/src/api';
+import { getFacturaURL } from 'facturacion_common/src/api';
 import * as Actions from './EditorActions.js';
 import { createReducer, getDefaultState } from './EditorReducers.js';
 import { updateState } from '../Arch.js';
@@ -54,13 +54,11 @@ export default class FacturaEditorView extends Component {
     const config = { empresa, iva, isExamen, editar };
     const callback = ({ success, ...extras }) => {
       if (!success) {
-        this.props.abrirLinkConSnackbar(extras.msg);
+        this.props.mostrarErrorConSnackbar(extras.msg);
         return;
       }
 
-      const pdfLink = isExamen
-        ? getFacturaExamenURL(ventaKey)
-        : getFacturaURL(ventaKey);
+      const pdfLink = getFacturaURL(extras.rowid);
       window.open(pdfLink);
       const msg = this.getInsertOkMsg(editar);
       this.props.abrirLinkConSnackbar(msg, pdfLink);
@@ -84,15 +82,18 @@ export default class FacturaEditorView extends Component {
   }
 
   abrirPagosForUpdate = total => {
-    this.props.abrirPagos({
-      total,
-      originalPagos: this.state.pagos,
-      onSaveData: pagos =>
-        updateState(this, {
-          type: Actions.updatePagos,
-          pagos
-        })
-    });
+    if (total === 0)
+      this.props.mostrarErrorConSnackbar('No hay nada que pagar.');
+    else
+      this.props.abrirPagos({
+        total,
+        originalPagos: this.state.pagos,
+        onSaveData: pagos =>
+          updateState(this, {
+            type: Actions.updatePagos,
+            pagos
+          })
+      });
   };
 
   render() {

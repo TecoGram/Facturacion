@@ -118,11 +118,12 @@ describe('/venta_ex/ endpoints', () => {
     });
   });
 
-  describe('/venta_ex/ver/:empresa/:codigo', () => {
+  describe('/venta_ex/ver/:id', () => {
     const ventaRow = {
       ...baseVentaEx,
       codigo: '9999996'
     };
+    let insertedRowid;
 
     beforeAll(async () => {
       const unidad = await fetchUnidad('examen');
@@ -130,17 +131,18 @@ describe('/venta_ex/ endpoints', () => {
       const newVentaRow = { ...ventaRow, unidades: [unidad] };
       const res1 = await api.insertarVentaExamen(newVentaRow);
       expect(res1.status).toBe(200);
+      insertedRowid = res1.body.rowid;
     });
 
     it('descarga el pdf de una factura existente', async () => {
-      const url = api.getFacturaExamenURL(ventaRow.codigo, ventaRow.empresa);
+      const url = api.getFacturaURL(insertedRowid);
       const res = await request.get(url);
       expect(res.status).toBe(200);
       expect(res.header['content-type']).toEqual('application/pdf');
     });
 
     it("retorna json si el header 'Accept' es igual a 'application/json'", async () => {
-      const res = await api.verVentaExamen(ventaRow.codigo, ventaRow.empresa);
+      const res = await api.verVentaExamen(insertedRowid);
       expect(res.status).toBe(200);
       const { facturaData, facturables, cliente } = res.body;
       expect(facturaData).toEqual(
@@ -156,7 +158,7 @@ describe('/venta_ex/ endpoints', () => {
 
     it('retorna 404 si la factura solicitada no existe', () =>
       api
-        .verVentaExamen(ventaRow.codigo, 'CAPCOM')
+        .verVentaExamen(999643)
         .then(() => Promise.reject('Expected to fail'))
         .catch(({ response: res }) => {
           expect(res.status).toBe(404);
@@ -199,24 +201,25 @@ describe('/venta_ex/ endpoints', () => {
       ...baseVentaEx,
       codigo: '9999990'
     };
+    let insertedRowid;
+
     beforeAll(async () => {
       const unidad = await fetchUnidad('examen');
 
       const newVentaRow = { ...ventaRow, unidades: [unidad] };
       const res1 = await api.insertarVentaExamen(newVentaRow);
       expect(res1.status).toBe(200);
+      insertedRowid = res1.body.rowid;
     });
+
     it('retorna 200 al borrar factura exitosamente', async () => {
-      const res = await api.deleteVentaExamen(
-        ventaRow.codigo,
-        ventaRow.empresa
-      );
+      const res = await api.deleteVenta(insertedRowid);
       expect(res.status).toBe(200);
     });
 
     it('retorna 404 al intentar borrar una factura no encontrada', () => {
       return api
-        .deleteVentaExamen('111', 'EA')
+        .deleteVenta(997347)
         .then(() => Promise.reject('Expected to fail'))
         .catch(({ response: res }) => {
           expect(res.status).toBe(404);

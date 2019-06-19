@@ -15,7 +15,9 @@ import { assertWithSchema, runActions } from '../TestingUtils.js';
 
 describe('EditorReducers', () => {
   it('crea una factura de productos correctamente', async () => {
-    API.insertarVenta.mockReturnValueOnce(Promise.resolve({ status: 200 }));
+    API.insertarVenta.mockReturnValueOnce(
+      Promise.resolve({ status: 200, body: { rowid: 5 } })
+    );
 
     const config = {
       iva: 12,
@@ -106,7 +108,7 @@ describe('EditorReducers', () => {
     const finalState = await runActions(createReducer, actions);
 
     // verificar callback ejecutado
-    expect(callback.mock.calls).toEqual([[{ success: true }]]);
+    expect(callback.mock.calls).toEqual([[{ success: true, rowid: 5 }]]);
 
     // verificar state reseteado
     expect(finalState).toEqual(

@@ -65,7 +65,7 @@ const crearVenta = (config, state, subtotal) => {
 const insertarVenta = (venta, callback) =>
   API.insertarVenta(venta)
     .then(res => {
-      callback({ success: true });
+      callback({ success: true, rowid: res.body.rowid });
       return { type: Actions.getDefaultState };
     })
     .catch(err => {
@@ -87,7 +87,6 @@ const guardarFactura = ({ config, subtotal, callback }) => state => {
     : validarVentaInsert;
   const { errors, inputs } = validacionFn(venta);
   if (errors) {
-    console.log('errors', errors);
     callback({
       success: false,
       msg: 'Por favor revisa los datos ingresados.'
