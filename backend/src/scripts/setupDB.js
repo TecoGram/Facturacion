@@ -8,6 +8,7 @@ const {
   borrarTablaStock,
   borrarTablaUnidades,
   borrarTablaVentas,
+  borrarTablaComprobantes,
 
   crearTablaClientes,
   crearTablaExamenInfo,
@@ -16,7 +17,8 @@ const {
   crearTablaStock,
   crearTablaPagos,
   crearTablaUnidades,
-  crearTablaVentas
+  crearTablaVentas,
+  crearTablaComprobantes
 } = require('../dbTables.js');
 
 const crearTablas = () =>
@@ -28,7 +30,8 @@ const crearTablas = () =>
     .createTable('stock', crearTablaStock)
     .createTable('examen_info', crearTablaExamenInfo)
     .createTable('pagos', crearTablaPagos)
-    .createTable('unidades', crearTablaUnidades);
+    .createTable('unidades', crearTablaUnidades)
+    .createTable('comprobantes', crearTablaComprobantes);
 
 const borrarTodasLasFilas = () =>
   borrarTablaUnidades()
@@ -37,7 +40,8 @@ const borrarTodasLasFilas = () =>
     .then(borrarTablaVentas)
     .then(borrarTablaProductos)
     .then(borrarTablaClientes)
-    .then(borrarTablaMedicos);
+    .then(borrarTablaMedicos)
+    .then(borrarTablaComprobantes);
 
 module.exports = () => {
   return knex.schema.hasTable('productos').then(exists => {

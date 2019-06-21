@@ -87,6 +87,7 @@ const guardarFactura = ({ config, subtotal, callback }) => state => {
     : validarVentaInsert;
   const { errors, inputs } = validacionFn(venta);
   if (errors) {
+    console.log('errors', errors);
     callback({
       success: false,
       msg: 'Por favor revisa los datos ingresados.'

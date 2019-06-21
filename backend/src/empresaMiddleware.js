@@ -3,8 +3,6 @@ const path = require('path');
 
 const indexFilePath = path.join(__dirname, '../../frontend/build/index.html');
 
-const iva = 12;
-
 const crearAjustes = empresa => ({ iva: 12, empresa });
 
 const colocarAjustesEnHtml = (html, store) => {

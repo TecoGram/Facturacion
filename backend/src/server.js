@@ -255,60 +255,48 @@ app.post('/producto/delete/:id', (req, res) => {
   db.deleteProducto(id).then(handleSuccess, handleFailiure);
 });
 
-function verVenta(req, res, tipo) {
+const verVentaJSON = (req, res) => {
+  const { id } = req.params;
+
+  const okHandler = body => {
+    res.status(200).send(body);
+  };
+  const errorHandler = error => {
+    res.status(error.errorCode).send(error.text);
+  };
+
+  db.getFacturaData(id).then(okHandler, errorHandler);
+};
+
+const verVentaPDF = (req, res) => {
   const { id } = req.params;
   const facturaFileName = id + '.pdf';
 
-  if (
-    req.headers.accept === 'application/json' //send json
-  )
-    db.getFacturaData(id, tipo).then(
-      function(resp) {
-        //OK!!
-        res.status(200).send(formatter.verVenta(resp));
-      },
-      function(error) {
-        //ERROR!
-        res.status(error.errorCode).send(error.text);
-      }
-    );
-  //send pdf
-  else
-    db.getFacturaData(id, tipo)
-      .then(
-        function(resp) {
-          //OK!!
-          const { ventaRow, cliente } = resp;
-
-          const pdfData = pdfutils.ventaRowToPDFData(ventaRow);
-          const writeFunc = facturaTemplate(pdfData, cliente);
-          return new PDFWriter(facturaDir + facturaFileName, writeFunc);
-        },
-        function(error) {
-          //ERROR!
-          return Promise.reject(error);
+  db.getFacturaData(id)
+    .then(resp => {
+      const writeFunc = facturaTemplate(resp);
+      return new PDFWriter(facturaDir + facturaFileName, writeFunc);
+    })
+    .then(() => {
+      fs.readFile(facturaDir + facturaFileName, function(err, data) {
+        if (err) {
+          res.status(500).send(err);
+          return;
         }
-      )
-      .then(
-        function() {
-          fs.readFile(facturaDir + facturaFileName, function(err, data) {
-            JSON.stringify(err);
-            res.contentType('application/pdf');
-            res.send(data);
-          });
-        },
-        function(error) {
-          res.status(error.errorCode).send(error.text);
-        }
-      );
-}
+        res.contentType('application/pdf');
+        res.send(data);
+      });
+    })
+    .catch(error => {
+      console.log('errorS', error);
+      if (error.errorCode) res.status(error.errorCode).send(error.text);
+      else res.status(500).send(error);
+    });
+};
 
 app.get('/venta/ver/:id', (req, res) => {
-  verVenta(req, res, 0);
-});
-
-app.get('/venta_ex/ver/:id', (req, res) => {
-  verVenta(req, res, 1);
+  if (req.headers.accept === 'application/json') verVentaJSON(req, res);
+  else verVentaPDF(req, res);
 });
 
 app.post('/venta/delete/:id', (req, res) => {
@@ -316,11 +304,7 @@ app.post('/venta/delete/:id', (req, res) => {
   db.deleteVenta(id).then(
     function(deletions) {
       if (deletions === 0)
-        res
-          .status(404)
-          .send(
-            `Factura con id: ${id} no encontrada`
-          );
+        res.status(404).send(`Factura con id: ${id} no encontrada`);
       else res.status(200).send('OK');
     },
     function(err) {

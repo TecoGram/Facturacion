@@ -180,14 +180,30 @@ const dateString = () => (ctx, value) => {
   return value;
 };
 
-const string = ({ fallback, maxLen } = {}) => (ctx, value) => {
-  if (!value) {
+const boolean = ({ fallback } = {}) => (ctx, value) => {
+  if (value === null || value === undefined) {
+    if (fallback === true || fallback === false) return fallback;
+    return new Error(`"${ctx.name}" es requerido`);
+  }
+
+  if (typeof value !== 'boolean')
+    return new Error(`"${ctx.name}" debe de ser un boolean`);
+
+  return value;
+};
+
+const string = ({ fallback, maxLen, allowEmpty } = {}) => (ctx, value) => {
+  if (value === null || value === undefined) {
     if (fallback || fallback === '') return fallback;
     return new Error(`"${ctx.name}" es requerido`);
   }
 
   if (typeof value !== 'string')
     return new Error(`"${ctx.name}" debe de ser un string`);
+
+  if (!allowEmpty && value === '') 
+    return new Error(`"${ctx.name}" no puede ser un string vacio`);
+    
 
   return value;
 };
@@ -323,17 +339,19 @@ const numericString = ({ fallback, abrv, len, minLen, maxLen } = {}) => (
   return value;
 };
 
-const validateObjectWithSchema = (schema, data) => {
+const validateObjectWithSchema = (schema, data, path) => {
   const keys = Object.keys(schema);
   return keys.reduce((res, dataKey) => {
     const validatorFn = schema[dataKey];
     const rawValue = data[dataKey];
-    res[dataKey] = validatorFn({ name: dataKey }, rawValue);
+    const name = path ? path + '.' + dataKey : dataKey; 
+    res[dataKey] = validatorFn({ name }, rawValue);
     return res;
   }, {});
 };
-const object = ({ schema }) => (ctx, value) => {
-  const validated = validateObjectWithSchema(schema, value);
+
+const object = ({ schema, path }) => (ctx, value) => {
+  const validated = validateObjectWithSchema(schema, value, path);
   const errorKey = Object.keys(validated).find(
     key => validated[key] instanceof Error
   );
@@ -428,7 +446,7 @@ const validarProducto = formData => {
 const unidadSchema = Object.freeze({
   producto: primaryKey(),
   fechaExp: dateString(),
-  lote: string({ fallback: '' }),
+  lote: string({ fallback: '', allowEmpty: true }),
   count: int({ min: 1 }),
   precioVenta: float()
 });
@@ -450,15 +468,15 @@ const getSchemaExcludingKeys = (schema, keys) => {
 };
 const ventaSchema = {
   rowid: primaryKey(),
-  codigo: numericString({ fallback: '' }),
+  codigo: numericString({ fallback: '', allowEmpty: true }),
   fecha: dateString(),
   descuento: int({ fallback: 0, min: 0, max: 100, abrv: true }),
   iva: int({ max: 30 }),
   empresa: string(),
   flete: int({ min: 0, fallback: 0 }),
   subtotal: int({ min: 0 }),
-  guia: string({ fallback: '' }),
-  autorizacion: string({ fallback: '' }),
+  guia: string({ fallback: '', allowEmpty: true }),
+  autorizacion: string({ fallback: '', allowEmpty: true }),
   cliente: primaryKey(),
   detallado: bool(),
   pagos: array({ item: pagoSchema, fallback: [] }),
@@ -491,8 +509,8 @@ const ventaExamenSchema = {
   empresa: string(),
   flete: float({ fallback: 0 }),
   subtotal: float({ fallback: 0 }),
-  autorizacion: string({ fallback: '' }),
-  guia: string({ fallback: '' }),
+  autorizacion: string({ fallback: '', allowEmpty: true }),
+  guia: string({ fallback: '', allowEmpty: true }),
   cliente: primaryKey(),
   medico: primaryKey(),
   paciente: string(),
@@ -503,6 +521,41 @@ const ventaExamenSchema = {
 const ventaExamenInsertSchema = getSchemaExcludingKeys(ventaExamenSchema, [
   'rowid'
 ]);
+
+const datilConfigSchema = {
+  apiKey: string(),
+  password: string(),
+
+  emision: object({ 
+    path: 'emision',
+    schema: {
+      ambiente: int(),
+      moneda: string(),
+      tipo_emision: int(),
+
+      emisor: object({
+        path: 'emision.emisor',
+        schema: {
+          ruc: numericString({ len: 13 }),
+          razon_social: string(),
+          nombre_comercial: string(),
+          direccion: string(),
+          contribuyente_especial: string({ allowEmpty: true }),
+          obligado_contabilidad: boolean(),
+
+          establecimiento: object({
+            path: 'emision.emisor.establecimiento',
+            schema: {
+              codigo: numericString({ len: 3 }),
+              punto_emision: numericString({ len: 3 }),
+              direccion: string()
+            }
+          })
+        }
+      })
+    }
+  }),
+};
 
 const validarBusqueda = (q, limit) => {
   const errors = {};
@@ -541,21 +594,29 @@ const getClienteRowSchemaByIdType = idType => {
     id: numericString({ len })
   };
 };
+
 const validarVentaExamenInsert = data =>
   validateFormWithSchema(ventaExamenInsertSchema, data);
+
 const validarFactura = data =>
   validateFormWithSchema(facturaSchema, data);
 
 const validarVentaInsert = data =>
   validateFormWithSchema(ventaInsertSchema, data);
+
 const validarClienteInsert = data =>
   validateFormWithSchema(getClienteInsertSchemaByIdType(data.tipo), data);
 
+const validarDatilConfig = data =>
+  validateFormWithSchema(datilConfigSchema, data);
+
 module.exports = {
+  datilConfigSchema,
   getClienteInsertSchemaByIdType,
   getClienteRowSchemaByIdType,
   validarFactura,
   validarClienteInsert,
+  validarDatilConfig,
   validarBusqueda,
   validarMedico,
   validarProducto,

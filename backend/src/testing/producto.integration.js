@@ -22,13 +22,15 @@ describe('/producto/ endpoints', () => {
     });
 
     it('retorna 422 al ingresar producto con un nombre ya existente', () =>
-      api.insertarProducto('34tger5', 'Glyco', 'TECO', 399900, 499900, true).then(
-        () => Promise.reject(new Error('expected to fail')),
-        ({ response: res }) => {
-          expect(res.status).toBe(422);
-          expect(res.body.code).toEqual('SQLITE_CONSTRAINT');
-        }
-      ));
+      api
+        .insertarProducto('34tger5', 'Glyco', 'TECO', 399900, 499900, true)
+        .then(
+          () => Promise.reject(new Error('expected to fail')),
+          ({ response: res }) => {
+            expect(res.status).toBe(422);
+            expect(res.body.code).toEqual('SQLITE_CONSTRAINT');
+          }
+        ));
   });
 
   describe('/producto/find', () => {

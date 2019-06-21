@@ -1,4 +1,8 @@
-const valorPalabras = require('../pdf/pdfutils.js').valorPalabras;
+const {
+  generarDetalleOpcionesDePago,
+  crearMatrizValoresTotales,
+  valorPalabras
+} = require('../pdf/pdfutils.js');
 
 const MAIN_BOX_X = 27;
 const MAIN_BOX_WIDTH = 519;
@@ -44,8 +48,9 @@ const paymentAgreementString =
   ' pago. Para toda acción legal, renuncio a domicilio y me someto a los jueces' +
   ' de esta jurisdicción o al que elija el acreedor.';
 
-const drawInvoiceInfoContents = (doc, fecha, cliente) => {
-  const { nombre, telefono1, direccion, ruc } = cliente;
+const drawInvoiceInfoContents = (doc, { ventaRow, clienteRow }) => {
+  const { nombre, telefono1, direccion, ruc } = clienteRow;
+  const { fecha } = ventaRow;
 
   const topTableStart = { x: BOX1_POS.x + 8, y: BOX1_POS.y + 16 };
   const tableContentRowPos = 95;
@@ -71,12 +76,6 @@ const drawInvoiceInfoContents = (doc, fecha, cliente) => {
     .text('RUC: ', RUCTitleLeftMargin, RUCPhoneLinePos)
     .text(ruc, RUCLeftMargin, RUCPhoneLinePos);
   doc.lineGap(0); //restore default
-};
-
-const drawInvoiceInfo = (doc, ventaRow, cliente) => {
-  const { fecha } = ventaRow;
-
-  drawInvoiceInfoContents(doc, fecha, cliente);
 };
 
 const drawFacturableDescription = (doc, facturable, detallado, linePos) => {
@@ -126,7 +125,7 @@ const drawFacturableLine = (doc, facturable, detallado, pos) => {
   drawFacturableDescription(doc, facturable, detallado, linePos);
 };
 
-const drawRemainingFacturablesOnNextPage = (doc, detallado, facturables) => {
+const drawRemainingFacturablesOnNextPage = (doc, detallado, unidades) => {
   doc.addPage({
     margins: {
       left: 72,
@@ -136,17 +135,17 @@ const drawRemainingFacturablesOnNextPage = (doc, detallado, facturables) => {
     }
   });
 
-  facturables.forEach((facturable, i) =>
+  unidades.forEach((facturable, i) =>
     drawFacturableLine(doc, facturable, detallado, i + 1)
   );
 };
 
-const drawFacturablesDetails = (doc, facturables, detallado) => {
+const drawFacturablesDetails = (doc, unidades, detallado) => {
   // eslint-disable-next-line fp/no-mutation
   doc.y = Y3_LINE + 9;
   try {
     doc.fontSize(8);
-    facturables.forEach((facturable, i) => {
+    unidades.forEach((facturable, i) => {
       const heightFactor = detallado ? 4 : 2;
       const facturableSeDesborda =
         doc.y + doc.currentLineHeight() * heightFactor > Y4_LINE;
@@ -180,13 +179,13 @@ const drawValueLine = (doc, valueLabel, valueSymbol, valueNumber) => {
     });
 };
 
-const drawTotalValues = (doc, facturaPDFData) => {
+const drawTotalValues = (doc, ventaRow) => {
   doc.lineGap(7);
   // eslint-disable-next-line fp/no-mutation
   doc.y = Y4_LINE + 15;
 
-  const drawValueLineArgs = facturaPDFData.matrizValoresTotales;
-  drawValueLineArgs.forEach(args => {
+  const matrizValoresTotales = crearMatrizValoresTotales(ventaRow);
+  matrizValoresTotales.forEach(args => {
     drawValueLine(doc, ...args);
   });
 
@@ -242,9 +241,10 @@ const drawPaymentMethodSubtitle = doc => {
   doc.x = doc.x + doc.widthOfString('FORMA DE PAGO:') + 3;
 };
 
-const drawPaymentMethodFooter = (doc, paymentMethods) => {
+const drawPaymentMethodFooter = (doc, pagos) => {
   const startX = BOX2_POS.x;
   const valueBoxHeight = doc.currentLineHeight() + 4;
+  const paymentMethods = generarDetalleOpcionesDePago(pagos);
 
   doc.fontSize(6);
 
@@ -259,25 +259,25 @@ const drawPaymentMethodFooter = (doc, paymentMethods) => {
   doc.fontSize(12); //restore default
 };
 
-module.exports = (facturaPDFData, cliente) => {
+module.exports = ({ ventaRow, unidades, pagos, clienteRow }) => {
   const writeFunc = doc => {
-    const { detallado, total, formasDePago, facturables } = facturaPDFData;
+    const { detallado, total } = ventaRow;
 
-    drawInvoiceInfo(doc, facturaPDFData, cliente);
+    drawInvoiceInfoContents(doc, { ventaRow, clienteRow, unidades });
     const remainingFacturablesIndex = drawFacturablesDetails(
       doc,
-      facturables,
+      unidades,
       detallado
     );
     drawTotalPalabras(doc, 'SON: ' + valorPalabras(total));
-    drawTotalValues(doc, facturaPDFData);
-    drawPaymentMethodFooter(doc, formasDePago);
+    drawTotalValues(doc, ventaRow);
+    drawPaymentMethodFooter(doc, pagos);
 
     if (remainingFacturablesIndex) {
       drawRemainingFacturablesOnNextPage(
         doc,
         detallado,
-        facturables,
+        unidades,
         remainingFacturablesIndex
       );
     }

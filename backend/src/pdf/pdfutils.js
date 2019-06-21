@@ -1,5 +1,9 @@
 const fs = require('fs');
-const { fromVentaRow } = require('./facturaPDFData.js');
+const {
+  fromVentaRow,
+  crearMatrizValoresTotales,
+  generarDetalleOpcionesDePago
+} = require('./facturaPDFData.js');
 
 const billetesPalabras = billetes => {
   if (billetes === 0) return 'CERO';
@@ -93,8 +97,10 @@ const createTemporaryDir = dirname => {
 };
 
 module.exports = {
-  billetesPalabras: billetesPalabras,
-  valorPalabras: valorPalabras,
-  createTemporaryDir: createTemporaryDir,
+  billetesPalabras,
+  valorPalabras,
+  createTemporaryDir,
+  crearMatrizValoresTotales,
+  generarDetalleOpcionesDePago,
   ventaRowToPDFData: fromVentaRow
 };

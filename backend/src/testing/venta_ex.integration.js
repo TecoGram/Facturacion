@@ -24,8 +24,8 @@ const baseVentaEx = Object.freeze({
   paciente: 'Carlos Armijos',
   fecha: '2016-11-26',
   autorizacion: '',
-  pagos: [{ formaPago: 'efectivo', valor: 22.39 }],
-  subtotal: 19.99,
+  pagos: [{ formaPago: 'efectivo', valor: 223900 }],
+  subtotal: 199900,
   descuento: 0
 });
 
@@ -37,8 +37,8 @@ describe('/venta_ex/ endpoints', () => {
         'rytertg663433g',
         'examen',
         'TECO',
-        39.99,
-        49.99,
+        399900,
+        499900,
         false
       ),
       api.insertarCliente({
@@ -118,7 +118,7 @@ describe('/venta_ex/ endpoints', () => {
     });
   });
 
-  describe('/venta_ex/ver/:id', () => {
+  describe('/venta/ver/:id', () => {
     const ventaRow = {
       ...baseVentaEx,
       codigo: '9999996'
@@ -129,7 +129,9 @@ describe('/venta_ex/ endpoints', () => {
       const unidad = await fetchUnidad('examen');
 
       const newVentaRow = { ...ventaRow, unidades: [unidad] };
-      const res1 = await api.insertarVentaExamen(newVentaRow);
+      const res1 = await api
+        .insertarVentaExamen(newVentaRow)
+        .catch(err => console.log(err));
       expect(res1.status).toBe(200);
       insertedRowid = res1.body.rowid;
     });
@@ -142,27 +144,39 @@ describe('/venta_ex/ endpoints', () => {
     });
 
     it("retorna json si el header 'Accept' es igual a 'application/json'", async () => {
-      const res = await api.verVentaExamen(insertedRowid);
+      const res = await api.verVenta(insertedRowid);
       expect(res.status).toBe(200);
-      const { facturaData, facturables, cliente } = res.body;
-      expect(facturaData).toEqual(
-        expect.objectContaining({
+      expect(res.body).toEqual({
+        ventaRow: expect.objectContaining({
           codigo: ventaRow.codigo,
-          fecha: ventaRow.fecha,
-          paciente: ventaRow.paciente
-        })
-      );
-      expect(facturables).toHaveLength(1);
-      expect(cliente.rowid).toEqual(ventaRow.cliente);
+          empresa: ventaRow.empresa,
+          fecha: ventaRow.fecha
+        }),
+        clienteRow: expect.objectContaining({
+          rowid: expect.any(Number),
+          nombre: 'Dr. Julio Mendoza'
+        }),
+        medicoRow: expect.objectContaining({
+          rowid: expect.any(Number),
+          nombre: 'Dr. Juan Coronel'
+        }),
+        unidades: [
+          expect.objectContaining({
+            producto: expect.any(Number),
+            nombre: 'examen',
+            count: 1,
+            precioVenta: 499900
+          })
+        ],
+        pagos: [
+          expect.objectContaining({
+            formaPago: 'efectivo',
+            valor: 223900
+          })
+        ],
+        paciente: 'Carlos Armijos'
+      });
     });
-
-    it('retorna 404 si la factura solicitada no existe', () =>
-      api
-        .verVentaExamen(999643)
-        .then(() => Promise.reject('Expected to fail'))
-        .catch(({ response: res }) => {
-          expect(res.status).toBe(404);
-        }));
   });
 
   describe('/venta_ex/find', () => {
@@ -196,7 +210,7 @@ describe('/venta_ex/ endpoints', () => {
         }));
   });
 
-  describe('/venta_ex/delete', () => {
+  describe('/venta/delete', () => {
     const ventaRow = {
       ...baseVentaEx,
       codigo: '9999990'

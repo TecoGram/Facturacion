@@ -1,8 +1,6 @@
 const knex = require('../db.js');
 const { crearTablaClientes, crearTablaMedicos } = require('../dbTables.js');
-const {
-  calcularTotalVentaRow
-} = require('../../../frontend/src/Factura/Math.js');
+const { calcularTotalVentaRow } = require('facturacion_common/src/Math.js');
 
 const crearTablaProductos = table => {
   table.integer('rowid').primary();
@@ -50,8 +48,10 @@ const crearTablaPagos = table => {
 };
 
 const crearTablaComprobantes = table => {
-  table.increments('rowid').primary();
+  table.increments('secuencial').primary();
   table.integer('ventaId').notNullable();
+  table.string('id');
+  table.string('clave_acceso');
 
   table
     .foreign('ventaId')
@@ -226,7 +226,8 @@ const copyUnidades = async ventasMap => {
     maxSize: 120
   });
 };
-const copyProductos = async ventasMap => {
+
+const copyProductos = async () => {
   const oldRows = await knex.select().from('productos');
   const newRows = oldRows.map(oldRow => {
     const { precioVenta, precioDist, ...o } = oldRow;

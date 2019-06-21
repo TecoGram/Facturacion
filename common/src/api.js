@@ -156,13 +156,6 @@ module.exports = {
       .set('Accept', 'application/json');
   },
 
-  verVentaExamen: (id) => {
-    return request
-      .get(prefix + `/venta_ex/ver/${id}`)
-      .send()
-      .set('Accept', 'application/json');
-  },
-
   deleteVenta: (id) => {
     return request
       .post(prefix + `/venta/delete/${id}`)

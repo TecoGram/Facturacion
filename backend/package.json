@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "criptext-js-tools": "^0.7.2",
-    "superagent": "^4.0.0-beta.5"
+    "superagent": "^5.1.0"
   },
   "scripts": {
     "init-db": "node src/scripts/setupDB.js",

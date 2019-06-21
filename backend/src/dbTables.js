@@ -87,8 +87,10 @@ const crearTablaPagos = table => {
 };
 
 const crearTablaComprobantes = table => {
-  table.increments('rowid').primary();
+  table.increments('secuencial').primary();
   table.integer('ventaId').notNullable();
+  table.string('id');
+  table.string('clave_acceso');
 
   table
     .foreign('ventaId')
@@ -132,6 +134,7 @@ const borrarTablaProductos = () => knex('productos').truncate();
 const borrarTablaStock = () => knex('stock').truncate();
 const borrarTablaUnidades = () => knex('unidades').truncate();
 const borrarTablaVentas = () => knex('ventas').truncate();
+const borrarTablaComprobantes = () => knex('comprobantes').truncate();
 
 module.exports = {
   borrarTablaClientes,
@@ -141,6 +144,7 @@ module.exports = {
   borrarTablaStock,
   borrarTablaUnidades,
   borrarTablaVentas,
+  borrarTablaComprobantes,
 
   crearTablaClientes,
   crearTablaComprobantes,

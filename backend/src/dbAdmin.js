@@ -31,15 +31,15 @@ const updateExamenInfo = (builder, { ventaId, medicoId, paciente }) => {
     });
 };
 
-const getExamenInfo = ventaId => {
+const getExamenInfoFromVenta = ventaId => {
   return knex
-    .select('nombre', 'nombreAscii', 'paciente')
+    .select('medicoId', 'nombre', 'nombreAscii', 'paciente')
     .from('examen_info')
     .join('medicos', { 'examen_info.medicoId': 'medicos.rowid' })
     .where({ ventaId });
 };
 
-const deleteVenta = (rowid) => {
+const deleteVenta = rowid => {
   return knex('ventas')
     .where({ rowid })
     .del();
@@ -87,7 +87,7 @@ const insertarExamenInfo = (builder, { medicoId, paciente, ventaId }) => {
   });
 };
 
-const getVenta = (rowid) => {
+const getVenta = rowid => {
   return knex
     .select('*')
     .from('ventas')
@@ -176,7 +176,7 @@ const getCliente = rowid => {
     .where({ rowid });
 };
 
-const getFacturablesVenta = ventaId => {
+const getUnidadesFromVenta = ventaId => {
   return knex
     .select(
       'productos.nombre',
@@ -194,58 +194,65 @@ const getFacturablesVenta = ventaId => {
     .where({ ventaId });
 };
 
-const getVentaPorTipo = (id, tipo) => {
-  switch (tipo) {
-    case 0:
-      return getVenta(id, empresa);
-    case 1:
-      return getVenta(id, empresa);
-    default:
-      throw Error('Tipo de venta desconocido');
-  }
+const getComprobanteFromVenta = ventaId => {
+  return knex
+    .select('*')
+    .from('comprobantes')
+    .where({ ventaId });
 };
 
-const getFacturaData = (id, tipo) => {
-  const p = getVenta(id)
-    .then(([ventaRow]) => {
-      if (ventaRow)
-        return getCliente(ventaRow.cliente).then(([cliente]) => ({
-          ventaRow,
-          cliente
-        }));
-      return Promise.reject({
-        errorCode: 404,
-        text: 'factura no encontrada'
-      });
-    })
-    .then(({ cliente, ventaRow }) => {
-      if (cliente)
-        return getFacturablesVenta(ventaRow.rowid).then(facturables => ({
-          ventaRow: { ...ventaRow, facturables },
-          cliente
-        }));
+const getPagosFromVenta = ventaId => {
+  return knex
+    .select('*')
+    .from('pagos')
+    .where({ ventaId });
+};
 
-      return Promise.reject({
-        errorCode: 404,
-        text: 'cliente no encontrado'
-      });
-    });
+const getFirstRow = ([row]) => row;
 
-  if (tipo === 0) return p;
-  return p.then(({ ventaRow, cliente }) => {
-    return getExamenInfo(ventaRow.rowid).then(([exInfo]) => {
-      if (exInfo)
-        return {
-          ventaRow: { ...ventaRow, paciente: exInfo.paciente },
-          cliente,
-          medico: { nombre: exInfo.nombre, nombreAscii: exInfo.nombreAscii }
-        };
-      return Promise.reject({
-        errorCode: 404,
-        text: 'examen no encontrado'
-      });
-    });
-  });
+const getFacturaData = async id => {
+  const [ventaRow] = await getVenta(id);
+  if (!ventaRow) throw { errorCode: 404, text: 'Factura no encontrada' };
+
+  const [
+    clienteRow,
+    examenInfo,
+    unidades,
+    pagos,
+    comprobanteRow
+  ] = await Promise.all([
+    getCliente(ventaRow.cliente).then(getFirstRow),
+    getExamenInfoFromVenta(id).then(getFirstRow),
+    getUnidadesFromVenta(id),
+    getPagosFromVenta(id),
+    getComprobanteFromVenta(id).then(getFirstRow)
+  ]);
+
+  if (!examenInfo) {
+    return {
+      ventaRow,
+      clienteRow,
+      unidades,
+      pagos,
+      comprobanteRow
+    };
+  }
+
+  const medicoRow = {
+    rowid: examenInfo.medicoId,
+    nombre: examenInfo.nombre,
+    nombreAscii: examenInfo.nombreAscii
+  };
+
+  return {
+    ventaRow,
+    medicoRow,
+    clienteRow,
+    unidades,
+    pagos,
+    comprobanteRow,
+    paciente: examenInfo.paciente
+  };
 };
 
 const buscarEnTabla = (tabla, columna, queryString, limit) => {
@@ -431,8 +438,8 @@ module.exports = {
 
   getFacturaData,
 
-  getExamenInfo,
-  getFacturablesVenta,
+  getExamenInfoFromVenta,
+  getUnidadesFromVenta,
   deleteCliente,
   deleteVenta,
   deleteProducto,

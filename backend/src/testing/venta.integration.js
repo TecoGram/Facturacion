@@ -136,16 +136,30 @@ describe('/venta/ endpoints', () => {
     it("retorna json si el header 'Accept' es igual a 'application/json'", async () => {
       const res = await api.verVenta(insertedRowid);
       expect(res.status).toBe(200);
-      const { facturaData, facturables, cliente } = res.body;
-      expect(facturaData).toEqual(
-        expect.objectContaining({
+      expect(res.body).toEqual({
+        ventaRow: expect.objectContaining({
           codigo: ventaRow.codigo,
           empresa: ventaRow.empresa,
           fecha: ventaRow.fecha
-        })
-      );
-      expect(facturables).toHaveLength(1);
-      expect(cliente.rowid).toEqual(ventaRow.cliente);
+        }),
+        clienteRow: expect.objectContaining({
+          rowid: expect.any(Number)
+        }),
+        unidades: [
+          expect.objectContaining({
+            producto: expect.any(Number),
+            nombre: 'Glyco',
+            count: 1,
+            precioVenta: 499900
+          })
+        ],
+        pagos: [
+          expect.objectContaining({
+            formaPago: 'efectivo',
+            valor: 223900
+          })
+        ]
+      });
     });
 
     it('retorna 404 si la factura solicitada no existe', () =>
