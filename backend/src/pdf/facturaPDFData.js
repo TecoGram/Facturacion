@@ -9,33 +9,33 @@ const generarDetalleOpcionesDePago = pagos => {
   ];
 
   const efectivoPayment = pagos.find(i => i.formaPago === 'efectivo') || {
-    total: null
+    valor: null
   };
   const dineroElecPayment = pagos.find(
     i => i.formaPago === 'dinero_electronico_ec'
-  ) || { total: null };
+  ) || { valor: null };
   const tarjetaPayment = pagos
     .filter(i => tarjetaOptions.includes(i.formaPago))
     .reduce(
       (acc, i) => ({
-        total: acc.total != null ? acc.total + i.valor : i.valor
+        valor: acc.valor != null ? acc.valor + i.valor : i.valor
       }),
-      { total: null }
+      { valor: null }
     );
 
   const transferPayment = pagos.find(i => i.formaPago === 'transferencia') || {
-    total: null
+    valor: null
   };
   const otrosPayment = pagos.find(i => i.formaPago === 'otros') || {
-    total: null
+    valor: null
   };
 
   return [
-    ['EFECTIVO', efectivoPayment.total],
-    ['DINERO ELECTRÓNICO', dineroElecPayment.total],
-    ['TARJETA DE CRÉDITO/DÉBITO', tarjetaPayment.total],
-    ['TRANSFERENCIA', transferPayment.total],
-    ['OTRO', otrosPayment.total]
+    ['EFECTIVO', efectivoPayment.valor],
+    ['DINERO ELECTRÓNICO', dineroElecPayment.valor],
+    ['TARJETA DE CRÉDITO/DÉBITO', tarjetaPayment.valor],
+    ['TRANSFERENCIA', transferPayment.valor],
+    ['OTRO', otrosPayment.valor]
   ];
 };
 

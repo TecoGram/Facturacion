@@ -4,6 +4,7 @@ const path = require('path');
 const Express = require('express');
 const bodyParser = require('body-parser');
 
+const Datil = require('./DatilClient.js');
 const PDFWriter = require('./pdf/PDFWriter.js');
 const pdfutils = require('./pdf/pdfutils.js');
 const facturaTemplate = require('./pdf/template.js');
@@ -265,14 +266,14 @@ const verVentaJSON = (req, res) => {
     res.status(error.errorCode).send(error.text);
   };
 
-  db.getFacturaData(id).then(okHandler, errorHandler);
+  db.getVentaById(id).then(okHandler, errorHandler);
 };
 
 const verVentaPDF = (req, res) => {
   const { id } = req.params;
   const facturaFileName = id + '.pdf';
 
-  db.getFacturaData(id)
+  db.getVentaById(id)
     .then(resp => {
       const writeFunc = facturaTemplate(resp);
       return new PDFWriter(facturaDir + facturaFileName, writeFunc);
@@ -288,7 +289,6 @@ const verVentaPDF = (req, res) => {
       });
     })
     .catch(error => {
-      console.log('errorS', error);
       if (error.errorCode) res.status(error.errorCode).send(error.text);
       else res.status(500).send(error);
     });
@@ -349,6 +349,7 @@ const handleValidData = fn => async (req, res) => {
     const { status, resp } = await fn(req.safeData);
     res.status(status).send(resp);
   } catch (err) {
+    console.error('Error al procesar request:', err);
     res.status(500).send(err);
   }
 };
@@ -356,33 +357,31 @@ const handleValidData = fn => async (req, res) => {
 app.post(
   '/venta/new',
   validarVenta,
-  handleValidData(data =>
-    db
-      .insertarVenta(data)
-      .then(rowid => ({ status: 200, resp: { rowid } }))
-      .catch(err => {
-        console.log('venta err', err);
-        if (err.errno === CONSTRAINT_ERROR_SQLITE)
-          return { status: 400, resp: 'Ya existe una factura con ese código.' };
-        throw err;
-      })
-  )
+  handleValidData(async data => {
+    const ventaId = await db.insertarVenta(data);
+    if (!data.contable) return { status: 200, resp: { rowid: ventaId } };
+
+    const venta = await db.getVentaById(ventaId);
+    const { id, clave_acceso } = await Datil.emitirFactura(venta);
+    await db.colocarComprobante({ ventaId, id, clave_acceso });
+
+    return { status: 200, resp: { rowid: ventaId } };
+  })
 );
 
 app.post(
   '/venta_ex/new',
   validarVentaExamen,
-  handleValidData(data =>
-    db
-      .insertarVentaExamen(data)
-      .then(rowid => ({ status: 200, resp: { rowid } }))
-      .catch(err => {
-        console.log('error ', err);
-        if (err.errno === CONSTRAINT_ERROR_SQLITE)
-          return { status: 400, resp: 'Ya existe una factura con ese código.' };
-        throw err;
-      })
-  )
+  handleValidData(async data => {
+    const ventaId = await db.insertarVentaExamen(data);
+    if (!data.contable) return { status: 200, resp: { rowid: ventaId } };
+
+    const venta = await db.getVentaById(ventaId);
+    const { id, clave_acceso } = await Datil.emitirFactura(venta);
+    await db.colocarComprobante({ ventaId, id, clave_acceso });
+
+    return { status: 200, resp: { rowid: ventaId } };
+  })
 );
 
 app.post('/venta/update', validarVentaUpdate, (req, res) => {

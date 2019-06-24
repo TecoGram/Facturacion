@@ -180,7 +180,7 @@ const dateString = () => (ctx, value) => {
   return value;
 };
 
-const boolean = ({ fallback } = {}) => (ctx, value) => {
+const bool = ({ fallback } = {}) => (ctx, value) => {
   if (value === null || value === undefined) {
     if (fallback === true || fallback === false) return fallback;
     return new Error(`"${ctx.name}" es requerido`);
@@ -235,13 +235,6 @@ const phone = ({ fallback } = {}) => (ctx, value) => {
   const invalidPhoneChar = usesCharset(value, phoneCharset);
   if (invalidPhoneChar)
     return new Error(`caracter inválido en ${ctx.name}: '${invalidPhoneChar}'`);
-
-  return value;
-};
-
-const bool = () => (ctx, value) => {
-  if (typeof value !== 'boolean')
-    return new Error(`"${ctx.name}" debe de ser boolean`);
 
   return value;
 };
@@ -479,11 +472,14 @@ const ventaSchema = {
   autorizacion: string({ fallback: '', allowEmpty: true }),
   cliente: primaryKey(),
   detallado: bool(),
+  contable: bool(),
   pagos: array({ item: pagoSchema, fallback: [] }),
   unidades: array({ item: unidadSchema })
 };
 
 const ventaInsertSchema = getSchemaExcludingKeys(ventaSchema, ['rowid']);
+
+const ventaUpdateSchema = getSchemaExcludingKeys(ventaSchema, ['contable']);
 
 const facturaSchema = getSchemaExcludingKeys(ventaSchema, ['rowid', 'pagos']);
 
@@ -514,6 +510,7 @@ const ventaExamenSchema = {
   cliente: primaryKey(),
   medico: primaryKey(),
   paciente: string(),
+  contable: bool(),
   pagos: array({ item: pagoSchema }),
   unidades: array({ item: unidadSchema })
 };
@@ -521,6 +518,7 @@ const ventaExamenSchema = {
 const ventaExamenInsertSchema = getSchemaExcludingKeys(ventaExamenSchema, [
   'rowid'
 ]);
+const ventaExamenUpdateSchema = getSchemaExcludingKeys(ventaExamenSchema, ['contable'])
 
 const datilConfigSchema = {
   apiKey: string(),
@@ -541,7 +539,7 @@ const datilConfigSchema = {
           nombre_comercial: string(),
           direccion: string(),
           contribuyente_especial: string({ allowEmpty: true }),
-          obligado_contabilidad: boolean(),
+          obligado_contabilidad: bool(),
 
           establecimiento: object({
             path: 'emision.emisor.establecimiento',
@@ -627,8 +625,10 @@ module.exports = {
   facturaSchema,
   ventaSchema,
   ventaInsertSchema,
+  ventaUpdateSchema,
   ventaExamenSchema,
   ventaExamenInsertSchema,
+  ventaExamenUpdateSchema,
   clienteRowSchema,
   clienteInsertSchema,
   sanitizarDinero,

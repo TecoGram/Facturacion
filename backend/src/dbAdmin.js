@@ -9,6 +9,12 @@ const insertarVentaBase = (builder, row) => {
   return q;
 };
 
+const insertarNuevoComprobante = (builder, ventaId) => {
+  return builder
+    .table('comprobantes')
+    .insert({ ventaId, id: null, clave_acceso: null });
+};
+
 const updateVenta = (builder, row) => {
   const { rowid } = row;
   return builder('ventas')
@@ -87,7 +93,7 @@ const insertarExamenInfo = (builder, { medicoId, paciente, ventaId }) => {
   });
 };
 
-const getVenta = rowid => {
+const getVentaRow = rowid => {
   return knex
     .select('*')
     .from('ventas')
@@ -210,8 +216,8 @@ const getPagosFromVenta = ventaId => {
 
 const getFirstRow = ([row]) => row;
 
-const getFacturaData = async id => {
-  const [ventaRow] = await getVenta(id);
+const getVentaById = async id => {
+  const [ventaRow] = await getVentaRow(id);
   if (!ventaRow) throw { errorCode: 404, text: 'Factura no encontrada' };
 
   const [
@@ -299,6 +305,13 @@ const updateCliente = row => {
     .update({ ...row, nombreAscii });
 };
 
+const colocarComprobante = ({ ventaId, id, clave_acceso }) => {
+  return knex
+    .table('comprobantes')
+    .where({ ventaId })
+    .update({ id, clave_acceso });
+};
+
 const insertarPagosPorVenta = (trx, ventaId, pagos) =>
   insertarPagos(trx, pagos.map(p => ({ ...p, ventaId })));
 
@@ -372,18 +385,27 @@ module.exports = {
 
   insertarVenta: venta =>
     knex.transaction(async trx => {
-      const { unidades, pagos, ...ventaRow } = venta;
+      const { unidades, pagos, contable, ...ventaRow } = venta;
       const [ventaId] = await insertarVentaBase(trx, { ...ventaRow, tipo: 0 });
 
       const unidadesConID = colocarVentaID(unidades, ventaId);
       await insertarPagosPorVenta(trx, ventaId, pagos);
       await insertarNuevasUnidades(trx, unidadesConID);
+      if (contable) await insertarNuevoComprobante(trx, ventaId);
+
       return ventaId;
     }),
 
   insertarVentaExamen: ventaEx =>
     knex.transaction(async trx => {
-      const { unidades, medico: medicoId, paciente, pagos, ...venta } = ventaEx;
+      const {
+        unidades,
+        medico: medicoId,
+        paciente,
+        pagos,
+        contable,
+        ...venta
+      } = ventaEx;
       const ventaRow = {
         ...venta,
         detallado: false,
@@ -396,6 +418,8 @@ module.exports = {
       await insertarExamenInfo(trx, { medicoId, paciente, ventaId });
       await insertarPagosPorVenta(trx, ventaId, pagos);
       await insertarNuevasUnidades(trx, unidadesConID);
+      if (contable) await insertarNuevoComprobante(trx, ventaId);
+
       return ventaId;
     }),
 
@@ -436,8 +460,9 @@ module.exports = {
     return findVentasExamen(keywords);
   },
 
-  getFacturaData,
-
+  colocarComprobante,
+  getVentaById,
+  getComprobanteFromVenta,
   getExamenInfoFromVenta,
   getUnidadesFromVenta,
   deleteCliente,

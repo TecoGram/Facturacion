@@ -24,6 +24,7 @@ export const getDefaultState = () => ({
     flete: '',
     detallado: true,
     paciente: '',
+    contable: false,
     guia: ''
   },
   unidades: [],
@@ -51,6 +52,7 @@ const crearVenta = (config, state, subtotal) => {
     fecha: toReadableDate(inputs.fecha),
     autorizacion: inputs.autorizacion,
     guia: inputs.guia,
+    contable: inputs.contable,
     detallado: inputs.detallado,
     descuento: inputs.descuento,
     iva: config.iva,

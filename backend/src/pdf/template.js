@@ -3,6 +3,8 @@ const {
   crearMatrizValoresTotales,
   valorPalabras
 } = require('../pdf/pdfutils.js');
+const { calcularValoresTotales } = require('facturacion_common/src/Math.js');
+const Money = require('facturacion_common/src/Money.js');
 
 const MAIN_BOX_X = 27;
 const MAIN_BOX_WIDTH = 519;
@@ -108,15 +110,13 @@ const drawFacturableLine = (doc, facturable, detallado, pos) => {
     width: cantColumnWidth - 10
   });
 
-  const precioVentaStr = Number(facturable.precioVenta).toFixed(2);
+  const precioVentaStr = Money.print(facturable.precioVenta);
   doc.text(precioVentaStr, descriptionColumnSeparator + 5, linePos, {
     align: 'right',
     width: unitPriceColumnWidth - 10
   });
 
-  const precioTotal = Number(facturable.count * facturable.precioVenta).toFixed(
-    2
-  );
+  const precioTotal = Money.print(facturable.count * facturable.precioVenta);
   doc.text(precioTotal, unitPriceColumnSeparator + 5, linePos, {
     align: 'right',
     width: BOX2_END_X - unitPriceColumnSeparator - 10
@@ -213,7 +213,7 @@ const drawPaymentMethodColumn = (doc, boxHeight, methodName, totalPayed) => {
   if (totalPayed) {
     doc
       .fontSize(7)
-      .text(totalPayed, doc.x, textY, {
+      .text(Money.print(totalPayed), doc.x, textY, {
         width: boxWidth - 3,
         align: 'right'
       })
@@ -261,7 +261,13 @@ const drawPaymentMethodFooter = (doc, pagos) => {
 
 module.exports = ({ ventaRow, unidades, pagos, clienteRow }) => {
   const writeFunc = doc => {
-    const { detallado, total } = ventaRow;
+    const { detallado } = ventaRow;
+    const { total } = calcularValoresTotales(
+      ventaRow.subtotal,
+      ventaRow.flete,
+      ventaRow.iva,
+      ventaRow.descuento
+    );
 
     drawInvoiceInfoContents(doc, { ventaRow, clienteRow, unidades });
     const remainingFacturablesIndex = drawFacturablesDetails(
@@ -269,7 +275,7 @@ module.exports = ({ ventaRow, unidades, pagos, clienteRow }) => {
       unidades,
       detallado
     );
-    drawTotalPalabras(doc, 'SON: ' + valorPalabras(total));
+    drawTotalPalabras(doc, 'SON: ' + valorPalabras(Money.print(total)));
     drawTotalValues(doc, ventaRow);
     drawPaymentMethodFooter(doc, pagos);
 

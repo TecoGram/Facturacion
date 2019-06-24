@@ -1,33 +1,52 @@
+jest.mock('../HTTPClient.js', () => ({
+  postRequest: jest.fn()
+}));
+jest.mock('../../../datil.config.js', () => require('./utils.js').datilConfig);
+
 const request = require('superagent');
 const api = require('facturacion_common/src/api.js');
-const FacturacionModels = require('facturacion_common/src/Models.js');
 
+const HTTPClient = require('../HTTPClient.js');
 const server = require('../server.js');
 const setup = require('../scripts/setupDB.js');
-
-const fetchUnidad = async name => {
-  const res = await api.findProductos(name);
-  expect(res.status).toBe(200);
-
-  const products = res.body;
-  const { nombre, codigo, ...unidad } = FacturacionModels.facturableAUnidad(
-    FacturacionModels.productoAFacturable(products[0])
-  );
-  return unidad;
-};
+const { fetchUnidad } = require('./utils.js');
 
 const baseVentaEx = Object.freeze({
-  codigo: '9999999',
+  codigo: '',
   empresa: 'TecoGram S.A.',
   cliente: 1,
   medico: 1,
   paciente: 'Carlos Armijos',
   fecha: '2016-11-26',
   autorizacion: '',
-  pagos: [{ formaPago: 'efectivo', valor: 223900 }],
+  contable: false,
+  pagos: [{ formaPago: 'efectivo', valor: 199900 }],
   subtotal: 199900,
   descuento: 0
 });
+
+const insertarNuevaFacturaContable = async () => {
+  HTTPClient.postRequest.mockReturnValueOnce(
+    Promise.resolve({
+      id: '__datil_id__',
+      clave_acceso: '__clave__'
+    })
+  );
+
+  const unidad = await fetchUnidad('examen');
+  const newVentaRow = {
+    ...baseVentaEx,
+    contable: true,
+    unidades: [unidad]
+  };
+
+  const res = await api.insertarVentaExamen(newVentaRow);
+  expect(res.status).toBe(200);
+  expect(HTTPClient.postRequest).toHaveBeenCalledTimes(1);
+
+  const [[issueReq]] = HTTPClient.postRequest.mock.calls;
+  return issueReq;
+};
 
 describe('/venta_ex/ endpoints', () => {
   beforeAll(async () => {
@@ -37,15 +56,15 @@ describe('/venta_ex/ endpoints', () => {
         'rytertg663433g',
         'examen',
         'TECO',
-        399900,
-        499900,
+        0,
+        199900,
         false
       ),
       api.insertarCliente({
         id: '0937816882001',
-        nombre: 'Dr. Julio Mendoza',
-        direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
-        email: 'julio_mendoza@yahoo.com.ec',
+        nombre: 'Eduardo Almeida',
+        direccion: 'Boyaca y Sucre 112',
+        email: 'ealmeida@yahoo.com.mx',
         telefono1: '2645422',
         telefono2: '2876357',
         descDefault: '0',
@@ -62,35 +81,79 @@ describe('/venta_ex/ endpoints', () => {
     ]).catch(err => console.log('setup error: ' + err));
     responses.forEach(res => expect(res.status).toEqual(200));
   });
+
   afterAll(server.destroy);
 
   describe('/venta_ex/new', () => {
-    it('retorna 200 al ingresar datos correctos', async () => {
-      const unidad = await fetchUnidad('examen');
-      const newVentaRow = {
-        ...baseVentaEx,
-        unidades: [unidad]
-      };
-
-      const res = await api.insertarVentaExamen(newVentaRow);
-      expect(res.status).toBe(200);
-    });
-
-    it('retorna 400 al ingresar datos duplicados', async () => {
-      const unidad = await fetchUnidad('examen');
-      const newVentaRow = {
-        ...baseVentaEx,
-        codigo: '9999998',
-        unidades: [unidad]
-      };
-
-      const res1 = await api.insertarVentaExamen(newVentaRow);
-      expect(res1.status).toBe(200);
-
-      return api
-        .insertarVenta(newVentaRow)
-        .then(() => Promise.reject('Expected to fail'))
-        .catch(({ response: res }) => expect(res.status).toBe(400));
+    it('genera comprobantes correctamente', async () => {
+      const issueReq = await insertarNuevaFacturaContable();
+      expect(issueReq).toEqual({
+        host: 'https://link.datil.co',
+        path: '/invoices/issue',
+        headers: [
+          { key: 'X-Key', value: '__MI_API_KEY_SECRETO__' },
+          { key: 'X-Password', value: '__MI_PASS__' }
+        ],
+        body: {
+          secuencial: 1,
+          emisor: {
+            ruc: '0999999999001',
+            razon_social: '__nombre__',
+            nombre_comercial: '__nombre__',
+            direccion: '__direccion__',
+            contribuyente_especial: '',
+            obligado_contabilidad: true,
+            establecimiento: {
+              codigo: '001',
+              punto_emision: '001',
+              direccion: '__direccion__'
+            }
+          },
+          moneda: 'USD',
+          ambiente: 1,
+          totales: {
+            totales_sin_impuestos: 19.99,
+            descuento_adicional: 0,
+            descuento: 0,
+            propina: 0,
+            importe_total: 19.99,
+            impuestos: [
+              {
+                codigo: 2,
+                codigo_porcentaje: 0,
+                base_imponible: 19.99,
+                valor: 0
+              }
+            ]
+          },
+          comprador: {
+            razon_social: 'Eduardo Almeida',
+            identificacion: '0937816882001',
+            tipo_identificacion: '04',
+            email: 'ealmeida@yahoo.com.mx',
+            telefono: '2645422',
+            direccion: 'Boyaca y Sucre 112'
+          },
+          tipo_emision: 1,
+          items: [
+            {
+              descripcion: 'examen',
+              cantidad: 1,
+              precio_unitario: 19.99,
+              precio_total_sin_impuestos: 19.99,
+              impuestos: [
+                {
+                  codigo: 2,
+                  codigo_porcentaje: 0,
+                  base_imponible: 19.99,
+                  valor: 0
+                }
+              ]
+            }
+          ],
+          pagos: [{ medio: 'efectivo', total: 19.99 }]
+        }
+      });
     });
   });
 
@@ -99,7 +162,6 @@ describe('/venta_ex/ endpoints', () => {
       const unidad = await fetchUnidad('examen');
       const newVentaRow = {
         ...baseVentaEx,
-        codigo: '9999997',
         unidades: [unidad]
       };
 
@@ -120,8 +182,7 @@ describe('/venta_ex/ endpoints', () => {
 
   describe('/venta/ver/:id', () => {
     const ventaRow = {
-      ...baseVentaEx,
-      codigo: '9999996'
+      ...baseVentaEx
     };
     let insertedRowid;
 
@@ -154,7 +215,7 @@ describe('/venta_ex/ endpoints', () => {
         }),
         clienteRow: expect.objectContaining({
           rowid: expect.any(Number),
-          nombre: 'Dr. Julio Mendoza'
+          nombre: 'Eduardo Almeida'
         }),
         medicoRow: expect.objectContaining({
           rowid: expect.any(Number),
@@ -165,13 +226,13 @@ describe('/venta_ex/ endpoints', () => {
             producto: expect.any(Number),
             nombre: 'examen',
             count: 1,
-            precioVenta: 499900
+            precioVenta: 199900
           })
         ],
         pagos: [
           expect.objectContaining({
             formaPago: 'efectivo',
-            valor: 223900
+            valor: 199900
           })
         ],
         paciente: 'Carlos Armijos'
@@ -212,8 +273,7 @@ describe('/venta_ex/ endpoints', () => {
 
   describe('/venta/delete', () => {
     const ventaRow = {
-      ...baseVentaEx,
-      codigo: '9999990'
+      ...baseVentaEx
     };
     let insertedRowid;
 

@@ -6,9 +6,9 @@ const {
   validarProducto,
   validateFormWithSchema,
   ventaInsertSchema,
-  ventaSchema,
+  ventaUpdateSchema,
   ventaExamenInsertSchema,
-  ventaExamenSchema
+  ventaExamenUpdateSchema
 } = require('facturacion_common/src/Validacion.js');
 
 const sendBadArgumentsResponse = (res, errors) => {
@@ -87,7 +87,7 @@ module.exports = {
   },
 
   validarVenta: validationMiddleware(ventaInsertSchema),
-  validarVentaUpdate: validationMiddleware(ventaSchema),
+  validarVentaUpdate: validationMiddleware(ventaUpdateSchema),
   validarVentaExamen: validationMiddleware(ventaExamenInsertSchema),
-  validarVentaExamenUpdate: validationMiddleware(ventaExamenSchema)
+  validarVentaExamenUpdate: validationMiddleware(ventaExamenUpdateSchema)
 };

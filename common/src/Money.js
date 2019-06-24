@@ -8,7 +8,10 @@ const fromString = s => {
 
 const print = v => (v / PRECISION).toFixed(2);
 
+const printFloat = v => parseFloat(print(v));
+
 module.exports = {
   fromString,
-  print
+  print,
+  printFloat
 };
