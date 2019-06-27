@@ -1,6 +1,7 @@
 const {
-  getClienteInsertSchemaByIdType,
-  getClienteRowSchemaByIdType,
+  clienteInsertSchema,
+  clienteRowSchema,
+  getClienteSchemaForIdType,
   validarBusqueda,
   validarMedico,
   validarProducto,
@@ -33,10 +34,10 @@ const validationMiddleware = (schema, key = 'body') => (req, res, next) => {
 
 const validarClienteMiddleware = ({ isInsert }) => (req, res, next) => {
   const { body } = req;
-  const getSchemaFn = isInsert
-    ? getClienteInsertSchemaByIdType
-    : getClienteRowSchemaByIdType;
-  const schema = getSchemaFn(body.tipo);
+  const schema = getClienteSchemaForIdType(
+    isInsert ? clienteInsertSchema : clienteRowSchema,
+    body.tipo
+  );
   const { inputs, errors } = validateFormWithSchema(schema, body);
   if (errors) {
     sendBadArgumentsResponse(res, errors);

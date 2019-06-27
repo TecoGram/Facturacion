@@ -6,7 +6,8 @@ import {
 } from 'facturacion_common/src/Validacion.js';
 import {
   oneYearFromToday,
-  toReadableDate
+  toReadableDate,
+  toDatilDate
 } from 'facturacion_common/src/DateParser.js';
 import * as Actions from './EditorActions.js';
 import API from 'facturacion_common/src/api.js';
@@ -18,7 +19,7 @@ export const getDefaultState = () => ({
   medicoRow: null,
   errors: {},
   inputs: {
-    fecha: new Date(),
+    fecha: 'now',
     descuento: '',
     autorizacion: '',
     flete: '',
@@ -45,15 +46,16 @@ const findValidacionErrors = (config, state) => {
 
 const crearVenta = (config, state, subtotal) => {
   const { clienteRow, medicoRow, inputs } = state;
+  const ventaDate = inputs.fecha === 'now' ? new Date() : inputs.fecha;
   return {
     codigo: '',
     empresa: config.empresa,
     cliente: clienteRow.rowid,
-    fecha: toReadableDate(inputs.fecha),
+    fecha: toDatilDate(ventaDate),
     autorizacion: inputs.autorizacion,
     guia: inputs.guia,
     contable: inputs.contable,
-    detallado: inputs.detallado,
+    detallado: config.isExamen ? false : inputs.detallado,
     descuento: inputs.descuento,
     iva: config.iva,
     subtotal,
@@ -89,7 +91,6 @@ const guardarFactura = ({ config, subtotal, callback }) => state => {
     : validarVentaInsert;
   const { errors, inputs } = validacionFn(venta);
   if (errors) {
-    console.log('errors', errors);
     callback({
       success: false,
       msg: 'Por favor revisa los datos ingresados.'
@@ -109,8 +110,17 @@ const guardarFactura = ({ config, subtotal, callback }) => state => {
 const updateFacturaInput = ({ key, value }) => state => {
   const { inputs } = state;
   const sanitizedValue = sanitizarFacturaInput(key, value);
-  if (sanitizedValue != null)
-    return { ...state, inputs: { ...inputs, [key]: value } };
+  if (sanitizedValue != null) {
+    switch (key) {
+      case 'flete':
+        return {
+          ...state,
+          inputs: { ...inputs, flete: sanitizedValue, fleteText: value }
+        };
+      default:
+        return { ...state, inputs: { ...inputs, [key]: value } };
+    }
+  }
   return state;
 };
 
@@ -136,6 +146,7 @@ const updateUnidadInput = ({ index, key, value }) => state => {
         };
         break;
       }
+
       default: {
         newUnidades[index] = {
           ...unidades[index],

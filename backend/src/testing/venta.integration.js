@@ -36,7 +36,7 @@ const baseClienteRow = Object.freeze({
 const baseVentaRow = Object.freeze({
   empresa: 'TecoGram S.A.',
   cliente: 1,
-  fecha: '2016-11-26',
+  fecha: '2016-11-26T12:33:56.875Z',
   autorizacion: '',
   detallado: false,
   flete: 0,
@@ -92,24 +92,22 @@ describe('/venta/ endpoints', () => {
   afterAll(server.destroy);
 
   describe('/venta/new', () => {
-
-    it ('genera facturas sin comprobantes', async () => {
+    it('genera facturas sin comprobantes', async () => {
       const newVentaRow = {
-          ...baseVentaRow,
-          unidades: [await fetchUnidad('Glyco')]
-        };
+        ...baseVentaRow,
+        unidades: [await fetchUnidad('Glyco')]
+      };
 
       const res = await api.insertarVenta(newVentaRow);
 
       expect(res.status).toBe(200);
       expect(HTTPClient.postRequest).toHaveBeenCalledTimes(0);
-    })
+    });
 
     describe('al generar facturas contables', () => {
       beforeEach(() => {
         HTTPClient.postRequest.mockReset();
       });
-
 
       it('genera comprobante usando cliente normal', async () => {
         const issueReq = await insertarNuevaFacturaContable();
@@ -122,6 +120,7 @@ describe('/venta/ endpoints', () => {
           ],
           body: {
             secuencial: expect.any(Number),
+            fecha_emision: '2016-11-26T12:33:56.875Z',
             emisor: {
               ruc: '0999999999001',
               razon_social: '__nombre__',
@@ -138,15 +137,15 @@ describe('/venta/ endpoints', () => {
             moneda: 'USD',
             ambiente: 1,
             totales: {
-              totales_sin_impuestos: 49.99,
+              total_sin_impuestos: 49.99,
               descuento_adicional: 0,
               descuento: 0,
               propina: 0,
               importe_total: 55.99,
               impuestos: [
                 {
-                  codigo: 2,
-                  codigo_porcentaje: 2,
+                  codigo: '2',
+                  codigo_porcentaje: '2',
                   base_imponible: 49.99,
                   valor: 6
                 }
@@ -167,12 +166,14 @@ describe('/venta/ endpoints', () => {
                 cantidad: 1,
                 precio_unitario: 49.99,
                 precio_total_sin_impuestos: 49.99,
+                descuento: 0,
                 impuestos: [
                   {
-                    codigo: 2,
-                    codigo_porcentaje: 2,
+                    codigo: '2',
+                    codigo_porcentaje: '2',
                     base_imponible: 49.99,
-                    valor: 6
+                    valor: 6,
+                    tarifa: 12
                   }
                 ]
               }
@@ -211,6 +212,7 @@ describe('/venta/ endpoints', () => {
           ],
           body: {
             secuencial: expect.any(Number),
+            fecha_emision: '2016-11-26T12:33:56.875Z',
             emisor: {
               ruc: '0999999999001',
               razon_social: '__nombre__',
@@ -227,21 +229,21 @@ describe('/venta/ endpoints', () => {
             moneda: 'USD',
             ambiente: 1,
             totales: {
-              totales_sin_impuestos: 152.97,
+              total_sin_impuestos: 152.97,
               descuento_adicional: 0,
               descuento: 0,
               propina: 0,
               importe_total: 170.97,
               impuestos: [
                 {
-                  codigo: 2,
-                  codigo_porcentaje: 2,
+                  codigo: '2',
+                  codigo_porcentaje: '2',
                   base_imponible: 149.97,
                   valor: 18
                 },
                 {
-                  codigo: 2,
-                  codigo_porcentaje: 0,
+                  codigo: '2',
+                  codigo_porcentaje: '0',
                   base_imponible: 3,
                   valor: 0
                 }
@@ -262,12 +264,14 @@ describe('/venta/ endpoints', () => {
                 cantidad: 3,
                 precio_unitario: 49.99,
                 precio_total_sin_impuestos: 149.97,
+                descuento: 0,
                 impuestos: [
                   {
-                    codigo: 2,
-                    codigo_porcentaje: 2,
+                    codigo: '2',
+                    codigo_porcentaje: '2',
                     base_imponible: 149.97,
-                    valor: 18
+                    valor: 18,
+                    tarifa: 12
                   }
                 ]
               },
@@ -276,12 +280,14 @@ describe('/venta/ endpoints', () => {
                 cantidad: 1,
                 precio_unitario: 3,
                 precio_total_sin_impuestos: 3,
+                descuento: 0,
                 impuestos: [
                   {
                     base_imponible: 3,
-                    codigo: 2,
-                    codigo_porcentaje: 0,
-                    valor: 0
+                    codigo: '2',
+                    codigo_porcentaje: '0',
+                    valor: 0,
+                    tarifa: 0
                   }
                 ]
               }
@@ -317,6 +323,7 @@ describe('/venta/ endpoints', () => {
           ],
           body: {
             secuencial: expect.any(Number),
+            fecha_emision: '2016-11-26T12:33:56.875Z',
             emisor: {
               ruc: '0999999999001',
               razon_social: '__nombre__',
@@ -333,15 +340,15 @@ describe('/venta/ endpoints', () => {
             moneda: 'USD',
             ambiente: 1,
             totales: {
-              totales_sin_impuestos: 99.98,
+              total_sin_impuestos: 99.98,
               descuento_adicional: 10,
               descuento: 10,
               propina: 0,
               importe_total: 100.78,
               impuestos: [
                 {
-                  codigo: 2,
-                  codigo_porcentaje: 2,
+                  codigo: '2',
+                  codigo_porcentaje: '2',
                   base_imponible: 89.98,
                   valor: 10.8
                 }
@@ -362,12 +369,14 @@ describe('/venta/ endpoints', () => {
                 cantidad: 2,
                 precio_unitario: 49.99,
                 precio_total_sin_impuestos: 99.98,
+                descuento: 0,
                 impuestos: [
                   {
-                    codigo: 2,
-                    codigo_porcentaje: 2,
+                    codigo: '2',
+                    codigo_porcentaje: '2',
                     base_imponible: 99.98,
-                    valor: 12
+                    valor: 12,
+                    tarifa: 12
                   }
                 ]
               }
@@ -377,7 +386,6 @@ describe('/venta/ endpoints', () => {
         });
       });
     });
-
   });
 
   describe('/venta/update', () => {

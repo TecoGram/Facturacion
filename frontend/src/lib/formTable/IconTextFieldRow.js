@@ -1,4 +1,5 @@
 import React from 'react';
+import AutoComplete from 'material-ui/AutoComplete';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import IconBox from '../IconBox';
@@ -12,13 +13,13 @@ const inputShape = React.PropTypes.shape({
   value: React.PropTypes.string.isRequired,
   onChange: React.PropTypes.func.isRequired,
   icon: React.PropTypes.func.isRequired,
-  disabled: React.PropTypes.bool,
+  disabled: React.PropTypes.bool
 });
 
 const boolInputShape = React.PropTypes.shape({
   hintText: React.PropTypes.string,
   value: React.PropTypes.bool.isRequired,
-  onChange: React.PropTypes.func.isRequired,
+  onChange: React.PropTypes.func.isRequired
 });
 const EmptyRow = props => {
   return (
@@ -53,6 +54,24 @@ const TextColumn = props => {
   );
 };
 
+const AutoCompleteColumn = props => {
+  const input = props.input;
+  return (
+    <td style={props.style}>
+      <AutoComplete
+        hintText={input.hintText}
+        dataSource={input.dataSource}
+        openOnFocus={true}
+        filter={AutoComplete.caseInsensitiveFilter}
+        onUpdateInput={input.onChange}
+        errorText={input.errorText}
+        disabled={input.disabled}
+        searchText={input.value}
+      />
+    </td>
+  );
+};
+
 const BoolColumn = props => {
   const input = props.input;
   return (
@@ -68,34 +87,34 @@ const BoolColumn = props => {
 };
 
 /**
-* Componente para mostrar un TextField con un icono a su izquierda o derecha.
-* La manera mas sencilla de alinear el icono con el TextField es una tabla, por
-* lo tanto este componente renderiza un tr. El padre de este componente debe
-* de ser un tableBody.
-*
-* Se pueden mostrar uno o dos TextFields con iconos organizados horizontalmente.
-* Para esto estan los props leftInput y rightInput. ambos props son un objeto
-* con los siguientes atributos:
-* - hintText: texto 'hint' a mostrar cuando el TextField esta vacio
-* - errorText: texto de error a mostrar debajo del TextField
-* - value: string a mostrar como contenido del TextField
-* - disabled: true si el campo debe de estar desabilitado
-* - onChange: callback a ejecutar cuando cambia el texto del TextField. esta
-* funcion deberia de terminar cambiando el prop 'value'
-* Si se pasan ambos props leftInput y rightInput se renderizan dos textFields,
-* de lo contrario uno, o ninguno si no se pasa nungun prop.
-*
-* El prop empty permite crear una fila vacia.
-* Por defecto se pinta el icono a la izquierda del TextField. se puede invertir
-* esto seteando el prop 'inverted' como true.
-*/
+ * Componente para mostrar un TextField con un icono a su izquierda o derecha.
+ * La manera mas sencilla de alinear el icono con el TextField es una tabla, por
+ * lo tanto este componente renderiza un tr. El padre de este componente debe
+ * de ser un tableBody.
+ *
+ * Se pueden mostrar uno o dos TextFields con iconos organizados horizontalmente.
+ * Para esto estan los props leftInput y rightInput. ambos props son un objeto
+ * con los siguientes atributos:
+ * - hintText: texto 'hint' a mostrar cuando el TextField esta vacio
+ * - errorText: texto de error a mostrar debajo del TextField
+ * - value: string a mostrar como contenido del TextField
+ * - disabled: true si el campo debe de estar desabilitado
+ * - onChange: callback a ejecutar cuando cambia el texto del TextField. esta
+ * funcion deberia de terminar cambiando el prop 'value'
+ * Si se pasan ambos props leftInput y rightInput se renderizan dos textFields,
+ * de lo contrario uno, o ninguno si no se pasa nungun prop.
+ *
+ * El prop empty permite crear una fila vacia.
+ * Por defecto se pinta el icono a la izquierda del TextField. se puede invertir
+ * esto seteando el prop 'inverted' como true.
+ */
 export default class IconTextFieldRow extends React.Component {
   static propTypes = {
     empty: React.PropTypes.bool,
     inverted: React.PropTypes.bool,
     leftInput: inputShape,
     rightInput: inputShape,
-    boolInput: boolInputShape,
+    boolInput: boolInputShape
   };
 
   getFirstIconColumn = leftInput => {
@@ -103,8 +122,17 @@ export default class IconTextFieldRow extends React.Component {
   };
 
   getFirstTextColumn = (leftInput, inverted) => {
+    if (!leftInput) return;
+
+    if (leftInput.dataSource)
+      return (
+        <AutoCompleteColumn
+          style={inverted ? secondInvColStyle : undefined}
+          input={leftInput}
+        />
+      );
+
     return (
-      leftInput &&
       <TextColumn
         style={inverted ? secondInvColStyle : undefined}
         input={leftInput}
@@ -113,8 +141,17 @@ export default class IconTextFieldRow extends React.Component {
   };
 
   getSecondIconColumn = (rightInput, inverted) => {
+    if (!rightInput) return;
+
+    if (rightInput.dataSource)
+      return (
+        <AutoCompleteColumn
+          style={inverted ? undefined : secondColStyle}
+          input={rightInput}
+        />
+      );
+
     return (
-      rightInput &&
       <IconColumn
         style={inverted ? undefined : secondColStyle}
         input={rightInput}
@@ -124,8 +161,9 @@ export default class IconTextFieldRow extends React.Component {
 
   getSecondBoolColumn = rightInput => {
     return (
-      rightInput &&
-      <BoolColumn input={rightInput} style={{ paddingLeft: '16px' }} />
+      rightInput && (
+        <BoolColumn input={rightInput} style={{ paddingLeft: '16px' }} />
+      )
     );
   };
 

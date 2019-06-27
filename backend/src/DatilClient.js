@@ -10,11 +10,18 @@ const codigosId = {
   cedula: '05',
   consumidor_final: '07'
 };
-const IVA = 2;
-const IVA_0p = 0;
-const IVA_12p = 2;
+const IVA = '2';
+const IVA_0p = '0';
+const IVA_12p = '2';
 
 const IVA_ACTUAL = IVA_12p;
+
+const iva2Float = iva => {
+  if (iva === IVA_0p) return 0;
+  if (iva === IVA_12p) return 12;
+
+  return 12;
+};
 
 const calcularIVA = (valor, codigo) => {
   if (codigo === IVA_ACTUAL) return Math.floor((valor * 12) / 100);
@@ -77,7 +84,7 @@ const crearTotales = (ventaRow, isExamen) => {
   );
 
   return {
-    totales_sin_impuestos: Money.printFloat(subtotal + flete),
+    total_sin_impuestos: Money.printFloat(subtotal + flete),
     descuento_adicional: Money.printFloat(rebaja),
     descuento: Money.printFloat(rebaja),
     propina: 0,
@@ -104,7 +111,8 @@ const crearImpuestosParaItem = (item, importe) => {
         codigo: IVA,
         codigo_porcentaje: IVA_ACTUAL,
         base_imponible: Money.printFloat(importe),
-        valor: Money.printFloat(calcularIVA(importe, IVA_ACTUAL))
+        valor: Money.printFloat(calcularIVA(importe, IVA_ACTUAL)),
+        tarifa: iva2Float(IVA_ACTUAL)
       }
     ];
 
@@ -113,7 +121,8 @@ const crearImpuestosParaItem = (item, importe) => {
       codigo: IVA,
       codigo_porcentaje: IVA_0p,
       base_imponible: Money.printFloat(importe),
-      valor: 0
+      valor: 0,
+      tarifa: 0
     }
   ];
 };
@@ -149,7 +158,8 @@ const crearItems = ({ unidades, detallado, flete }) => {
       cantidad: item.count,
       precio_unitario: Money.printFloat(item.precioVenta),
       precio_total_sin_impuestos: Money.printFloat(importe),
-      impuestos: crearImpuestosParaItem(item, importe)
+      impuestos: crearImpuestosParaItem(item, importe),
+      descuento: 0
     };
   });
 };
@@ -178,6 +188,7 @@ const ventaToReqBody = venta => {
 
   return {
     secuencial: comprobanteRow.secuencial,
+    fecha_emision: ventaRow.fecha,
     emisor: config.emision.emisor,
     moneda: config.emision.moneda,
     ambiente: config.emision.ambiente,

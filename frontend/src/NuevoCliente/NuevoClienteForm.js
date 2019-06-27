@@ -8,20 +8,38 @@ import Person from 'material-ui/svg-icons/social/person';
 import Phone from 'material-ui/svg-icons/communication/phone';
 
 import IconTextFieldRow from '../lib/formTable/IconTextFieldRow';
+import { TiposID } from 'facturacion_common/src/Models.js';
+
+const tiposIDSource = Object.keys(TiposID).map(key => ({
+  text: TiposID[key],
+  value: key
+}));
 
 export default class NuevoClienteForm extends React.Component {
   render() {
     const { editar, errors, inputs, updateData } = this.props;
 
-    const rucInput = {
-      hintText: 'RUC',
+    const tipoInput = {
+      hintText: 'Tipo de identificación',
       icon: Info,
-      value: inputs.ruc || '',
-      errorText: errors.ruc,
+      value: inputs.tipoText || '',
+      errorText: errors.tipo,
+      dataSource: tiposIDSource,
+      disabled: editar,
+      onChange: newText => {
+        updateData('tipo', newText);
+      }
+    };
+
+    const idInput = {
+      hintText: '#ID',
+      icon: Info,
+      value: inputs.id || '',
+      errorText: errors.id,
       disabled: editar,
       onChange: event => {
-        updateData('ruc', event.target.value);
-      },
+        updateData('id', event.target.value);
+      }
     };
 
     const telf1Input = {
@@ -31,7 +49,7 @@ export default class NuevoClienteForm extends React.Component {
       errorText: errors.telefono1,
       onChange: event => {
         updateData('telefono1', event.target.value);
-      },
+      }
     };
 
     const clienteInput = {
@@ -41,7 +59,7 @@ export default class NuevoClienteForm extends React.Component {
       errorText: errors.nombre,
       onChange: event => {
         updateData('nombre', event.target.value);
-      },
+      }
     };
 
     const telf2Input = {
@@ -51,7 +69,7 @@ export default class NuevoClienteForm extends React.Component {
       errorText: errors.telefono2,
       onChange: event => {
         updateData('telefono2', event.target.value);
-      },
+      }
     };
 
     const direccionInput = {
@@ -61,7 +79,7 @@ export default class NuevoClienteForm extends React.Component {
       errorText: errors.direccion,
       onChange: event => {
         updateData('direccion', event.target.value);
-      },
+      }
     };
 
     const emailInput = {
@@ -71,7 +89,7 @@ export default class NuevoClienteForm extends React.Component {
       errorText: errors.email,
       onChange: event => {
         updateData('email', event.target.value);
-      },
+      }
     };
 
     const descDefaultInput = {
@@ -81,19 +99,19 @@ export default class NuevoClienteForm extends React.Component {
       errorText: errors.descDefault,
       onChange: event => {
         updateData('descDefault', event.target.value);
-      },
+      }
     };
 
     return (
       <table>
         <tbody>
-          <IconTextFieldRow leftInput={clienteInput} rightInput={rucInput} />
+          <IconTextFieldRow leftInput={tipoInput} rightInput={idInput} />
+          <IconTextFieldRow leftInput={clienteInput} rightInput={emailInput} />
+          <IconTextFieldRow leftInput={telf1Input} rightInput={telf2Input} />
           <IconTextFieldRow
             leftInput={direccionInput}
-            rightInput={emailInput}
+            rightInput={descDefaultInput}
           />
-          <IconTextFieldRow leftInput={telf1Input} rightInput={telf2Input} />
-          <IconTextFieldRow leftInput={descDefaultInput} />
           {/* An additional empty row prevents jittering in the dialog */}
           <IconTextFieldRow empty={true} />
         </tbody>
@@ -106,5 +124,5 @@ NuevoClienteForm.propTypes = {
   editar: React.PropTypes.bool.isRequired,
   errors: React.PropTypes.object.isRequired,
   inputs: React.PropTypes.object.isRequired,
-  updateData: React.PropTypes.func.isRequired,
+  updateData: React.PropTypes.func.isRequired
 };

@@ -3,12 +3,24 @@ const format = require('fecha').format;
 * Parsea un Date de un string formato YYYY-MM-dd sin timezones
 */
 const parseDBDate = fecha => {
+  // ISO6801 string
+  if (fecha.contains('T') && fecha.endsWith('Z'))
+    return new Date(fecha);
+  
   //fucking timezones http://stackoverflow.com/a/31732581
   return new Date(fecha.replace(/-/g, '/'));
 };
 
 const toReadableDate = fecha => {
   return format(fecha, 'YYYY-MM-DD');
+};
+
+const toReadableDateTime = fecha => {
+  return format(fecha, 'YYYY-MM-DD hh:mm');
+};
+
+const toDatilDate = fecha => {
+  return fecha.toISOString();
 };
 
 const oneYearFromToday = () => {
@@ -19,6 +31,8 @@ module.exports = {
   oneYearFromToday,
   parseDBDate,
   toReadableDate,
+  toReadableDateTime,
+  toDatilDate,
 
   verVenta(resp) {
     const { cliente, medico, facturaData, facturables } = resp;

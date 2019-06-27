@@ -2,6 +2,7 @@ const validator = require('validator');
 
 const { FormasDePago, TiposID } = require('./Models.js');
 const Money = require('./Money.js')
+const { excludeKeys } = require('./Object.js');
 
 const campo_obligatorio = 'Este campo es obligatorio';
 const porcentaje_invalido = 'No está entre 0 y 100';
@@ -176,6 +177,15 @@ const dateString = () => (ctx, value) => {
     !esFechaValida(value)
   )
     return new Error(`"${ctx.name}" debe ser una fecha con forma "YYYY-MM-dd"`);
+
+  return value;
+};
+
+const iso8601DateString = () => (ctx, value) => {
+  if (!value) return new Error(`"${ctx.name}" es requerido.`);
+
+  if (typeof value !== 'string' || !validator.isISO8601(value, {strict: true}))
+    return new Error(`"${ctx.name}" debe ser una fecha con formato ISO8601`);
 
   return value;
 };
@@ -452,17 +462,10 @@ const pagoSchema = Object.freeze({
   valor: float()
 });
 
-const getSchemaExcludingKeys = (schema, keys) => {
-  const copiedSchema = { ...schema };
-  keys.forEach(key => {
-    delete copiedSchema[key];
-  });
-  return copiedSchema;
-};
 const ventaSchema = {
   rowid: primaryKey(),
   codigo: numericString({ fallback: '', allowEmpty: true }),
-  fecha: dateString(),
+  fecha: iso8601DateString(),
   descuento: int({ fallback: 0, min: 0, max: 100, abrv: true }),
   iva: int({ max: 30 }),
   empresa: string(),
@@ -477,11 +480,11 @@ const ventaSchema = {
   unidades: array({ item: unidadSchema })
 };
 
-const ventaInsertSchema = getSchemaExcludingKeys(ventaSchema, ['rowid']);
+const ventaInsertSchema = excludeKeys(ventaSchema, ['rowid']);
 
-const ventaUpdateSchema = getSchemaExcludingKeys(ventaSchema, ['contable']);
+const ventaUpdateSchema = excludeKeys(ventaSchema, ['contable']);
 
-const facturaSchema = getSchemaExcludingKeys(ventaSchema, ['rowid', 'pagos']);
+const facturaSchema = excludeKeys(ventaSchema, ['rowid', 'pagos']);
 
 const clienteRowSchema = {
   rowid: primaryKey(),
@@ -495,8 +498,7 @@ const clienteRowSchema = {
   tipo: either({ opts: Object.keys(TiposID) })
 };
 
-const clienteInsertSchema = getSchemaExcludingKeys(clienteRowSchema, ['rowid']);
-
+const clienteInsertSchema = excludeKeys(clienteRowSchema, ['rowid']);
 const ventaExamenSchema = {
   rowid: primaryKey(),
   codigo: numericString({ fallback: '' }),
@@ -515,10 +517,10 @@ const ventaExamenSchema = {
   unidades: array({ item: unidadSchema })
 };
 
-const ventaExamenInsertSchema = getSchemaExcludingKeys(ventaExamenSchema, [
+const ventaExamenInsertSchema = excludeKeys(ventaExamenSchema, [
   'rowid'
 ]);
-const ventaExamenUpdateSchema = getSchemaExcludingKeys(ventaExamenSchema, ['contable'])
+const ventaExamenUpdateSchema = excludeKeys(ventaExamenSchema, ['contable'])
 
 const datilConfigSchema = {
   apiKey: string(),
@@ -585,10 +587,10 @@ const getClienteInsertSchemaByIdType = idType => {
   };
 };
 
-const getClienteRowSchemaByIdType = idType => {
+const getClienteSchemaForIdType = (schema,idType) => {
   const len = getExpectedIDLength(idType);
   return {
-    ...clienteRowSchema,
+    ...schema,
     id: numericString({ len })
   };
 };
@@ -603,17 +605,24 @@ const validarVentaInsert = data =>
   validateFormWithSchema(ventaInsertSchema, data);
 
 const validarClienteInsert = data =>
-  validateFormWithSchema(getClienteInsertSchemaByIdType(data.tipo), data);
+  validateFormWithSchema(
+    getClienteSchemaForIdType(clienteInsertSchema, data.tipo), 
+    data);
+
+const validarClienteUpdate = data =>
+  validateFormWithSchema(
+    getClienteSchemaForIdType(clienteRowSchema, data.tipo), 
+    data);
 
 const validarDatilConfig = data =>
   validateFormWithSchema(datilConfigSchema, data);
 
 module.exports = {
   datilConfigSchema,
-  getClienteInsertSchemaByIdType,
-  getClienteRowSchemaByIdType,
+  getClienteSchemaForIdType,
   validarFactura,
   validarClienteInsert,
+  validarClienteUpdate,
   validarDatilConfig,
   validarBusqueda,
   validarMedico,

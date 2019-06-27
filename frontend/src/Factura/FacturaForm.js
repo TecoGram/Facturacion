@@ -15,29 +15,11 @@ import ClienteAutoComplete from '../AutoComplete/ClienteAutoComplete';
 import ProductoAutoComplete from '../AutoComplete/ProductoAutoComplete';
 import MedicoAutoComplete from '../AutoComplete/MedicoAutoComplete';
 import CloseableColorChip from '../lib/CloseableColorChip';
-import FormattedDatePicker from '../lib/FormattedDatePicker';
 import IconBox from '../lib/IconBox';
+import { DateTimePicker, CurrentTime } from './TimeInputs';
 
 const autoCompleteWidth = '425px';
 const txtMargin = '35px';
-const fechaStyle = { display: 'inline-block' };
-const fechaTextStyle = { width: '140px', marginRight: txtMargin };
-
-const FechaText = props => {
-  const { errors, data, onDataChanged } = props;
-
-  const myProps = {
-    hintText: 'Fecha',
-    style: fechaStyle,
-    textFieldStyle: fechaTextStyle
-  };
-
-  myProps.value = data.fecha;
-  myProps.errorText = errors.fecha;
-  myProps.onChange = (n, date) => onDataChanged('fecha', date);
-
-  return <FormattedDatePicker {...myProps} />;
-};
 
 const ClienteInput = props => {
   const { cliente, errors, onNewCliente, width } = props;
@@ -130,6 +112,42 @@ const PacienteDataRow = props => {
   );
 };
 
+const DateTimeInput = props => {
+  const { fecha } = props.data;
+
+  if (fecha === 'now')
+    return (
+      <CurrentTime onClick={() => props.onDataChanged('fecha', new Date())} />
+    );
+
+  const onDateChange = (e, date) => {
+    const copiedDate = new Date(date.getTime());
+    copiedDate.setHours(
+      fecha.getHours(),
+      fecha.getMinutes(),
+      fecha.getSeconds()
+    );
+    props.onDataChanged('fecha', copiedDate);
+  };
+
+  const onTimeChange = (e, date) => {
+    props.onDataChanged('fecha', date);
+  };
+
+  const onDeleteClick = () => {
+    props.onDataChanged('fecha', 'now');
+  };
+
+  return (
+    <DateTimePicker
+      onDateChange={onDateChange}
+      onTimeChange={onTimeChange}
+      onDeleteClick={onDeleteClick}
+      value={fecha}
+    />
+  );
+};
+
 export default class FacturaForm extends Component {
   render() {
     const {
@@ -161,7 +179,7 @@ export default class FacturaForm extends Component {
                 <IconBox icon={Today} />
               </td>
               <td>
-                <FechaText {...this.props} />
+                <DateTimeInput {...this.props} />
               </td>
 
               <td>
@@ -170,7 +188,7 @@ export default class FacturaForm extends Component {
               <td>
                 <TextField
                   hintText="Flete"
-                  value={data.flete}
+                  value={data.fleteText}
                   errorText={errors.flete}
                   onChange={event => onDataChanged('flete', event.target.value)}
                   style={{ width: '80px', marginRight: txtMargin }}

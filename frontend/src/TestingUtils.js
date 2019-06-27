@@ -18,8 +18,7 @@ export const assertWithSchema = (schema, value) => {
     );
 };
 
-export const runActions = async (createReducer, actions) => {
-  let state;
+export const runActions = async (createReducer, actions, state = {}) => {
   for (let i = 0; i < actions.length; i++) {
     const newState = await runAction(createReducer, state, actions[i]);
     if (newState) state = newState;

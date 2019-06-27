@@ -17,7 +17,7 @@ const baseVentaEx = Object.freeze({
   cliente: 1,
   medico: 1,
   paciente: 'Carlos Armijos',
-  fecha: '2016-11-26',
+  fecha: '2016-11-26T17:28:12.000Z',
   autorizacion: '',
   contable: false,
   pagos: [{ formaPago: 'efectivo', valor: 199900 }],
@@ -96,6 +96,7 @@ describe('/venta_ex/ endpoints', () => {
         ],
         body: {
           secuencial: 1,
+          fecha_emision: '2016-11-26T17:28:12.000Z',
           emisor: {
             ruc: '0999999999001',
             razon_social: '__nombre__',
@@ -112,15 +113,15 @@ describe('/venta_ex/ endpoints', () => {
           moneda: 'USD',
           ambiente: 1,
           totales: {
-            totales_sin_impuestos: 19.99,
+            total_sin_impuestos: 19.99,
             descuento_adicional: 0,
             descuento: 0,
             propina: 0,
             importe_total: 19.99,
             impuestos: [
               {
-                codigo: 2,
-                codigo_porcentaje: 0,
+                codigo: '2',
+                codigo_porcentaje: '0',
                 base_imponible: 19.99,
                 valor: 0
               }
@@ -141,12 +142,14 @@ describe('/venta_ex/ endpoints', () => {
               cantidad: 1,
               precio_unitario: 19.99,
               precio_total_sin_impuestos: 19.99,
+              descuento: 0,
               impuestos: [
                 {
-                  codigo: 2,
-                  codigo_porcentaje: 0,
+                  codigo: '2',
+                  codigo_porcentaje: '0',
                   base_imponible: 19.99,
-                  valor: 0
+                  valor: 0,
+                  tarifa: 0
                 }
               ]
             }

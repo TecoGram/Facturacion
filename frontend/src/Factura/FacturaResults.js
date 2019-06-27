@@ -2,6 +2,7 @@ import React from 'react';
 
 import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
+import CircularProgress from 'material-ui/CircularProgress';
 
 import Money from 'facturacion_common/src/Money.js';
 
@@ -61,35 +62,53 @@ const ResultsTable = props => {
   );
 };
 
-const FacturaDetalladaCheckbox = props => {
-  const { detallado, isExamen, onFacturaDataChanged } = props;
+const FacturaOptions = props => {
+  const { detallado, contable, isExamen, onFacturaDataChanged } = props;
 
   if (isExamen) return null;
   return (
-    <Checkbox
-      label={'Mostrar Información detallada en cada producto'}
-      style={{ textAlign: 'left' }}
-      checked={detallado}
-      onCheck={(event, isChecked) => {
-        onFacturaDataChanged('detallado', isChecked);
-      }}
-    />
+    <div style={{ width: '420px', float: 'left' }}>
+      <Checkbox
+        label={'Generar comprobante electrónico'}
+        style={{ textAlign: 'left' }}
+        checked={contable}
+        onCheck={(event, isChecked) => {
+          onFacturaDataChanged('contable', isChecked);
+        }}
+      />
+      <Checkbox
+        label={'Mostrar Información detallada en cada producto'}
+        style={{ textAlign: 'left' }}
+        checked={isExamen ? false : detallado}
+        disabled={isExamen}
+        onCheck={(event, isChecked) => {
+          onFacturaDataChanged('detallado', isChecked);
+        }}
+      />
+    </div>
   );
 };
 
 const GuardarFacturaButton = props => {
-  const { nuevo, guardarButtonDisabled, onGuardarClick, subtotal } = props;
+  const {
+    nuevo,
+    guardando,
+    guardarButtonDisabled,
+    onGuardarClick,
+    subtotal
+  } = props;
   const label = nuevo ? nuevoLabel : editarLabel;
-  return (
-    <div style={{ textAlign: 'center' }}>
-      <RaisedButton
-        label={label}
-        primary={true}
-        onTouchTap={() => onGuardarClick(subtotal)}
-        disabled={guardarButtonDisabled}
-      />
-    </div>
+  const childItem = guardando ? (
+    <CircularProgress />
+  ) : (
+    <RaisedButton
+      label={label}
+      primary={true}
+      onTouchTap={() => onGuardarClick(subtotal)}
+      disabled={guardarButtonDisabled}
+    />
   );
+  return <div style={{ textAlign: 'center' }}>{childItem}</div>;
 };
 
 export default class FacturaResults extends React.Component {
@@ -99,9 +118,10 @@ export default class FacturaResults extends React.Component {
         <ServerErrorText style={errorMsgStyle}>
           {this.props.errorUnidades}
         </ServerErrorText>
-        <ResultsTable {...this.props} />
-        <FacturaDetalladaCheckbox {...this.props} />
-        <br />
+        <div style={{ overflow: 'auto' }}>
+          <FacturaOptions {...this.props} />
+          <ResultsTable {...this.props} />
+        </div>
         <GuardarFacturaButton {...this.props} />
       </div>
     );
@@ -111,6 +131,8 @@ export default class FacturaResults extends React.Component {
 FacturaResults.propTypes = {
   errorUnidades: React.PropTypes.string,
   isExamen: React.PropTypes.bool,
+  contable: React.PropTypes.bool,
+  guardando: React.PropTypes.bool,
   detallado: React.PropTypes.bool.isRequired,
   rebaja: React.PropTypes.number.isRequired,
   subtotal: React.PropTypes.number.isRequired,

@@ -97,7 +97,14 @@ export default class FacturaEditorView extends Component {
   };
 
   render() {
-    const { clienteRow, errors, unidades, inputs, medicoRow } = this.state;
+    const {
+      clienteRow,
+      errors,
+      unidades,
+      inputs,
+      medicoRow,
+      guardando
+    } = this.state;
 
     const { isExamen, ventaKey, ajustes } = this.props;
 
@@ -152,6 +159,8 @@ export default class FacturaEditorView extends Component {
               impuestos={impuestos}
               total={total}
               porcentajeIVA={iva}
+              contable={inputs.contable}
+              guardando={guardando}
               detallado={detallado}
               onGuardarClick={this.onGenerarFacturaClick}
               onFacturaDataChanged={this.onFacturaInputChanged}
