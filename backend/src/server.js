@@ -354,6 +354,17 @@ const handleValidData = fn => async (req, res) => {
   }
 };
 
+const generarNuevoComprobante = async ventaId => {
+  const venta = await db.getVentaById(ventaId);
+  const { id, clave_acceso, datilMsg } = await Datil.emitirFactura(venta);
+
+  if (datilMsg) return { status: 210, resp: { rowid: ventaId, datilMsg } };
+
+  await db.colocarComprobante({ ventaId, id, clave_acceso });
+
+  return { status: 200, resp: { rowid: ventaId } };
+};
+
 app.post(
   '/venta/new',
   validarVenta,
@@ -361,11 +372,7 @@ app.post(
     const ventaId = await db.insertarVenta(data);
     if (!data.contable) return { status: 200, resp: { rowid: ventaId } };
 
-    const venta = await db.getVentaById(ventaId);
-    const { id, clave_acceso } = await Datil.emitirFactura(venta);
-    await db.colocarComprobante({ ventaId, id, clave_acceso });
-
-    return { status: 200, resp: { rowid: ventaId } };
+    return generarNuevoComprobante(ventaId);
   })
 );
 
@@ -376,11 +383,7 @@ app.post(
     const ventaId = await db.insertarVentaExamen(data);
     if (!data.contable) return { status: 200, resp: { rowid: ventaId } };
 
-    const venta = await db.getVentaById(ventaId);
-    const { id, clave_acceso } = await Datil.emitirFactura(venta);
-    await db.colocarComprobante({ ventaId, id, clave_acceso });
-
-    return { status: 200, resp: { rowid: ventaId } };
+    return generarNuevoComprobante(ventaId);
   })
 );
 

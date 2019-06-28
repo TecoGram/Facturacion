@@ -79,6 +79,30 @@ const insertarNuevaFacturaContable = async ventaRow => {
   return issueReq;
 };
 
+const insertarNuevaFacturaContableConErrorDatil = async datilError => {
+  HTTPClient.postRequest.mockRejectedValueOnce(datilError);
+
+  const newVentaRow = {
+    ...baseVentaRow,
+    contable: true,
+    unidades: [await fetchUnidad('Glyco')]
+  };
+
+  const res = await api.insertarVenta(newVentaRow);
+  expect(res.status).toBe(210);
+  expect(HTTPClient.postRequest).toHaveBeenCalledTimes(1);
+
+  const [comprobante] = await getComprobanteFromVenta(res.body.rowid);
+  expect(comprobante).toEqual({
+    id: null,
+    clave_acceso: null,
+    secuencial: expect.any(Number),
+    ventaId: res.body.rowid
+  });
+
+  return res.body.datilMsg;
+};
+
 describe('/venta/ endpoints', () => {
   beforeAll(async () => {
     await setup();
@@ -383,6 +407,39 @@ describe('/venta/ endpoints', () => {
             ],
             pagos: [{ medio: 'efectivo', total: 100.78 }]
           }
+        });
+      });
+
+      describe('cuando datil retorna error', () => {
+        it('Muestra el primer error del body (si hay)', async () => {
+          const errorText = await insertarNuevaFacturaContableConErrorDatil({
+            body: {
+              errors: [
+                {
+                  details: 'Punto de emision no existe',
+                  message: 'Punto de emision no existe',
+                  code: 'INVALID_RECEIPT',
+                  parameter: ''
+                }
+              ]
+            }
+          });
+
+          expect(errorText).toEqual(
+            'Error de Datil. Punto de emision no existe. code: INVALID_RECEIPT'
+          );
+        });
+
+        it('Muestra el text completo si no puede parsear el body', async () => {
+          const errorText = await insertarNuevaFacturaContableConErrorDatil({
+            body: {
+              something: 'oops'
+            },
+            text: 'Some text',
+            status: 401
+          });
+
+          expect(errorText).toEqual('Error de Datil con status 401. Some text');
         });
       });
     });

@@ -23,7 +23,6 @@ const setSafeData = (req, data) => {
 
 const validationMiddleware = (schema, key = 'body') => (req, res, next) => {
   const { inputs, errors } = validateFormWithSchema(schema, req[key]);
-  //console.log('validacion', req[key], errors);
   if (errors) {
     sendBadArgumentsResponse(res, errors);
   } else {

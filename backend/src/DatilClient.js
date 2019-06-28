@@ -200,6 +200,19 @@ const ventaToReqBody = venta => {
   };
 };
 
+const handleDatilError = err => {
+  const { body, status, text } = err;
+  if (body) {
+    const { errors } = body;
+    if (errors && Array.isArray(errors) && errors.length > 0) {
+      const { code, message } = errors[0];
+      return { datilMsg: `Error de Datil. ${message}. code: ${code}` };
+    }
+  }
+
+  return { datilMsg: `Error de Datil con status ${status}. ${text}` };
+};
+
 const emitirFactura = venta => {
   const body = ventaToReqBody(venta);
   return postRequest({
@@ -210,7 +223,7 @@ const emitirFactura = venta => {
       { key: 'X-Password', value: config.password }
     ],
     body
-  });
+  }).catch(handleDatilError);
 };
 
 module.exports = {
