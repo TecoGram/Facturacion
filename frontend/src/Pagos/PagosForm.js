@@ -1,15 +1,22 @@
 import React from 'react';
 import { Table, TableBody, TableRow, TableRowColumn } from 'material-ui/Table';
-import Clear from 'material-ui/svg-icons/content/clear';
-import Payment from 'material-ui/svg-icons/action/payment';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
 import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
+
+import Clear from 'material-ui/svg-icons/content/clear';
+import Payment from 'material-ui/svg-icons/action/payment';
+import CheckCircle from 'material-ui/svg-icons/action/check-circle';
+import Warning from 'material-ui/svg-icons/alert/warning';
+import Error from 'material-ui/svg-icons/alert/error';
+import { yellow700, red700, green700 } from 'material-ui/styles/colors';
+
 import * as Actions from './Actions.js';
 
 import { FormasDePago } from 'facturacion_common/src/Models.js';
 import Money from 'facturacion_common/src/Money.js';
+import IconBox from '../lib/IconBox.js';
 
 const formasDePago = Object.keys(FormasDePago).map(key => ({
   text: FormasDePago[key],
@@ -115,25 +122,52 @@ const AgregarPagoButton = props => {
   );
 };
 
-const totalMsg = ({ pagos, total }) => {
-  if (pagos.length === 0) return 'Por favor agrega almenos un pago.';
+const warningMessage = text => (
+  <p style={{ paddingLeft: '24px' }}>
+    <IconBox color={yellow700} icon={Warning} />
+    {text}
+  </p>
+);
+
+const errorMessage = text => (
+  <p style={{ paddingLeft: '24px' }}>
+    <IconBox color={red700} icon={Error} />
+    {text}
+  </p>
+);
+
+const okMessage = text => (
+  <p style={{ paddingLeft: '24px' }}>
+    <IconBox color={green700} icon={CheckCircle} />
+    {text}
+  </p>
+);
+
+const footerMsg = ({ pagos, total }) => {
+  if (pagos.length === 0)
+    return warningMessage('Por favor agrega almenos un pago.');
 
   const totalPagado = pagos.reduce((res, item) => {
     if (!item.valor) return res;
-
     return res + item.valor;
   }, 0);
 
   const totalPagadoStr = Money.print(totalPagado);
   const totalStr = Money.print(total);
-  return `Pagado $${totalPagadoStr}/${totalStr}.`;
+
+  if (totalStr === totalPagadoStr)
+    return okMessage(`Pagado $${totalPagadoStr}/${totalStr}.`);
+
+  return warningMessage(
+    `Pagado $${totalPagadoStr}/${totalStr}. Por favor completa el saldo.`
+  );
 };
 
-const FooterMessage = props => {
+const Footer = props => {
   const { errorMsg, pagos, total } = props;
-  if (errorMsg) return <p style={{ color: '#f44336' }}>{errorMsg}</p>;
+  if (errorMsg) return errorMessage(errorMsg);
 
-  return <p>{totalMsg({ pagos, total })}</p>;
+  return footerMsg({ pagos, total });
 };
 
 const PagosForm = props => {
@@ -147,7 +181,7 @@ const PagosForm = props => {
           {pagos.map(renderRow(props))}
         </TableBody>
       </Table>
-      <FooterMessage {...props} />
+      <Footer {...props} />
     </div>
   );
 };

@@ -46,7 +46,7 @@ export default class FacturaEditorView extends Component {
       ? 'La factura se editó exitosamente'
       : 'La factura se guardó exitosamente';
 
-  onGenerarFacturaClick = subtotal => {
+  onGenerarFacturaClick = () => {
     const { empresa, iva } = this.props.ajustes;
     const { isExamen, ventaKey } = this.props;
     const editar = !!ventaKey;
@@ -67,7 +67,6 @@ export default class FacturaEditorView extends Component {
     updateState(this, {
       type: Actions.guardarFactura,
       config,
-      subtotal,
       callback
     });
   };

@@ -90,13 +90,7 @@ const FacturaOptions = props => {
 };
 
 const GuardarFacturaButton = props => {
-  const {
-    nuevo,
-    guardando,
-    guardarButtonDisabled,
-    onGuardarClick,
-    subtotal
-  } = props;
+  const { nuevo, guardando, guardarButtonDisabled, onGuardarClick } = props;
   const label = nuevo ? nuevoLabel : editarLabel;
   const childItem = guardando ? (
     <CircularProgress />
@@ -104,7 +98,7 @@ const GuardarFacturaButton = props => {
     <RaisedButton
       label={label}
       primary={true}
-      onTouchTap={() => onGuardarClick(subtotal)}
+      onTouchTap={onGuardarClick}
       disabled={guardarButtonDisabled}
     />
   );

@@ -9,6 +9,7 @@ import {
   toReadableDate,
   toDatilDate
 } from 'facturacion_common/src/DateParser.js';
+import { calcularValoresFacturables } from 'facturacion_common/src/Math.js';
 import * as Actions from './EditorActions.js';
 import API from 'facturacion_common/src/api.js';
 import Money from 'facturacion_common/src/Money.js';
@@ -77,15 +78,53 @@ const insertarVenta = (venta, callback) =>
       return { type: Actions.abortInsert };
     });
 
-const guardarFactura = ({ config, subtotal, callback }) => state => {
+const validarPagos = (pagos, total) => {
+  const totalPagado = pagos.reduce(
+    (acc, i) => (i.valor ? acc + i.valor : acc),
+    0
+  );
+  if (totalPagado === total) return { pagos };
+
+  const diff = Math.abs(totalPagado - total);
+  if (diff < 100) {
+    const nuevosPagos = [...pagos];
+    const [primerPago] = pagos;
+    nuevosPagos[0].valor =
+      totalPagado < total ? primerPago.valor + diff : primerPago.valor - diff;
+    return { pagos: nuevosPagos };
+  }
+
+  return {
+    pagosError:
+      totalPagado < total
+        ? `Por favor revisa los pagos. Faltan $${Money.print(diff)}`
+        : `Por favor revisa los pagos. Sobran $${Money.print(diff)}`
+  };
+};
+
+const guardarFactura = ({ config, callback }) => state => {
   if (state.guardando) return state;
 
   const vError = findValidacionErrors(config, state);
   if (vError) {
     callback({ success: false, msg: vError });
-    return;
+    return state;
   }
-  const venta = crearVenta(config, state, subtotal);
+
+  const { subtotal, total } = calcularValoresFacturables({
+    unidades: state.unidades,
+    descuento: state.inputs.descuento || 0,
+    iva: config.iva,
+    flete: state.inputs.flete || 0
+  });
+
+  const { pagos, pagosError } = validarPagos(state.pagos, total);
+  if (pagosError) {
+    callback({ success: false, msg: pagosError });
+    return state;
+  }
+
+  const venta = crearVenta(config, { ...state, pagos }, subtotal);
   const validacionFn = config.isExamen
     ? validarVentaExamenInsert
     : validarVentaInsert;

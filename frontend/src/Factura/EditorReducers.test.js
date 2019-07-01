@@ -14,6 +14,213 @@ const {
 import { assertWithSchema, runActions } from '../TestingUtils.js';
 
 describe('EditorReducers', () => {
+  beforeEach(() => {
+    API.insertarVenta.mockReset();
+  });
+
+  describe('Si los pagos no cuadran', () => {
+    it('valida pagos insuficientes', async () => {
+      const config = {
+        iva: 12,
+        isExamen: false,
+        empresa: 'Teco'
+      };
+      const callback = jest.fn();
+
+      const actions = [
+        { type: Actions.getDefaultState },
+        {
+          type: Actions.setCliente,
+          clienteRow: {
+            rowid: 1,
+            id: '0945537385',
+            nombre: 'Carlos Salazar',
+            nombre: 'carlos salazar',
+            direccion: 'Pedro Carbo 41',
+            telefono1: '099123123',
+            telefono2: '099456456',
+            email: 'carlos@gmail.com',
+            descDefault: 0,
+            tipo: 'cedula'
+          }
+        },
+        {
+          type: Actions.agregarProducto,
+          productoRow: {
+            rowid: 1,
+            codigo: '0945',
+            nombre: 'HCG Cassette',
+            nombreAscii: 'hcg cassette',
+            marca: 'TECO',
+            precioDist: 9900,
+            precioVenta: 19900,
+            pagaIva: true
+          }
+        },
+        {
+          type: Actions.updatePagos,
+          pagos: [
+            {
+              key: 0,
+              formaPagoText: 'EFECTIVO',
+              formaPago: 'efectivo',
+              valor: 19900
+            }
+          ]
+        },
+        {
+          type: Actions.guardarFactura,
+          config,
+          callback
+        }
+      ];
+
+      const finalState = await runActions(createReducer, actions);
+
+      expect(finalState.guardando).toEqual(false);
+
+      // verificar callback ejecutado
+      expect(callback.mock.calls).toEqual([
+        [{ success: false, msg: 'Por favor revisa los pagos. Faltan $0.24' }]
+      ]);
+      expect(API.insertarVenta).not.toHaveBeenCalled();
+    });
+
+    it('valida pagos abundantes', async () => {
+      const config = {
+        iva: 12,
+        isExamen: false,
+        empresa: 'Teco'
+      };
+      const callback = jest.fn();
+
+      const actions = [
+        { type: Actions.getDefaultState },
+        {
+          type: Actions.setCliente,
+          clienteRow: {
+            rowid: 1,
+            id: '0945537385',
+            nombre: 'Carlos Salazar',
+            nombre: 'carlos salazar',
+            direccion: 'Pedro Carbo 41',
+            telefono1: '099123123',
+            telefono2: '099456456',
+            email: 'carlos@gmail.com',
+            descDefault: 0,
+            tipo: 'cedula'
+          }
+        },
+        {
+          type: Actions.agregarProducto,
+          productoRow: {
+            rowid: 1,
+            codigo: '0945',
+            nombre: 'HCG Cassette',
+            nombreAscii: 'hcg cassette',
+            marca: 'TECO',
+            precioDist: 9900,
+            precioVenta: 19900,
+            pagaIva: true
+          }
+        },
+        {
+          type: Actions.updatePagos,
+          pagos: [
+            {
+              key: 0,
+              formaPagoText: 'EFECTIVO',
+              formaPago: 'efectivo',
+              valor: 30000
+            }
+          ]
+        },
+        {
+          type: Actions.guardarFactura,
+          config,
+          callback
+        }
+      ];
+
+      const finalState = await runActions(createReducer, actions);
+
+      expect(finalState.guardando).toEqual(false);
+
+      // verificar callback ejecutado
+      expect(callback.mock.calls).toEqual([
+        [{ success: false, msg: 'Por favor revisa los pagos. Sobran $0.77' }]
+      ]);
+      expect(API.insertarVenta).not.toHaveBeenCalled();
+    });
+
+    it('Completa la diferencia cuando es muy pequeña', async () => {
+      API.insertarVenta.mockReturnValueOnce(
+        Promise.resolve({ status: 200, body: { rowid: 5 } })
+      );
+      const config = {
+        iva: 12,
+        isExamen: false,
+        empresa: 'Teco'
+      };
+      const callback = jest.fn();
+
+      const actions = [
+        { type: Actions.getDefaultState },
+        {
+          type: Actions.setCliente,
+          clienteRow: {
+            rowid: 1,
+            id: '0945537385',
+            nombre: 'Carlos Salazar',
+            nombre: 'carlos salazar',
+            direccion: 'Pedro Carbo 41',
+            telefono1: '099123123',
+            telefono2: '099456456',
+            email: 'carlos@gmail.com',
+            descDefault: 0,
+            tipo: 'cedula'
+          }
+        },
+        {
+          type: Actions.agregarProducto,
+          productoRow: {
+            rowid: 1,
+            codigo: '0945',
+            nombre: 'HCG Cassette',
+            nombreAscii: 'hcg cassette',
+            marca: 'TECO',
+            precioDist: 9900,
+            precioVenta: 19900,
+            pagaIva: true
+          }
+        },
+        {
+          type: Actions.updatePagos,
+          pagos: [
+            {
+              key: 0,
+              formaPagoText: 'EFECTIVO',
+              formaPago: 'efectivo',
+              valor: 22200
+            }
+          ]
+        },
+        {
+          type: Actions.guardarFactura,
+          config,
+          callback
+        }
+      ];
+
+      const finalState = await runActions(createReducer, actions);
+
+      expect(finalState.guardando).toEqual(false);
+
+      // verificar callback ejecutado
+      expect(callback.mock.calls).toEqual([[{ success: true, rowid: 5 }]]);
+    });
+  });
+
   it('crea una factura de productos correctamente', async () => {
     API.insertarVenta.mockReturnValueOnce(
       Promise.resolve({ status: 200, body: { rowid: 5 } })
@@ -82,11 +289,6 @@ describe('EditorReducers', () => {
         value: '1.49'
       },
       {
-        type: Actions.agregarPago,
-        formaPago: 'efectivo',
-        valor: 128128
-      },
-      {
         type: Actions.updatePagos,
         pagos: [
           {
@@ -100,7 +302,6 @@ describe('EditorReducers', () => {
       {
         type: Actions.guardarFactura,
         config,
-        subtotal: 128128,
         callback
       }
     ];
@@ -136,7 +337,7 @@ describe('EditorReducers', () => {
         descuento: 0,
         flete: 0,
         iva: 12,
-        subtotal: 128128,
+        subtotal: 114400,
         pagos: [
           {
             formaPago: 'efectivo',
