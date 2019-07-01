@@ -17,3 +17,5 @@ npm-debug.log
 *.sqlite
 
 *.pdf
+
+datil.config.js
