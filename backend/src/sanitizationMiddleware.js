@@ -11,6 +11,8 @@ const {
   ventaExamenInsertSchema,
   ventaExamenUpdateSchema
 } = require('facturacion_common/src/Validacion.js');
+const { calcularValoresTotales } = require('facturacion_common/src/Math.js');
+const { tarifaIVA } = require('./DatilClient.js');
 
 const sendBadArgumentsResponse = (res, errors) => {
   res.status(400).send(errors);
@@ -44,6 +46,25 @@ const validarClienteMiddleware = ({ isInsert }) => (req, res, next) => {
     setSafeData(req, inputs);
     next();
   }
+};
+
+const validarPagos = pagaIVA => (req, res, next) => {
+  const { safeData: venta } = req;
+  const { total } = calcularValoresTotales(
+    venta.subtotal,
+    venta.flete,
+    pagaIVA ? tarifaIVA : 0,
+    venta.descuento
+  );
+
+  const totalPagado = venta.pagos.reduce((acc, item) => acc + item.valor, 0);
+
+  if (totalPagado !== total)
+    sendBadArgumentsResponse(
+      res,
+      `Pagos no cuadran. Se esperaban ${total}, pero se encontró ${totalPagado}.`
+    );
+  else next();
 };
 
 module.exports = {
@@ -86,6 +107,7 @@ module.exports = {
     }
   },
 
+  validarPagos,
   validarVenta: validationMiddleware(ventaInsertSchema),
   validarVentaUpdate: validationMiddleware(ventaUpdateSchema),
   validarVentaExamen: validationMiddleware(ventaExamenInsertSchema),

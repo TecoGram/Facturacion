@@ -14,22 +14,6 @@ const IVA = '2';
 const IVA_0p = '0';
 const IVA_12p = '2';
 
-const IVA_ACTUAL = IVA_12p;
-
-const iva2Float = iva => {
-  if (iva === IVA_0p) return 0;
-  if (iva === IVA_12p) return 12;
-
-  return 12;
-};
-
-const calcularIVA = (valor, codigo) => {
-  if (codigo === IVA_ACTUAL) return Math.floor((valor * 12) / 100);
-
-  // 0 IVA
-  return 0;
-};
-
 const r = validarDatilConfig(config);
 if (r.errors) {
   const [primerError] = Object.values(r.errors);
@@ -40,6 +24,19 @@ if (r.errors) {
   );
   process.exit(1);
 }
+
+const IVA_ACTUAL = config.codigoIVA;
+
+const iva2Float = iva => {
+  if (iva === IVA_0p) return 0;
+  if (iva === IVA_12p) return 12;
+
+  return 12;
+};
+
+const calcularIVAParaItem = valor => {
+  return Math.floor((valor * iva2Float(IVA_ACTUAL)) / 100);
+};
 
 const crearImpuestos = params => {
   const { isExamen, impuestos, rebaja, subtotal, flete } = params;
@@ -111,7 +108,7 @@ const crearImpuestosParaItem = (item, importe) => {
         codigo: IVA,
         codigo_porcentaje: IVA_ACTUAL,
         base_imponible: Money.printFloat(importe),
-        valor: Money.printFloat(calcularIVA(importe, IVA_ACTUAL)),
+        valor: Money.printFloat(calcularIVAParaItem(importe)),
         tarifa: iva2Float(IVA_ACTUAL)
       }
     ];
@@ -227,5 +224,6 @@ const emitirFactura = venta => {
 };
 
 module.exports = {
-  emitirFactura
+  emitirFactura,
+  tarifaIVA: iva2Float(IVA_ACTUAL)
 };

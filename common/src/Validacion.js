@@ -525,6 +525,7 @@ const ventaExamenUpdateSchema = excludeKeys(ventaExamenSchema, ['contable'])
 const datilConfigSchema = {
   apiKey: string(),
   password: string(),
+  codigoIVA: int(),
 
   emision: object({ 
     path: 'emision',

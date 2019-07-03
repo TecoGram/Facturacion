@@ -15,6 +15,7 @@ const {
   validarCliente,
   validarClienteUpdate,
   validarMedico,
+  validarPagos,
   validarProducto,
   validarVenta,
   validarVentaUpdate,
@@ -368,6 +369,7 @@ const generarNuevoComprobante = async ventaId => {
 app.post(
   '/venta/new',
   validarVenta,
+  validarPagos(true),
   handleValidData(async data => {
     const ventaId = await db.insertarVenta(data);
     if (!data.contable) return { status: 200, resp: { rowid: ventaId } };
@@ -379,6 +381,7 @@ app.post(
 app.post(
   '/venta_ex/new',
   validarVentaExamen,
+  validarPagos(false),
   handleValidData(async data => {
     const ventaId = await db.insertarVentaExamen(data);
     if (!data.contable) return { status: 200, resp: { rowid: ventaId } };
