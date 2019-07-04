@@ -1,3 +1,9 @@
+import {
+  toReadableDateTime,
+  parseDBDate
+} from 'facturacion_common/src/DateParser.js';
+import Money from 'facturacion_common/src/Money.js';
+import { calcularTotalVentaRow } from 'facturacion_common/src/Math.js';
 export default class ListState {
   constructor(props, setStateFunc) {
     this.setState = setStateFunc;
@@ -9,8 +15,21 @@ export default class ListState {
   }
 
   colocarVentas(listaVentas) {
+    const rows = listaVentas.map(venta => {
+      const { fecha, id } = venta;
+      const fechaText = toReadableDateTime(parseDBDate(fecha));
+      const total = Money.print(calcularTotalVentaRow(venta));
+      const comprobanteID = id || 'N/A';
+      return {
+        ...venta,
+        fechaText,
+        comprobanteID,
+        total
+      };
+    });
+
     this.setState(() => {
-      return { rows: listaVentas };
+      return { rows };
     });
   }
 
@@ -19,7 +38,7 @@ export default class ListState {
       return {
         rows: prevState.rows.filter(
           item => item.empresa !== empresa || item.codigo !== codigo
-        ),
+        )
       };
     });
   }
@@ -29,4 +48,3 @@ export default class ListState {
     else this.props.editarFacturaExamen(codigo, empresa);
   }
 }
-

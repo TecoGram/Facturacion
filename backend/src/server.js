@@ -9,7 +9,6 @@ const PDFWriter = require('./pdf/PDFWriter.js');
 const pdfutils = require('./pdf/pdfutils.js');
 const facturaTemplate = require('./pdf/template.js');
 const db = require('./dbAdmin.js');
-const formatter = require('./responseFormatter.js');
 const {
   validarBusqueda,
   validarCliente,
@@ -319,15 +318,16 @@ function findVentas(req, res, tipo, all) {
   const q = req.query.q || '';
   const promise = all ? db.findAllVentas(q) : db.findVentas(q, tipo);
   promise.then(
-    function(ventas) {
+    ventas => {
       if (ventas.length === 0)
         res
           .status(404)
           .send('No existen facturas con esa cadena de caracteres');
-      else res.status(200).send(formatter.findVentas(ventas));
+      else res.status(200).send(ventas);
     },
-    function(err) {
+    err => {
       //ERROR!
+      console.error(err);
       res.status(500).send(err);
     }
   );

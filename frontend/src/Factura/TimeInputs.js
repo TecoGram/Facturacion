@@ -64,10 +64,9 @@ export class CurrentTime extends Component {
     );
   }
 
-  handleOnClick = () => {
+  componentWillUnmount() {
     clearInterval(this.intervalId);
-    this.props.onClick();
-  };
+  }
 
   render() {
     const style = {
@@ -81,7 +80,7 @@ export class CurrentTime extends Component {
         <IconButton
           iconStyle={smallIconStyle}
           style={smallButtonStyle}
-          onClick={this.handleOnClick}
+          onClick={this.props.onClick}
         >
           <Edit />
         </IconButton>

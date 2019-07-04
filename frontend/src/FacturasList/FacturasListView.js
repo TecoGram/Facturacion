@@ -9,8 +9,8 @@ import MaterialTable from '../lib/MaterialTable';
 import ListState from './ListState';
 
 const ColumnTypes = MaterialTable.ColumnTypes;
-const columns = ['Código', 'Empresa', 'Fecha', 'Cliente', 'Total'];
-const keys = ['codigo', 'empresa', 'fecha', 'nombre', 'total'];
+const columns = ['Comprobante ID', 'Empresa', 'Fecha', 'Cliente', 'Total'];
+const keys = ['comprobanteID', 'empresa', 'fechaText', 'nombre', 'total'];
 const columnTypes = [
   ColumnTypes.string,
   ColumnTypes.string,

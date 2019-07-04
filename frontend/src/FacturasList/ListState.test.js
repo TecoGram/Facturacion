@@ -13,12 +13,53 @@ describe('Factura ListView State', () => {
   describe('colocarVentas', () => {
     it('coloca la lista de ventas en el state venta del state', () => {
       const newVentas = [
-        { codigo: '00435', empresa: 'TECO' },
-        { codigo: '00434', empresa: 'TECO' }
+        {
+          id: 'e8feh5',
+          empresa: 'TECO',
+          fecha: '2019-07-04T01:31:19.983Z',
+          subtotal: 100000,
+          iva: 12,
+          flete: 0,
+          descuento: 0
+        },
+        {
+          empresa: 'TECO',
+          fecha: '2019-07-04T01:32:19.983Z',
+          subtotal: 100000,
+          iva: 12,
+          flete: 0,
+          descuento: 0
+        }
       ];
       const stateManager = new ListState({}, setStateFunc);
       stateManager.colocarVentas(newVentas);
-      expect(state).toEqual({ rows: newVentas });
+      expect(state).toEqual({
+        rows: [
+          {
+            comprobanteID: 'e8feh5',
+            id: 'e8feh5',
+            empresa: 'TECO',
+            fechaText: '2019-07-04 01:31',
+            fecha: '2019-07-04T01:31:19.983Z',
+            total: '11.20',
+            subtotal: 100000,
+            iva: 12,
+            flete: 0,
+            descuento: 0
+          },
+          {
+            comprobanteID: 'N/A',
+            empresa: 'TECO',
+            fecha: '2019-07-04T01:32:19.983Z',
+            fechaText: '2019-07-04 01:32',
+            total: '11.20',
+            subtotal: 100000,
+            iva: 12,
+            flete: 0,
+            descuento: 0
+          }
+        ]
+      });
 
       stateManager.colocarVentas([]);
       expect(state).toEqual({ rows: [] });

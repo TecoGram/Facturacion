@@ -130,10 +130,10 @@ const findAllVentas = nombreCliente => {
   const nombreClienteAscii = convertToAscii(nombreCliente);
   return knex
     .select(
-      'codigo',
+      'ventas.rowid',
+      'comprobantes.id',
       'empresa',
       'fecha',
-      'clientes.id',
       'nombre',
       'iva',
       'descuento',
@@ -141,10 +141,11 @@ const findAllVentas = nombreCliente => {
       'flete',
       'detallado',
       'subtotal',
-      'tipo'
+      'ventas.tipo'
     )
     .from('ventas')
     .join('clientes', { 'ventas.cliente': 'clientes.rowid' })
+    .join('comprobantes', { 'ventas.rowid': 'comprobantes.ventaId' })
     .where('nombreAscii', 'like', `%${nombreClienteAscii}%`)
     .orderBy('fecha', 'desc')
     .limit(50);
