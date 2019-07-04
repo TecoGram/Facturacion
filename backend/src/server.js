@@ -21,6 +21,7 @@ const {
   validarVentaExamen,
   validarVentaExamenUpdate
 } = require('./sanitizationMiddleware.js');
+const { validarVentaMutable } = require('./dbValidationMiddleware.js');
 const { serveTecogram, serveBiocled } = require('./empresaMiddleware.js');
 const CONSTRAINT_ERROR_SQLITE = 19;
 const port = process.env.PORT || 8192;
@@ -299,12 +300,12 @@ app.get('/venta/ver/:id', (req, res) => {
   else verVentaPDF(req, res);
 });
 
-app.post('/venta/delete/:id', (req, res) => {
-  const { id } = req.params;
-  db.deleteVenta(id).then(
+app.post('/venta/delete/:rowid', validarVentaMutable('params'), (req, res) => {
+  const { rowid } = req.params;
+  db.deleteVenta(rowid).then(
     function(deletions) {
       if (deletions === 0)
-        res.status(404).send(`Factura con id: ${id} no encontrada`);
+        res.status(404).send(`Factura con id: ${rowid} no encontrada`);
       else res.status(200).send('OK');
     },
     function(err) {
@@ -390,33 +391,46 @@ app.post(
   })
 );
 
-app.post('/venta/update', validarVentaUpdate, (req, res) => {
-  db.updateVenta(req.safeData)
-    .then(function() {
-      //OK!
-      res.status(200).send('OK');
-    })
-    .catch(function(error) {
-      //ERROR!
-      console.log(error);
-      res.status(500);
-      res.send(error);
-    });
-});
+app.post(
+  '/venta/update',
+  validarVentaUpdate,
+  validarVentaMutable('safeData'),
+  (req, res) => {
+    db.updateVenta(req.safeData)
+      .then(async () => {
+        const { rowid, contable } = req.safeData;
+        if (!contable || (await db.tieneComprobante(rowid)))
+          return res.status(200).send('OK');
 
-app.post('/venta_ex/update', validarVentaExamenUpdate, (req, res) => {
-  db.updateVentaExamen(req.safeData)
-    .then(function() {
-      //OK!
-      res.status(200).send('OK');
-    })
-    .catch(function(error) {
-      //ERROR!
-      console.log('error', error);
-      res.status(500);
-      res.send(error);
-    });
-});
+        return generarNuevoComprobante(rowid);
+      })
+      .catch(error => {
+        //ERROR!
+        res.status(500).send(error);
+      });
+  }
+);
+
+app.post(
+  '/venta_ex/update',
+  validarVentaExamenUpdate,
+  validarVentaMutable('safeData'),
+  (req, res) => {
+    db.updateVentaExamen(req.safeData)
+      .then(async () => {
+        const { rowid, contable } = req.safeData;
+        if (!contable || (await db.tieneComprobante(rowid)))
+          return res.status(200).send('OK');
+
+        return generarNuevoComprobante(rowid);
+      })
+      .catch(error => {
+        //ERROR!
+        res.status(500);
+        res.send(error);
+      });
+  }
+);
 
 const server = app.listen(port, function() {
   //eslint-disable-next-line

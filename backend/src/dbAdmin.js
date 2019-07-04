@@ -316,6 +316,22 @@ const colocarComprobante = ({ ventaId, id, clave_acceso }) => {
 const insertarPagosPorVenta = (trx, ventaId, pagos) =>
   insertarPagos(trx, pagos.map(p => ({ ...p, ventaId })));
 
+const tieneComprobante = async ventaId => {
+  const [id] = await knex
+    .select('id')
+    .table('comprobantes')
+    .where({ ventaId });
+  return !!id;
+};
+
+const ventaExiste = async rowid => {
+  const [{ count }] = await knex
+    .select(knex.raw('COUNT(*) as count'))
+    .table('ventas')
+    .where({ rowid });
+  return count > 0;
+};
+
 module.exports = {
   close: () => {
     knex.destroy();
@@ -469,6 +485,8 @@ module.exports = {
   deleteCliente,
   deleteVenta,
   deleteProducto,
+  tieneComprobante,
   updateCliente,
-  updateProducto
+  updateProducto,
+  ventaExiste
 };

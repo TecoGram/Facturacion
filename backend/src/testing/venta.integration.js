@@ -76,7 +76,7 @@ const insertarNuevaFacturaContable = async ventaRow => {
   });
 
   const [[issueReq]] = HTTPClient.postRequest.mock.calls;
-  return issueReq;
+  return { issueReq, rowid: res.body.rowid };
 };
 
 const insertarNuevaFacturaContableConErrorDatil = async datilError => {
@@ -134,7 +134,7 @@ describe('/venta/ endpoints', () => {
       });
 
       it('genera comprobante usando cliente normal', async () => {
-        const issueReq = await insertarNuevaFacturaContable();
+        const { issueReq } = await insertarNuevaFacturaContable();
         expect(issueReq).toEqual({
           host: 'https://link.datil.co',
           path: '/invoices/issue',
@@ -208,7 +208,7 @@ describe('/venta/ endpoints', () => {
       });
 
       it('genera comprobante usando consumidor final', async () => {
-        const issueReq = await insertarNuevaFacturaContable({
+        const { issueReq } = await insertarNuevaFacturaContable({
           ...baseVentaRow,
           cliente: await fetchCliente('CONSUMIDOR FINAL'),
           contable: true,
@@ -325,7 +325,7 @@ describe('/venta/ endpoints', () => {
       });
 
       it('genera comprobante con descuento', async () => {
-        const issueReq = await insertarNuevaFacturaContable({
+        const { issueReq } = await insertarNuevaFacturaContable({
           ...baseVentaRow,
           subtotal: 999800,
           descuento: 10,
@@ -462,6 +462,7 @@ describe('/venta/ endpoints', () => {
         autorization: '12345',
         formaPago: 'transferencia'
       };
+
       const res2 = await api.updateVenta(editedVentaRow);
       expect(res2.status).toBe(200);
     });
@@ -611,6 +612,33 @@ describe('/venta/ endpoints', () => {
         .catch(({ response: res }) => {
           expect(res.status).toBe(400);
         }));
+  });
+
+  describe('tras guardar venta contable', () => {
+    let insertedRowid;
+    beforeAll(async () => {
+      const { rowid } = await insertarNuevaFacturaContable();
+      insertedRowid = rowid;
+    });
+
+    it('no permite borrar ventas contables', () =>
+      api
+        .deleteVenta(insertedRowid)
+        .then(() => Promise.reject('Expected to fail'))
+        .catch(({ response: res }) => expect(res.status).toBe(400)));
+
+    it('no permite editar ventas contables', async () => {
+      try {
+        await api.updateVenta({
+          ...baseVentaRow,
+          rowid: insertedRowid,
+          unidades: [await fetchUnidad('Glyco')]
+        });
+        throw 'Expected to fail';
+      } catch ({ response: res }) {
+        expect(res.status).toBe(400);
+      }
+    });
   });
 
   describe('/venta/find', () => {
