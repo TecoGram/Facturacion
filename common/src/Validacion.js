@@ -1,7 +1,7 @@
 const validator = require('validator');
 
 const { FormasDePago, TiposID } = require('./Models.js');
-const Money = require('./Money.js')
+const Money = require('./Money.js');
 const { excludeKeys } = require('./Object.js');
 
 const campo_obligatorio = 'Este campo es obligatorio';
@@ -49,25 +49,26 @@ const esEnteroValido = enteroString => {
 };
 
 const sanitizarDinero = dineroString => {
-  if (!esNumeroValido(dineroString))
-    return null;
+  if (!esNumeroValido(dineroString)) return null;
 
   const dotPosition = dineroString.indexOf('.');
 
-  if (dotPosition > 0 && dineroString.length > 2 && dotPosition < dineroString.length - 3)
+  if (
+    dotPosition > 0 &&
+    dineroString.length > 2 &&
+    dotPosition < dineroString.length - 3
+  )
     return null; // demasiados decimales
 
   const dinero = Money.fromString(dineroString);
-  if (dinero === NaN)
-    return null;
+  if (dinero === NaN) return null;
   return dinero;
 };
 
 const sanitizarFacturaInput = (key, value) => {
   switch (key) {
     case 'descuento': {
-      if (esPorcentajeValido(value))
-        return parseInt(value, 10)
+      if (esPorcentajeValido(value)) return parseInt(value, 10);
       return null;
     }
     case 'flete': {
@@ -81,11 +82,10 @@ const sanitizarFacturaInput = (key, value) => {
 const sanitizarUnidadInput = (key, value) => {
   switch (key) {
     case 'count': {
-      if (esEnteroValido(value)) 
-        return parseInt(value, 10);
+      if (esEnteroValido(value)) return parseInt(value, 10);
       return null;
     }
-    case 'precioVenta':{
+    case 'precioVenta': {
       return sanitizarDinero(value);
     }
 
@@ -184,7 +184,10 @@ const dateString = () => (ctx, value) => {
 const iso8601DateString = () => (ctx, value) => {
   if (!value) return new Error(`"${ctx.name}" es requerido.`);
 
-  if (typeof value !== 'string' || !validator.isISO8601(value, {strict: true}))
+  if (
+    typeof value !== 'string' ||
+    !validator.isISO8601(value, { strict: true })
+  )
     return new Error(`"${ctx.name}" debe ser una fecha con formato ISO8601`);
 
   return value;
@@ -211,9 +214,8 @@ const string = ({ fallback, maxLen, allowEmpty } = {}) => (ctx, value) => {
   if (typeof value !== 'string')
     return new Error(`"${ctx.name}" debe de ser un string`);
 
-  if (!allowEmpty && value === '') 
+  if (!allowEmpty && value === '')
     return new Error(`"${ctx.name}" no puede ser un string vacio`);
-    
 
   return value;
 };
@@ -347,7 +349,7 @@ const validateObjectWithSchema = (schema, data, path) => {
   return keys.reduce((res, dataKey) => {
     const validatorFn = schema[dataKey];
     const rawValue = data[dataKey];
-    const name = path ? path + '.' + dataKey : dataKey; 
+    const name = path ? path + '.' + dataKey : dataKey;
     res[dataKey] = validatorFn({ name }, rawValue);
     return res;
   }, {});
@@ -517,17 +519,15 @@ const ventaExamenSchema = {
   unidades: array({ item: unidadSchema })
 };
 
-const ventaExamenInsertSchema = excludeKeys(ventaExamenSchema, [
-  'rowid'
-]);
-const ventaExamenUpdateSchema = excludeKeys(ventaExamenSchema, ['contable'])
+const ventaExamenInsertSchema = excludeKeys(ventaExamenSchema, ['rowid']);
+const ventaExamenUpdateSchema = excludeKeys(ventaExamenSchema, ['contable']);
 
 const datilConfigSchema = {
   apiKey: string(),
   password: string(),
   codigoIVA: int(),
 
-  emision: object({ 
+  emision: object({
     path: 'emision',
     schema: {
       ambiente: int(),
@@ -555,7 +555,7 @@ const datilConfigSchema = {
         }
       })
     }
-  }),
+  })
 };
 
 const validarBusqueda = (q, limit) => {
@@ -573,7 +573,7 @@ const getExpectedIDLength = idType => {
       return 13;
     case 'cedula':
       return 10;
-    default: 
+    default:
       return undefined;
   }
   // retorna undefined si recibe tipo desconocido
@@ -588,7 +588,7 @@ const getClienteInsertSchemaByIdType = idType => {
   };
 };
 
-const getClienteSchemaForIdType = (schema,idType) => {
+const getClienteSchemaForIdType = (schema, idType) => {
   const len = getExpectedIDLength(idType);
   return {
     ...schema,
@@ -599,21 +599,22 @@ const getClienteSchemaForIdType = (schema,idType) => {
 const validarVentaExamenInsert = data =>
   validateFormWithSchema(ventaExamenInsertSchema, data);
 
-const validarFactura = data =>
-  validateFormWithSchema(facturaSchema, data);
+const validarFactura = data => validateFormWithSchema(facturaSchema, data);
 
 const validarVentaInsert = data =>
   validateFormWithSchema(ventaInsertSchema, data);
 
 const validarClienteInsert = data =>
   validateFormWithSchema(
-    getClienteSchemaForIdType(clienteInsertSchema, data.tipo), 
-    data);
+    getClienteSchemaForIdType(clienteInsertSchema, data.tipo),
+    data
+  );
 
 const validarClienteUpdate = data =>
   validateFormWithSchema(
-    getClienteSchemaForIdType(clienteRowSchema, data.tipo), 
-    data);
+    getClienteSchemaForIdType(clienteRowSchema, data.tipo),
+    data
+  );
 
 const validarDatilConfig = data =>
   validateFormWithSchema(datilConfigSchema, data);

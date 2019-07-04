@@ -23,8 +23,8 @@ const calcularSubtotal = unidades => {
 };
 
 const calcularValoresTotales = (subtotal, flete, iva, descuento) => {
-  const rebaja = Math.floor(subtotal * descuento / 100);
-  const impuestos = Math.floor((subtotal - rebaja) * iva / 100);
+  const rebaja = Math.floor((subtotal * descuento) / 100);
+  const impuestos = Math.floor(((subtotal - rebaja) * iva) / 100);
   const total = subtotal + flete + impuestos - rebaja;
 
   return Object.freeze({
@@ -36,7 +36,7 @@ const calcularValoresTotales = (subtotal, flete, iva, descuento) => {
   });
 };
 
-const calcularValoresFacturables = ({unidades, flete, iva, descuento}) => {
+const calcularValoresFacturables = ({ unidades, flete, iva, descuento }) => {
   const subtotal = calcularSubtotal(unidades);
   return calcularValoresTotales(subtotal, flete, iva, descuento);
 };

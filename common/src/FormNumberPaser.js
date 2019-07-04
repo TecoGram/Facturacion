@@ -10,5 +10,5 @@ const parseFormFloat = str => {
 
 module.exports = {
   parseFormFloat,
-  parseFormInt,
+  parseFormInt
 };

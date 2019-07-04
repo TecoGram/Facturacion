@@ -4,10 +4,10 @@ const DateParser = require('./DateParser.js');
 describe('DateParser', () => {
   describe('toReadableDate', () => {
     it('convierte la fecha un Date object a String sin importar la zona horaria', () => {
-      const dbDate = '2016-12-25';
+      const dbDate = '2016-12-25T01:13:44.345Z';
       const parsedDate = DateParser.parseDBDate(dbDate);
       const result = DateParser.toReadableDate(parsedDate);
-      expect(result).toEqual(dbDate);
+      expect(result).toEqual('2016-12-25');
     });
   });
 
@@ -23,14 +23,14 @@ describe('DateParser', () => {
             email: 'julio_mendoza@yahoo.com.ec',
             direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
             telefono1: '2645422',
-            telefono2: '2876357',
+            telefono2: '2876357'
           },
           facturaData: {
             codigo: 9999999,
             fecha: '2017-01-06',
             autorizacion: '',
             descuento: 0,
-            formaPago: 'CONTADO',
+            formaPago: 'CONTADO'
           },
           facturables: [
             {
@@ -38,9 +38,9 @@ describe('DateParser', () => {
               count: 1,
               precioVenta: 11,
               lote: 'ert3',
-              fechaExp: '2017-04-04',
-            },
-          ],
+              fechaExp: '2017-04-04'
+            }
+          ]
         };
 
         const desiredResp = {
@@ -50,7 +50,7 @@ describe('DateParser', () => {
             email: 'julio_mendoza@yahoo.com.ec',
             direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
             telefono1: '2645422',
-            telefono2: '2876357',
+            telefono2: '2876357'
           },
           medico: undefined,
           facturaData: {
@@ -58,7 +58,7 @@ describe('DateParser', () => {
             fecha: new Date('2017/01/06'),
             autorizacion: '',
             descuento: 0,
-            formaPago: 'CONTADO',
+            formaPago: 'CONTADO'
           },
           facturables: [
             {
@@ -66,9 +66,9 @@ describe('DateParser', () => {
               count: 1,
               precioVenta: 11,
               lote: 'ert3',
-              fechaExp: '2017-04-04',
-            },
-          ],
+              fechaExp: '2017-04-04'
+            }
+          ]
         };
         const formattedResp = DateParser.verVenta(queryResp);
         expect(formattedResp).toEqual(desiredResp);
@@ -92,10 +92,10 @@ describe('DateParser', () => {
           email: 'julio_mendoza@yahoo.com.ec',
           direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
           telefono1: '2645422',
-          telefono2: '2876357',
+          telefono2: '2876357'
         },
         medico: {
-          nombre: 'Noguchi',
+          nombre: 'Noguchi'
         },
         facturaData: {
           codigo: 9999999,
@@ -103,7 +103,7 @@ describe('DateParser', () => {
           autorizacion: '',
           descuento: 0,
           formaPago: 'CONTADO',
-          paciente: 'Carlos Sanchez',
+          paciente: 'Carlos Sanchez'
         },
         facturables: [
           {
@@ -111,9 +111,9 @@ describe('DateParser', () => {
             count: 1,
             precioVenta: 11,
             lote: 'ert3',
-            fechaExp: '2017-04-04',
-          },
-        ],
+            fechaExp: '2017-04-04'
+          }
+        ]
       };
 
       const desiredResp = {
@@ -123,10 +123,10 @@ describe('DateParser', () => {
           email: 'julio_mendoza@yahoo.com.ec',
           direccion: 'Avenida Juan Tanca Marengo y Gomez Gould',
           telefono1: '2645422',
-          telefono2: '2876357',
+          telefono2: '2876357'
         },
         medico: {
-          nombre: 'Noguchi',
+          nombre: 'Noguchi'
         },
         facturaData: {
           codigo: 9999999,
@@ -134,7 +134,7 @@ describe('DateParser', () => {
           autorizacion: '',
           descuento: 0,
           formaPago: 'CONTADO',
-          paciente: 'Carlos Sanchez',
+          paciente: 'Carlos Sanchez'
         },
         facturables: [
           {
@@ -142,9 +142,9 @@ describe('DateParser', () => {
             count: 1,
             precioVenta: 11,
             lote: 'ert3',
-            fechaExp: '2017-04-04',
-          },
-        ],
+            fechaExp: '2017-04-04'
+          }
+        ]
       };
       const formattedResp = DateParser.verVenta(queryResp);
       expect(formattedResp).toEqual(desiredResp);

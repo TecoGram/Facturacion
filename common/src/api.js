@@ -3,7 +3,7 @@ const request = require('superagent');
 const prefix =
   process.env.NODE_ENV === 'integration' ? 'http://localhost:8192' : '';
 
-const getFacturaURL = (id) => {
+const getFacturaURL = id => {
   return `${prefix}/venta/ver/${id}`;
 };
 
@@ -149,19 +149,19 @@ module.exports = {
     return request.get(prefix + '/venta/findAll?q=' + queryString).send();
   },
 
-  verVenta: (id) => {
+  verVenta: id => {
     return request
       .get(prefix + `/venta/ver/${id}`)
       .send()
       .set('Accept', 'application/json');
   },
 
-  deleteVenta: (id) => {
+  deleteVenta: id => {
     return request
       .post(prefix + `/venta/delete/${id}`)
       .send()
       .set('Accept', 'application/json');
   },
 
-  getFacturaURL,
+  getFacturaURL
 };
