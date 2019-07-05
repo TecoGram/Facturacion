@@ -5,7 +5,7 @@ import {
   TableHeader,
   TableHeaderColumn,
   TableRow,
-  TableRowColumn,
+  TableRowColumn
 } from 'material-ui/Table';
 import PaperContainer from './PaperContainer';
 import IconTextFieldRow from './formTable/IconTextFieldRow';
@@ -17,22 +17,24 @@ import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 
 const black54p = '#757575';
 
-const ButtonsColumn = (index, onEditItem, onDeleteItem, onOpenItem) => {
+const ButtonsColumn = props => {
+  const { item, index, onEditItem, onDeleteItem, onOpenItem } = props;
+  const isMutableItem = props.isMutableItem || (() => true);
   const iconStyle = {
-    display: 'inline-block',
+    display: 'inline-block'
   };
 
   let editCol = null;
   let deleteCol = null;
   let openCol = null;
-  if (onDeleteItem) {
+  if (onDeleteItem && isMutableItem(item)) {
     deleteCol = (
       <IconButton style={iconStyle} onTouchTap={() => onDeleteItem(index)}>
         <Clear color={black54p} />
       </IconButton>
     );
   }
-  if (onEditItem) {
+  if (onEditItem && isMutableItem(item)) {
     editCol = (
       <IconButton style={iconStyle} onTouchTap={() => onEditItem(index)}>
         <ModeEdit color={black54p} />
@@ -66,13 +68,13 @@ const ButtonsColumn = (index, onEditItem, onDeleteItem, onOpenItem) => {
 class SearchBox extends React.Component {
   static propTypes = {
     hint: React.PropTypes.string.isRequired,
-    onQueryChanged: React.PropTypes.func.isRequired,
+    onQueryChanged: React.PropTypes.func.isRequired
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      queryText: '',
+      queryText: ''
     };
   }
 
@@ -87,13 +89,13 @@ class SearchBox extends React.Component {
       icon: Search,
       hintText: this.props.hint,
       onChange: this.newQuery,
-      value: this.state.queryText,
+      value: this.state.queryText
     };
 
     const tableStyle = {
       width: 'auto',
       marginLeft: 'auto',
-      marginRight: '0px',
+      marginRight: '0px'
     };
 
     return (
@@ -107,33 +109,33 @@ class SearchBox extends React.Component {
 }
 
 /**
-* Renderiza una tabla dentro de un Paper. En la esquina superior dereche se coloca
-* un TextField para hacer busquedas que filtren el contenido de la tabla.
-*
-* Es necesario pasar 3 arrays: rows, columns y keys. rows son las filas de la tabla,
-* tienen que ser objetos. columns tiene las etiquetas de cada columna y keys tiene
-* el nombre del atributo con la data de la columna.
-*
-* Con el prop searchHint se pone el 'hint' para filtrar el contenido de la tabla.
-*
-* El prop onQueryChanged es un callback a ejecutar cada vez que el usario escribe
-* en el textField para filtrar datos, es una funcion tipo (query) => { }, donde
-* query es el texto ingresado.
-*
-* onEditItem, onDeleteItem y onOpenItem son callbacks opcionales.
-* Si se pasa onEditItem, se agrega una columna a la tabla para editar la fila.
-* Si se pasa onDeleteItem, se agrega una columna a la tabla para eliminar la fila.
-* Si se pasa onOpenItem, se agrega una columna a la tabla para ver detalle de la fila.
-* Todos tienen la forma (item) => { } donde item es el indice de la fila con la
-* cual se origino el click.
-*
-* Esto usa el componente Table de material-ui, el cual no recicla views, por lo
-* tanto hay que tener cuidado con no renderizar muchas filas
-*/
+ * Renderiza una tabla dentro de un Paper. En la esquina superior dereche se coloca
+ * un TextField para hacer busquedas que filtren el contenido de la tabla.
+ *
+ * Es necesario pasar 3 arrays: rows, columns y keys. rows son las filas de la tabla,
+ * tienen que ser objetos. columns tiene las etiquetas de cada columna y keys tiene
+ * el nombre del atributo con la data de la columna.
+ *
+ * Con el prop searchHint se pone el 'hint' para filtrar el contenido de la tabla.
+ *
+ * El prop onQueryChanged es un callback a ejecutar cada vez que el usario escribe
+ * en el textField para filtrar datos, es una funcion tipo (query) => { }, donde
+ * query es el texto ingresado.
+ *
+ * onEditItem, onDeleteItem y onOpenItem son callbacks opcionales.
+ * Si se pasa onEditItem, se agrega una columna a la tabla para editar la fila.
+ * Si se pasa onDeleteItem, se agrega una columna a la tabla para eliminar la fila.
+ * Si se pasa onOpenItem, se agrega una columna a la tabla para ver detalle de la fila.
+ * Todos tienen la forma (item) => { } donde item es el indice de la fila con la
+ * cual se origino el click.
+ *
+ * Esto usa el componente Table de material-ui, el cual no recicla views, por lo
+ * tanto hay que tener cuidado con no renderizar muchas filas
+ */
 
 const _columnTypes = {
   string: 0,
-  numeric: 1,
+  numeric: 1
 };
 
 export default class MaterialTable extends React.Component {
@@ -150,7 +152,8 @@ export default class MaterialTable extends React.Component {
     onEditItem: React.PropTypes.func,
     onDeleteItem: React.PropTypes.func,
     onOpenItem: React.PropTypes.func,
-    enableCheckbox: React.PropTypes.bool,
+    isMutableItem: React.PropTypes.func,
+    enableCheckbox: React.PropTypes.bool
   };
 
   renderTableRows = () => {
@@ -161,6 +164,7 @@ export default class MaterialTable extends React.Component {
       onDeleteItem,
       onEditItem,
       onOpenItem,
+      isMutableItem
     } = this.props;
 
     return rows.map((item, i) => {
@@ -183,7 +187,14 @@ export default class MaterialTable extends React.Component {
               </TableRowColumn>
             );
           })}
-          {ButtonsColumn(i, onEditItem, onDeleteItem, onOpenItem)}
+          {ButtonsColumn({
+            index: i,
+            item,
+            isMutableItem,
+            onEditItem,
+            onDeleteItem,
+            onOpenItem
+          })}
         </TableRow>
       );
     });
@@ -196,7 +207,7 @@ export default class MaterialTable extends React.Component {
       onDeleteItem,
       onEditItem,
       onQueryChanged,
-      searchHint,
+      searchHint
     } = this.props;
 
     let columns = this.props.columns;
@@ -216,9 +227,7 @@ export default class MaterialTable extends React.Component {
               <TableRow>
                 {columns.map((colName, i) => {
                   return (
-                    <TableHeaderColumn key={i}>
-                      {colName}
-                    </TableHeaderColumn>
+                    <TableHeaderColumn key={i}>{colName}</TableHeaderColumn>
                   );
                 })}
               </TableRow>

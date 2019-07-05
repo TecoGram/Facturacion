@@ -33,18 +33,16 @@ export default class ListState {
     });
   }
 
-  deleteVenta(codigo, empresa) {
+  deleteVenta(rowid) {
     this.setState(prevState => {
       return {
-        rows: prevState.rows.filter(
-          item => item.empresa !== empresa || item.codigo !== codigo
-        )
+        rows: prevState.rows.filter(item => item.rowid !== rowid)
       };
     });
   }
 
-  openEditorPage(codigo, empresa, tipo) {
-    if (tipo === 0) this.props.editarFactura(codigo, empresa);
-    else this.props.editarFacturaExamen(codigo, empresa);
+  openEditorPage(rowid, tipo) {
+    if (tipo === 0) this.props.editarFactura(rowid);
+    else this.props.editarFacturaExamen(rowid);
   }
 }

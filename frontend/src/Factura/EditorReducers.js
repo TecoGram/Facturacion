@@ -2,7 +2,9 @@ import {
   sanitizarFacturaInput,
   sanitizarUnidadInput,
   validarVentaInsert,
-  validarVentaExamenInsert
+  validarVentaUpdate,
+  validarVentaExamenInsert,
+  validarVentaExamenUpdate
 } from 'facturacion_common/src/Validacion.js';
 import {
   oneYearFromToday,
@@ -14,12 +16,14 @@ import * as Actions from './EditorActions.js';
 import API from 'facturacion_common/src/api.js';
 import Money from 'facturacion_common/src/Money.js';
 import DateParser from 'facturacion_common/src/DateParser.js';
+import { FormasDePago } from 'facturacion_common/src/Models.js';
 
 export const getDefaultState = () => ({
   clienteRow: null,
   medicoRow: null,
   errors: {},
   inputs: {
+    codigo: '',
     fecha: 'now',
     descuento: '',
     autorizacion: '',
@@ -39,8 +43,8 @@ const findValidacionErrors = (config, state) => {
 
   if (state.unidades.length === 0) return 'Por favor ingresa un producto.';
 
-  if (config.isExamen && !state.medicoRow)
-    return 'Por favor ingresa un médico.';
+  if (config.isExamen && !state.inputs.paciente)
+    return 'Por favor ingresa un paciente.';
 
   return null;
 };
@@ -49,14 +53,16 @@ const crearVenta = (config, state, subtotal) => {
   const { clienteRow, medicoRow, inputs } = state;
   const ventaDate = inputs.fecha === 'now' ? new Date() : inputs.fecha;
   return {
-    codigo: '',
+    codigo: inputs.codigo || '',
+    rowid: inputs.rowid,
     empresa: config.empresa,
     cliente: clienteRow.rowid,
     fecha: toDatilDate(ventaDate),
     autorizacion: inputs.autorizacion,
     guia: inputs.guia,
     contable: inputs.contable,
-    detallado: config.isExamen ? false : inputs.detallado,
+    detallado: inputs.detallado,
+    tipo: config.isExamen ? 1 : 0,
     descuento: inputs.descuento,
     iva: config.iva,
     subtotal,
@@ -67,8 +73,9 @@ const crearVenta = (config, state, subtotal) => {
   };
 };
 
-const insertarVenta = (venta, callback) =>
-  API.insertarVenta(venta)
+const subirVenta = ({ config, venta, callback }) => {
+  const uploadFn = config.editar ? API.updateVenta : API.insertarVenta;
+  return uploadFn(venta)
     .then(res => {
       callback({ success: true, rowid: res.body.rowid });
       return { type: Actions.getDefaultState };
@@ -77,6 +84,7 @@ const insertarVenta = (venta, callback) =>
       callback({ success: false, msg: err.text });
       return { type: Actions.abortInsert };
     });
+};
 
 const validarPagos = (pagos, total) => {
   const totalPagado = pagos.reduce(
@@ -114,7 +122,7 @@ const guardarFactura = ({ config, callback }) => state => {
   const { subtotal, total } = calcularValoresFacturables({
     unidades: state.unidades,
     descuento: state.inputs.descuento || 0,
-    iva: config.iva,
+    iva: config.isExamen ? 0 : config.iva,
     flete: state.inputs.flete || 0
   });
 
@@ -125,7 +133,11 @@ const guardarFactura = ({ config, callback }) => state => {
   }
 
   const venta = crearVenta(config, { ...state, pagos }, subtotal);
-  const validacionFn = config.isExamen
+  const validacionFn = config.editar
+    ? config.isExamen
+      ? validarVentaExamenUpdate
+      : validarVentaUpdate
+    : config.isExamen
     ? validarVentaExamenInsert
     : validarVentaInsert;
   const { errors, inputs } = validacionFn(venta);
@@ -143,7 +155,10 @@ const guardarFactura = ({ config, callback }) => state => {
     };
   }
 
-  return [{ ...state, guardando: true }, insertarVenta(inputs, callback)];
+  return [
+    { ...state, guardando: true },
+    subirVenta({ config, venta: inputs, callback })
+  ];
 };
 
 const updateFacturaInput = ({ key, value }) => state => {
@@ -220,10 +235,9 @@ const getVenta = ({ ventaKey, isExamen }) => {
   const fetchFn = isExamen ? API.verVentaExamen : API.verVenta;
   return fetchFn(ventaKey)
     .then(res => {
-      const venta = DateParser.verVenta(res.body);
       return {
         type: Actions.editarFactura,
-        venta
+        venta: res.body
       };
     })
     .catch(err => {
@@ -249,7 +263,33 @@ const updatePagos = ({ pagos }) => state => {
 };
 
 const editarFactura = ({ venta }) => state => {
-  return { ...state, ...venta };
+  const { ventaRow, clienteRow, medicoRow, paciente, unidades, pagos } = venta;
+  return {
+    clienteRow: clienteRow || null,
+    medicoRow: medicoRow || null,
+    inputs: {
+      rowid: ventaRow.rowid,
+      codigo: ventaRow.codigo,
+      fecha: DateParser.parseDBDate(ventaRow.fecha),
+      descuento: ventaRow.descuento,
+      autorizacion: ventaRow.autorizacion,
+      flete: ventaRow.flete,
+      detallado: ventaRow.detallado,
+      paciente: paciente || '',
+      contable: ventaRow.contable,
+      guia: ''
+    },
+    unidades: unidades.map(u => ({
+      ...u,
+      countText: '' + u.count,
+      precioVentaText: Money.print(u.precioVenta)
+    })),
+    pagos: pagos.map(p => ({
+      ...p,
+      formaPagoText: FormasDePago[p.formaPago],
+      precioVentaText: Money.print(p.precioVenta)
+    }))
+  };
 };
 
 export const createReducer = action => {

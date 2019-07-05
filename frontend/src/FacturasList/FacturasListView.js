@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  getFacturaURLByType,
+  getFacturaURL,
   findAllVentas,
   deleteVenta
 } from 'facturacion_common/src/api';
@@ -34,20 +34,20 @@ export default class FacturasListView extends React.Component {
   };
 
   openFacturaInNewTab = index => {
-    const { codigo, empresa, tipo } = this.state.rows[index];
-    const facturaURL = getFacturaURLByType(codigo, empresa, tipo);
+    const { rowid } = this.state.rows[index];
+    const facturaURL = getFacturaURL(rowid);
     window.open(facturaURL);
   };
 
   openEditorPage = index => {
-    const { codigo, empresa, tipo } = this.state.rows[index];
-    this.stateManager.openEditorPage(codigo, empresa, tipo);
+    const { rowid, tipo } = this.state.rows[index];
+    this.stateManager.openEditorPage(rowid, tipo);
   };
 
   deleteRow = index => {
-    const { codigo, empresa } = this.state.rows[index];
-    deleteVenta(codigo, empresa).then(() => {
-      this.stateManager.deleteVenta(codigo, empresa);
+    const { rowid } = this.state.rows[index];
+    deleteVenta(rowid).then(() => {
+      this.stateManager.deleteVenta(rowid);
     });
   };
 
@@ -82,6 +82,7 @@ export default class FacturasListView extends React.Component {
         onDeleteItem={this.deleteRow}
         onEditItem={this.openEditorPage}
         onOpenItem={this.openFacturaInNewTab}
+        isMutableItem={item => !item.id}
         height={'450px'}
         onQueryChanged={this.requestData}
       />

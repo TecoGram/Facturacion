@@ -134,22 +134,12 @@ const creators = {
     };
   },
 
-  editarFactura(codigo, empresa) {
-    return cambiarPagina(EDITAR_FACTURA_PAGE, {
-      ventaKey: {
-        codigo: codigo,
-        empresa: empresa
-      }
-    });
+  editarFactura(rowid) {
+    return cambiarPagina(EDITAR_FACTURA_PAGE, { ventaKey: rowid });
   },
 
-  editarFacturaExamen(codigo, empresa) {
-    return cambiarPagina(EDITAR_FACTURA_EXAMEN_PAGE, {
-      ventaKey: {
-        codigo: codigo,
-        empresa: empresa
-      }
-    });
+  editarFacturaExamen(rowid) {
+    return cambiarPagina(EDITAR_FACTURA_EXAMEN_PAGE, { ventaKey: rowid });
   },
 
   cambiarPagina: cambiarPagina,

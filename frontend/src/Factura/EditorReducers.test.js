@@ -9,7 +9,8 @@ const API = require('facturacion_common/src/api.js');
 const Money = require('facturacion_common/src/Money.js');
 const {
   validateFormWithSchema,
-  ventaInsertSchema
+  ventaInsertSchema,
+  ventaExamenInsertSchema
 } = require('facturacion_common/src/Validacion.js');
 import { assertWithSchema, runActions } from '../TestingUtils.js';
 
@@ -23,6 +24,7 @@ describe('EditorReducers', () => {
       const config = {
         iva: 12,
         isExamen: false,
+        editar: false,
         empresa: 'Teco'
       };
       const callback = jest.fn();
@@ -90,6 +92,7 @@ describe('EditorReducers', () => {
       const config = {
         iva: 12,
         isExamen: false,
+        editar: false,
         empresa: 'Teco'
       };
       const callback = jest.fn();
@@ -160,6 +163,7 @@ describe('EditorReducers', () => {
       const config = {
         iva: 12,
         isExamen: false,
+        editar: false,
         empresa: 'Teco'
       };
       const callback = jest.fn();
@@ -229,6 +233,7 @@ describe('EditorReducers', () => {
     const config = {
       iva: 12,
       isExamen: false,
+      editar: false,
       empresa: 'Teco'
     };
     const callback = jest.fn();
@@ -357,6 +362,122 @@ describe('EditorReducers', () => {
             count: 1,
             producto: 2,
             precioVenta: 14900,
+            fechaExp: expect.any(String)
+          }
+        ]
+      })
+    );
+  });
+
+  it('crea una factura de examenes correctamente', async () => {
+    API.insertarVenta.mockReturnValueOnce(
+      Promise.resolve({ status: 200, body: { rowid: 5 } })
+    );
+
+    const config = {
+      iva: 12,
+      isExamen: true,
+      editar: false,
+      empresa: 'Teco'
+    };
+    const callback = jest.fn();
+
+    const actions = [
+      { type: Actions.getDefaultState },
+      {
+        type: Actions.setCliente,
+        clienteRow: {
+          rowid: 1,
+          id: '0945537385',
+          nombre: 'Carlos Salazar',
+          nombre: 'carlos salazar',
+          direccion: 'Pedro Carbo 41',
+          telefono1: '099123123',
+          telefono2: '099456456',
+          email: 'carlos@gmail.com',
+          descDefault: 0,
+          tipo: 'cedula'
+        }
+      },
+      {
+        type: Actions.updateFacturaInput,
+        key: 'paciente',
+        value: 'Carlos Salazar'
+      },
+      {
+        type: Actions.agregarProducto,
+        productoRow: {
+          rowid: 1,
+          codigo: '-',
+          nombre: 'Examenes especiales',
+          nombreAscii: 'examenes especiales',
+          marca: '',
+          precioDist: 0,
+          precioVenta: 99900,
+          pagaIva: false
+        }
+      },
+      {
+        type: Actions.updatePagos,
+        pagos: [
+          {
+            key: 0,
+            formaPagoText: 'EFECTIVO',
+            formaPago: 'efectivo',
+            valor: 99900
+          }
+        ]
+      },
+      {
+        type: Actions.guardarFactura,
+        config,
+        callback
+      }
+    ];
+
+    const finalState = await runActions(createReducer, actions);
+
+    // verificar callback ejecutado
+    expect(callback.mock.calls).toEqual([[{ success: true, rowid: 5 }]]);
+
+    // verificar state reseteado
+    expect(finalState).toEqual(
+      expect.objectContaining({
+        clienteRow: null,
+        medicoRow: null,
+        guardando: false,
+        unidades: []
+      })
+    );
+
+    // verificar request enviado
+    expect(API.insertarVenta).toHaveBeenCalledTimes(1);
+    const [[insertarVentaBody]] = API.insertarVenta.mock.calls;
+    assertWithSchema(ventaExamenInsertSchema, insertarVentaBody);
+    expect(insertarVentaBody).toEqual(
+      expect.objectContaining({
+        codigo: '',
+        empresa: 'Teco',
+        cliente: 1,
+        paciente: 'Carlos Salazar',
+        fecha: expect.any(String),
+        autorizacion: '',
+        guia: '',
+        descuento: 0,
+        flete: 0,
+        subtotal: 99900,
+        pagos: [
+          {
+            formaPago: 'efectivo',
+            valor: 99900
+          }
+        ],
+        unidades: [
+          {
+            lote: '',
+            count: 1,
+            producto: 1,
+            precioVenta: 99900,
             fechaExp: expect.any(String)
           }
         ]

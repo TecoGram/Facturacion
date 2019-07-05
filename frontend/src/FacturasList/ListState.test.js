@@ -69,13 +69,13 @@ describe('Factura ListView State', () => {
   describe('deleteVenta', () => {
     it('remueve una venta del state', () => {
       state.rows = [
-        { codigo: '00435', empresa: 'TECO' },
-        { codigo: '00434', empresa: 'TECO' }
+        { rowid: 1, codigo: '00435', empresa: 'TECO' },
+        { rowid: 2, codigo: '00434', empresa: 'TECO' }
       ];
       const stateManager = new ListState({}, setStateFunc);
-      stateManager.deleteVenta('00434', 'TECO');
+      stateManager.deleteVenta(2);
       expect(state).toEqual({
-        rows: [{ codigo: '00435', empresa: 'TECO' }]
+        rows: [{ rowid: 1, codigo: '00435', empresa: 'TECO' }]
       });
     });
   });
@@ -92,7 +92,7 @@ describe('Factura ListView State', () => {
         }
       };
       const stateManager = new ListState(props, setStateFunc);
-      stateManager.openEditorPage('00546', 'TECO', 0);
+      stateManager.openEditorPage(1, 0);
       expect(success).toEqual(true);
     });
 
@@ -123,7 +123,7 @@ describe('Factura ListView State', () => {
       };
       const stateManager = new ListState({}, setStateFunc);
       stateManager.props = props;
-      stateManager.openEditorPage('00546', 'TECO', 0);
+      stateManager.openEditorPage(1, 0);
       expect(success).toBe(true);
     });
   });
