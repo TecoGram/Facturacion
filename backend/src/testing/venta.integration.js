@@ -43,6 +43,7 @@ const baseVentaRow = Object.freeze({
   subtotal: 499900,
   contable: false,
   descuento: 0,
+  tipo: 0,
   iva: 12,
   pagos: [{ formaPago: 'efectivo', valor: 559888 }]
 });
@@ -122,7 +123,7 @@ describe('/venta/ endpoints', () => {
         unidades: [await fetchUnidad('Glyco')]
       };
 
-      const res = await api.insertarVenta(newVentaRow);
+      const res = await api.insertarVenta(newVentaRow).catch(err => console.error(err));
 
       expect(res.status).toBe(200);
       expect(HTTPClient.postRequest).toHaveBeenCalledTimes(0);

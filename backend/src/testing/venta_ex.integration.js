@@ -16,6 +16,7 @@ const baseVentaEx = Object.freeze({
   empresa: 'TecoGram S.A.',
   cliente: 1,
   medico: 1,
+  tipo: 1,
   paciente: 'Carlos Armijos',
   fecha: '2016-11-26T17:28:12.000Z',
   autorizacion: '',
@@ -40,7 +41,7 @@ const insertarNuevaFacturaContable = async () => {
     unidades: [unidad]
   };
 
-  const res = await api.insertarVentaExamen(newVentaRow);
+  const res = await api.insertarVenta(newVentaRow);
   expect(res.status).toBe(200);
   expect(HTTPClient.postRequest).toHaveBeenCalledTimes(1);
 
@@ -168,7 +169,7 @@ describe('/venta_ex/ endpoints', () => {
         unidades: [unidad]
       };
 
-      const res1 = await api.insertarVentaExamen(newVentaRow);
+      const res1 = await api.insertarVenta(newVentaRow);
       expect(res1.status).toBe(200);
       const rowid = res1.body.rowid;
 
@@ -178,7 +179,7 @@ describe('/venta_ex/ endpoints', () => {
         autorizacion: '12345679',
         paciente: 'Vicente Hernandez'
       };
-      const res2 = await api.updateVentaExamen(editedVenta);
+      const res2 = await api.updateVenta(editedVenta);
       expect(res2.status).toBe(200);
     });
   });
@@ -194,7 +195,7 @@ describe('/venta_ex/ endpoints', () => {
 
       const newVentaRow = { ...ventaRow, unidades: [unidad] };
       const res1 = await api
-        .insertarVentaExamen(newVentaRow)
+        .insertarVenta(newVentaRow)
         .catch(err => console.log(err));
       expect(res1.status).toBe(200);
       insertedRowid = res1.body.rowid;
@@ -249,7 +250,7 @@ describe('/venta_ex/ endpoints', () => {
       const codigos = ['9999992', '9999991'];
       const responses = await Promise.all(
         codigos.map(codigo =>
-          api.insertarVentaExamen({
+          api.insertarVenta({
             ...baseVentaEx,
             codigo,
             unidades: [unidad]
@@ -284,7 +285,7 @@ describe('/venta_ex/ endpoints', () => {
       const unidad = await fetchUnidad('examen');
 
       const newVentaRow = { ...ventaRow, unidades: [unidad] };
-      const res1 = await api.insertarVentaExamen(newVentaRow);
+      const res1 = await api.insertarVenta(newVentaRow);
       expect(res1.status).toBe(200);
       insertedRowid = res1.body.rowid;
     });

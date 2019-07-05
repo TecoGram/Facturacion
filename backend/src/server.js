@@ -16,10 +16,8 @@ const {
   validarMedico,
   validarPagos,
   validarProducto,
-  validarVenta,
-  validarVentaUpdate,
-  validarVentaExamen,
-  validarVentaExamenUpdate
+  validarVentaInsert,
+  validarVentaUpdate
 } = require('./sanitizationMiddleware.js');
 const { validarVentaMutable } = require('./dbValidationMiddleware.js');
 const { serveTecogram, serveBiocled } = require('./empresaMiddleware.js');
@@ -369,22 +367,11 @@ const generarNuevoComprobante = async ventaId => {
 
 app.post(
   '/venta/new',
-  validarVenta,
-  validarPagos(true),
+  validarVentaInsert,
+  validarPagos,
   handleValidData(async data => {
-    const ventaId = await db.insertarVenta(data);
-    if (!data.contable) return { status: 200, resp: { rowid: ventaId } };
-
-    return generarNuevoComprobante(ventaId);
-  })
-);
-
-app.post(
-  '/venta_ex/new',
-  validarVentaExamen,
-  validarPagos(false),
-  handleValidData(async data => {
-    const ventaId = await db.insertarVentaExamen(data);
+    const insertFn = data.tipo ? db.insertarVentaExamen : db.insertarVenta;
+    const ventaId = await insertFn(data);
     if (!data.contable) return { status: 200, resp: { rowid: ventaId } };
 
     return generarNuevoComprobante(ventaId);
@@ -395,41 +382,16 @@ app.post(
   '/venta/update',
   validarVentaUpdate,
   validarVentaMutable('safeData'),
-  (req, res) => {
-    db.updateVenta(req.safeData)
-      .then(async () => {
-        const { rowid, contable } = req.safeData;
-        if (!contable || (await db.tieneComprobante(rowid)))
-          return res.status(200).send('OK');
+  handleValidData(async data => {
+    const updateFn = data.tipo ? db.updateVentaExamen : db.updateVenta;
+    await updateFn(data);
 
-        return generarNuevoComprobante(rowid);
-      })
-      .catch(error => {
-        //ERROR!
-        res.status(500).send(error);
-      });
-  }
-);
+    const { rowid, contable } = data;
+    if (!contable || (await db.tieneComprobante(rowid)))
+      return { status: 200, resp: { rowid } };
 
-app.post(
-  '/venta_ex/update',
-  validarVentaExamenUpdate,
-  validarVentaMutable('safeData'),
-  (req, res) => {
-    db.updateVentaExamen(req.safeData)
-      .then(async () => {
-        const { rowid, contable } = req.safeData;
-        if (!contable || (await db.tieneComprobante(rowid)))
-          return res.status(200).send('OK');
-
-        return generarNuevoComprobante(rowid);
-      })
-      .catch(error => {
-        //ERROR!
-        res.status(500);
-        res.send(error);
-      });
-  }
+    return generarNuevoComprobante(rowid);
+  })
 );
 
 const server = app.listen(port, function() {

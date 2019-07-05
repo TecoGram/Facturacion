@@ -116,23 +116,9 @@ module.exports = {
       .set('Accept', 'application/json');
   },
 
-  insertarVentaExamen: ventaRow => {
-    return request
-      .post(prefix + '/venta_ex/new')
-      .send(ventaRow)
-      .set('Accept', 'application/json');
-  },
-
   updateVenta: ventaRow => {
     return request
       .post(prefix + '/venta/update')
-      .send(ventaRow)
-      .set('Accept', 'application/json');
-  },
-
-  updateVentaExamen: ventaRow => {
-    return request
-      .post(prefix + '/venta_ex/update')
       .send(ventaRow)
       .set('Accept', 'application/json');
   },

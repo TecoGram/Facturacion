@@ -23,16 +23,6 @@ const setSafeData = (req, data) => {
   req.safeData = data;
 };
 
-const validationMiddleware = (schema, key = 'body') => (req, res, next) => {
-  const { inputs, errors } = validateFormWithSchema(schema, req[key]);
-  if (errors) {
-    sendBadArgumentsResponse(res, errors);
-  } else {
-    setSafeData(req, inputs);
-    next();
-  }
-};
-
 const validarClienteMiddleware = ({ isInsert }) => (req, res, next) => {
   const { body } = req;
   const schema = getClienteSchemaForIdType(
@@ -48,12 +38,12 @@ const validarClienteMiddleware = ({ isInsert }) => (req, res, next) => {
   }
 };
 
-const validarPagos = pagaIVA => (req, res, next) => {
+const validarPagos = (req, res, next) => {
   const { safeData: venta } = req;
   const { total } = calcularValoresTotales(
     venta.subtotal,
     venta.flete,
-    pagaIVA ? tarifaIVA : 0,
+    venta.tipo === 1 ? 0 : tarifaIVA,
     venta.descuento
   );
 
@@ -65,6 +55,68 @@ const validarPagos = pagaIVA => (req, res, next) => {
       `Pagos no cuadran. Se esperaban ${total}, pero se encontró ${totalPagado}.`
     );
   else next();
+};
+
+const getSchemaForVentaInsertByTipo = tipo => {
+  switch (tipo) {
+    case 1:
+      return ventaExamenInsertSchema;
+    case 0:
+      return ventaInsertSchema;
+    default:
+      return undefined;
+  }
+};
+
+const getSchemaForVentaUpdateByTipo = tipo => {
+  switch (tipo) {
+    case 1:
+      return ventaExamenUpdateSchema;
+    case 0:
+      return ventaUpdateSchema;
+    default:
+      return undefined;
+  }
+};
+
+const validarVentaInsert = (req, res, next) => {
+  const unsafeVenta = req.body;
+  if (!unsafeVenta) return sendBadArgumentsResponse(res, 'Request mal formado');
+
+  const schema = getSchemaForVentaInsertByTipo(unsafeVenta.tipo);
+  if (!schema)
+    return sendBadArgumentsResponse(
+      res,
+      `tipo de venta desconocido: ${unsafeVenta.tipo}`
+    );
+
+  const { inputs, errors } = validateFormWithSchema(schema, unsafeVenta);
+  if (errors) {
+    sendBadArgumentsResponse(res, errors);
+  } else {
+    setSafeData(req, inputs);
+    next();
+  }
+};
+
+const validarVentaUpdate = (req, res, next) => {
+  const unsafeVenta = req.body;
+  if (!unsafeVenta) return sendBadArgumentsResponse(res, 'Request mal formado');
+
+  const schema = getSchemaForVentaUpdateByTipo(unsafeVenta.tipo);
+  if (!schema)
+    return sendBadArgumentsResponse(
+      res,
+      `tipo de venta desconocido: ${unsafeVenta.tipo}`
+    );
+
+  const { inputs, errors } = validateFormWithSchema(schema, unsafeVenta);
+  if (errors) {
+    sendBadArgumentsResponse(res, errors);
+  } else {
+    setSafeData(req, inputs);
+    next();
+  }
 };
 
 module.exports = {
@@ -108,8 +160,6 @@ module.exports = {
   },
 
   validarPagos,
-  validarVenta: validationMiddleware(ventaInsertSchema),
-  validarVentaUpdate: validationMiddleware(ventaUpdateSchema),
-  validarVentaExamen: validationMiddleware(ventaExamenInsertSchema),
-  validarVentaExamenUpdate: validationMiddleware(ventaExamenUpdateSchema)
+  validarVentaInsert,
+  validarVentaUpdate
 };

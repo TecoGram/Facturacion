@@ -161,7 +161,10 @@ const array = ({ item, fallback }) => (ctx, value) => {
   return newValue;
 };
 
-const primaryKey = () => (ctx, value) => {
+const primaryKey = ({ optional } = {}) => (ctx, value) => {
+  if (optional && value === undefined)
+    return undefined;
+
   if (typeof value !== 'number' || !validator.isInt('' + value, { min: 1 }))
     return new Error(`"${ctx.name}" debe de ser una clave primaria`);
 
@@ -270,7 +273,7 @@ const int = (args = {}) => (ctx, value) => {
   const { fallback, max, min, abrv } = args;
   const { name } = ctx;
 
-  if (!value) {
+  if (!value && value !== 0) {
     if (fallback || fallback === 0) return fallback;
 
     return abrv
@@ -478,6 +481,7 @@ const ventaSchema = {
   cliente: primaryKey(),
   detallado: bool(),
   contable: bool(),
+  tipo: int({ min: 0, max: 1 }),
   pagos: array({ item: pagoSchema, fallback: [] }),
   unidades: array({ item: unidadSchema })
 };
@@ -512,9 +516,10 @@ const ventaExamenSchema = {
   autorizacion: string({ fallback: '', allowEmpty: true }),
   guia: string({ fallback: '', allowEmpty: true }),
   cliente: primaryKey(),
-  medico: primaryKey(),
+  medico: primaryKey({ optional: true }),
   paciente: string(),
   contable: bool(),
+  tipo: int({ min: 0, max: 1 }),
   pagos: array({ item: pagoSchema }),
   unidades: array({ item: unidadSchema })
 };
