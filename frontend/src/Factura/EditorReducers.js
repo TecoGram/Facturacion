@@ -81,7 +81,7 @@ const subirVenta = ({ config, venta, callback }) => {
       return { type: Actions.getDefaultState };
     })
     .catch(err => {
-      callback({ success: false, msg: err.text });
+      callback({ success: false, msg: err.response.text });
       return { type: Actions.abortInsert };
     });
 };
@@ -274,20 +274,21 @@ const editarFactura = ({ venta }) => state => {
       descuento: ventaRow.descuento,
       autorizacion: ventaRow.autorizacion,
       flete: ventaRow.flete,
-      detallado: ventaRow.detallado,
+      detallado: !!ventaRow.detallado,
       paciente: paciente || '',
-      contable: ventaRow.contable,
+      contable: false,
       guia: ''
     },
     unidades: unidades.map(u => ({
       ...u,
       countText: '' + u.count,
+      pagaIva: !!u.pagaIva,
       precioVentaText: Money.print(u.precioVenta)
     })),
     pagos: pagos.map(p => ({
       ...p,
       formaPagoText: FormasDePago[p.formaPago],
-      precioVentaText: Money.print(p.precioVenta)
+      valorText: Money.print(p.valor)
     }))
   };
 };

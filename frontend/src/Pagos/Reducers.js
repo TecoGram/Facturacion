@@ -57,7 +57,7 @@ const agregarPago = params => state => {
 const removerPago = params => state => {
   const { index, originalPagos } = params;
   const src = state.modificado ? state.pagos : originalPagos;
-  const newPagos = [...src.slice(0, index), src.slice(index + 1)];
+  const newPagos = [...src.slice(0, index), ...src.slice(index + 1)];
 
   return { ...state, modificado: true, pagos: newPagos };
 };

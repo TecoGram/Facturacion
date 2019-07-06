@@ -65,26 +65,32 @@ const ResultsTable = props => {
 const FacturaOptions = props => {
   const { detallado, contable, isExamen, onFacturaDataChanged } = props;
 
-  if (isExamen) return null;
+  const contableCheckbox = (
+    <Checkbox
+      label={'Generar comprobante electrónico'}
+      style={{ textAlign: 'left' }}
+      checked={contable}
+      onCheck={(event, isChecked) => {
+        onFacturaDataChanged('contable', isChecked);
+      }}
+    />
+  );
+  const detalladoCheckbox = (
+    <Checkbox
+      label={'Mostrar Información detallada en cada producto'}
+      style={{ textAlign: 'left' }}
+      checked={isExamen ? false : detallado}
+      disabled={isExamen}
+      onCheck={(event, isChecked) => {
+        onFacturaDataChanged('detallado', isChecked);
+      }}
+    />
+  );
+
   return (
     <div style={{ width: '420px', float: 'left' }}>
-      <Checkbox
-        label={'Generar comprobante electrónico'}
-        style={{ textAlign: 'left' }}
-        checked={contable}
-        onCheck={(event, isChecked) => {
-          onFacturaDataChanged('contable', isChecked);
-        }}
-      />
-      <Checkbox
-        label={'Mostrar Información detallada en cada producto'}
-        style={{ textAlign: 'left' }}
-        checked={isExamen ? false : detallado}
-        disabled={isExamen}
-        onCheck={(event, isChecked) => {
-          onFacturaDataChanged('detallado', isChecked);
-        }}
-      />
+      {contableCheckbox}
+      {isExamen ? null : detalladoCheckbox}
     </div>
   );
 };

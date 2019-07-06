@@ -317,11 +317,12 @@ const insertarPagosPorVenta = (trx, ventaId, pagos) =>
   insertarPagos(trx, pagos.map(p => ({ ...p, ventaId })));
 
 const tieneComprobante = async ventaId => {
-  const [id] = await knex
+  const results = await knex
     .select('id')
     .table('comprobantes')
     .where({ ventaId });
-  return !!id;
+
+  return results.length > 0 && !!results[0].id;
 };
 
 const ventaExiste = async rowid => {

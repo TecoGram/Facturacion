@@ -16,7 +16,7 @@ const toReadableDate = fecha => {
 };
 
 const toReadableDateTime = fecha => {
-  return format(fecha, 'YYYY-MM-DD hh:mm');
+  return format(fecha, 'YYYY-MM-DD HH:mm');
 };
 
 const toDatilDate = fecha => {

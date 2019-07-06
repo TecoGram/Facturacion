@@ -162,8 +162,8 @@ const array = ({ item, fallback }) => (ctx, value) => {
 };
 
 const primaryKey = ({ optional } = {}) => (ctx, value) => {
-  if (optional && value === undefined)
-    return undefined;
+  if (optional && !value)
+    return null;
 
   if (typeof value !== 'number' || !validator.isInt('' + value, { min: 1 }))
     return new Error(`"${ctx.name}" debe de ser una clave primaria`);
@@ -609,6 +609,12 @@ const validarFactura = data => validateFormWithSchema(facturaSchema, data);
 const validarVentaInsert = data =>
   validateFormWithSchema(ventaInsertSchema, data);
 
+const validarVentaExamenUpdate = data =>
+  validateFormWithSchema(ventaExamenUpdateSchema, data);
+
+const validarVentaUpdate = data =>
+  validateFormWithSchema(ventaUpdateSchema, data);
+
 const validarClienteInsert = data =>
   validateFormWithSchema(
     getClienteSchemaForIdType(clienteInsertSchema, data.tipo),
@@ -637,6 +643,8 @@ module.exports = {
   validarUnidad,
   validarVentaInsert,
   validarVentaExamenInsert,
+  validarVentaUpdate,
+  validarVentaExamenUpdate,
   validateFormWithSchema,
   facturaSchema,
   ventaSchema,
