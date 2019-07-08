@@ -68,8 +68,16 @@ const renderRow = props => ({ key, formaPagoText, valorText }, i) => {
     });
   };
 
+  const deleteColumn = (
+    <TableRowColumn>
+      <IconButton style={iconStyle} onTouchTap={onDelete}>
+        <Clear color={black54p} />
+      </IconButton>
+    </TableRowColumn>
+  );
+
   return (
-    <TableRow key={key}>
+    <TableRow key={key} displayBorder={false}>
       <TableRowColumn width={260} style={noPaddingStyle}>
         <AutoComplete
           hintText="Forma de pago"
@@ -92,11 +100,7 @@ const renderRow = props => ({ key, formaPagoText, valorText }, i) => {
           onChange={onValorChange}
         />
       </TableRowColumn>
-      <TableRowColumn>
-        <IconButton style={iconStyle} onTouchTap={onDelete}>
-          <Clear color={black54p} />
-        </IconButton>
-      </TableRowColumn>
+      {i > 1 ? deleteColumn : <div style={{ width: '48px' }} />}
     </TableRow>
   );
 };
@@ -166,7 +170,6 @@ const footerMsg = ({ pagos, total }) => {
 const Footer = props => {
   const { errorMsg, pagos, total } = props;
   if (errorMsg) return errorMessage(errorMsg);
-
   return footerMsg({ pagos, total });
 };
 
@@ -176,7 +179,7 @@ const PagosForm = props => {
     <div>
       <AgregarPagoButton submitAction={submitAction} />
 
-      <Table height={'200px'} selectable={false}>
+      <Table height={'200px'} style={{ width: '380px' }} selectable={false}>
         <TableBody displayRowCheckbox={false}>
           {pagos.map(renderRow(props))}
         </TableBody>

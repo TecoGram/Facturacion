@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+import FlatButton from 'material-ui/FlatButton';
 import TimePicker from 'material-ui/TimePicker';
 import DatePicker from 'material-ui/DatePicker';
 import IconButton from 'material-ui/IconButton';
@@ -8,7 +9,7 @@ import Edit from 'material-ui/svg-icons/image/edit';
 
 import { toReadableDateTime } from 'facturacion_common/src/DateParser.js';
 
-const txtMargin = '35px';
+const txtMargin = '22px';
 const smallButtonStyle = {
   width: 36,
   height: 36,
@@ -76,14 +77,13 @@ export class CurrentTime extends Component {
     };
     return (
       <div style={style}>
-        <span>{toReadableDateTime(this.state.date)}</span>
-        <IconButton
-          iconStyle={smallIconStyle}
-          style={smallButtonStyle}
+        <FlatButton
+          primary={true}
           onClick={this.props.onClick}
-        >
-          <Edit />
-        </IconButton>
+          labelPosition={'before'}
+          icon={<Edit />}
+          label={toReadableDateTime(this.state.date)}
+        />
       </div>
     );
   }

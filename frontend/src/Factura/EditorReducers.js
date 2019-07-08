@@ -34,7 +34,7 @@ export const getDefaultState = () => ({
     guia: ''
   },
   unidades: [],
-  pagos: [],
+  pagos: [{ formaPagoText: '', valorText: '' }],
   guardando: false
 });
 
@@ -87,6 +87,8 @@ const subirVenta = ({ config, venta, callback }) => {
 };
 
 const validarPagos = (pagos, total) => {
+  if (pagos.length === 1) return { pagos: [{ ...pagos[0], valor: total }] };
+
   const totalPagado = pagos.reduce(
     (acc, i) => (i.valor ? acc + i.valor : acc),
     0

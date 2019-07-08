@@ -80,19 +80,26 @@ export default class FacturaEditorView extends Component {
     });
   }
 
+  updatePagos = pagos =>
+    updateState(this, {
+      type: Actions.updatePagos,
+      pagos
+    });
+
   abrirPagosForUpdate = total => {
     if (total === 0)
       this.props.mostrarErrorConSnackbar('No hay nada que pagar.');
-    else
+    else {
+      const originalPagos =
+        this.state.pagos.length < 2
+          ? [...this.state.pagos, { formaPagoText: '', valorText: '' }]
+          : this.state.pagos;
       this.props.abrirPagos({
         total,
-        originalPagos: this.state.pagos,
-        onSaveData: pagos =>
-          updateState(this, {
-            type: Actions.updatePagos,
-            pagos
-          })
+        originalPagos,
+        onSaveData: this.updatePagos
       });
+    }
   };
 
   render() {
@@ -102,6 +109,7 @@ export default class FacturaEditorView extends Component {
       unidades,
       inputs,
       medicoRow,
+      pagos,
       guardando
     } = this.state;
 
@@ -137,6 +145,8 @@ export default class FacturaEditorView extends Component {
               errors={errors}
               cliente={clienteRow}
               medico={medicoRow}
+              pagos={pagos}
+              updatePagos={this.updatePagos}
               onDataChanged={this.onFacturaInputChanged}
               ventaKey={ventaKey}
               onNewMedico={this.onNewMedico}

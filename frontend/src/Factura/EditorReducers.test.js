@@ -68,7 +68,13 @@ describe('EditorReducers', () => {
               key: 0,
               formaPagoText: 'EFECTIVO',
               formaPago: 'efectivo',
-              valor: 19900
+              valor: 10000
+            },
+            {
+              key: 0,
+              formaPagoText: 'TARJETA DE DEBITO',
+              formaPago: 'tarjeta_debito',
+              valor: 9900
             }
           ]
         },
@@ -136,7 +142,13 @@ describe('EditorReducers', () => {
               key: 0,
               formaPagoText: 'EFECTIVO',
               formaPago: 'efectivo',
-              valor: 30000
+              valor: 10000
+            },
+            {
+              key: 1,
+              formaPagoText: 'TARJETA DE DEBITO',
+              formaPago: 'tarjeta_debito',
+              valor: 20000
             }
           ]
         },
@@ -207,7 +219,13 @@ describe('EditorReducers', () => {
               key: 0,
               formaPagoText: 'EFECTIVO',
               formaPago: 'efectivo',
-              valor: 22200
+              valor: 10000
+            },
+            {
+              key: 0,
+              formaPagoText: 'TARJETA DE DEBITO',
+              formaPago: 'efectivo',
+              valor: 12200
             }
           ]
         },
@@ -302,7 +320,13 @@ describe('EditorReducers', () => {
             key: 0,
             formaPagoText: 'EFECTIVO',
             formaPago: 'efectivo',
-            valor: 128128
+            valor: 100000
+          },
+          {
+            key: 0,
+            formaPagoText: 'CHEQUE',
+            formaPago: 'cheque',
+            valor: 28128
           }
         ]
       },
@@ -348,7 +372,11 @@ describe('EditorReducers', () => {
         pagos: [
           {
             formaPago: 'efectivo',
-            valor: 128128
+            valor: 100000
+          },
+          {
+            formaPago: 'cheque',
+            valor: 28128
           }
         ],
         unidades: [
@@ -417,8 +445,7 @@ describe('EditorReducers', () => {
           {
             key: 0,
             formaPagoText: 'TARJETA DE DEBITO',
-            formaPago: 'tarjeta_debito',
-            valor: 149900
+            formaPago: 'tarjeta_debito'
           }
         ]
       },

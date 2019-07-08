@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
 
 import AddShoppingCart from 'material-ui/svg-icons/action/add-shopping-cart';
+import Payment from 'material-ui/svg-icons/action/payment';
 import Info from 'material-ui/svg-icons/action/info';
 import Loyalty from 'material-ui/svg-icons/action/loyalty';
 import Person from 'material-ui/svg-icons/social/person';
@@ -17,9 +17,10 @@ import MedicoAutoComplete from '../AutoComplete/MedicoAutoComplete';
 import CloseableColorChip from '../lib/CloseableColorChip';
 import IconBox from '../lib/IconBox';
 import { DateTimePicker, CurrentTime } from './TimeInputs';
+import { SinglePaymentInput, PaymentsInput } from './PaymentInputs';
 
 const autoCompleteWidth = '425px';
-const txtMargin = '35px';
+const txtMargin = '28px';
 
 const ClienteInput = props => {
   const { cliente, errors, onNewCliente, width } = props;
@@ -112,6 +113,33 @@ const PacienteDataRow = props => {
   );
 };
 
+const PagosInput = props => {
+  const { pagos, empresa, updatePagos, abrirPagosForUpdate } = props;
+
+  const isMultiplePayments = pagos.length > 1;
+  if (isMultiplePayments) {
+    return (
+      <PaymentsInput
+        empresa={empresa}
+        pagos={pagos}
+        abrirPagosForUpdate={abrirPagosForUpdate}
+        onDelete={() => updatePagos([{ formaPagoText: '', valorText: '' }])}
+      />
+    );
+  }
+
+  const [pagoUnico] = pagos;
+  const onChange = (formaPagoText, formaPago) =>
+    updatePagos([{ formaPagoText, formaPago }]);
+  return (
+    <SinglePaymentInput
+      onChange={onChange}
+      onAddPaymentsClick={abrirPagosForUpdate}
+      value={pagoUnico.formaPagoText}
+    />
+  );
+};
+
 const DateTimeInput = props => {
   const { fecha } = props.data;
 
@@ -152,6 +180,8 @@ export default class FacturaForm extends Component {
   render() {
     const {
       abrirPagosForUpdate,
+      updatePagos,
+      pagos,
       data,
       errors,
       onDataChanged,
@@ -233,11 +263,15 @@ export default class FacturaForm extends Component {
                   }}
                 />
               </td>
+
               <td>
-                <RaisedButton
-                  label="Editar pagos"
-                  primary={true}
-                  onTouchTap={abrirPagosForUpdate}
+                <IconBox icon={Payment} />
+              </td>
+              <td>
+                <PagosInput
+                  pagos={pagos}
+                  abrirPagosForUpdate={abrirPagosForUpdate}
+                  updatePagos={updatePagos}
                 />
               </td>
             </tr>
