@@ -169,6 +169,7 @@ export default class FacturaEditorView extends Component {
               total={total}
               porcentajeIVA={iva}
               contable={inputs.contable}
+              contableDisabled={inputs.contableDisabled}
               guardando={guardando}
               detallado={detallado}
               onGuardarClick={this.onGenerarFacturaClick}
@@ -189,10 +190,7 @@ FacturaEditorView.propTypes = {
   abrirLinkConSnackbar: React.PropTypes.func.isRequired,
   mostrarErrorConSnackbar: React.PropTypes.func.isRequired,
   isExamen: React.PropTypes.bool,
-  ventaKey: React.PropTypes.shape({
-    codigo: React.PropTypes.string.isRequired,
-    empresa: React.PropTypes.string.isRequired
-  })
+  ventaKey: React.PropTypes.number
 };
 
 FacturaEditorView.defaultProps = {

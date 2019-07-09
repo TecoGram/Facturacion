@@ -488,7 +488,7 @@ const ventaSchema = {
 
 const ventaInsertSchema = excludeKeys(ventaSchema, ['rowid']);
 
-const ventaUpdateSchema = excludeKeys(ventaSchema, ['contable']);
+const ventaUpdateSchema = ventaSchema;
 
 const facturaSchema = excludeKeys(ventaSchema, ['rowid', 'pagos']);
 
@@ -525,7 +525,7 @@ const ventaExamenSchema = {
 };
 
 const ventaExamenInsertSchema = excludeKeys(ventaExamenSchema, ['rowid']);
-const ventaExamenUpdateSchema = excludeKeys(ventaExamenSchema, ['contable']);
+const ventaExamenUpdateSchema = ventaExamenSchema;
 
 const datilConfigSchema = {
   apiKey: string(),

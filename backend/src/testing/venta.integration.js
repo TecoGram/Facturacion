@@ -8,7 +8,7 @@ const request = require('superagent');
 const api = require('facturacion_common/src/api.js');
 const server = require('../server.js');
 const setup = require('../scripts/setupDB.js');
-const { fetchUnidad, fetchCliente } = require('./utils.js');
+const { deleteVentas, fetchUnidad, fetchCliente } = require('./utils.js');
 const { getComprobanteFromVenta } = require('../dbAdmin.js');
 
 const consumidorFinal = Object.freeze({
@@ -123,7 +123,9 @@ describe('/venta/ endpoints', () => {
         unidades: [await fetchUnidad('Glyco')]
       };
 
-      const res = await api.insertarVenta(newVentaRow).catch(err => console.error(err));
+      const res = await api
+        .insertarVenta(newVentaRow)
+        .catch(err => console.error(err));
 
       expect(res.status).toBe(200);
       expect(HTTPClient.postRequest).toHaveBeenCalledTimes(0);
@@ -414,15 +416,17 @@ describe('/venta/ endpoints', () => {
       describe('cuando datil retorna error', () => {
         it('Muestra el primer error del body (si hay)', async () => {
           const errorText = await insertarNuevaFacturaContableConErrorDatil({
-            body: {
-              errors: [
-                {
-                  details: 'Punto de emision no existe',
-                  message: 'Punto de emision no existe',
-                  code: 'INVALID_RECEIPT',
-                  parameter: ''
-                }
-              ]
+            response: {
+              body: {
+                errors: [
+                  {
+                    details: 'Punto de emision no existe',
+                    message: 'Punto de emision no existe',
+                    code: 'INVALID_RECEIPT',
+                    parameter: ''
+                  }
+                ]
+              }
             }
           });
 
@@ -433,11 +437,13 @@ describe('/venta/ endpoints', () => {
 
         it('Muestra el text completo si no puede parsear el body', async () => {
           const errorText = await insertarNuevaFacturaContableConErrorDatil({
-            body: {
-              something: 'oops'
-            },
-            text: 'Some text',
-            status: 401
+            response: {
+              body: {
+                something: 'oops'
+              },
+              text: 'Some text',
+              status: 401
+            }
           });
 
           expect(errorText).toEqual('Error de Datil con status 401. Some text');
@@ -644,24 +650,45 @@ describe('/venta/ endpoints', () => {
 
   describe('/venta/find', () => {
     beforeAll(async () => {
-      const unidad = await fetchUnidad('Glyco');
-      const codigos = ['9999992', '9999991'];
-      const responses = await Promise.all(
-        codigos.map(codigo =>
-          api.insertarVenta({
-            ...baseVentaRow,
-            codigo,
-            unidades: [unidad]
-          })
-        )
-      );
-      responses.forEach(res => expect(res.status).toBe(200));
+      HTTPClient.postRequest.mockReset();
+      await deleteVentas();
+
+      await insertarNuevaFacturaContable({
+        ...baseVentaRow,
+        cliente: await fetchCliente('CONSUMIDOR FINAL'),
+        subtotal: 1499700,
+        flete: 30000,
+        pagos: [
+          {
+            formaPago: 'efectivo',
+            valor: 1000000
+          },
+          {
+            formaPago: 'tarjeta_credito',
+            valor: 709664
+          }
+        ],
+        unidades: [{ ...(await fetchUnidad('Glyco')), count: 3 }]
+      });
+
+      // insertar venta no contable
+      const res = await api.insertarVenta({
+        ...baseVentaRow,
+        unidades: [await fetchUnidad('Glyco')]
+      });
+      expect(res.status).toBe(200);
+    });
+
+    it('retorna 200 con todas las facturas si el parametro es vacio', async () => {
+      const res = await api.findVentas('');
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveLength(2);
     });
 
     it('retorna 200 al encontrar facturas', async () => {
       const res = await api.findVentas('Jul');
       expect(res.status).toBe(200);
-      expect(res.body.length).toBeGreaterThanOrEqual(2);
+      expect(res.body).toHaveLength(1);
     });
 
     it('retorna 404 si no encuentra ventas', () =>

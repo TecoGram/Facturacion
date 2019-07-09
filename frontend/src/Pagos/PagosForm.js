@@ -37,7 +37,7 @@ const noPaddingStyle = { padding: '0px' };
 
 const getNewId = newUniqueIdGenerator();
 
-const renderRow = props => ({ key, formaPagoText, valorText }, i) => {
+const renderRow = props => ({ formaPagoText, valorText }, i) => {
   const { submitAction } = props;
   const onValorChange = event => {
     submitAction({
@@ -77,7 +77,7 @@ const renderRow = props => ({ key, formaPagoText, valorText }, i) => {
   );
 
   return (
-    <TableRow key={key} displayBorder={false}>
+    <TableRow key={i} displayBorder={false}>
       <TableRowColumn width={260} style={noPaddingStyle}>
         <AutoComplete
           hintText="Forma de pago"
@@ -100,7 +100,7 @@ const renderRow = props => ({ key, formaPagoText, valorText }, i) => {
           onChange={onValorChange}
         />
       </TableRowColumn>
-      {i > 1 ? deleteColumn : <div style={{ width: '48px' }} />}
+      {i > 1 ? deleteColumn : <TableRowColumn style={{ width: '48px' }} />}
     </TableRow>
   );
 };
@@ -127,24 +127,24 @@ const AgregarPagoButton = props => {
 };
 
 const warningMessage = text => (
-  <p style={{ paddingLeft: '24px' }}>
+  <span style={{ paddingLeft: '24px' }}>
     <IconBox color={yellow700} icon={Warning} />
     {text}
-  </p>
+  </span>
 );
 
 const errorMessage = text => (
-  <p style={{ paddingLeft: '24px' }}>
+  <span style={{ paddingLeft: '24px' }}>
     <IconBox color={red700} icon={Error} />
     {text}
-  </p>
+  </span>
 );
 
 const okMessage = text => (
-  <p style={{ paddingLeft: '24px' }}>
+  <span style={{ paddingLeft: '24px' }}>
     <IconBox color={green700} icon={CheckCircle} />
     {text}
-  </p>
+  </span>
 );
 
 const footerMsg = ({ pagos, total }) => {

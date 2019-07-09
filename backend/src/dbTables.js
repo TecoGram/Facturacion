@@ -88,7 +88,10 @@ const crearTablaPagos = table => {
 
 const crearTablaComprobantes = table => {
   table.increments('secuencial').primary();
-  table.integer('ventaId').notNullable();
+  table
+    .integer('ventaId')
+    .notNullable()
+    .unique();
   table.string('id');
   table.string('clave_acceso');
 

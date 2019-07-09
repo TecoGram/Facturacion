@@ -63,13 +63,20 @@ const ResultsTable = props => {
 };
 
 const FacturaOptions = props => {
-  const { detallado, contable, isExamen, onFacturaDataChanged } = props;
+  const {
+    detallado,
+    contableDisabled,
+    contable,
+    isExamen,
+    onFacturaDataChanged
+  } = props;
 
   const contableCheckbox = (
     <Checkbox
       label={'Generar comprobante electrónico'}
       style={{ textAlign: 'left' }}
       checked={contable}
+      disabled={contableDisabled}
       onCheck={(event, isChecked) => {
         onFacturaDataChanged('contable', isChecked);
       }}
@@ -132,6 +139,7 @@ FacturaResults.propTypes = {
   errorUnidades: React.PropTypes.string,
   isExamen: React.PropTypes.bool,
   contable: React.PropTypes.bool,
+  contableDisabled: React.PropTypes.bool,
   guardando: React.PropTypes.bool,
   detallado: React.PropTypes.bool.isRequired,
   rebaja: React.PropTypes.number.isRequired,

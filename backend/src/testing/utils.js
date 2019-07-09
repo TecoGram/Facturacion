@@ -1,5 +1,8 @@
 const Models = require('facturacion_common/src/Models.js');
 const api = require('facturacion_common/src/api.js');
+const db = require('../db.js');
+
+const deleteVentas = () => db('ventas').del();
 
 const fetchUnidad = async name => {
   const res = await api.findProductos(name);
@@ -41,4 +44,4 @@ const datilConfig = {
   }
 };
 
-module.exports = { fetchUnidad, fetchCliente, datilConfig };
+module.exports = { deleteVentas, fetchUnidad, fetchCliente, datilConfig };

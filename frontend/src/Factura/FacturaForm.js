@@ -68,6 +68,10 @@ const MedicoInput = props => {
 
 const ClienteDataRow = props => {
   let width = autoCompleteWidth;
+  const onNewCliente = cliente => {
+    // delay para evitar warnings de no-op setState
+    Promise.resolve().then(() => props.onNewCliente(cliente));
+  };
 
   return (
     <div style={{ display: 'block' }}>
@@ -75,7 +79,7 @@ const ClienteDataRow = props => {
       <ClienteInput
         cliente={props.cliente}
         errors={props.errors}
-        onNewCliente={props.onNewCliente}
+        onNewCliente={onNewCliente}
         width={width}
       />
       <IconBox icon={AddShoppingCart} />

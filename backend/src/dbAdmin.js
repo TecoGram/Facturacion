@@ -9,8 +9,16 @@ const insertarVentaBase = (builder, row) => {
   return q;
 };
 
-const insertarNuevoComprobante = (builder, ventaId) => {
-  return builder
+const insertarNuevoComprobante = async ({ trx, ventaId, checkExists }) => {
+  if (checkExists) {
+    const [comprobanteRow] = await trx
+      .select('secuencial')
+      .from('comprobantes')
+      .where({ ventaId });
+    if (comprobanteRow) return [comprobanteRow.secuencial];
+  }
+
+  return trx
     .table('comprobantes')
     .insert({ ventaId, id: null, clave_acceso: null });
 };
@@ -145,7 +153,7 @@ const findAllVentas = nombreCliente => {
     )
     .from('ventas')
     .join('clientes', { 'ventas.cliente': 'clientes.rowid' })
-    .join('comprobantes', { 'ventas.rowid': 'comprobantes.ventaId' })
+    .leftOuterJoin('comprobantes', { 'ventas.rowid': 'comprobantes.ventaId' })
     .where('nombreAscii', 'like', `%${nombreClienteAscii}%`)
     .orderBy('fecha', 'desc')
     .limit(50);
@@ -409,7 +417,7 @@ module.exports = {
       const unidadesConID = colocarVentaID(unidades, ventaId);
       await insertarPagosPorVenta(trx, ventaId, pagos);
       await insertarNuevasUnidades(trx, unidadesConID);
-      if (contable) await insertarNuevoComprobante(trx, ventaId);
+      if (contable) await insertarNuevoComprobante({ trx, ventaId });
 
       return ventaId;
     }),
@@ -436,20 +444,23 @@ module.exports = {
       await insertarExamenInfo(trx, { medicoId, paciente, ventaId });
       await insertarPagosPorVenta(trx, ventaId, pagos);
       await insertarNuevasUnidades(trx, unidadesConID);
-      if (contable) await insertarNuevoComprobante(trx, ventaId);
+      if (contable) await insertarNuevoComprobante({ trx, ventaId });
 
       return ventaId;
     }),
 
   updateVenta: venta => {
     return knex.transaction(async trx => {
-      const { unidades, pagos, ...row } = venta;
+      const { unidades, pagos, contable, ...row } = venta;
       const ventaId = row.rowid;
       await updateVenta(trx, row);
       await deleteUnidadesVenta(trx, ventaId);
       await deletePagosVenta(trx, ventaId);
       await insertarNuevasUnidades(trx, colocarVentaID(unidades, ventaId));
       await insertarPagosPorVenta(trx, ventaId, pagos);
+
+      if (contable)
+        await insertarNuevoComprobante({ trx, ventaId, checkExists: true });
     });
   },
 
@@ -460,6 +471,7 @@ module.exports = {
         medico: medicoId,
         paciente,
         pagos,
+        contable,
         ...ventaExRow
       } = ventaEx;
       const { rowid: ventaId } = ventaExRow;
@@ -469,6 +481,9 @@ module.exports = {
       await updateExamenInfo(trx, { medicoId, paciente, ventaId });
       await insertarNuevasUnidades(trx, colocarVentaID(unidades, ventaId));
       await insertarPagosPorVenta(trx, ventaId, pagos);
+
+      if (contable)
+        await insertarNuevoComprobante({ trx, ventaId, checkExists: true });
     });
   },
 

@@ -77,7 +77,14 @@ const subirVenta = ({ config, venta, callback }) => {
   const uploadFn = config.editar ? API.updateVenta : API.insertarVenta;
   return uploadFn(venta)
     .then(res => {
-      callback({ success: true, rowid: res.body.rowid });
+      if (res.status === 210)
+        callback({
+          success: false,
+          msg: `la factura se guardó, pero el comprobante no se generó. ${
+            res.body.datilMsg
+          }`
+        });
+      else callback({ success: true, rowid: res.body.rowid });
       return { type: Actions.getDefaultState };
     })
     .catch(err => {
@@ -265,7 +272,15 @@ const updatePagos = ({ pagos }) => state => {
 };
 
 const editarFactura = ({ venta }) => state => {
-  const { ventaRow, clienteRow, medicoRow, paciente, unidades, pagos } = venta;
+  const {
+    ventaRow,
+    clienteRow,
+    comprobanteRow,
+    medicoRow,
+    paciente,
+    unidades,
+    pagos
+  } = venta;
   return {
     clienteRow: clienteRow || null,
     medicoRow: medicoRow || null,
@@ -278,7 +293,8 @@ const editarFactura = ({ venta }) => state => {
       flete: ventaRow.flete,
       detallado: !!ventaRow.detallado,
       paciente: paciente || '',
-      contable: false,
+      contable: !!comprobanteRow,
+      contableDisabled: !!comprobanteRow,
       guia: ''
     },
     unidades: unidades.map(u => ({

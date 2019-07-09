@@ -198,7 +198,8 @@ const ventaToReqBody = venta => {
 };
 
 const handleDatilError = err => {
-  const { body, status, text } = err;
+  const { body, status, text } = err.response;
+  console.error('error de Datil', Object.keys(err.response));
   if (body) {
     const { errors } = body;
     if (errors && Array.isArray(errors) && errors.length > 0) {
@@ -207,7 +208,7 @@ const handleDatilError = err => {
     }
   }
 
-  return { datilMsg: `Error de Datil con status ${status}. ${text}` };
+  return { datilMsg: `Error de Datil (${status})` };
 };
 
 const emitirFactura = venta => {
