@@ -1,3 +1,5 @@
+jest.mock('../../../datil.config.js', () => require('./utils.js').datilConfig);
+
 const api = require('facturacion_common/src/api.js');
 
 const server = require('../server.js');

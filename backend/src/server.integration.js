@@ -1,3 +1,8 @@
+jest.mock(
+  '../../datil.config.js',
+  () => require('./testing/utils.js').datilConfig
+);
+
 const fs = require('fs');
 
 const server = require('./server.js');
