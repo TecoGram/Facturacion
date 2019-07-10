@@ -25,14 +25,23 @@ jobs:
           - v1-dependencies-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
-
+      - run: 
+          name: Install common deps
+          command: | 
+            yarn 
+            yarn link
+          working_directory: common
       - run: 
           name: Install backend deps
-          command: yarn install
+          command: |
+            yarn link facturacion_common
+            yarn 
           working_directory: backend
       - run: 
           name: Install frontend deps
-          command: yarn install
+          command: |
+            yarn link facturacion_common
+            yarn 
           working_directory: frontend
 
       - save_cache:
@@ -40,6 +49,11 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "backend/package.json" }}-{{ checksum "frontend/package.json" }}
         
+      - run: 
+          name: Common unit tests
+          command: yarn test
+          working_directory: common
+
       - run: 
           name: Frontend unit tests
           command: yarn test
