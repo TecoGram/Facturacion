@@ -61,7 +61,7 @@ export default class DialogState {
     switch (fieldName) {
       case 'precioVenta': {
         newData.precioVentaText = newValue;
-        newData.precioVenta = Money.parse(newValue);
+        newData.precioVenta = Money.fromString(newValue);
         break;
       }
 

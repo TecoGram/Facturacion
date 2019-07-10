@@ -118,6 +118,7 @@ const creators = {
       value: CLIENTE_DIALOG,
       dialogParams: {
         editar: clienteAEditar,
+        key: clienteAEditar,
         open: true
       }
     };

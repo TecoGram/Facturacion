@@ -287,7 +287,7 @@ const editarFactura = ({ venta }) => state => {
       rowid: ventaRow.rowid,
       codigo: ventaRow.codigo,
       fecha: DateParser.parseDBDate(ventaRow.fecha),
-      descuento: ventaRow.descuento,
+      descuento: ventaRow.descuento || '',
       autorizacion: ventaRow.autorizacion,
       flete: ventaRow.flete,
       detallado: !!ventaRow.detallado,

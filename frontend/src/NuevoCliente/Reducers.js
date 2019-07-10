@@ -98,6 +98,18 @@ const cerrar = ({ callback }) => state => {
   return state;
 };
 
+const editar = ({ cliente }) => state => {
+  return {
+    inputs: {
+      ...cliente,
+      tipoText: TiposID[cliente.tipo]
+    },
+    errors: {},
+    serverError: null,
+    working: false
+  };
+};
+
 export const createReducer = ({ type, ...params }) => {
   switch (type) {
     case Actions.getDefaultState:
@@ -114,6 +126,9 @@ export const createReducer = ({ type, ...params }) => {
 
     case Actions.cerrar:
       return cerrar(params);
+
+    case Actions.editar:
+      return editar(params);
 
     default:
       return x => x;

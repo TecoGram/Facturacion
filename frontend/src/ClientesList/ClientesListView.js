@@ -4,8 +4,8 @@ import { findClientes, deleteCliente } from 'facturacion_common/src/api';
 import MaterialTable from '../lib/MaterialTable';
 import ListState from './ListState';
 
-const columns = ['RUC', 'Nombre', 'Teléfono 1', 'Teléfono 2'];
-const keys = ['ruc', 'nombre', 'telefono1', 'telefono2'];
+const columns = ['#ID', 'Nombre', 'E-mail', 'Teléfono 1'];
+const keys = ['id', 'nombre', 'email', 'telefono1'];
 const searchHint = 'Buscar clientes...';
 
 export default class ClientesListView extends React.Component {

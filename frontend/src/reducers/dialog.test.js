@@ -48,6 +48,7 @@ describe('dialog reducer', () => {
       value: CLIENTE_DIALOG,
       dialogParams: {
         editar: ruc,
+        key: ruc,
         open: true
       }
     });

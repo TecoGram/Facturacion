@@ -34,6 +34,12 @@ export default class NuevoClienteDialog extends React.Component {
     updateState(this, { type: Actions.guardar, callback: this.cerrar });
   };
 
+  componentDidMount() {
+    const { editar } = this.props;
+    console.log('editar', editar);
+    if (editar) updateState(this, { type: Actions.editar, cliente: editar });
+  }
+
   render() {
     const { open } = this.props;
 
