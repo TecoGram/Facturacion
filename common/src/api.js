@@ -124,7 +124,9 @@ module.exports = {
   },
 
   findAllVentas: (empresa, cliente) => {
-    return request.get(`${prefix}/venta/find?empresa=${empresa}&cliente=${cliente}`).send();
+    return request
+      .get(`${prefix}/venta/find?empresa=${empresa}&cliente=${cliente}`)
+      .send();
   },
 
   verVenta: id => {

@@ -4,8 +4,7 @@ const format = require('fecha').format;
 */
 const parseDBDate = fecha => {
   // ISO6801 string
-  if (fecha.includes('T') && fecha.endsWith('Z'))
-    return new Date(fecha);
+  if (fecha.includes('T') && fecha.endsWith('Z')) return new Date(fecha);
 
   //fucking timezones http://stackoverflow.com/a/31732581
   return new Date(fecha.replace(/-/g, '/'));

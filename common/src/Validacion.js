@@ -162,8 +162,7 @@ const array = ({ item, fallback }) => (ctx, value) => {
 };
 
 const primaryKey = ({ optional } = {}) => (ctx, value) => {
-  if (optional && !value)
-    return null;
+  if (optional && !value) return null;
 
   if (typeof value !== 'number' || !validator.isInt('' + value, { min: 1 }))
     return new Error(`"${ctx.name}" debe de ser una clave primaria`);
