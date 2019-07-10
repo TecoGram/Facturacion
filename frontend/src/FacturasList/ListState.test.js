@@ -15,8 +15,9 @@ describe('Factura ListView State', () => {
       const newVentas = [
         {
           id: 'e8feh5',
+          secuencial: 21,
           empresa: 'TECO',
-          fecha: '2019-07-04T01:31:19.983Z',
+          fecha: '2019-07-04T06:31:19.983Z',
           subtotal: 100000,
           iva: 12,
           flete: 0,
@@ -24,7 +25,7 @@ describe('Factura ListView State', () => {
         },
         {
           empresa: 'TECO',
-          fecha: '2019-07-04T01:32:19.983Z',
+          fecha: '2019-07-04T06:32:19.983Z',
           subtotal: 100000,
           iva: 12,
           flete: 0,
@@ -36,11 +37,12 @@ describe('Factura ListView State', () => {
       expect(state).toEqual({
         rows: [
           {
-            comprobanteID: 'e8feh5',
+            comprobante: '000000021',
+            secuencial: 21,
             id: 'e8feh5',
             empresa: 'TECO',
             fechaText: '2019-07-04 01:31',
-            fecha: '2019-07-04T01:31:19.983Z',
+            fecha: '2019-07-04T06:31:19.983Z',
             total: '11.20',
             subtotal: 100000,
             iva: 12,
@@ -48,9 +50,9 @@ describe('Factura ListView State', () => {
             descuento: 0
           },
           {
-            comprobanteID: 'N/A',
+            comprobante: '-',
             empresa: 'TECO',
-            fecha: '2019-07-04T01:32:19.983Z',
+            fecha: '2019-07-04T06:32:19.983Z',
             fechaText: '2019-07-04 01:32',
             total: '11.20',
             subtotal: 100000,

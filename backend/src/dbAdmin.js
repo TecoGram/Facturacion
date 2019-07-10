@@ -109,6 +109,7 @@ const findAllVentas = (empresa, nombreCliente) => {
   return knex
     .select(
       'ventas.rowid',
+      'secuencial',
       'comprobantes.id',
       'empresa',
       'fecha',
