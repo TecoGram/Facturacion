@@ -1,3 +1,5 @@
+import Money from 'facturacion_common/src/Money.js';
+
 export default class ListState {
   constructor(props, setStateFunc) {
     this.setState = setStateFunc;
@@ -13,7 +15,12 @@ export default class ListState {
 
   colocarProductosDelResponse(resp) {
     this.setState(() => {
-      return { rows: resp.body };
+      return {
+        rows: resp.body.map(p => ({
+          ...p,
+          precioVentaText: Money.print(p.precioVenta)
+        }))
+      };
     });
   }
 

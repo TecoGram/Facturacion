@@ -313,10 +313,11 @@ app.post('/venta/delete/:rowid', validarVentaMutable('params'), (req, res) => {
   );
 });
 
-function findVentas(req, res, tipo, all) {
-  const q = req.query.q || '';
-  const promise = all ? db.findAllVentas(q) : db.findVentas(q, tipo);
-  promise.then(
+app.get('/venta/find', (req, res) => {
+  const cliente = req.query.cliente || '';
+  const empresa = req.query.empresa || '';
+
+  db.findAllVentas(empresa, cliente).then(
     ventas => {
       if (ventas.length === 0)
         res
@@ -330,18 +331,6 @@ function findVentas(req, res, tipo, all) {
       res.status(500).send(err);
     }
   );
-}
-
-app.get('/venta/find', (req, res) => {
-  findVentas(req, res, 0);
-});
-
-app.get('/venta_ex/find', (req, res) => {
-  findVentas(req, res, 1);
-});
-
-app.get('/venta/findAll', (req, res) => {
-  findVentas(req, res, null, true);
 });
 
 const handleValidData = fn => async (req, res) => {

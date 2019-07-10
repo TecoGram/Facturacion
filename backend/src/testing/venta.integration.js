@@ -430,9 +430,7 @@ describe('/venta/ endpoints', () => {
             }
           });
 
-          expect(errorText).toEqual(
-            'Error de Datil. Punto de emision no existe. code: INVALID_RECEIPT'
-          );
+          expect(errorText).toEqual('INVALID_RECEIPT');
         });
 
         it('Muestra el text completo si no puede parsear el body', async () => {
@@ -446,7 +444,7 @@ describe('/venta/ endpoints', () => {
             }
           });
 
-          expect(errorText).toEqual('Error de Datil con status 401. Some text');
+          expect(errorText).toEqual('Error de Datil (401)');
         });
       });
     });
@@ -680,20 +678,20 @@ describe('/venta/ endpoints', () => {
     });
 
     it('retorna 200 con todas las facturas si el parametro es vacio', async () => {
-      const res = await api.findVentas('');
+      const res = await api.findAllVentas('TecoGram S.A.', '');
       expect(res.status).toBe(200);
       expect(res.body).toHaveLength(2);
     });
 
     it('retorna 200 al encontrar facturas', async () => {
-      const res = await api.findVentas('Jul');
+      const res = await api.findAllVentas('TecoGram S.A.', 'Jul');
       expect(res.status).toBe(200);
       expect(res.body).toHaveLength(1);
     });
 
     it('retorna 404 si no encuentra ventas', () =>
       api
-        .findVentas('xyz')
+        .findAllVentas('TecoGram S.A.', 'xyz')
         .then(() => Promise.reject('expected to fail'))
         .catch(({ response: res }) => {
           expect(res.status).toBe(404);

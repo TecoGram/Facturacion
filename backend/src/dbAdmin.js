@@ -30,10 +30,6 @@ const updateVenta = (builder, row) => {
     .update(row);
 };
 
-const updateVentaExamen = (builder, row) => {
-  return updateVenta(builder, { ...row, detallado: false, tipo: 0, iva: 0 });
-};
-
 const updateExamenInfo = (builder, { ventaId, medicoId, paciente }) => {
   const pacienteAscii = convertToAscii(paciente);
   return builder('examen_info')
@@ -49,7 +45,7 @@ const getExamenInfoFromVenta = ventaId => {
   return knex
     .select('medicoId', 'nombre', 'nombreAscii', 'paciente')
     .from('examen_info')
-    .join('medicos', { 'examen_info.medicoId': 'medicos.rowid' })
+    .leftOuterJoin('medicos', { 'examen_info.medicoId': 'medicos.rowid' })
     .where({ ventaId });
 };
 
@@ -108,33 +104,7 @@ const getVentaRow = rowid => {
     .where({ rowid });
 };
 
-const findVentas = nombreCliente => {
-  const nombreClienteAscii = convertToAscii(nombreCliente);
-  return knex
-    .select(
-      'ventas.rowid',
-      'codigo',
-      'empresa',
-      'fecha',
-      'clientes.id',
-      'nombre',
-      'iva',
-      'descuento',
-      'autorizacion',
-      'flete',
-      'detallado',
-      'subtotal',
-      'ventas.tipo'
-    )
-    .from('ventas')
-    .join('clientes', { 'ventas.cliente': 'clientes.rowid' })
-    .where('nombreAscii', 'like', `%${nombreClienteAscii}%`)
-    .where('ventas.tipo', 0)
-    .orderBy('fecha', 'desc')
-    .limit(50);
-};
-
-const findAllVentas = nombreCliente => {
+const findAllVentas = (empresa, nombreCliente) => {
   const nombreClienteAscii = convertToAscii(nombreCliente);
   return knex
     .select(
@@ -155,31 +125,7 @@ const findAllVentas = nombreCliente => {
     .join('clientes', { 'ventas.cliente': 'clientes.rowid' })
     .leftOuterJoin('comprobantes', { 'ventas.rowid': 'comprobantes.ventaId' })
     .where('nombreAscii', 'like', `%${nombreClienteAscii}%`)
-    .orderBy('fecha', 'desc')
-    .limit(50);
-};
-
-const findVentasExamen = nombre => {
-  const nombreAscii = convertToAscii(nombre);
-  return knex
-    .select(
-      'codigo',
-      'fecha',
-      'cliente',
-      'nombre',
-      'subtotal',
-      'descuento',
-      'iva',
-      'paciente',
-      'medicoId',
-      'detallado'
-    )
-    .from('ventas')
-    .join('clientes', { 'ventas.cliente': 'clientes.rowid' })
-    .join('examen_info', { 'ventas.rowid': 'examen_info.ventaId' })
-    .orWhere('pacienteAscii', 'like', `%${nombreAscii}%`)
-    .orWhere('clientes.nombreAscii', 'like', `%${nombreAscii}%`)
-    .where('ventas.tipo', 1)
+    .where('empresa', empresa)
     .orderBy('fecha', 'desc')
     .limit(50);
 };
@@ -253,11 +199,13 @@ const getVentaById = async id => {
     };
   }
 
-  const medicoRow = {
-    rowid: examenInfo.medicoId,
-    nombre: examenInfo.nombre,
-    nombreAscii: examenInfo.nombreAscii
-  };
+  const medicoRow = examenInfo.medicoId
+    ? {
+        rowid: examenInfo.medicoId,
+        nombre: examenInfo.nombre,
+        nombreAscii: examenInfo.nombreAscii
+      }
+    : null;
 
   return {
     ventaRow,
@@ -475,7 +423,14 @@ module.exports = {
         ...ventaExRow
       } = ventaEx;
       const { rowid: ventaId } = ventaExRow;
-      await updateVentaExamen(trx, ventaExRow);
+      const ventaRow = {
+        ...ventaExRow,
+        detallado: false,
+        tipo: 1,
+        iva: 0,
+        flete: 0
+      };
+      await updateVenta(trx, ventaRow);
       await deleteUnidadesVenta(trx, ventaId);
       await deletePagosVenta(trx, ventaId);
       await updateExamenInfo(trx, { medicoId, paciente, ventaId });
@@ -488,11 +443,6 @@ module.exports = {
   },
 
   findAllVentas,
-  findVentas: (keywords, tipo) => {
-    if (tipo === 0) return findVentas(keywords);
-    return findVentasExamen(keywords);
-  },
-
   colocarComprobante,
   getVentaById,
   getComprobanteFromVenta,

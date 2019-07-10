@@ -52,7 +52,8 @@ export default class FacturasListView extends React.Component {
   };
 
   requestData = input => {
-    findAllVentas(input).then(
+    const { ajustes } = this.props;
+    findAllVentas(ajustes.empresa, input).then(
       resp => {
         const listaVentas = resp.body;
         this.stateManager.colocarVentas(listaVentas);
@@ -91,6 +92,7 @@ export default class FacturasListView extends React.Component {
 }
 
 FacturasListView.propTypes = {
+  ajustes: React.PropTypes.object.isRequired,
   editarFactura: React.PropTypes.func.isRequired,
   editarFacturaExamen: React.PropTypes.func.isRequired
 };

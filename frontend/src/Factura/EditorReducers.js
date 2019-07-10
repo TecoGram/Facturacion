@@ -240,9 +240,8 @@ const setMedico = ({ medicoRow }) => state => ({ ...state, medicoRow });
 
 const abortInsert = state => ({ ...state, guardando: false });
 
-const getVenta = ({ ventaKey, isExamen }) => {
-  const fetchFn = isExamen ? API.verVentaExamen : API.verVenta;
-  return fetchFn(ventaKey)
+const getVenta = ventaKey => {
+  return API.verVenta(ventaKey)
     .then(res => {
       return {
         type: Actions.editarFactura,
@@ -258,7 +257,7 @@ const getFacturaExistente = params => state => {
   const { ventaKey } = params;
   if (!ventaKey) return state;
 
-  return [state, getVenta(params)];
+  return [state, getVenta(ventaKey)];
 };
 
 const removeUnidad = ({ index }) => state => {

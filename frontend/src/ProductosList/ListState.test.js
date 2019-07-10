@@ -13,10 +13,21 @@ describe('Productos ListView State', () => {
 
   const insertarProductosDePrebaTest = () => {
     const resp = {
-      body: [{ rowid: 1, marca: 'TECO' }, { rowid: 2, marca: 'TECO' }]
+      body: [
+        { rowid: 1, precioVenta: 199900, marca: 'TECO' },
+        { rowid: 2, precioVenta: 199900, marca: 'TECO' }
+      ]
     };
     stateManager.colocarProductosDelResponse(resp);
-    expect(state.rows).toEqual(resp.body);
+    expect(state.rows).toEqual([
+      {
+        rowid: 1,
+        precioVenta: 199900,
+        precioVentaText: '19.99',
+        marca: 'TECO'
+      },
+      { rowid: 2, precioVenta: 199900, precioVentaText: '19.99', marca: 'TECO' }
+    ]);
   };
 
   describe('colocarProductosDelResponse', () => {
@@ -40,7 +51,14 @@ describe('Productos ListView State', () => {
       stateManager = new ListState({}, setStateFunc);
       insertarProductosDePrebaTest();
       stateManager.removerProductoDeLaLista(1);
-      expect(state.rows).toEqual([{ rowid: 2, marca: 'TECO' }]);
+      expect(state.rows).toEqual([
+        {
+          rowid: 2,
+          marca: 'TECO',
+          precioVenta: 199900,
+          precioVentaText: '19.99'
+        }
+      ]);
     });
   });
 

@@ -1,3 +1,4 @@
+import Money from 'facturacion_common/src/Money.js';
 import { validarProducto } from 'facturacion_common/src/Validacion.js';
 
 export default class DialogState {
@@ -57,7 +58,18 @@ export default class DialogState {
 
   updateData(fieldName, newValue, state) {
     const newData = Object.assign({}, state.inputs);
-    newData[fieldName] = newValue;
+    switch (fieldName) {
+      case 'precioVenta': {
+        newData.precioVentaText = newValue;
+        newData.precioVenta = Money.parse(newValue);
+        break;
+      }
+
+      default: {
+        newData[fieldName] = newValue;
+      }
+    }
+
     const newErrors = Object.assign({}, state.errors);
     newErrors[fieldName] = null;
     this.setState({ inputs: newData, errors: newErrors });

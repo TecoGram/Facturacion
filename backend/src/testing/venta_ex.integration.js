@@ -194,9 +194,7 @@ describe('/venta_ex/ endpoints', () => {
       const unidad = await fetchUnidad('examen');
 
       const newVentaRow = { ...ventaRow, unidades: [unidad] };
-      const res1 = await api
-        .insertarVenta(newVentaRow)
-        .catch(err => console.log(err));
+      const res1 = await api.insertarVenta(newVentaRow);
       expect(res1.status).toBe(200);
       insertedRowid = res1.body.rowid;
     });
@@ -242,37 +240,47 @@ describe('/venta_ex/ endpoints', () => {
         paciente: 'Carlos Armijos'
       });
     });
-  });
 
-  describe('/venta_ex/find', () => {
-    beforeAll(async () => {
-      const unidad = await fetchUnidad('examen');
-      const codigos = ['9999992', '9999991'];
-      const responses = await Promise.all(
-        codigos.map(codigo =>
-          api.insertarVenta({
-            ...baseVentaEx,
-            codigo,
-            unidades: [unidad]
-          })
-        )
-      );
-      responses.forEach(res => expect(res.status).toBe(200));
-    });
+    it('retorna json correcto si el medico es null', async () => {
+      // insertar venta sin medico
+      const newVentaRow = {
+        ...ventaRow,
+        unidades: [await fetchUnidad('examen')],
+        medico: null
+      };
+      const res1 = await api.insertarVenta(newVentaRow);
+      expect(res1.status).toBe(200);
 
-    it('retorna 200 al encontrar facturas', async () => {
-      const res = await api.findVentasExamen('Arm');
+      const res = await api.verVenta(res1.body.rowid);
       expect(res.status).toBe(200);
-      expect(res.body.length).toBeGreaterThanOrEqual(2);
+      expect(res.body).toEqual({
+        ventaRow: expect.objectContaining({
+          codigo: ventaRow.codigo,
+          empresa: ventaRow.empresa,
+          fecha: ventaRow.fecha
+        }),
+        clienteRow: expect.objectContaining({
+          rowid: expect.any(Number),
+          nombre: 'Eduardo Almeida'
+        }),
+        medicoRow: null,
+        unidades: [
+          expect.objectContaining({
+            producto: expect.any(Number),
+            nombre: 'examen',
+            count: 1,
+            precioVenta: 199900
+          })
+        ],
+        pagos: [
+          expect.objectContaining({
+            formaPago: 'efectivo',
+            valor: 199900
+          })
+        ],
+        paciente: 'Carlos Armijos'
+      });
     });
-
-    it('retorna 404 si no encuentra ventas', () =>
-      api
-        .findVentasExamen('xyz')
-        .then(() => Promise.reject('expected to fail'))
-        .catch(({ response: res }) => {
-          expect(res.status).toBe(404);
-        }));
   });
 
   describe('/venta/delete', () => {

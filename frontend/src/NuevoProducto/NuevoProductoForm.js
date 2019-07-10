@@ -18,7 +18,7 @@ export default class NuevoProductoForm extends React.Component {
       errorText: errors.codigo,
       onChange: event => {
         updateData('codigo', event.target.value);
-      },
+      }
     };
 
     const nombreInput = {
@@ -28,7 +28,7 @@ export default class NuevoProductoForm extends React.Component {
       errorText: errors.nombre,
       onChange: event => {
         updateData('nombre', event.target.value);
-      },
+      }
     };
 
     const precioFabInput = {
@@ -38,17 +38,17 @@ export default class NuevoProductoForm extends React.Component {
       errorText: errors.precioDist,
       onChange: event => {
         updateData('precioDist', event.target.value);
-      },
+      }
     };
 
     const precioVentaInput = {
       hintText: 'Precio Venta',
       icon: AttachMoney,
-      value: inputs.precioVenta || '',
+      value: inputs.precioVentaText || '',
       errorText: errors.precioVenta,
       onChange: event => {
         updateData('precioVenta', event.target.value);
-      },
+      }
     };
 
     const marcaInput = {
@@ -58,7 +58,7 @@ export default class NuevoProductoForm extends React.Component {
       errorText: errors.marca,
       onChange: event => {
         updateData('marca', event.target.value);
-      },
+      }
     };
 
     const pagaIvaInput = {
@@ -66,7 +66,7 @@ export default class NuevoProductoForm extends React.Component {
       value: inputs.pagaIva,
       onChange: (event, isChecked) => {
         updateData('pagaIva', isChecked);
-      },
+      }
     };
 
     return (
@@ -87,5 +87,5 @@ export default class NuevoProductoForm extends React.Component {
 NuevoProductoForm.propTypes = {
   errors: React.PropTypes.object.isRequired,
   inputs: React.PropTypes.object.isRequired,
-  updateData: React.PropTypes.func.isRequired,
+  updateData: React.PropTypes.func.isRequired
 };

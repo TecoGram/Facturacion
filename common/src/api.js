@@ -123,16 +123,8 @@ module.exports = {
       .set('Accept', 'application/json');
   },
 
-  findVentas: queryString => {
-    return request.get(prefix + '/venta/find?q=' + queryString).send();
-  },
-
-  findVentasExamen: queryString => {
-    return request.get(prefix + '/venta_ex/find?q=' + queryString).send();
-  },
-
-  findAllVentas: queryString => {
-    return request.get(prefix + '/venta/findAll?q=' + queryString).send();
+  findAllVentas: (empresa, cliente) => {
+    return request.get(`${prefix}/venta/find?empresa=${empresa}&cliente=${cliente}`).send();
   },
 
   verVenta: id => {

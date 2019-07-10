@@ -76,7 +76,7 @@ const crearTotales = (ventaRow, isExamen) => {
   const { rebaja, impuestos, total } = calcularValoresTotales(
     subtotal,
     flete,
-    ventaRow.iva,
+    isExamen ? 0 : iva2Float(IVA_ACTUAL),
     ventaRow.descuento
   );
 
@@ -198,13 +198,16 @@ const ventaToReqBody = venta => {
 };
 
 const handleDatilError = err => {
+  if (!err.response) {
+    return { datilMsg: `Error de conexión` };
+  }
   const { body, status, text } = err.response;
-  console.error('error de Datil', Object.keys(err.response));
+  console.error('error de Datil', text);
   if (body) {
     const { errors } = body;
     if (errors && Array.isArray(errors) && errors.length > 0) {
-      const { code, message } = errors[0];
-      return { datilMsg: `Error de Datil. ${message}. code: ${code}` };
+      const { code } = errors[0];
+      return { datilMsg: code };
     }
   }
 
