@@ -1,21 +1,15 @@
 import * as Actions from './Actions.js';
 import { excludeKeys } from 'facturacion_common/src/Object.js';
-import { TiposID } from 'facturacion_common/src/Models.js';
 import API from 'facturacion_common/src/api.js';
 import {
-  validarClienteInsert,
-  validarClienteUpdate
+  validarMedicoInsert,
+  validarMedicoUpdate
 } from 'facturacion_common/src/Validacion.js';
 
-const tiposReverseMap = Object.keys(TiposID).reduce((acc, key) => {
-  const value = TiposID[key];
-  return { ...acc, [value]: key };
-}, {});
-
-export const getDefaultState = cliente => {
-  if (cliente)
+export const getDefaultState = medico => {
+  if (medico)
     return {
-      inputs: { ...cliente },
+      inputs: { ...medico },
       errors: {},
       serverError: null,
       working: false
@@ -23,15 +17,12 @@ export const getDefaultState = cliente => {
 
   return {
     inputs: {
-      id: '',
-      tipoText: '',
-      tipo: undefined,
       nombre: '',
       direccion: '',
       email: '',
       telefono1: '',
       telefono2: '',
-      descDefault: ''
+      comision: ''
     },
     errors: {},
     serverError: null,
@@ -39,19 +30,8 @@ export const getDefaultState = cliente => {
   };
 };
 
-const createNewInputs = (oldInputs, key, value) => {
-  switch (key) {
-    case 'tipo': {
-      return { ...oldInputs, tipoText: value, tipo: tiposReverseMap[value] };
-    }
-    default: {
-      return { ...oldInputs, [key]: value };
-    }
-  }
-};
-
 const updateInput = ({ key, value }) => state => {
-  const newInputs = createNewInputs(state.inputs, key, value);
+  const newInputs = { ...state.inputs, [key]: value };
   if (!state.errors[key])
     return { ...state, inputs: newInputs, serverError: null };
 
@@ -65,19 +45,14 @@ const setServerError = ({ serverError }) => state => ({
   working: false
 });
 
-const upload = (cliente, callback) => {
-  const editing = !!cliente.rowid;
-  const promise = editing
-    ? API.updateCliente(cliente)
-    : API.insertarCliente(cliente);
+const upload = (medico, callback) => {
+  const promise = medico.rowid
+    ? API.updateMedico(medico)
+    : API.insertarMedico(medico);
 
   return promise
     .then(() => {
-      callback(
-        editing
-          ? `Cliente editado: ${cliente.nombre}`
-          : `Cliente creado: ${cliente.nombre}`
-      );
+      callback();
       return { type: Actions.getDefaultState };
     })
     .catch(err => {
@@ -89,8 +64,8 @@ const guardar = ({ callback }) => state => {
   if (state.working) return state;
 
   const { errors, inputs } = state.inputs.rowid
-    ? validarClienteUpdate(state.inputs)
-    : validarClienteInsert(state.inputs);
+    ? validarMedicoUpdate(state.inputs)
+    : validarMedicoInsert(state.inputs);
 
   if (errors) return { ...state, errors };
 
@@ -103,12 +78,9 @@ const cerrar = ({ callback }) => state => {
   return state;
 };
 
-const editar = ({ cliente }) => state => {
+const editar = ({ medico }) => state => {
   return {
-    inputs: {
-      ...cliente,
-      tipoText: TiposID[cliente.tipo]
-    },
+    inputs: { ...medico },
     errors: {},
     serverError: null,
     working: false

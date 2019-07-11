@@ -7,7 +7,7 @@ import AttachMoney from 'material-ui/svg-icons/editor/attach-money';
 
 import IconTextFieldRow from '../lib/formTable/IconTextFieldRow';
 
-export default class NuevoProductoForm extends React.Component {
+export default class ProductoFormView extends React.Component {
   render() {
     const { errors, inputs, updateData } = this.props;
 
@@ -34,7 +34,7 @@ export default class NuevoProductoForm extends React.Component {
     const precioFabInput = {
       hintText: 'Precio Distribuidora',
       icon: AttachMoney,
-      value: inputs.precioDist || '',
+      value: inputs.precioDistText || '',
       errorText: errors.precioDist,
       onChange: event => {
         updateData('precioDist', event.target.value);
@@ -84,7 +84,7 @@ export default class NuevoProductoForm extends React.Component {
   }
 }
 
-NuevoProductoForm.propTypes = {
+ProductoFormView.propTypes = {
   errors: React.PropTypes.object.isRequired,
   inputs: React.PropTypes.object.isRequired,
   updateData: React.PropTypes.func.isRequired

@@ -230,28 +230,13 @@ const buscarEnTabla = (tabla, columna, queryString, limit) => {
   return query;
 };
 
-const updateProducto = (
-  rowid,
-  codigo,
-  nombre,
-  marca,
-  precioDist,
-  precioVenta,
-  pagaIva
-) => {
+const updateProducto = producto => {
+  const { rowid, nombre } = producto;
   const nombreAscii = convertToAscii(nombre);
   return knex
     .table('productos')
     .where({ rowid })
-    .update({
-      codigo: codigo,
-      nombreAscii: nombreAscii,
-      nombre: nombre,
-      marca: marca,
-      precioDist: precioDist,
-      precioVenta: precioVenta,
-      pagaIva: pagaIva
-    });
+    .update({ ...producto, nombreAscii });
 };
 
 const updateCliente = row => {
@@ -294,24 +279,9 @@ module.exports = {
   close: () => {
     knex.destroy();
   },
-  insertarProducto: (
-    codigo,
-    nombre,
-    marca,
-    precioDist,
-    precioVenta,
-    pagaIva
-  ) => {
-    const nombreAscii = convertToAscii(nombre);
-    return knex.table('productos').insert({
-      codigo: codigo,
-      nombreAscii: nombreAscii,
-      nombre: nombre,
-      marca: marca,
-      precioDist: precioDist,
-      precioVenta: precioVenta,
-      pagaIva: pagaIva
-    });
+  insertarProducto: producto => {
+    const nombreAscii = convertToAscii(producto.nombre);
+    return knex.table('productos').insert({ ...producto, nombreAscii });
   },
 
   findProductos: (queryString, limit) => {
@@ -333,24 +303,9 @@ module.exports = {
     return buscarEnTabla('clientes', 'nombreAscii', queryStringAscii);
   },
 
-  insertarMedico: (
-    nombre,
-    direccion,
-    email,
-    comision,
-    telefono1,
-    telefono2
-  ) => {
-    const nombreAscii = convertToAscii(nombre);
-    return knex.table('medicos').insert({
-      nombreAscii: nombreAscii,
-      nombre: nombre,
-      direccion: direccion,
-      email: email,
-      comision: comision,
-      telefono1: telefono1,
-      telefono2: telefono2
-    });
+  insertarMedico: medico => {
+    const nombreAscii = convertToAscii(medico.nombre);
+    return knex.table('medicos').insert({ ...medico, nombreAscii });
   },
 
   findMedicos: queryString => {

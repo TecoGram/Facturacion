@@ -108,7 +108,14 @@ describe('/venta/ endpoints', () => {
   beforeAll(async () => {
     await setup();
     const responses = await Promise.all([
-      api.insertarProducto('AD-12-21', 'Glyco', 'TECO', 399900, 499900, true),
+      api.insertarProducto({
+        codigo: 'AD-12-21',
+        nombre: 'Glyco',
+        marca: 'TECO',
+        precioDist: 399900,
+        precioVenta: 499900,
+        pagaIva: true
+      }),
       api.insertarCliente(baseClienteRow),
       api.insertarCliente(consumidorFinal)
     ]);

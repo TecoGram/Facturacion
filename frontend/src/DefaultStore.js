@@ -1,13 +1,12 @@
-const { NEW_FACTURA_PAGE } = require('../src/PageTypes.js');
-const { CLIENTE_DIALOG } = require('../src/DialogTypes.js');
+import ClienteForm from './NuevoCliente/ClienteForm';
+import { NEW_FACTURA_PAGE } from '../src/PageTypes.js';
 
-module.exports = {
+const store = {
   dialog: {
-    value: CLIENTE_DIALOG,
-    dialogParams: {
-      editar: null,
-      open: false
-    }
+    Content: ClienteForm,
+    title: 'Nuevo Cliente',
+    editar: null,
+    open: false
   },
   snackbar: null,
   page: {
@@ -15,3 +14,5 @@ module.exports = {
     props: {}
   }
 };
+
+export default store;

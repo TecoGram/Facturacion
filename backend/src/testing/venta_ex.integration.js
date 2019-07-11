@@ -53,14 +53,14 @@ describe('/venta_ex/ endpoints', () => {
   beforeAll(async () => {
     await setup();
     const responses = await Promise.all([
-      api.insertarProducto(
-        'rytertg663433g',
-        'examen',
-        'TECO',
-        0,
-        199900,
-        false
-      ),
+      api.insertarProducto({
+        codigo: 'rytertg663433g',
+        nombre: 'examen',
+        marca: 'TECO',
+        precioDist: 0,
+        precioVenta: 199900,
+        pagaIva: false
+      }),
       api.insertarCliente({
         id: '0937816882001',
         nombre: 'Eduardo Almeida',
@@ -71,14 +71,14 @@ describe('/venta_ex/ endpoints', () => {
         descDefault: '0',
         tipo: 'ruc'
       }),
-      api.insertarMedico(
-        'Dr. Juan Coronel',
-        'Avenida Leopoldo Carrera Calvo 493',
-        'jcoronel23@yahoo.com.ec',
-        '20',
-        '2448272',
-        '2885685'
-      )
+      api.insertarMedico({
+        nombre: 'Dr. Juan Coronel',
+        direccion: 'Avenida Leopoldo Carrera Calvo 493',
+        email: 'jcoronel23@yahoo.com.ec',
+        comision: '20',
+        telefono1: '2448272',
+        telefono2: '2885685'
+      })
     ]).catch(err => console.log('setup error: ' + err));
     responses.forEach(res => expect(res.status).toEqual(200));
   });

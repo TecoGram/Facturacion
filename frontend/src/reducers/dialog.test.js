@@ -1,6 +1,10 @@
+import ClienteForm from '../NuevoCliente/ClienteForm';
+import ProductoForm from '../NuevoProducto/ProductoForm';
+
 import actionCreators from '../ActionCreators.js';
+import dialogReducer from './dialog.js';
+
 const defaultStore = require('../DefaultStore.js');
-const dialogReducer = require('./dialog.js');
 const { CLIENTE_DIALOG, PRODUCTO_DIALOG } = require('../DialogTypes.js');
 
 let state;
@@ -17,24 +21,9 @@ describe('dialog reducer', () => {
 
     expect(newState).not.toBe(state);
     expect(newState).toEqual({
-      value: CLIENTE_DIALOG,
-      dialogParams: {
-        editar: true,
-        open: true
-      }
-    });
-  });
-
-  it('Si se cierra el dialog con CAMBIAR_DIALOG_ACTION, se setea editar null', () => {
-    const action = actionCreators.cancelarDialog();
-    const newState = dialogReducer(state, action);
-
-    expect(newState).not.toBe(state);
-    expect(newState).toEqual({
-      value: CLIENTE_DIALOG,
-      dialogParams: {
-        open: false
-      }
+      Content: ClienteForm,
+      open: true,
+      title: 'Nuevo Cliente'
     });
   });
 
@@ -45,12 +34,10 @@ describe('dialog reducer', () => {
 
     expect(newState).not.toBe(state);
     expect(newState).toEqual({
-      value: CLIENTE_DIALOG,
-      dialogParams: {
-        editar: ruc,
-        key: ruc,
-        open: true
-      }
+      Content: ClienteForm,
+      editar: ruc,
+      open: true,
+      title: 'Editar Cliente'
     });
   });
 
@@ -61,26 +48,10 @@ describe('dialog reducer', () => {
 
     expect(newState).not.toBe(state);
     expect(newState).toEqual({
-      value: PRODUCTO_DIALOG,
-      dialogParams: {
-        editar: editarObj,
-        open: true
-      }
-    });
-  });
-
-  it('coloca open=false con cancelarDialog action', () => {
-    state.open = true;
-    const action = actionCreators.cancelarDialog();
-    const newState = dialogReducer(state, action);
-
-    expect(newState).not.toBe(state);
-    expect(newState).toEqual({
-      value: state.value,
-      dialogParams: {
-        editar: state.editar,
-        open: false
-      }
+      Content: ProductoForm,
+      editar: editarObj,
+      open: true,
+      title: 'Editar Producto'
     });
   });
 
@@ -91,11 +62,8 @@ describe('dialog reducer', () => {
 
     expect(newState).not.toBe(state);
     expect(newState).toEqual({
-      value: state.value,
-      dialogParams: {
-        editar: null,
-        open: false
-      }
+      editar: null,
+      open: false
     });
   });
 });

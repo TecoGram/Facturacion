@@ -8,7 +8,7 @@ import MonetizationOn from 'material-ui/svg-icons/editor/monetization-on';
 
 import IconTextFieldRow from '../lib/formTable/IconTextFieldRow';
 
-export default class NuevoMedicoForm extends React.Component {
+export default class MedicoFormView extends React.Component {
   render() {
     const { errors, inputs, updateData } = this.props;
 
@@ -19,7 +19,7 @@ export default class NuevoMedicoForm extends React.Component {
       errorText: errors.telefono1,
       onChange: event => {
         updateData('telefono1', event.target.value);
-      },
+      }
     };
 
     const medicoInput = {
@@ -29,7 +29,7 @@ export default class NuevoMedicoForm extends React.Component {
       errorText: errors.nombre,
       onChange: event => {
         updateData('nombre', event.target.value);
-      },
+      }
     };
 
     const telf2Input = {
@@ -39,7 +39,7 @@ export default class NuevoMedicoForm extends React.Component {
       errorText: errors.telefono2,
       onChange: event => {
         updateData('telefono2', event.target.value);
-      },
+      }
     };
 
     const direccionInput = {
@@ -49,7 +49,7 @@ export default class NuevoMedicoForm extends React.Component {
       errorText: errors.direccion,
       onChange: event => {
         updateData('direccion', event.target.value);
-      },
+      }
     };
 
     const emailInput = {
@@ -59,7 +59,7 @@ export default class NuevoMedicoForm extends React.Component {
       errorText: errors.email,
       onChange: event => {
         updateData('email', event.target.value);
-      },
+      }
     };
 
     const comisionInput = {
@@ -69,7 +69,7 @@ export default class NuevoMedicoForm extends React.Component {
       errorText: errors.comision,
       onChange: event => {
         updateData('comision', event.target.value);
-      },
+      }
     };
 
     return (

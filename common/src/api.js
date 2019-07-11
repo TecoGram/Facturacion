@@ -30,24 +30,10 @@ module.exports = {
     return request.post(prefix + `/cliente/delete/${tipo}/${id}`).send();
   },
 
-  insertarMedico: (
-    nombre,
-    direccion,
-    email,
-    comision,
-    telefono1,
-    telefono2
-  ) => {
+  insertarMedico: medico => {
     return request
       .post(prefix + '/medico/new')
-      .send({
-        nombre: nombre,
-        direccion: direccion,
-        email: email,
-        comision,
-        telefono1: telefono1,
-        telefono2: telefono2
-      })
+      .send(medico)
       .set('Accept', 'application/json');
   },
 
@@ -55,53 +41,26 @@ module.exports = {
     return request.get(prefix + '/medico/find?q=' + queryString).send();
   },
 
-  insertarProducto: (
-    codigo,
-    nombre,
-    marca,
-    precioDist,
-    precioVenta,
-    pagaIva
-  ) => {
+  insertarProducto: producto => {
     return request
       .post(prefix + '/producto/new')
-      .send({
-        codigo: codigo,
-        nombre: nombre,
-        marca: marca,
-        precioDist: precioDist,
-        precioVenta: precioVenta,
-        pagaIva: pagaIva
-      })
+      .send(producto)
       .set('Accept', 'application/json');
   },
 
-  updateProducto: (
-    rowid,
-    codigo,
-    nombre,
-    marca,
-    precioDist,
-    precioVenta,
-    pagaIva
-  ) => {
+  updateProducto: producto => {
     return request
       .post(prefix + '/producto/update')
-      .send({
-        rowid: rowid,
-        codigo: codigo,
-        nombre: nombre,
-        marca: marca,
-        precioDist: precioDist,
-        precioVenta: precioVenta,
-        pagaIva: pagaIva
-      })
+      .send(producto)
       .set('Accept', 'application/json');
   },
 
   findProductos: (queryString, limit) => {
-    let url = prefix + `/producto/find?q=${queryString}`;
-    if (limit) url += `&limit=${limit}`;
+    const url =
+      prefix +
+      (limit
+        ? `/producto/find?q=${queryString}&limit=${limit}`
+        : `/producto/find?q=${queryString}`);
     return request.get(url).send();
   },
 

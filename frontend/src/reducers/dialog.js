@@ -1,27 +1,26 @@
-const {
+import {
   CAMBIAR_DIALOG_ACTION,
   CERRAR_DIALOG_CON_MSG_ACTION
-} = require('../ActionTypes');
+} from '../ActionTypes';
 
-function dialog(state = {}, action) {
-  switch (action.type) {
+const dialog = (state = {}, action) => {
+  const { type, ...extras } = action;
+  switch (type) {
     case CAMBIAR_DIALOG_ACTION:
       return {
-        value: action.value || state.value,
-        dialogParams: action.dialogParams
+        open: true,
+        Content: action.Content,
+        ...extras
       };
     case CERRAR_DIALOG_CON_MSG_ACTION:
       return {
-        value: action.value || state.value,
-        dialogParams: {
-          editar: null,
-          open: false
-        }
+        ...state,
+        open: false,
+        editar: null
       };
-    default: {
+    default:
       return state;
-    }
   }
-}
+};
 
-module.exports = dialog;
+export default dialog;

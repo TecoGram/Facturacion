@@ -1,21 +1,16 @@
 import * as Actions from './Actions.js';
 import { excludeKeys } from 'facturacion_common/src/Object.js';
-import { TiposID } from 'facturacion_common/src/Models.js';
 import API from 'facturacion_common/src/api.js';
+import Money from 'facturacion_common/src/Money.js';
 import {
-  validarClienteInsert,
-  validarClienteUpdate
+  validarProductoInsert,
+  validarProductoUpdate
 } from 'facturacion_common/src/Validacion.js';
 
-const tiposReverseMap = Object.keys(TiposID).reduce((acc, key) => {
-  const value = TiposID[key];
-  return { ...acc, [value]: key };
-}, {});
-
-export const getDefaultState = cliente => {
-  if (cliente)
+export const getDefaultState = producto => {
+  if (producto)
     return {
-      inputs: { ...cliente },
+      inputs: { ...producto },
       errors: {},
       serverError: null,
       working: false
@@ -23,15 +18,12 @@ export const getDefaultState = cliente => {
 
   return {
     inputs: {
-      id: '',
-      tipoText: '',
-      tipo: undefined,
       nombre: '',
-      direccion: '',
-      email: '',
-      telefono1: '',
-      telefono2: '',
-      descDefault: ''
+      marca: '',
+      codigo: '',
+      precioVentaText: '',
+      precioDistText: '',
+      pagaIva: true
     },
     errors: {},
     serverError: null,
@@ -41,8 +33,19 @@ export const getDefaultState = cliente => {
 
 const createNewInputs = (oldInputs, key, value) => {
   switch (key) {
-    case 'tipo': {
-      return { ...oldInputs, tipoText: value, tipo: tiposReverseMap[value] };
+    case 'precioVenta': {
+      return {
+        ...oldInputs,
+        precioVentaText: value,
+        precioVenta: Money.fromString(value)
+      };
+    }
+    case 'precioDist': {
+      return {
+        ...oldInputs,
+        precioDistText: value,
+        precioDist: Money.fromString(value)
+      };
     }
     default: {
       return { ...oldInputs, [key]: value };
@@ -65,18 +68,18 @@ const setServerError = ({ serverError }) => state => ({
   working: false
 });
 
-const upload = (cliente, callback) => {
-  const editing = !!cliente.rowid;
+const upload = (producto, callback) => {
+  const editing = !!producto.rowid;
   const promise = editing
-    ? API.updateCliente(cliente)
-    : API.insertarCliente(cliente);
+    ? API.updateProducto(producto)
+    : API.insertarProducto(producto);
 
   return promise
     .then(() => {
       callback(
         editing
-          ? `Cliente editado: ${cliente.nombre}`
-          : `Cliente creado: ${cliente.nombre}`
+          ? `Producto editado: ${producto.nombre}`
+          : `Producto creado: ${producto.nombre}`
       );
       return { type: Actions.getDefaultState };
     })
@@ -89,8 +92,8 @@ const guardar = ({ callback }) => state => {
   if (state.working) return state;
 
   const { errors, inputs } = state.inputs.rowid
-    ? validarClienteUpdate(state.inputs)
-    : validarClienteInsert(state.inputs);
+    ? validarProductoUpdate(state.inputs)
+    : validarProductoInsert(state.inputs);
 
   if (errors) return { ...state, errors };
 
@@ -103,11 +106,13 @@ const cerrar = ({ callback }) => state => {
   return state;
 };
 
-const editar = ({ cliente }) => state => {
+const editar = ({ producto }) => state => {
   return {
     inputs: {
-      ...cliente,
-      tipoText: TiposID[cliente.tipo]
+      ...producto,
+      precioVentaText: Money.print(producto.precioVenta),
+      precioDistText: Money.print(producto.precioDist),
+      pagaIva: !!producto.pagaIva
     },
     errors: {},
     serverError: null,

@@ -1,17 +1,18 @@
 import {
   CERRAR_DIALOG_CON_MSG_ACTION,
   ABRIR_LINK_CON_SNACKBAR,
-  MOSTRAR_ERROR_CON_SNACKBAR,
+  MOSTRAR_ERROR_CON_SNACKBAR
 } from '../ActionTypes';
 
 function message(state = {}, action) {
-  switch (action.type) {
+  const { type, message } = action;
+  switch (type) {
     case MOSTRAR_ERROR_CON_SNACKBAR:
-      return { message: action.message, duration: action.duration };
+      return { message, duration: action.duration };
     case CERRAR_DIALOG_CON_MSG_ACTION:
-      return { message: action.message };
+      return message ? { message } : null;
     case ABRIR_LINK_CON_SNACKBAR:
-      return { message: action.message, link: action.link };
+      return { message, link: action.link };
     default: {
       return null;
     }

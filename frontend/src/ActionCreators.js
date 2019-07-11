@@ -4,6 +4,11 @@ import {
   MEDICO_DIALOG,
   PAGOS_DIALOG
 } from './DialogTypes';
+import ClienteForm from './NuevoCliente/ClienteForm';
+import ProductoForm from './NuevoProducto/ProductoForm';
+import MedicoForm from './NuevoMedico/MedicoForm';
+import PagosForm from './Pagos/PagosForm';
+
 import {
   NEW_FACTURA_PAGE,
   FACTURA_LIST_PAGE,
@@ -13,6 +18,7 @@ import {
   NEW_FACTURA_EXAMEN_PAGE,
   EDITAR_FACTURA_EXAMEN_PAGE
 } from './PageTypes';
+
 import {
   CAMBIAR_DIALOG_ACTION,
   CAMBIAR_PAGE_ACTION,
@@ -77,61 +83,56 @@ const creators = {
       case CLIENTE_DIALOG:
         return {
           type: CAMBIAR_DIALOG_ACTION,
-          value: CLIENTE_DIALOG,
-          dialogParams: { open, ...extras }
+          Content: ClienteForm,
+          title: 'Nuevo Cliente',
+          open
         };
       case MEDICO_DIALOG:
         return {
           type: CAMBIAR_DIALOG_ACTION,
-          value: MEDICO_DIALOG,
-          dialogParams: { open, ...extras }
+          Content: MedicoForm,
+          title: 'Nuevo Médico',
+          open
         };
       case PRODUCTO_DIALOG:
         return {
           type: CAMBIAR_DIALOG_ACTION,
-          value: PRODUCTO_DIALOG,
-          dialogParams: { open, ...extras }
+          Content: ProductoForm,
+          title: 'Nuevo Producto',
+          open
         };
       case PAGOS_DIALOG:
         return {
           type: CAMBIAR_DIALOG_ACTION,
-          value: PAGOS_DIALOG,
-          dialogParams: { open, ...extras }
+          Content: PagosForm,
+          title: 'EditarPagos',
+          originalPagos: extras.originalPagos,
+          total: extras.total,
+          onSaveData: extras.onSaveData,
+          open
         };
       default:
         throw new Error('Tipo de dialog desconocido: ' + tipoDialog);
     }
   },
 
-  cancelarDialog() {
-    return {
-      type: CAMBIAR_DIALOG_ACTION,
-      dialogParams: {
-        open: false
-      }
-    };
-  },
-
   editarCliente(clienteAEditar) {
     return {
       type: CAMBIAR_DIALOG_ACTION,
-      value: CLIENTE_DIALOG,
-      dialogParams: {
-        editar: clienteAEditar,
-        key: clienteAEditar,
-        open: true
-      }
+      Content: ClienteForm,
+      title: 'Editar Cliente',
+      editar: clienteAEditar,
+      open: true
     };
   },
 
   editarProducto(productoAEditar) {
     return {
       type: CAMBIAR_DIALOG_ACTION,
-      value: PRODUCTO_DIALOG,
-      dialogParams: {
-        editar: productoAEditar,
-        open: true
-      }
+      Content: ProductoForm,
+      title: 'Editar Producto',
+      editar: productoAEditar,
+      open: true
     };
   },
 
@@ -146,12 +147,10 @@ const creators = {
   cambiarPagina: cambiarPagina,
 
   cerrarDialogConMsg(msg) {
+    console.log('cerrarDialogConMsg', msg);
     return {
       type: CERRAR_DIALOG_CON_MSG_ACTION,
-      message: msg,
-      dialogParams: {
-        open: false
-      }
+      message: msg
     };
   },
 

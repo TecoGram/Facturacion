@@ -3,11 +3,12 @@ const {
   clienteRowSchema,
   getClienteSchemaForIdType,
   validarBusqueda,
-  validarMedico,
-  validarProducto,
   validateFormWithSchema,
+  medicoInsertSchema,
   ventaInsertSchema,
   ventaUpdateSchema,
+  productoInsertSchema,
+  productoUpdateSchema,
   ventaExamenInsertSchema,
   ventaExamenUpdateSchema
 } = require('facturacion_common/src/Validacion.js');
@@ -23,12 +24,14 @@ const setSafeData = (req, data) => {
   req.safeData = data;
 };
 
-const validarClienteMiddleware = ({ isInsert }) => (req, res, next) => {
+const validateWithSchemaMiddleware = arg => (req, res, next) => {
   const { body } = req;
-  const schema = getClienteSchemaForIdType(
-    isInsert ? clienteInsertSchema : clienteRowSchema,
-    body.tipo
-  );
+  if (!body) return sendBadArgumentsResponse(res, 'Request mal formado');
+
+  const schema = typeof arg === 'function' ? arg(body) : arg;
+  if (!schema)
+    return sendBadArgumentsResponse(res, 'Error al interpretar datos');
+
   const { inputs, errors } = validateFormWithSchema(schema, body);
   if (errors) {
     sendBadArgumentsResponse(res, errors);
@@ -37,6 +40,14 @@ const validarClienteMiddleware = ({ isInsert }) => (req, res, next) => {
     next();
   }
 };
+
+const validarClienteMiddleware = ({ isInsert }) =>
+  validateWithSchemaMiddleware(body => {
+    return getClienteSchemaForIdType(
+      isInsert ? clienteInsertSchema : clienteRowSchema,
+      body.tipo
+    );
+  });
 
 const validarPagos = (req, res, next) => {
   const { safeData: venta } = req;
@@ -57,19 +68,8 @@ const validarPagos = (req, res, next) => {
   else next();
 };
 
-const getSchemaForVentaInsertByTipo = tipo => {
-  switch (tipo) {
-    case 1:
-      return ventaExamenInsertSchema;
-    case 0:
-      return ventaInsertSchema;
-    default:
-      return undefined;
-  }
-};
-
-const getSchemaForVentaUpdateByTipo = tipo => {
-  switch (tipo) {
+const validarVentaUpdate = validateWithSchemaMiddleware(unsafeVenta => {
+  switch (unsafeVenta.tipo) {
     case 1:
       return ventaExamenUpdateSchema;
     case 0:
@@ -77,47 +77,18 @@ const getSchemaForVentaUpdateByTipo = tipo => {
     default:
       return undefined;
   }
-};
+});
 
-const validarVentaInsert = (req, res, next) => {
-  const unsafeVenta = req.body;
-  if (!unsafeVenta) return sendBadArgumentsResponse(res, 'Request mal formado');
-
-  const schema = getSchemaForVentaInsertByTipo(unsafeVenta.tipo);
-  if (!schema)
-    return sendBadArgumentsResponse(
-      res,
-      `tipo de venta desconocido: ${unsafeVenta.tipo}`
-    );
-
-  const { inputs, errors } = validateFormWithSchema(schema, unsafeVenta);
-  if (errors) {
-    sendBadArgumentsResponse(res, errors);
-  } else {
-    setSafeData(req, inputs);
-    next();
+const validarVentaInsert = validateWithSchemaMiddleware(unsafeVenta => {
+  switch (unsafeVenta.tipo) {
+    case 1:
+      return ventaExamenInsertSchema;
+    case 0:
+      return ventaInsertSchema;
+    default:
+      return undefined;
   }
-};
-
-const validarVentaUpdate = (req, res, next) => {
-  const unsafeVenta = req.body;
-  if (!unsafeVenta) return sendBadArgumentsResponse(res, 'Request mal formado');
-
-  const schema = getSchemaForVentaUpdateByTipo(unsafeVenta.tipo);
-  if (!schema)
-    return sendBadArgumentsResponse(
-      res,
-      `tipo de venta desconocido: ${unsafeVenta.tipo}`
-    );
-
-  const { inputs, errors } = validateFormWithSchema(schema, unsafeVenta);
-  if (errors) {
-    sendBadArgumentsResponse(res, errors);
-  } else {
-    setSafeData(req, inputs);
-    next();
-  }
-};
+});
 
 module.exports = {
   validarBusqueda: (req, res, next) => {
@@ -131,33 +102,9 @@ module.exports = {
   validarCliente: validarClienteMiddleware({ isInsert: true }),
   validarClienteUpdate: validarClienteMiddleware({ isInsert: false }),
 
-  validarMedico: function(req, res, next) {
-    const { inputs, errors } = validarMedico(req.body);
-    if (errors) {
-      sendBadArgumentsResponse(res, errors);
-    } else {
-      setSafeData(req, {
-        ...inputs,
-        comision: Number(inputs.comision)
-      });
-      next();
-    }
-  },
-
-  validarProducto: function(req, res, next) {
-    const { inputs, errors } = validarProducto(req.body);
-    if (errors) {
-      sendBadArgumentsResponse(res, errors);
-    } else {
-      setSafeData(req, {
-        ...inputs,
-        precioDist: Number(inputs.precioDist),
-        precioVenta: Number(inputs.precioVenta),
-        rowid: req.url === '/producto/update' ? req.body.rowid : undefined
-      });
-      next();
-    }
-  },
+  validarMedico: validateWithSchemaMiddleware(medicoInsertSchema),
+  validarProducto: validateWithSchemaMiddleware(productoInsertSchema),
+  validarProductoUpdate: validateWithSchemaMiddleware(productoUpdateSchema),
 
   validarPagos,
   validarVentaInsert,

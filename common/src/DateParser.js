@@ -31,18 +31,5 @@ module.exports = {
   parseDBDate,
   toReadableDate,
   toReadableDateTime,
-  toDatilDate,
-
-  verVenta(resp) {
-    const { cliente, medico, facturaData, facturables } = resp;
-    const _facturaData = Object.assign({}, facturaData);
-    _facturaData.fecha = parseDBDate(facturaData.fecha);
-
-    return {
-      cliente,
-      medico,
-      facturaData: _facturaData,
-      facturables
-    };
-  }
+  toDatilDate
 };

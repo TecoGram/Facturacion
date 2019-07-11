@@ -12,38 +12,40 @@ describe('/medico/ endpoints', () => {
   describe('/medico/new', () => {
     it('retorna 200 al ingresar datos correctos', () =>
       api
-        .insertarMedico(
-          'Dr. Juan Coronel',
-          'Avenida Leopoldo Carrera Calvo 493',
-          'jcoronel23@yahoo.com.ec',
-          '20',
-          '2448272',
-          '2885685'
-        )
+        .insertarMedico({
+          nombre: 'Dr. Juan Coronel',
+          direccion: 'Avenida Leopoldo Carrera Calvo 493',
+          email: 'jcoronel23@yahoo.com.ec',
+          comision: '20',
+          telefono1: '2448272',
+          telefono2: '2885685'
+        })
         .then(res => {
           expect(res.status).toBe(200);
         }));
 
     it('retorna 500 al ingresar medico con un nombre ya existente', async () => {
-      const res = await api.insertarMedico(
-        'Dra. Olga Saldarreaga',
-        'Via a Samborondon km. 7.5 Urbanizacion Tornasol mz. 5 villa 20',
-        'olga@outlook.com',
-        10,
-        '2854345',
-        '28654768'
-      );
+      const res = await api.insertarMedico({
+        nombre: 'Dra. Olga Saldarreaga',
+        direccion:
+          'Via a Samborondon km. 7.5 Urbanizacion Tornasol mz. 5 villa 20',
+        email: 'olga@outlook.com',
+        comision: 10,
+        telefono1: '2854345',
+        telefono2: '28654768'
+      });
 
       expect(res.status).toBe(200);
       return api
-        .insertarMedico(
-          'Dra. Olga Saldarreaga',
-          'Via a Samborondon km. 7.5 Urbanizacion Tornasol mz. 5 villa 20',
-          'olga@outlook.com',
-          10,
-          '2854345',
-          '28654768'
-        )
+        .insertarMedico({
+          nombre: 'Dra. Olga Saldarreaga',
+          direccion:
+            'Via a Samborondon km. 7.5 Urbanizacion Tornasol mz. 5 villa 20',
+          email: 'olga@outlook.com',
+          comision: 10,
+          telefono1: '2854345',
+          telefono2: '28654768'
+        })
         .then(
           () => Promise.reject('expected to fail'),
           ({ response: res }) => {
@@ -56,14 +58,15 @@ describe('/medico/ endpoints', () => {
 
   describe('/medico/find', () => {
     it('retorna 200 al encontrar medicos', async () => {
-      const res1 = await api.insertarMedico(
-        'Dr. Julio Plaza',
-        'Via a Samborondon km. 7.5 Urbanizacion Tornasol mz. 5 villa 20',
-        'jplaza@outlook.com',
-        10,
-        '2854345',
-        '28654768'
-      );
+      const res1 = await api.insertarMedico({
+        nombre: 'Dr. Julio Plaza',
+        direccion:
+          'Via a Samborondon km. 7.5 Urbanizacion Tornasol mz. 5 villa 20',
+        email: 'jplaza@outlook.com',
+        comision: 10,
+        telefono1: '2854345',
+        telefono2: '28654768'
+      });
       expect(res1.status).toBe(200);
 
       const res2 = await api.findMedicos('pla');

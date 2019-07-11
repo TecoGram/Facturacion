@@ -36,24 +36,19 @@ const crearUnidadesRows = facturables =>
   );
 
 const productoAFacturable = producto => {
-  const facturable = Object.assign({}, producto);
-  facturable.producto = producto.rowid;
-  delete facturable.rowid;
-  delete facturable.precioDist;
-  delete facturable.nombreAscii;
-  facturable.lote = '';
-  facturable.count = '1';
-  facturable.precio = Money.print(producto.precioVenta);
-  facturable.fechaExp = toReadableDate(oneYearFromToday());
-  return facturable;
+  const { rowid, precioDist, nombreAscii, ...cols } = producto;
+  return {
+    ...cols,
+    producto: rowid,
+    lote: '',
+    count: '1',
+    precio: Money.print(producto.precioVenta),
+    fechaExp: toReadableDate(oneYearFromToday())
+  };
 };
 
 const facturableAUnidad = facturable => {
-  const unidad = Object.assign({}, facturable);
-  delete unidad.pagaIva;
-  delete unidad.nombre;
-  delete unidad.codigo;
-  delete unidad.marca;
+  const { pagaIva, nombre, codigo, marca, ...unidad } = facturable;
   return unidad;
 };
 

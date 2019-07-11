@@ -34,16 +34,13 @@ import {
 
 import ActionCreators from './ActionCreators';
 import * as CustomStyle from './CustomStyle';
+import MainDialog from './MainDialog';
 import {
   NuevaFacturaPage,
   EditarFacturaPage,
   NuevaFacturaExamenPage,
   EditarFacturaExamenPage
 } from './Factura/Variantes';
-import NuevoClienteDialog from './NuevoCliente/NuevoClienteDialog';
-import NuevoProductoDialog from './NuevoProducto/NuevoProductoDialog';
-import NuevoMedicoDialog from './NuevoMedico/NuevoMedicoDialog';
-import PagosDialog from './Pagos/PagosDialog.js';
 import FacturasListView from './FacturasList/FacturasListView';
 import ClientesListView from './ClientesList/ClientesListView';
 import ProductosListView from './ProductosList/ProductosListView';
@@ -292,36 +289,6 @@ class MainToolbar extends Component {
   }
 }
 
-class MainDialog extends Component {
-  render() {
-    const {
-      dialogState,
-      mostrarDialog,
-      cancelarDialog,
-      cerrarDialogConMsg
-    } = this.props;
-
-    const dialogProps = {
-      ...dialogState.dialogParams,
-      cancelarDialog,
-      mostrarDialog,
-      cerrarDialogConMsg
-    };
-    switch (dialogState.value) {
-      case CLIENTE_DIALOG:
-        return <NuevoClienteDialog {...dialogProps} />;
-      case MEDICO_DIALOG:
-        return <NuevoMedicoDialog {...dialogProps} />;
-      case PRODUCTO_DIALOG:
-        return <NuevoProductoDialog {...dialogProps} />;
-      case PAGOS_DIALOG:
-        return <PagosDialog {...dialogProps} />;
-      default:
-        throw Error('Unknown dialog: ' + dialogState.value);
-    }
-  }
-}
-
 const SelectedPage = props => {
   const {
     abrirLinkConSnackbar,
@@ -415,7 +382,6 @@ class Main extends Component {
       editarProducto,
       editarFactura,
       editarFacturaExamen,
-      cancelarDialog,
       mostrarDialog,
       cerrarDialogConMsg,
       dialog,
@@ -424,6 +390,7 @@ class Main extends Component {
       page
     } = this.props;
     const abrirPagos = extras => mostrarDialog(PAGOS_DIALOG, extras);
+    const dialogProps = { ...dialog, cerrarDialog: cerrarDialogConMsg };
 
     return (
       <div style={{ backgroundColor: '#ededed', height: 'inherit' }}>
@@ -448,12 +415,7 @@ class Main extends Component {
           handleChange={this.handleDrawerChange}
           onPageSelected={this.onPageSelected}
         />
-        <MainDialog
-          dialogState={dialog}
-          cancelarDialog={cancelarDialog}
-          mostrarDialog={mostrarDialog}
-          cerrarDialogConMsg={cerrarDialogConMsg}
-        />
+        <MainDialog {...dialogProps} />
         <MainSnackbar data={snackbar} />
       </div>
     );

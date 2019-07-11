@@ -16,6 +16,7 @@ const {
   validarMedico,
   validarPagos,
   validarProducto,
+  validarProductoUpdate,
   validarVentaInsert,
   validarVentaUpdate
 } = require('./sanitizationMiddleware.js');
@@ -113,28 +114,12 @@ app.post('/cliente/delete/:tipo/:id', (req, res) => {
 });
 
 app.post('/medico/new', validarMedico, (req, res) => {
-  const {
-    nombre,
-    direccion,
-    email,
-    comision,
-    telefono1,
-    telefono2
-  } = req.safeData;
-
-  db.insertarMedico(
-    nombre,
-    direccion,
-    email,
-    comision,
-    telefono1,
-    telefono2
-  ).then(
-    function() {
+  db.insertarMedico(req.safeData).then(
+    () => {
       //OK!
       res.status(200).send('OK');
     },
-    function(err) {
+    err => {
       //ERROR!
       printError('db error: ' + err);
       res.status(422).send(err);
@@ -160,27 +145,11 @@ app.get('/medico/find', (req, res) => {
 });
 
 app.post('/producto/new', validarProducto, (req, res) => {
-  const {
-    codigo,
-    nombre,
-    marca,
-    precioDist,
-    precioVenta,
-    pagaIva
-  } = req.safeData;
-
-  db.insertarProducto(
-    codigo,
-    nombre,
-    marca,
-    precioDist,
-    precioVenta,
-    pagaIva
-  ).then(
-    function(id) {
+  db.insertarProducto(req.safeData).then(
+    id => {
       res.status(200).send(id);
     },
-    function(err) {
+    err => {
       //ERROR!
       printError('db error: ' + JSON.stringify(err));
       res.status(422).send(err);
@@ -191,49 +160,31 @@ app.post('/producto/new', validarProducto, (req, res) => {
 app.get('/producto/find', validarBusqueda, (req, res) => {
   const q = req.query.q || '';
   db.findProductos(q, req.query.limit).then(
-    function(productos) {
+    productos => {
       if (productos.length === 0)
         res
           .status(404)
           .send('No existen productos con esa cadena de caracteres');
       else res.status(200).send(productos);
     },
-    function(err) {
+    err => {
       //ERROR!
       res.status(500).send(err);
     }
   );
 });
 
-app.post('/producto/update', validarProducto, (req, res) => {
-  const {
-    rowid,
-    codigo,
-    nombre,
-    marca,
-    precioDist,
-    precioVenta,
-    pagaIva
-  } = req.safeData;
-
-  const handleSuccess = function(updateCount) {
+app.post('/producto/update', validarProductoUpdate, (req, res) => {
+  const handleSuccess = updateCount => {
     if (updateCount === 0) res.status(404).send('Producto no encontrado');
     else res.status(200).send('Producto actualizado');
   };
 
-  const handleFailiure = function(err) {
+  const handleFailiure = err => {
     res.status(500).send(err);
   };
 
-  db.updateProducto(
-    rowid,
-    codigo,
-    nombre,
-    marca,
-    precioDist,
-    precioVenta,
-    pagaIva
-  ).then(handleSuccess, handleFailiure);
+  db.updateProducto(req.safeData).then(handleSuccess, handleFailiure);
 });
 
 app.post('/producto/delete/:id', (req, res) => {

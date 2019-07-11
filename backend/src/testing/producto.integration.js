@@ -11,21 +11,26 @@ describe('/producto/ endpoints', () => {
 
   describe('/producto/new', () => {
     it('retorna 200 al ingresar datos correctos', async () => {
-      const res = await api.insertarProducto(
-        'rytertg663433g',
-        'Glyco',
-        'TECO',
-        399900,
-        499900,
-        true
-      );
+      const res = await api.insertarProducto({
+        codigo: 'rytertg663433g',
+        nombre: 'Glyco',
+        precioDist: 399900,
+        precioVenta: 499900,
+        pagaIva: true
+      });
       expect(res.status).toEqual(200);
       expect(res.body).toHaveLength(1);
     });
 
     it('retorna 422 al ingresar producto con un nombre ya existente', () =>
       api
-        .insertarProducto('34tger5', 'Glyco', 'TECO', 399900, 499900, true)
+        .insertarProducto({
+          codigo: 'rytertg663433g',
+          nombre: 'Glyco',
+          precioDist: 399900,
+          precioVenta: 499900,
+          pagaIva: true
+        })
         .then(
           () => Promise.reject(new Error('expected to fail')),
           ({ response: res }) => {
@@ -38,22 +43,22 @@ describe('/producto/ endpoints', () => {
   describe('/producto/find', () => {
     beforeAll(async () => {
       const responses = await Promise.all([
-        api.insertarProducto(
-          'rytertg663433g',
-          'TGO 8x50',
-          'TECO',
-          399900,
-          499900,
-          true
-        ),
-        api.insertarProducto(
-          'rytertg663433g',
-          'TGP 8x50',
-          'TECO',
-          399900,
-          499900,
-          true
-        )
+        api.insertarProducto({
+          codigo: 'rytertg663433g',
+          nombre: 'TGO 8x50',
+          marca: 'TECO',
+          precioDist: 399900,
+          precioVenta: 499900,
+          pagaIva: true
+        }),
+        api.insertarProducto({
+          codigo: 'rytertg663433g',
+          nombre: 'TGP 8x50',
+          marca: 'TECO',
+          precioDist: 399900,
+          precioVenta: 499900,
+          pagaIva: true
+        })
       ]);
 
       responses.forEach(res => expect(res.status).toBe(200));
@@ -86,34 +91,42 @@ describe('/producto/ endpoints', () => {
   describe('/producto/update', () => {
     let productoId;
     beforeAll(async () => {
-      const res = await api.insertarProducto(
-        'ryt126s4',
-        'HCG',
-        'TECO',
-        399900,
-        499900,
-        true
-      );
+      const res = await api.insertarProducto({
+        codigo: 'ryt126s4',
+        nombre: 'HCG',
+        marca: 'TECO',
+        precioDist: 399900,
+        precioVenta: 499900,
+        pagaIva: true
+      });
       expect(res.status).toBe(200);
       productoId = res.body[0];
     });
 
     it('retorna 200 al actualizar un producto exitosamente', async () => {
-      const res = await api.updateProducto(
-        productoId,
-        'ryt126s4',
-        'HCG',
-        'TECO',
-        399900,
-        499900,
-        true
-      );
+      const res = await api.updateProducto({
+        rowid: productoId,
+        codigo: 'ryt126s4',
+        nombre: 'HCG',
+        marca: 'TECO',
+        precioDist: 399900,
+        precioVenta: 599900,
+        pagaIva: true
+      });
       expect(res.status).toBe(200);
     });
 
     it('retorna 404 al tratar de actualizar un producto inexistente', () =>
       api
-        .updateProducto(998, 'ryt126s4', 'HCG', 'TECO', 399900, 499900, true)
+        .updateProducto({
+          rowid: 889,
+          codigo: 'ryt126s4',
+          nombre: 'HCG',
+          marca: 'TECO',
+          precioDist: 399900,
+          precioVenta: 599900,
+          pagaIva: true
+        })
         .then(() => Promise.reject('Expected to fail'))
         .catch(({ response: res }) => expect(res.status).toBe(404)));
   });
@@ -121,14 +134,14 @@ describe('/producto/ endpoints', () => {
   describe('/producto/delete', () => {
     let productoId;
     beforeAll(async () => {
-      const res = await api.insertarProducto(
-        'ryt126s4',
-        'HCG Tirilla',
-        'TECO',
-        399900,
-        499900,
-        true
-      );
+      const res = await api.insertarProducto({
+        codigo: 'ryt126s4',
+        nombre: 'HCG Tirilla',
+        marca: 'TECO',
+        precioDist: 399900,
+        precioVenta: 499900,
+        pagaIva: true
+      });
       expect(res.status).toBe(200);
       productoId = res.body[0];
     });
