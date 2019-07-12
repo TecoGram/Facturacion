@@ -5,9 +5,9 @@ const indexFilePath = path.join(__dirname, '../../frontend/build/index.html');
 const { empresas } = require('../../system.config.js');
 const { tarifaIVA, empresaName: empresaConDatil } = require('./DatilClient');
 
-const crearAjustes = empresa => ({ 
-  iva: tarifaIVA, 
-  empresa, 
+const crearAjustes = empresa => ({
+  iva: tarifaIVA,
+  empresa,
   main: empresaConDatil === empresa,
   empresas
 });
@@ -44,5 +44,5 @@ const serveApp = (req, res) => {
 };
 
 module.exports = {
-  serveApp,
+  serveApp
 };

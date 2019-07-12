@@ -147,7 +147,6 @@ const creators = {
   cambiarPagina: cambiarPagina,
 
   cerrarDialogConMsg(msg) {
-    console.log('cerrarDialogConMsg', msg);
     return {
       type: CERRAR_DIALOG_CON_MSG_ACTION,
       message: msg

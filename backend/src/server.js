@@ -21,7 +21,10 @@ const {
   validarVentaInsert,
   validarVentaUpdate
 } = require('./sanitizationMiddleware.js');
-const { validarVentaMutable } = require('./dbValidationMiddleware.js');
+const {
+  validarIVAEnUnidades,
+  validarVentaMutable
+} = require('./dbValidationMiddleware.js');
 const { serveApp } = require('./empresaMiddleware.js');
 const CONSTRAINT_ERROR_SQLITE = 19;
 const port = process.env.PORT || 8192;
@@ -309,6 +312,7 @@ app.post(
   '/venta/new',
   validarVentaInsert,
   validarPagos,
+  validarIVAEnUnidades,
   validarNombreEmpresa,
   handleValidData(async data => {
     const insertFn = data.tipo ? db.insertarVentaExamen : db.insertarVenta;
@@ -323,6 +327,7 @@ app.post(
   '/venta/update',
   validarVentaUpdate,
   validarPagos,
+  validarIVAEnUnidades,
   validarNombreEmpresa,
   validarVentaMutable('safeData'),
   handleValidData(async data => {

@@ -83,7 +83,7 @@ describe('/venta_ex/ endpoints', () => {
         telefono1: '2448272',
         telefono2: '2885685'
       })
-    ]).catch(err => console.log('setup error: ' + err));
+    ]);
     responses.forEach(res => expect(res.status).toEqual(200));
   });
 

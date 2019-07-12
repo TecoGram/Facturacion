@@ -49,6 +49,13 @@ const getExamenInfoFromVenta = ventaId => {
     .where({ ventaId });
 };
 
+const findPagaIVAProductos = ids => {
+  return knex
+    .select('pagaIva')
+    .from('productos')
+    .whereIn('rowid', ids);
+};
+
 const deleteVenta = rowid => {
   return knex('ventas')
     .where({ rowid })
@@ -399,6 +406,7 @@ module.exports = {
   },
 
   findAllVentas,
+  findPagaIVAProductos,
   colocarComprobante,
   getVentaById,
   getComprobanteFromVenta,

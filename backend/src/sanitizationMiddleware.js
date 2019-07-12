@@ -13,10 +13,7 @@ const {
   ventaExamenUpdateSchema
 } = require('facturacion_common/src/Validacion.js');
 const { calcularValoresTotales } = require('facturacion_common/src/Math.js');
-const {
-  empresaName: empresaConDatil,
-  tarifaIVA
-} = require('./DatilClient.js');
+const { empresaName: empresaConDatil, tarifaIVA } = require('./DatilClient.js');
 const { empresas } = require('../../system.config.js');
 
 const sendBadArgumentsResponse = (res, errors) => {
