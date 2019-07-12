@@ -2,6 +2,10 @@ jest.mock(
   '../../datil.config.js',
   () => require('./testing/utils.js').datilConfig
 );
+jest.mock(
+  '../../system.config.js',
+  () => require('./testing/utils.js').systemConfig
+);
 
 const fs = require('fs');
 

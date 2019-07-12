@@ -13,7 +13,11 @@ const {
   ventaExamenUpdateSchema
 } = require('facturacion_common/src/Validacion.js');
 const { calcularValoresTotales } = require('facturacion_common/src/Math.js');
-const { tarifaIVA } = require('./DatilClient.js');
+const {
+  empresaName: empresaConDatil,
+  tarifaIVA
+} = require('./DatilClient.js');
+const { empresas } = require('../../system.config.js');
 
 const sendBadArgumentsResponse = (res, errors) => {
   res.status(400).send(errors);
@@ -79,6 +83,19 @@ const validarVentaUpdate = validateWithSchemaMiddleware(unsafeVenta => {
   }
 });
 
+const validarNombreEmpresa = (req, res, next) => {
+  const venta = req.safeData;
+
+  if (!empresas.includes(venta.empresa))
+    sendBadArgumentsResponse(res, `Empresa desconocida: ${venta.empresa}`);
+  else if (venta.contable && venta.empresa !== empresaConDatil)
+    sendBadArgumentsResponse(
+      res,
+      `La empresa ${venta.empresa} no puede emitir comprobantes electrónicos`
+    );
+  else next();
+};
+
 const validarVentaInsert = validateWithSchemaMiddleware(unsafeVenta => {
   switch (unsafeVenta.tipo) {
     case 1:
@@ -103,6 +120,9 @@ module.exports = {
   validarClienteUpdate: validarClienteMiddleware({ isInsert: false }),
 
   validarMedico: validateWithSchemaMiddleware(medicoInsertSchema),
+
+  validarNombreEmpresa,
+
   validarProducto: validateWithSchemaMiddleware(productoInsertSchema),
   validarProductoUpdate: validateWithSchemaMiddleware(productoUpdateSchema),
 

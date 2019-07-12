@@ -2,13 +2,22 @@ jest.mock('../HTTPClient.js', () => ({
   postRequest: jest.fn()
 }));
 jest.mock('../../../datil.config.js', () => require('./utils.js').datilConfig);
+jest.mock(
+  '../../../system.config.js',
+  () => require('./utils.js').systemConfig
+);
 
 const HTTPClient = require('../HTTPClient.js');
 const request = require('superagent');
 const api = require('facturacion_common/src/api.js');
 const server = require('../server.js');
 const setup = require('../scripts/setupDB.js');
-const { deleteVentas, fetchUnidad, fetchCliente } = require('./utils.js');
+const {
+  empresaName,
+  deleteVentas,
+  fetchUnidad,
+  fetchCliente
+} = require('./utils.js');
 const { getComprobanteFromVenta } = require('../dbAdmin.js');
 
 const consumidorFinal = Object.freeze({
@@ -34,7 +43,7 @@ const baseClienteRow = Object.freeze({
 });
 
 const baseVentaRow = Object.freeze({
-  empresa: 'TecoGram S.A.',
+  empresa: empresaName,
   cliente: 1,
   fecha: '2016-11-26T12:33:56.875Z',
   autorizacion: '',
@@ -158,7 +167,7 @@ describe('/venta/ endpoints', () => {
             emisor: {
               ruc: '0999999999001',
               razon_social: '__nombre__',
-              nombre_comercial: '__nombre__',
+              nombre_comercial: empresaName,
               direccion: '__direccion__',
               contribuyente_especial: '',
               obligado_contabilidad: true,
@@ -250,7 +259,7 @@ describe('/venta/ endpoints', () => {
             emisor: {
               ruc: '0999999999001',
               razon_social: '__nombre__',
-              nombre_comercial: '__nombre__',
+              nombre_comercial: empresaName,
               direccion: '__direccion__',
               contribuyente_especial: '',
               obligado_contabilidad: true,
@@ -361,7 +370,7 @@ describe('/venta/ endpoints', () => {
             emisor: {
               ruc: '0999999999001',
               razon_social: '__nombre__',
-              nombre_comercial: '__nombre__',
+              nombre_comercial: empresaName,
               direccion: '__direccion__',
               contribuyente_especial: '',
               obligado_contabilidad: true,
@@ -685,20 +694,20 @@ describe('/venta/ endpoints', () => {
     });
 
     it('retorna 200 con todas las facturas si el parametro es vacio', async () => {
-      const res = await api.findAllVentas('TecoGram S.A.', '');
+      const res = await api.findAllVentas(empresaName, '');
       expect(res.status).toBe(200);
       expect(res.body).toHaveLength(2);
     });
 
     it('retorna 200 al encontrar facturas', async () => {
-      const res = await api.findAllVentas('TecoGram S.A.', 'Jul');
+      const res = await api.findAllVentas(empresaName, 'Jul');
       expect(res.status).toBe(200);
       expect(res.body).toHaveLength(1);
     });
 
     it('retorna 404 si no encuentra ventas', () =>
       api
-        .findAllVentas('TecoGram S.A.', 'xyz')
+        .findAllVentas('nombre', 'xyz')
         .then(() => Promise.reject('expected to fail'))
         .catch(({ response: res }) => {
           expect(res.status).toBe(404);

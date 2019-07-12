@@ -2,6 +2,10 @@ jest.mock('../HTTPClient.js', () => ({
   postRequest: jest.fn()
 }));
 jest.mock('../../../datil.config.js', () => require('./utils.js').datilConfig);
+jest.mock(
+  '../../../system.config.js',
+  () => require('./utils.js').systemConfig
+);
 
 const request = require('superagent');
 const api = require('facturacion_common/src/api.js');
@@ -9,11 +13,11 @@ const api = require('facturacion_common/src/api.js');
 const HTTPClient = require('../HTTPClient.js');
 const server = require('../server.js');
 const setup = require('../scripts/setupDB.js');
-const { fetchUnidad } = require('./utils.js');
+const { empresaName, fetchUnidad } = require('./utils.js');
 
 const baseVentaEx = Object.freeze({
   codigo: '',
-  empresa: 'TecoGram S.A.',
+  empresa: empresaName,
   cliente: 1,
   medico: 1,
   tipo: 1,
@@ -101,7 +105,7 @@ describe('/venta_ex/ endpoints', () => {
           emisor: {
             ruc: '0999999999001',
             razon_social: '__nombre__',
-            nombre_comercial: '__nombre__',
+            nombre_comercial: empresaName,
             direccion: '__direccion__',
             contribuyente_especial: '',
             obligado_contabilidad: true,

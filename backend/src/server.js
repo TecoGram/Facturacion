@@ -14,6 +14,7 @@ const {
   validarCliente,
   validarClienteUpdate,
   validarMedico,
+  validarNombreEmpresa,
   validarPagos,
   validarProducto,
   validarProductoUpdate,
@@ -21,7 +22,7 @@ const {
   validarVentaUpdate
 } = require('./sanitizationMiddleware.js');
 const { validarVentaMutable } = require('./dbValidationMiddleware.js');
-const { serveTecogram, serveBiocled } = require('./empresaMiddleware.js');
+const { serveApp } = require('./empresaMiddleware.js');
 const CONSTRAINT_ERROR_SQLITE = 19;
 const port = process.env.PORT || 8192;
 //crear directorio donde almacenar facturas en pdf.
@@ -34,13 +35,12 @@ const printError = errorString => {
 
 const app = Express();
 app.get('/', (req, res) => {
-  res.redirect('/teco');
+  res.redirect('/app');
 });
 app.use('/', Express.static(path.join(__dirname, '../../frontend/build')));
 app.use(bodyParser.json()); // for parsing application/json
 
-app.get('/teco', serveTecogram);
-app.get('/biocled', serveBiocled);
+app.get('/app', serveApp);
 
 app.post('/cliente/new', validarCliente, (req, res) => {
   db.insertarCliente(req.safeData).then(
@@ -309,6 +309,7 @@ app.post(
   '/venta/new',
   validarVentaInsert,
   validarPagos,
+  validarNombreEmpresa,
   handleValidData(async data => {
     const insertFn = data.tipo ? db.insertarVentaExamen : db.insertarVenta;
     const ventaId = await insertFn(data);
@@ -321,6 +322,8 @@ app.post(
 app.post(
   '/venta/update',
   validarVentaUpdate,
+  validarPagos,
+  validarNombreEmpresa,
   validarVentaMutable('safeData'),
   handleValidData(async data => {
     const updateFn = data.tipo ? db.updateVentaExamen : db.updateVenta;

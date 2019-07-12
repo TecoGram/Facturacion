@@ -2,8 +2,15 @@ const fs = require('fs');
 const path = require('path');
 
 const indexFilePath = path.join(__dirname, '../../frontend/build/index.html');
+const { empresas } = require('../../system.config.js');
+const { tarifaIVA, empresaName: empresaConDatil } = require('./DatilClient');
 
-const crearAjustes = empresa => ({ iva: 12, empresa });
+const crearAjustes = empresa => ({ 
+  iva: tarifaIVA, 
+  empresa, 
+  main: empresaConDatil === empresa,
+  empresas
+});
 
 const colocarAjustesEnHtml = (html, store) => {
   const storePlaceholder = 'void 0';
@@ -24,17 +31,18 @@ const enviarHtmlConAjustes = (res, store) => {
   });
 };
 
-const serveTecogram = (req, res) => {
-  const ajustes = crearAjustes('TecoGram S.A.');
-  enviarHtmlConAjustes(res, ajustes);
-};
+const serveApp = (req, res) => {
+  const empresaIndex = req.query.empresa || 0;
+  const empresaName = empresas[empresaIndex];
+  if (!empresaName) {
+    res.status(404).send('Empresa no encontrada');
+    return;
+  }
 
-const serveBiocled = (req, res) => {
-  const ajustes = crearAjustes('Biocled');
+  const ajustes = crearAjustes(empresaName);
   enviarHtmlConAjustes(res, ajustes);
 };
 
 module.exports = {
-  serveTecogram,
-  serveBiocled
+  serveApp,
 };

@@ -20,6 +20,12 @@ const fetchCliente = async name => {
   return res.body[0].rowid;
 };
 
+const empresaName = '__empresa_name__';
+
+const systemConfig = {
+  empresas: [empresaName, '__alt_empresa__']
+};
+
 const datilConfig = {
   apiKey: '__MI_API_KEY_SECRETO__',
   password: '__MI_PASS__',
@@ -31,7 +37,7 @@ const datilConfig = {
     emisor: {
       ruc: '0999999999001',
       razon_social: '__nombre__',
-      nombre_comercial: '__nombre__',
+      nombre_comercial: empresaName,
       direccion: '__direccion__',
       contribuyente_especial: '',
       obligado_contabilidad: true,
@@ -44,4 +50,11 @@ const datilConfig = {
   }
 };
 
-module.exports = { deleteVentas, fetchUnidad, fetchCliente, datilConfig };
+module.exports = {
+  deleteVentas,
+  empresaName,
+  fetchUnidad,
+  fetchCliente,
+  datilConfig,
+  systemConfig
+};

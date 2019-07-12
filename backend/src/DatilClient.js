@@ -229,5 +229,6 @@ const emitirFactura = venta => {
 
 module.exports = {
   emitirFactura,
-  tarifaIVA: iva2Float(IVA_ACTUAL)
+  tarifaIVA: iva2Float(IVA_ACTUAL),
+  empresaName: config.emision.emisor.nombre_comercial
 };

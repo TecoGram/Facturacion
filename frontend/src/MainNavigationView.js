@@ -66,9 +66,9 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(ActionCreators, dispatch);
 }
 
-const redirectEmpresa = redirigirATeco => {
-  if (redirigirATeco) window.location = '/teco';
-  else window.location = '/biocled';
+const redirectEmpresa = redirigirAMain => {
+  if (redirigirAMain) window.location = '/app?empresa=0';
+  else window.location = '/app?empresa=1';
 };
 
 const MainDrawer = props => {
@@ -112,18 +112,17 @@ const MainDrawer = props => {
         Productos
       </MenuItem>
       <Divider />
-      <MenuItem
-        onTouchTap={() => redirectEmpresa(true)}
-        leftIcon={<ExitToApp />}
-      >
-        TecoGram S.A.
-      </MenuItem>
-      <MenuItem
-        onTouchTap={() => redirectEmpresa(false)}
-        leftIcon={<ExitToApp />}
-      >
-        Biocled
-      </MenuItem>
+      {appSettings.empresas.map((empresaName, index) => {
+        return (
+          <MenuItem
+            key={index}
+            onTouchTap={() => redirectEmpresa(index === 0)}
+            leftIcon={<ExitToApp />}
+          >
+            {empresaName}
+          </MenuItem>
+        );
+      })}
     </Drawer>
   );
 };
@@ -436,7 +435,7 @@ export default class MainNavigationView extends Component {
       mapStateToProps,
       mapDispatchToProps
     )(Main);
-    const muiTheme = CustomStyle.getEmpresaTheme(appSettings.empresa);
+    const muiTheme = CustomStyle.getEmpresaTheme(appSettings.main);
     return (
       <Provider store={store}>
         <MuiThemeProvider muiTheme={muiTheme}>
