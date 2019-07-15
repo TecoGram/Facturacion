@@ -4,8 +4,8 @@ const db = require('../db.js');
 
 const deleteVentas = () => db('ventas').del();
 
-const fetchUnidad = async name => {
-  const res = await api.findProductos(name);
+const fetchUnidad = async queryString => {
+  const res = await api.findProductos({ queryString });
 
   const products = res.body;
   const { nombre, codigo, ...unidad } = Models.facturableAUnidad(

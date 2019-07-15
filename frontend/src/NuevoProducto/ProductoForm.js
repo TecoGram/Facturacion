@@ -31,7 +31,7 @@ export default class ProductoForm extends React.Component {
 
   componentDidMount() {
     const { editar } = this.props;
-    if (editar) updateState(this, { type: Actions.editar, cliente: editar });
+    if (editar) updateState(this, { type: Actions.editar, producto: editar });
   }
 
   render() {

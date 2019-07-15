@@ -73,20 +73,24 @@ const insertarNuevaFacturaContable = async ventaRow => {
         unidades: [await fetchUnidad('Glyco')]
       };
 
-  const res = await api.insertarVenta(newVentaRow);
-  expect(res.status).toBe(200);
+  const res1 = await api.insertarVenta(newVentaRow);
+  expect(res1.status).toBe(200);
+
+  const res2 = await api.emitirComprobante(res1.body.rowid);
+  expect(res2.status).toBe(200);
+
   expect(HTTPClient.postRequest).toHaveBeenCalledTimes(1);
 
-  const [comprobante] = await getComprobanteFromVenta(res.body.rowid);
+  const [comprobante] = await getComprobanteFromVenta(res2.body.rowid);
   expect(comprobante).toEqual({
     id: '__datil_id__',
     clave_acceso: '__clave__',
     secuencial: expect.any(Number),
-    ventaId: res.body.rowid
+    ventaId: res2.body.rowid
   });
 
   const [[issueReq]] = HTTPClient.postRequest.mock.calls;
-  return { issueReq, rowid: res.body.rowid };
+  return { issueReq, rowid: res2.body.rowid };
 };
 
 const insertarNuevaFacturaContableConErrorDatil = async datilError => {
@@ -98,19 +102,28 @@ const insertarNuevaFacturaContableConErrorDatil = async datilError => {
     unidades: [await fetchUnidad('Glyco')]
   };
 
-  const res = await api.insertarVenta(newVentaRow);
-  expect(res.status).toBe(210);
+  const res1 = await api.insertarVenta(newVentaRow);
+  expect(res1.status).toBe(200);
+
+  const res2 = await api
+    .emitirComprobante(res1.body.rowid)
+    .then(() => {
+      throw new Error('Expected to fail');
+    })
+    .catch(err => err.response);
+  expect(res2.status).toBe(520);
+
   expect(HTTPClient.postRequest).toHaveBeenCalledTimes(1);
 
-  const [comprobante] = await getComprobanteFromVenta(res.body.rowid);
+  const [comprobante] = await getComprobanteFromVenta(res2.body.rowid);
   expect(comprobante).toEqual({
     id: null,
     clave_acceso: null,
     secuencial: expect.any(Number),
-    ventaId: res.body.rowid
+    ventaId: res2.body.rowid
   });
 
-  return res.body.datilMsg;
+  return res2.body.datilMsg;
 };
 
 describe('/venta/ endpoints', () => {
@@ -128,6 +141,7 @@ describe('/venta/ endpoints', () => {
       api.insertarCliente(baseClienteRow),
       api.insertarCliente(consumidorFinal)
     ]);
+
     responses.forEach(res => expect(res.status).toEqual(200));
   });
   afterAll(server.destroy);
@@ -139,9 +153,7 @@ describe('/venta/ endpoints', () => {
         unidades: [await fetchUnidad('Glyco')]
       };
 
-      const res = await api
-        .insertarVenta(newVentaRow)
-        .catch(err => console.error(err));
+      const res = await api.insertarVenta(newVentaRow);
 
       expect(res.status).toBe(200);
       expect(HTTPClient.postRequest).toHaveBeenCalledTimes(0);
@@ -446,7 +458,9 @@ describe('/venta/ endpoints', () => {
             }
           });
 
-          expect(errorText).toEqual('INVALID_RECEIPT');
+          expect(errorText).toEqual(
+            'Punto de emision no existe (INVALID_RECEIPT)'
+          );
         });
 
         it('Muestra el text completo si no puede parsear el body', async () => {
@@ -564,10 +578,13 @@ describe('/venta/ endpoints', () => {
         expect(res1.status).toBe(200);
         const ventaContableId = res1.body.rowid;
 
+        const res2 = await api.emitirComprobante(ventaContableId);
+        expect(res2.status).toBe(200);
+
         // obtener json
-        const res = await api.verVenta(ventaContableId);
-        expect(res.status).toBe(200);
-        expect(res.body).toEqual({
+        const res3 = await api.verVenta(ventaContableId);
+        expect(res3.status).toBe(200);
+        expect(res3.body).toEqual({
           ventaRow: expect.objectContaining({
             codigo: '',
             empresa: ventaRow.empresa,

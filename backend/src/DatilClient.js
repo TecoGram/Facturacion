@@ -206,8 +206,8 @@ const handleDatilError = err => {
   if (body) {
     const { errors } = body;
     if (errors && Array.isArray(errors) && errors.length > 0) {
-      const { code } = errors[0];
-      return { datilMsg: code };
+      const { code, message } = errors[0];
+      return { datilMsg: `${message} (${code})` };
     }
   }
 

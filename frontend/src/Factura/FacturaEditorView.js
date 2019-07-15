@@ -4,6 +4,7 @@ import PaperContainer from '../lib/PaperContainer';
 import FacturaForm from './FacturaForm';
 import FacturaTable from './FacturaTable';
 import FacturaResults from './FacturaResults';
+import ComprobanteDialog from './ComprobanteDialog';
 import { getFacturaURL } from 'facturacion_common/src/api';
 import * as Actions from './EditorActions.js';
 import { createReducer, getDefaultState } from './EditorReducers.js';
@@ -102,6 +103,22 @@ export default class FacturaEditorView extends Component {
     }
   };
 
+  resetearConMsg = msg => {
+    updateState(this, { type: Actions.getDefaultState });
+    Promise.resolve().then(() => this.props.mostrarErrorConSnackbar(msg));
+  };
+
+  editarFactura = ventaId => {
+    const { ventaKey, isExamen } = this.props;
+    if (ventaId === ventaKey)
+      return updateState(this, { type: Actions.cerrarComprobanteDialog });
+
+    const editarFn = isExamen
+      ? this.props.editarFacturaExamen
+      : this.props.editarFactura;
+    editarFn(ventaId);
+  };
+
   render() {
     const {
       clienteRow,
@@ -169,7 +186,7 @@ export default class FacturaEditorView extends Component {
               total={total}
               porcentajeIVA={iva}
               contable={inputs.contable}
-              contableDisabled={inputs.contableDisabled}
+              contableDisabled={!ajustes.main || inputs.contableDisabled}
               guardando={guardando}
               detallado={detallado}
               onGuardarClick={this.onGenerarFacturaClick}
@@ -177,6 +194,11 @@ export default class FacturaEditorView extends Component {
               nuevo={!ventaKey}
               guardarButtonDisabled={false}
               isExamen={isExamen}
+            />
+            <ComprobanteDialog
+              ventaId={this.state.emitiendo ? this.state.emitiendo.ventaId : 0}
+              editarFactura={this.editarFactura}
+              cerrarConMsg={this.resetearConMsg}
             />
           </div>
         </PaperContainer>
@@ -189,6 +211,8 @@ FacturaEditorView.propTypes = {
   abrirPagos: React.PropTypes.func.isRequired,
   abrirLinkConSnackbar: React.PropTypes.func.isRequired,
   mostrarErrorConSnackbar: React.PropTypes.func.isRequired,
+  editarFactura: React.PropTypes.func.isRequired,
+  editarFacturaExamen: React.PropTypes.func.isRequired,
   isExamen: React.PropTypes.bool,
   ventaKey: React.PropTypes.number
 };

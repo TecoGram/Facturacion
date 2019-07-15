@@ -45,8 +45,12 @@ const insertarNuevaFacturaContable = async () => {
     unidades: [unidad]
   };
 
-  const res = await api.insertarVenta(newVentaRow);
-  expect(res.status).toBe(200);
+  const res1 = await api.insertarVenta(newVentaRow);
+  expect(res1.status).toBe(200);
+
+  const res2 = await api.emitirComprobante(res1.body.rowid);
+  expect(res2.status).toBe(200);
+
   expect(HTTPClient.postRequest).toHaveBeenCalledTimes(1);
 
   const [[issueReq]] = HTTPClient.postRequest.mock.calls;

@@ -237,6 +237,23 @@ const buscarEnTabla = (tabla, columna, queryString, limit) => {
   return query;
 };
 
+const findProductos = ({ pagaIva, queryString, limit }) => {
+  const query = knex
+    .select('*')
+    .from('productos')
+    .limit(limit);
+
+  if (typeof pagaIva === 'number' && queryString !== '')
+    return query
+      .where({ pagaIva })
+      .where('nombreAscii', 'like', `%${queryString}%`);
+
+  if (queryString !== '')
+    return query.where('nombreAscii', 'like', `%${queryString}%`);
+
+  return query;
+};
+
 const updateProducto = producto => {
   const { rowid, nombre } = producto;
   const nombreAscii = convertToAscii(nombre);
@@ -289,11 +306,6 @@ module.exports = {
   insertarProducto: producto => {
     const nombreAscii = convertToAscii(producto.nombre);
     return knex.table('productos').insert({ ...producto, nombreAscii });
-  },
-
-  findProductos: (queryString, limit) => {
-    const queryStringAscii = convertToAscii(queryString);
-    return buscarEnTabla('productos', 'nombreAscii', queryStringAscii, limit);
   },
 
   insertarCliente: async row => {
@@ -407,6 +419,7 @@ module.exports = {
 
   findAllVentas,
   findPagaIVAProductos,
+  findProductos,
   colocarComprobante,
   getVentaById,
   getComprobanteFromVenta,

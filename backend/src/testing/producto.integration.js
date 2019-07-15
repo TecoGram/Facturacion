@@ -69,21 +69,25 @@ describe('/producto/ endpoints', () => {
     });
 
     it('retorna 200 al encontrar productos', async () => {
-      const res = await api.findProductos('TG');
+      const res = await api.findProductos({ pagaIva: true, queryString: 'TG' });
 
       expect(res.status).toBe(200);
       expect(res.body).toHaveLength(2);
     });
 
-    it('puede limitar el numero de resultados con el segundo argumento', async () => {
-      const res = await api.findProductos('TG', 1);
+    it('puede limitar el numero de resultados', async () => {
+      const res = await api.findProductos({
+        pagaIva: true,
+        queryString: 'TG',
+        limit: 1
+      });
 
       expect(res.status).toBe(200);
       expect(res.body).toHaveLength(1);
     });
 
     it('retorna 404 si no encuentra productos', () =>
-      api.findProductos('xyz').then(
+      api.findProductos({ queryString: 'xyz' }).then(
         () => Promise.reject('Expected to fail'),
         ({ response: res }) => {
           expect(res.status).toBe(404);

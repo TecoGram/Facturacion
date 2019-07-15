@@ -80,5 +80,6 @@ jobs:
           name: Backend Integration tests
           command: |
             touch ../datil.config.js
+            touch ../system.config.js
             yarn integration
           working_directory: backend

@@ -55,13 +55,21 @@ module.exports = {
       .set('Accept', 'application/json');
   },
 
-  findProductos: (queryString, limit) => {
-    const url =
-      prefix +
-      (limit
-        ? `/producto/find?q=${queryString}&limit=${limit}`
-        : `/producto/find?q=${queryString}`);
-    return request.get(url).send();
+  findProductos: ({ pagaIva, queryString, limit }) => {
+    let path = `/producto/find?queryString=${queryString}`;
+    if (limit && typeof pagaIva === 'boolean') {
+      path = `/producto/find?pagaIva=${
+        pagaIva ? 1 : 0
+      }&queryString=${queryString}&limit=${limit}`;
+    } else if (limit) {
+      path = `/producto/find?queryString=${queryString}&limit=${limit}`;
+    } else if (typeof pagaIva === 'boolean') {
+      path = `/producto/find?pagaIva=${
+        pagaIva ? 1 : 0
+      }&queryString=${queryString}`;
+    }
+
+    return request.get(prefix + path).send();
   },
 
   deleteProducto: rowid => {
@@ -73,6 +81,10 @@ module.exports = {
       .post(prefix + '/venta/new')
       .send(ventaRow)
       .set('Accept', 'application/json');
+  },
+
+  emitirComprobante: rowid => {
+    return request.post(prefix + `/venta/emitir/${rowid}`).send();
   },
 
   updateVenta: ventaRow => {

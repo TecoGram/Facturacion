@@ -35,7 +35,7 @@ export const getDefaultState = () => ({
   },
   unidades: [],
   pagos: [{ formaPagoText: '', valorText: '' }],
-  guardando: false
+  emitiendo: false
 });
 
 const findValidacionErrors = (config, state) => {
@@ -77,14 +77,13 @@ const subirVenta = ({ config, venta, callback }) => {
   const uploadFn = config.editar ? API.updateVenta : API.insertarVenta;
   return uploadFn(venta)
     .then(res => {
-      if (res.status === 210)
-        callback({
-          success: false,
-          msg: `la factura se guardó, pero el comprobante no se generó. ${
-            res.body.datilMsg
-          }`
-        });
-      else callback({ success: true, rowid: res.body.rowid });
+      if (venta.contable)
+        return {
+          type: Actions.mostrarComprobanteDialog,
+          ventaId: res.body.rowid
+        };
+
+      callback({ success: true, rowid: res.body.rowid });
       return { type: Actions.getDefaultState };
     })
     .catch(err => {
@@ -120,7 +119,7 @@ const validarPagos = (pagos, total) => {
 };
 
 const guardarFactura = ({ config, callback }) => state => {
-  if (state.guardando) return state;
+  if (state.emitiendo) return state;
 
   const vError = findValidacionErrors(config, state);
   if (vError) {
@@ -164,10 +163,7 @@ const guardarFactura = ({ config, callback }) => state => {
     };
   }
 
-  return [
-    { ...state, guardando: true },
-    subirVenta({ config, venta: inputs, callback })
-  ];
+  return [state, subirVenta({ config, venta: inputs, callback })];
 };
 
 const updateFacturaInput = ({ key, value }) => state => {
@@ -238,7 +234,7 @@ const setCliente = ({ clienteRow }) => state => ({ ...state, clienteRow });
 
 const setMedico = ({ medicoRow }) => state => ({ ...state, medicoRow });
 
-const abortInsert = state => ({ ...state, guardando: false });
+const abortInsert = state => ({ ...state, emitiendo: false });
 
 const getVenta = ventaKey => {
   return API.verVenta(ventaKey)
@@ -258,6 +254,14 @@ const getFacturaExistente = params => state => {
   if (!ventaKey) return state;
 
   return [state, getVenta(ventaKey)];
+};
+
+const mostrarComprobanteDialog = ({ ventaId }) => state => {
+  return { ...state, emitiendo: { ventaId } };
+};
+
+const cerrarComprobanteDialog = () => state => {
+  return { ...state, emitiendo: false };
 };
 
 const removeUnidad = ({ index }) => state => {
@@ -358,6 +362,14 @@ export const createReducer = action => {
 
     case Actions.updatePagos: {
       return updatePagos(params);
+    }
+
+    case Actions.mostrarComprobanteDialog: {
+      return mostrarComprobanteDialog(params);
+    }
+
+    case Actions.cerrarComprobanteDialog: {
+      return cerrarComprobanteDialog(params);
     }
 
     default: {

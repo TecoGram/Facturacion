@@ -51,7 +51,7 @@ const paymentAgreementString =
   ' de esta jurisdicción o al que elija el acreedor.';
 
 const drawInvoiceInfoContents = (doc, { ventaRow, clienteRow }) => {
-  const { nombre, telefono1, direccion, ruc } = clienteRow;
+  const { nombre, telefono1, direccion, id } = clienteRow;
   const { fecha } = ventaRow;
 
   const topTableStart = { x: BOX1_POS.x + 8, y: BOX1_POS.y + 16 };
@@ -76,7 +76,7 @@ const drawInvoiceInfoContents = (doc, { ventaRow, clienteRow }) => {
   doc
     .text(telefono1, doc.x, RUCPhoneLinePos)
     .text('RUC: ', RUCTitleLeftMargin, RUCPhoneLinePos)
-    .text(ruc, RUCLeftMargin, RUCPhoneLinePos);
+    .text(id, RUCLeftMargin, RUCPhoneLinePos);
   doc.lineGap(0); //restore default
 };
 

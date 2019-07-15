@@ -10,9 +10,10 @@ const pdfutils = require('./pdf/pdfutils.js');
 const facturaTemplate = require('./pdf/template.js');
 const db = require('./dbAdmin.js');
 const {
-  validarBusqueda,
+  validarBusquedaProductos,
   validarCliente,
   validarClienteUpdate,
+  validarIdInParams,
   validarMedico,
   validarNombreEmpresa,
   validarPagos,
@@ -160,9 +161,8 @@ app.post('/producto/new', validarProducto, (req, res) => {
   );
 });
 
-app.get('/producto/find', validarBusqueda, (req, res) => {
-  const q = req.query.q || '';
-  db.findProductos(q, req.query.limit).then(
+app.get('/producto/find', validarBusquedaProductos, (req, res) => {
+  db.findProductos(req.safeData).then(
     productos => {
       if (productos.length === 0)
         res
@@ -301,12 +301,18 @@ const generarNuevoComprobante = async ventaId => {
   const venta = await db.getVentaById(ventaId);
   const { id, clave_acceso, datilMsg } = await Datil.emitirFactura(venta);
 
-  if (datilMsg) return { status: 210, resp: { rowid: ventaId, datilMsg } };
+  if (datilMsg) return { status: 520, resp: { rowid: ventaId, datilMsg } };
 
   await db.colocarComprobante({ ventaId, id, clave_acceso });
 
   return { status: 200, resp: { rowid: ventaId } };
 };
+
+app.post(
+  '/venta/emitir/:id',
+  validarIdInParams,
+  handleValidData(data => generarNuevoComprobante(data.id))
+);
 
 app.post(
   '/venta/new',
@@ -317,9 +323,7 @@ app.post(
   handleValidData(async data => {
     const insertFn = data.tipo ? db.insertarVentaExamen : db.insertarVenta;
     const ventaId = await insertFn(data);
-    if (!data.contable) return { status: 200, resp: { rowid: ventaId } };
-
-    return generarNuevoComprobante(ventaId);
+    return { status: 200, resp: { rowid: ventaId } };
   })
 );
 
@@ -333,12 +337,7 @@ app.post(
   handleValidData(async data => {
     const updateFn = data.tipo ? db.updateVentaExamen : db.updateVenta;
     await updateFn(data);
-
-    const { rowid, contable } = data;
-    if (!contable || (await db.tieneComprobante(rowid)))
-      return { status: 200, resp: { rowid } };
-
-    return generarNuevoComprobante(rowid);
+    return { status: 200, resp: { rowid: data.rowid } };
   })
 );
 

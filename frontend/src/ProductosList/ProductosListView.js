@@ -29,7 +29,7 @@ export default class ProductosListView extends React.Component {
       colocarListaVacia,
       colocarProductosDelResponse
     } = this.stateManager;
-    findProductos(input, 50).then(
+    findProductos({ queryString: input, limit: 50 }).then(
       colocarProductosDelResponse,
       colocarListaVacia
     );

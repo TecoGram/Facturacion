@@ -77,6 +77,11 @@ const sanitizarUnidadInput = (key, value) => {
   }
 };
 
+const sanitizarId = maybeId => {
+  if (esEnteroValido(maybeId)) return parseInt(maybeId, 10);
+  return null;
+};
+
 //regext dates between 2010 and 2029
 const fechaRegex = /20(1|2)[0-9]-(0|1)[0-9]-[0-3][0-9]/i;
 const esFechaValida = dateString => fechaRegex.test(dateString);
@@ -227,7 +232,7 @@ const int = (args = {}) => (ctx, value) => {
   const { name } = ctx;
 
   if (!value && value !== 0) {
-    if (fallback || fallback === 0) return fallback;
+    if (fallback || fallback === null || fallback === 0) return fallback;
 
     return abrv
       ? new Error('Obligatorio')
@@ -445,6 +450,12 @@ const ventaExamenSchema = {
 const ventaExamenInsertSchema = excludeKeys(ventaExamenSchema, ['rowid']);
 const ventaExamenUpdateSchema = ventaExamenSchema;
 
+const busquedaProductoSchema = {
+  pagaIva: int({ min: 0, max: 1, fallback: null }),
+  queryString: string({ fallback: '' }),
+  limit: int({ fallback: 5 })
+};
+
 const datilConfigSchema = {
   apiKey: string(),
   password: string(),
@@ -553,6 +564,7 @@ const validarDatilConfig = data =>
   validateFormWithSchema(datilConfigSchema, data);
 
 module.exports = {
+  busquedaProductoSchema,
   datilConfigSchema,
   getClienteSchemaForIdType,
   medicoInsertSchema,
@@ -583,5 +595,6 @@ module.exports = {
   clienteInsertSchema,
   sanitizarDinero,
   sanitizarFacturaInput,
+  sanitizarId,
   sanitizarUnidadInput
 };

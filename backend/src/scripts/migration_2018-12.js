@@ -161,7 +161,8 @@ const copyVentas = async clientesMap => {
     ...v,
     cliente: clientesMap[v.cliente],
     flete: float2int(v.flete),
-    subtotal: float2int(v.subtotal)
+    subtotal: float2int(v.subtotal),
+    fecha: v.fecha + 'T17:00:00.000Z'
   }));
 
   await insertAsChunks({
@@ -275,6 +276,10 @@ const run = async () => {
     .renameTable('temp_medicos', 'medicos')
     .renameTable('temp_clientes', 'clientes')
     .renameTable('temp_productos', 'productos');
+
+  await knex('ventas')
+    .where({ empresa: 'TecoGram S.A.' })
+    .update({ empresa: 'Teco-Gram S.A.' });
 };
 
 run()

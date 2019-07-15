@@ -1,4 +1,5 @@
 const {
+  busquedaProductoSchema,
   clienteInsertSchema,
   clienteRowSchema,
   getClienteSchemaForIdType,
@@ -9,6 +10,7 @@ const {
   ventaUpdateSchema,
   productoInsertSchema,
   productoUpdateSchema,
+  sanitizarId,
   ventaExamenInsertSchema,
   ventaExamenUpdateSchema
 } = require('facturacion_common/src/Validacion.js');
@@ -104,6 +106,29 @@ const validarVentaInsert = validateWithSchemaMiddleware(unsafeVenta => {
   }
 });
 
+const validarIdInParams = (req, res, next) => {
+  const { id } = req.params;
+  const sanitizedId = sanitizarId(id);
+  if (!sanitizedId) return sendBadArgumentsResponse(res, 'ID inválido: ' + id);
+
+  setSafeData(req, { id: sanitizedId });
+  next();
+};
+
+const validarBusquedaProductos = (req, res, next) => {
+  const { inputs, errors } = validateFormWithSchema(
+    busquedaProductoSchema,
+    req.query
+  );
+
+  if (errors) {
+    sendBadArgumentsResponse(res, errors);
+  } else {
+    setSafeData(req, inputs);
+    next();
+  }
+};
+
 module.exports = {
   validarBusqueda: (req, res, next) => {
     const q = req.query.q;
@@ -113,9 +138,11 @@ module.exports = {
     else next();
   },
 
+  validarBusquedaProductos,
   validarCliente: validarClienteMiddleware({ isInsert: true }),
   validarClienteUpdate: validarClienteMiddleware({ isInsert: false }),
 
+  validarIdInParams,
   validarMedico: validateWithSchemaMiddleware(medicoInsertSchema),
 
   validarNombreEmpresa,

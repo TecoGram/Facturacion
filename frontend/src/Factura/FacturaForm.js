@@ -84,6 +84,7 @@ const ClienteDataRow = props => {
       />
       <IconBox icon={AddShoppingCart} />
       <ProductoAutoComplete
+        isExamen={props.isExamen}
         width={width}
         onNewItemSelected={props.onNewProduct}
       />
@@ -192,14 +193,8 @@ export default class FacturaForm extends Component {
       isExamen
     } = this.props;
 
-    let formHeight = '130px';
-    let pacienteRow = null;
-
-    if (isExamen) {
-      //renderizar cosas especificas para examenes
-      formHeight = '170px';
-      pacienteRow = <PacienteDataRow {...this.props} />;
-    }
+    const formHeight = isExamen ? '170px' : '130px';
+    const pacienteRow = isExamen ? <PacienteDataRow {...this.props} /> : null;
 
     return (
       <div style={{ height: formHeight }}>

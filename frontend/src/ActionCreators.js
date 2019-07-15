@@ -137,6 +137,7 @@ const creators = {
   },
 
   editarFactura(rowid) {
+    console.log('editarFactura', rowid);
     return cambiarPagina(EDITAR_FACTURA_PAGE, { ventaKey: rowid });
   },
 

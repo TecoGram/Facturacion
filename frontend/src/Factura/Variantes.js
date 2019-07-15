@@ -1,30 +1,40 @@
 import React from 'react';
 import FacturaEditorView from './FacturaEditorView';
 
-export const FacturaExamenEditorView = props => {
-  return <FacturaEditorView {...props} isExamen={true} />;
-};
-
 export const NuevaFacturaPage = props => {
-  return <FacturaEditorView {...props} ventaKey={undefined} isExamen={false} />;
+  return (
+    <FacturaEditorView
+      {...props}
+      key={0}
+      ventaKey={undefined}
+      isExamen={false}
+    />
+  );
 };
 
 export const EditarFacturaPage = props => {
-  return <FacturaEditorView {...props} isExamen={false} />;
+  return <FacturaEditorView {...props} key={props.ventaKey} isExamen={false} />;
 };
 
 export const NuevaFacturaExamenPage = props => {
-  return <FacturaEditorView {...props} ventaKey={undefined} isExamen={true} />;
+  return (
+    <FacturaEditorView
+      {...props}
+      key={0}
+      ventaKey={undefined}
+      isExamen={true}
+    />
+  );
 };
 
 export const EditarFacturaExamenPage = props => {
-  return <FacturaEditorView {...props} isExamen={true} />;
+  return <FacturaEditorView {...props} key={props.ventaKey} isExamen={true} />;
 };
 
 EditarFacturaPage.propTypes = {
-  ventaKey: React.PropTypes.object.isRequired,
+  ventaKey: React.PropTypes.number.isRequired
 };
 
 EditarFacturaExamenPage.propTypes = {
-  ventaKey: React.PropTypes.object.isRequired,
+  ventaKey: React.PropTypes.number.isRequired
 };

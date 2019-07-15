@@ -310,6 +310,8 @@ const SelectedPage = props => {
   const facturaEditorProps = {
     abrirLinkConSnackbar,
     mostrarErrorConSnackbar,
+    editarFactura,
+    editarFacturaExamen,
     abrirPagos,
     ...pageProps
   };
