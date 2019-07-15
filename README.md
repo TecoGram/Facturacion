@@ -10,7 +10,7 @@ Se recomienda usar versiones actuales de Google Chrome (>=56) o Firefox (>= 54) 
 
 Este sistema solo ha sido probado en Linux, debería de funcionar en cualquier distro que cumpla las siguientes dependencias:
 
-- Node.js (>= 8.12)
+- Node.js (>= 10.13)
 - Yarn (>= 1.10)
 - SQLite 3
 
@@ -34,7 +34,7 @@ Tercero, crea la base de datos.
 
 ```bash
 cd backend
-yarn build
+yarn init-db
 ```
 
 Ahora solo falta levantar el servidor
