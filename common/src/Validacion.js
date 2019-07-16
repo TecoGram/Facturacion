@@ -452,7 +452,7 @@ const ventaExamenUpdateSchema = ventaExamenSchema;
 
 const busquedaProductoSchema = {
   pagaIva: int({ min: 0, max: 1, fallback: null }),
-  queryString: string({ allowEmpty: true, fallback: '' }),
+  queryString: string({ fallback: '' }),
   limit: int({ fallback: 5 })
 };
 

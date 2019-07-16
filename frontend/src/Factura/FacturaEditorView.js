@@ -111,7 +111,7 @@ export default class FacturaEditorView extends Component {
   editarFactura = ventaId => {
     const { ventaKey, isExamen } = this.props;
     if (ventaId === ventaKey)
-      updateState(this, { type: Actions.cerrarComprobanteDialog });
+      return updateState(this, { type: Actions.cerrarComprobanteDialog });
 
     const editarFn = isExamen
       ? this.props.editarFacturaExamen
