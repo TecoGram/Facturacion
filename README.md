@@ -8,7 +8,7 @@ Se recomienda usar versiones actuales de Google Chrome (>=56) o Firefox (>= 54) 
 
 ## Dependencias
 
-Este sistema solo ha sido probado en Linux, debería de funcionar en cualquier distro que cumpla las siguientes dependencias:
+Este sistema solo ha sido probado en Linux, debería de funcionar en cualquier sistema que cumpla las siguientes dependencias:
 
 - Node.js (>= 10.13)
 - Yarn (>= 1.10)
@@ -16,13 +16,24 @@ Este sistema solo ha sido probado en Linux, debería de funcionar en cualquier d
 
 ## Setup
 
-Primero, clona este repositorio e instala el paquete.
+Primero, clona este repositorio, instala todos los paquetes linkeando `common` con `yarn`.
 
 ```bash
 git clone https://github.com/GAumala/Facturacion
-cd Facturacion
-yarn install 
+cd Facturacion/common
+yarn --frozen-lockfile
+yarn link
+
+cd ../frontend
+yarn link facturacion_common
+yarn --frozen-lockfile
+
+cd ../backend
+yarn link facturacion_common
+yarn --frozen-lockfile
 ```
+
+
 Segundo, crea el build de producción del React App. 
 
 ```bash
