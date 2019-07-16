@@ -109,27 +109,27 @@ const splitIntoChunks = (array, maxSize) => {
 };
 /* eslint-enable fp/no-let, fp/no-loops, fp/no-mutation */
 
-const insertAsChunks = ({ array, tableName, maxSize }) => {
+const insertAsChunks = (trx, { array, tableName, maxSize }) => {
   const chunks = splitIntoChunks(array, maxSize);
-  const promises = chunks.map(values => knex(tableName).insert(values));
+  const promises = chunks.map(values => trx(tableName).insert(values));
   return Promise.all(promises);
 };
 
-const copyClientes = async () => {
-  const oldClientes = await knex.select().from('clientes');
+const copyClientes = async trx => {
+  const oldClientes = await trx.select().from('clientes');
   const newClientes = oldClientes.map(({ ruc, ...c }) => ({
     ...c,
     tipo: ruc.length === 13 ? 'ruc' : 'cedula',
     id: ruc
   }));
 
-  await insertAsChunks({
+  await insertAsChunks(trx, {
     array: newClientes,
     tableName: 'temp_clientes',
     maxSize: 80
   });
 
-  const insertedClientes = await knex
+  const insertedClientes = await trx
     .select(['rowid', 'id'])
     .from('temp_clientes');
   const clientesMap = insertedClientes.reduce((res, row) => {
@@ -155,8 +155,8 @@ const convertFormaPagoIndexToKey = index => {
 
 const float2int = f => Math.floor(f * 10000);
 
-const copyVentas = async clientesMap => {
-  const oldVentas = await knex.select().from('ventas');
+const copyVentas = async (trx, clientesMap) => {
+  const oldVentas = await trx.select().from('ventas');
   const newVentas = oldVentas.map(({ formaPago, ...v }) => ({
     ...v,
     cliente: clientesMap[v.cliente],
@@ -165,13 +165,13 @@ const copyVentas = async clientesMap => {
     fecha: v.fecha + 'T17:00:00.000Z'
   }));
 
-  await insertAsChunks({
+  await insertAsChunks(trx, {
     array: newVentas,
     tableName: 'temp_ventas',
     maxSize: 3
   });
 
-  const insertedVentas = await knex
+  const insertedVentas = await trx
     .select(['rowid', 'empresa', 'codigo'])
     .from('temp_ventas');
   const ventasMap = insertedVentas.reduce((res, row) => {
@@ -184,7 +184,7 @@ const copyVentas = async clientesMap => {
     valor: calcularTotalVentaRow(v)
   }));
 
-  await insertAsChunks({
+  await insertAsChunks(trx, {
     array: pagos,
     tableName: 'pagos',
     maxSize: 300
@@ -193,8 +193,8 @@ const copyVentas = async clientesMap => {
   return ventasMap;
 };
 
-const copyExamenInfoRows = async ventasMap => {
-  const oldRows = await knex.select().from('examen_info');
+const copyExamenInfoRows = async (trx, ventasMap) => {
+  const oldRows = await trx.select().from('examen_info');
   const newRows = oldRows.map(oldRow => {
     const { medico_id, codigoVenta, empresaVenta, ...o } = oldRow;
     const ventaId = ventasMap[empresaVenta + codigoVenta];
@@ -205,15 +205,15 @@ const copyExamenInfoRows = async ventasMap => {
     };
   });
 
-  await insertAsChunks({
+  await insertAsChunks(trx, {
     array: newRows,
     tableName: 'temp_examen_info',
     maxSize: 140
   });
 };
 
-const copyUnidades = async ventasMap => {
-  const oldRows = await knex.select().from('unidades');
+const copyUnidades = async (trx, ventasMap) => {
+  const oldRows = await trx.select().from('unidades');
   const newRows = oldRows.map(oldRow => {
     const { codigoVenta, empresaVenta, ...o } = oldRow;
     const ventaId = ventasMap[empresaVenta + codigoVenta];
@@ -224,15 +224,15 @@ const copyUnidades = async ventasMap => {
       precioVenta
     };
   });
-  await insertAsChunks({
+  await insertAsChunks(trx, {
     array: newRows,
     tableName: 'temp_unidades',
     maxSize: 120
   });
 };
 
-const copyProductos = async () => {
-  const oldRows = await knex.select().from('productos');
+const copyProductos = async trx => {
+  const oldRows = await trx.select().from('productos');
   const newRows = oldRows.map(oldRow => {
     const { precioVenta, precioDist, ...o } = oldRow;
     return {
@@ -241,15 +241,15 @@ const copyProductos = async () => {
       precioDist: float2int(precioDist)
     };
   });
-  await insertAsChunks({
+  await insertAsChunks(trx, {
     array: newRows,
     tableName: 'temp_productos',
     maxSize: 120
   });
 };
 
-const run = async () => {
-  await knex.schema
+const run = async trx => {
+  await trx.schema
     .createTable('temp_productos', crearTablaProductos)
     .createTable('temp_clientes', crearTablaClientes)
     .createTable('temp_medicos', crearTablaMedicos)
@@ -258,12 +258,13 @@ const run = async () => {
     .createTable('temp_unidades', crearTablaUnidades)
     .createTable('pagos', crearTablaPagos)
     .createTable('comprobantes', crearTablaComprobantes);
-  await copyProductos();
-  const clientesMap = await copyClientes();
-  const ventasMap = await copyVentas(clientesMap);
-  await Promise.all([copyExamenInfoRows(ventasMap), copyUnidades(ventasMap)]);
+  await copyProductos(trx);
+  const clientesMap = await copyClientes(trx);
+  const ventasMap = await copyVentas(trx, clientesMap);
+  await copyExamenInfoRows(trx, ventasMap);
+  await copyUnidades(trx, ventasMap);
 
-  await knex.schema
+  await trx.schema
     .dropTable('unidades')
     .dropTable('examen_info')
     .dropTable('ventas')
@@ -277,12 +278,13 @@ const run = async () => {
     .renameTable('temp_clientes', 'clientes')
     .renameTable('temp_productos', 'productos');
 
-  await knex('ventas')
+  await trx('ventas')
     .where({ empresa: 'TecoGram S.A.' })
     .update({ empresa: 'Teco-Gram S.A.' });
 };
 
-run()
+knex
+  .transaction(run)
   .then(() => console.log('ok'))
   .catch(err => console.log('failed: ' + err))
   .then(() => knex.destroy());
