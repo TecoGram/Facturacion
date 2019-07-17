@@ -140,8 +140,11 @@ class MainSnackbar extends React.Component {
       open = true;
       message = data.message;
       if (data.link) {
-        action = 'ABRIR';
-        onActionTouchTap = () => window.open(data.link);
+        action = (
+          <a rel={'noopener'} target={'_blank'} href={data.link}>
+            ABRIR
+          </a>
+        );
       }
       if (data.duration) duration = data.duration;
     } else {
@@ -153,20 +156,15 @@ class MainSnackbar extends React.Component {
   };
 
   render() {
-    const {
-      action,
-      message,
-      open,
-      duration,
-      onActionTouchTap
-    } = this.getDataFromProps(this.props);
+    const { action, message, open, duration } = this.getDataFromProps(
+      this.props
+    );
 
     return (
       <Snackbar
         open={open}
         message={message}
         action={action}
-        onActionTouchTap={onActionTouchTap}
         autoHideDuration={duration || 12000}
       />
     );
@@ -291,6 +289,7 @@ class MainToolbar extends Component {
 const SelectedPage = props => {
   const {
     abrirLinkConSnackbar,
+    clearFacturaEditorOk,
     mostrarErrorConSnackbar,
     ajustes,
     page,
@@ -312,6 +311,7 @@ const SelectedPage = props => {
     mostrarErrorConSnackbar,
     editarFactura,
     editarFacturaExamen,
+    clearFacturaEditorOk,
     abrirPagos,
     ...pageProps
   };
@@ -378,6 +378,7 @@ class Main extends Component {
   render() {
     const {
       abrirLinkConSnackbar,
+      clearFacturaEditorOk,
       mostrarErrorConSnackbar,
       editarCliente,
       editarProducto,
@@ -409,6 +410,7 @@ class Main extends Component {
           editarFacturaExamen={editarFacturaExamen}
           abrirLinkConSnackbar={abrirLinkConSnackbar}
           mostrarErrorConSnackbar={mostrarErrorConSnackbar}
+          clearFacturaEditorOk={clearFacturaEditorOk}
           abrirPagos={abrirPagos}
         />
         <MainDrawer

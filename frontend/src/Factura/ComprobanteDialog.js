@@ -19,12 +19,15 @@ export default class ComprobanteDialog extends Component {
 
     this.setState({ type: 'loading' });
     API.emitirComprobante(ventaId)
-      .then(() => {
+      .then(res => {
         this.setState(
           {
             type: 'idle'
           },
-          this.props.cerrarConMsg('Comprobante emitido exitosamente')
+          this.props.cerrarConMsg(
+            'Comprobante emitido exitosamente',
+            res.body.id
+          )
         );
       })
       .catch(err => {

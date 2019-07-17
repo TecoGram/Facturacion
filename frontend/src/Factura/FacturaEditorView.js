@@ -11,6 +11,8 @@ import { createReducer, getDefaultState } from './EditorReducers.js';
 import { updateState } from '../Arch.js';
 import { calcularValoresFacturables } from 'facturacion_common/src/Math.js';
 
+const getDatilURL = id => `https://app.datil.co/ver/${id}/pdf`;
+
 export default class FacturaEditorView extends Component {
   constructor(props) {
     super(props);
@@ -62,7 +64,7 @@ export default class FacturaEditorView extends Component {
       const pdfLink = getFacturaURL(extras.rowid);
       window.open(pdfLink);
       const msg = this.getInsertOkMsg(editar);
-      this.props.abrirLinkConSnackbar(msg, pdfLink);
+      this.props.clearFacturaEditorOk(msg, pdfLink);
     };
 
     updateState(this, {
@@ -103,9 +105,11 @@ export default class FacturaEditorView extends Component {
     }
   };
 
-  resetearConMsg = msg => {
+  resetearConMsg = (msg, id) => {
     updateState(this, { type: Actions.getDefaultState });
-    Promise.resolve().then(() => this.props.mostrarErrorConSnackbar(msg));
+    const pdfLink = getDatilURL(id);
+    window.open(pdfLink);
+    Promise.resolve().then(() => this.props.clearFacturaEditorOk(msg, pdfLink));
   };
 
   editarFactura = ventaId => {
@@ -209,8 +213,8 @@ export default class FacturaEditorView extends Component {
 
 FacturaEditorView.propTypes = {
   abrirPagos: React.PropTypes.func.isRequired,
-  abrirLinkConSnackbar: React.PropTypes.func.isRequired,
   mostrarErrorConSnackbar: React.PropTypes.func.isRequired,
+  clearFacturaEditorOk: React.PropTypes.func.isRequired,
   editarFactura: React.PropTypes.func.isRequired,
   editarFacturaExamen: React.PropTypes.func.isRequired,
   isExamen: React.PropTypes.bool,

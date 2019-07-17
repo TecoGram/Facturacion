@@ -24,8 +24,17 @@ import {
   CAMBIAR_PAGE_ACTION,
   CERRAR_DIALOG_CON_MSG_ACTION,
   ABRIR_LINK_CON_SNACKBAR,
-  MOSTRAR_ERROR_CON_SNACKBAR
+  MOSTRAR_ERROR_CON_SNACKBAR,
+  CLEAR_FACTURA_EDITOR_OK
 } from './ActionTypes';
+
+const clearFacturaEditorOk = (message, link) => {
+  return {
+    type: CLEAR_FACTURA_EDITOR_OK,
+    message,
+    link
+  };
+};
 
 const cambiarPagina = (tipoPagina, props) => {
   switch (tipoPagina) {
@@ -168,7 +177,9 @@ const creators = {
       message: msg,
       duration: 5000
     };
-  }
+  },
+
+  clearFacturaEditorOk
 };
 
 export default creators;
