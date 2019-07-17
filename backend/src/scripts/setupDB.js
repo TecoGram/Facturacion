@@ -5,7 +5,7 @@ const {
   borrarTablaExamenInfo,
   borrarTablaMedicos,
   borrarTablaProductos,
-  borrarTablaStock,
+  borrarTablaProductosFts,
   borrarTablaUnidades,
   borrarTablaVentas,
   borrarTablaComprobantes,
@@ -13,9 +13,9 @@ const {
   crearTablaClientes,
   crearTablaExamenInfo,
   crearTablaMedicos,
-  crearTablaProductos,
-  crearTablaStock,
   crearTablaPagos,
+  crearTablaProductos,
+  crearTablaProductosFtsRaw,
   crearTablaUnidades,
   crearTablaVentas,
   crearTablaComprobantes
@@ -23,11 +23,11 @@ const {
 
 const crearTablas = () =>
   knex.schema
+    .raw(crearTablaProductosFtsRaw)
     .createTable('productos', crearTablaProductos)
     .createTable('clientes', crearTablaClientes)
     .createTable('medicos', crearTablaMedicos)
     .createTable('ventas', crearTablaVentas)
-    .createTable('stock', crearTablaStock)
     .createTable('examen_info', crearTablaExamenInfo)
     .createTable('pagos', crearTablaPagos)
     .createTable('unidades', crearTablaUnidades)
@@ -36,9 +36,9 @@ const crearTablas = () =>
 const borrarTodasLasFilas = () =>
   borrarTablaUnidades()
     .then(borrarTablaExamenInfo)
-    .then(borrarTablaStock)
     .then(borrarTablaVentas)
     .then(borrarTablaProductos)
+    .then(borrarTablaProductosFts)
     .then(borrarTablaClientes)
     .then(borrarTablaMedicos)
     .then(borrarTablaComprobantes);

@@ -62,11 +62,21 @@ const deleteVenta = rowid => {
     .del();
 };
 
-const deleteProducto = rowid => {
-  return knex('productos')
-    .where({ rowid })
-    .del();
-};
+const deleteProducto = rowid =>
+  knex.transaction(async trx => {
+    const [oldRow] = await trx
+      .select('ftsid')
+      .from('productos')
+      .where({ rowid });
+    if (!oldRow) return 0;
+
+    await trx('productos')
+      .where({ rowid })
+      .del();
+    return trx('productosFts')
+      .where({ rowid: oldRow.ftsid })
+      .del();
+  });
 
 const deleteCliente = (tipo, id) => {
   return knex('clientes')
@@ -148,18 +158,19 @@ const getCliente = rowid => {
 const getUnidadesFromVenta = ventaId => {
   return knex
     .select(
-      'productos.nombre',
+      'productosFts.nombre',
       'unidades.producto',
       'unidades.count',
       'unidades.precioVenta',
       'productos.codigo',
       'productos.pagaIva',
-      'productos.marca',
+      'productosFts.marca',
       'unidades.lote',
       'unidades.fechaExp'
     )
     .from('unidades')
     .join('productos', { 'unidades.producto': 'productos.rowid' })
+    .join('productosFts', { 'productosFts.rowid': 'productos.ftsid' })
     .where({ ventaId });
 };
 
@@ -238,29 +249,38 @@ const buscarEnTabla = (tabla, columna, queryString, limit) => {
 };
 
 const findProductos = ({ pagaIva, queryString, limit }) => {
-  const query = knex
+  if (queryString) {
+    const baseQuery = knex
+      .select([
+        'rowid',
+        'nombre',
+        'marca',
+        'precioVenta',
+        'precioDist',
+        'codigo',
+        'pagaIva'
+      ])
+      .from('productos')
+      .join('productosFts', { 'productos.ftsid': 'productosFts.rowid' })
+      .where('productosFts.nombre', 'MATCH', queryString + '*')
+      .limit(limit);
+
+    if (typeof pagaIva === 'number') return baseQuery.where({ pagaIva });
+
+    return baseQuery;
+  }
+
+  if (typeof pagaIva === 'number')
+    return knex
+      .select('*')
+      .from('productos')
+      .where({ pagaIva })
+      .limit(limit);
+
+  return knex
     .select('*')
     .from('productos')
     .limit(limit);
-
-  if (typeof pagaIva === 'number' && queryString !== '')
-    return query
-      .where({ pagaIva })
-      .where('nombreAscii', 'like', `%${queryString}%`);
-
-  if (queryString !== '')
-    return query.where('nombreAscii', 'like', `%${queryString}%`);
-
-  return query;
-};
-
-const updateProducto = producto => {
-  const { rowid, nombre } = producto;
-  const nombreAscii = convertToAscii(nombre);
-  return knex
-    .table('productos')
-    .where({ rowid })
-    .update({ ...producto, nombreAscii });
 };
 
 const updateCliente = row => {
@@ -299,13 +319,37 @@ const ventaExiste = async rowid => {
   return count > 0;
 };
 
+const insertarProducto = params =>
+  knex.transaction(async trx => {
+    const { nombre, marca, ...producto } = params;
+    const [ftsid] = await trx.table('productosFts').insert({ nombre, marca });
+    return trx
+      .table('productos')
+      .insert({ ...producto, ftsid, nombreUnique: nombre });
+  });
+
+const updateProducto = params =>
+  knex.transaction(async trx => {
+    const { nombre, marca, ...producto } = params;
+    const [oldRecord] = await trx
+      .select('ftsid')
+      .table('productos')
+      .where({ rowid: params.rowid });
+    if (!oldRecord) return 0;
+
+    await trx
+      .table('productosFts')
+      .where({ rowid: oldRecord.ftsid })
+      .update({ nombre, marca });
+    return trx
+      .table('productos')
+      .where({ rowid: params.rowid })
+      .update({ ...producto, nombreUnique: nombre });
+  });
+
 module.exports = {
   close: () => {
     knex.destroy();
-  },
-  insertarProducto: producto => {
-    const nombreAscii = convertToAscii(producto.nombre);
-    return knex.table('productos').insert({ ...producto, nombreAscii });
   },
 
   insertarCliente: async row => {
@@ -417,6 +461,9 @@ module.exports = {
     });
   },
 
+  deleteCliente,
+  deleteVenta,
+  deleteProducto,
   findAllVentas,
   findPagaIVAProductos,
   findProductos,
@@ -425,9 +472,7 @@ module.exports = {
   getComprobanteFromVenta,
   getExamenInfoFromVenta,
   getUnidadesFromVenta,
-  deleteCliente,
-  deleteVenta,
-  deleteProducto,
+  insertarProducto,
   tieneComprobante,
   updateCliente,
   updateProducto,

@@ -1,27 +1,18 @@
 const knex = require('./db.js');
 
+const crearTablaProductosFtsRaw =
+  'CREATE VIRTUAL TABLE productosFts USING fts4(nombre, marca);';
+
 const crearTablaProductos = table => {
   table.integer('rowid').primary();
   table.string('codigo', 10);
-  table.string('nombreAscii', 50);
-  table.string('nombre', 50);
-  table.string('marca', 30);
+  table.string('nombreUnique', 50);
+  table.integer('ftsid');
   table.integer('precioDist');
   table.integer('precioVenta');
   table.boolean('pagaIva');
 
-  table.unique('nombre');
-};
-
-const crearTablaStock = table => {
-  table
-    .integer('producto')
-    .unsigned()
-    .index();
-  table.string('lote', 10);
-  table.date('fechaExp');
-
-  table.foreign('producto').references('productos.rowid');
+  table.unique('nombreUnique');
 };
 
 const crearTablaClientes = table => {
@@ -134,7 +125,7 @@ const borrarTablaClientes = () => knex('clientes').truncate();
 const borrarTablaExamenInfo = () => knex('examen_info').truncate();
 const borrarTablaMedicos = () => knex('medicos').truncate();
 const borrarTablaProductos = () => knex('productos').truncate();
-const borrarTablaStock = () => knex('stock').truncate();
+const borrarTablaProductosFts = () => knex('productosFts').truncate();
 const borrarTablaUnidades = () => knex('unidades').truncate();
 const borrarTablaVentas = () => knex('ventas').truncate();
 const borrarTablaComprobantes = () => knex('comprobantes').truncate();
@@ -144,7 +135,7 @@ module.exports = {
   borrarTablaExamenInfo,
   borrarTablaMedicos,
   borrarTablaProductos,
-  borrarTablaStock,
+  borrarTablaProductosFts,
   borrarTablaUnidades,
   borrarTablaVentas,
   borrarTablaComprobantes,
@@ -154,7 +145,7 @@ module.exports = {
   crearTablaExamenInfo,
   crearTablaMedicos,
   crearTablaProductos,
-  crearTablaStock,
+  crearTablaProductosFtsRaw,
   crearTablaPagos,
   crearTablaUnidades,
   crearTablaVentas

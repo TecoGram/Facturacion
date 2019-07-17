@@ -83,7 +83,17 @@ describe('/producto/ endpoints', () => {
       });
 
       expect(res.status).toBe(200);
-      expect(res.body).toHaveLength(1);
+      expect(res.body).toEqual([
+        {
+          rowid: expect.any(Number),
+          codigo: 'rytertg663433g',
+          nombre: 'TGO 8x50',
+          marca: 'TECO',
+          precioDist: 399900,
+          precioVenta: 499900,
+          pagaIva: 1
+        }
+      ]);
     });
 
     it('retorna 404 si no encuentra productos', () =>
