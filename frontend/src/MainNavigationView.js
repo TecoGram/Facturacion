@@ -1,4 +1,11 @@
 import React, { Component, PropTypes } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+  Switch,
+  withRouter
+} from 'react-router-dom';
 
 import Add from 'material-ui/svg-icons/content/add';
 import ExitToApp from 'material-ui/svg-icons/action/exit-to-app';
@@ -13,67 +20,35 @@ import IconButton from 'material-ui/IconButton';
 import Snackbar from 'material-ui/Snackbar';
 import NavigationMenu from 'material-ui/svg-icons/navigation/menu';
 
-import { bindActionCreators } from 'redux';
-import { connect, Provider } from 'react-redux';
-
-import {
-  CLIENTE_DIALOG,
-  PRODUCTO_DIALOG,
-  MEDICO_DIALOG,
-  PAGOS_DIALOG
-} from './DialogTypes';
-import {
-  NEW_FACTURA_PAGE,
-  EDITAR_FACTURA_PAGE,
-  NEW_FACTURA_EXAMEN_PAGE,
-  EDITAR_FACTURA_EXAMEN_PAGE,
-  FACTURA_LIST_PAGE,
-  CLIENTE_LIST_PAGE,
-  PRODUCTO_LIST_PAGE
-} from './PageTypes';
-
-import ActionCreators from './ActionCreators';
 import * as CustomStyle from './CustomStyle';
 import MainDialog from './MainDialog';
-import {
-  NuevaFacturaPage,
-  EditarFacturaPage,
-  NuevaFacturaExamenPage,
-  EditarFacturaExamenPage
-} from './Factura/Variantes';
+import ClienteForm from './NuevoCliente/ClienteForm.js';
+import ProductoForm from './NuevoProducto/ProductoForm.js';
+import MedicoForm from './NuevoMedico/MedicoForm.js';
 import FacturasListView from './FacturasList/FacturasListView';
 import ClientesListView from './ClientesList/ClientesListView';
 import ProductosListView from './ProductosList/ProductosListView';
-import store from './Store';
+import FacturaEditorView from './Factura/FacturaEditorView';
 import appSettings from './Ajustes';
-
+import * as Actions from './MainActions.js';
+import { createReducer, getDefaultState } from './MainReducers.js';
+import { updateState } from './Arch.js';
 const toolbarTextColor = '#FFFFFF';
 const toolbarTitleStyle = {
   color: toolbarTextColor,
   fontFamily: 'Roboto'
 };
 
-function mapStateToProps(state) {
-  return {
-    dialog: state.dialog,
-    ajustes: state.ajustes,
-    snackbar: state.snackbar,
-    page: state.page
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators(ActionCreators, dispatch);
-}
-
 const redirectEmpresa = redirigirAMain => {
   if (redirigirAMain) window.location = '/app?empresa=0';
   else window.location = '/app?empresa=1';
 };
 
-const MainDrawer = props => {
-  const cp = page => {
-    props.onPageSelected(page);
+const MainDrawer = withRouter(props => {
+  const redirectAndClose = path => {
+    props.handleChange(false);
+    // change location after drawer closes
+    setTimeout(() => props.history.push(path), 300);
   };
 
   return (
@@ -83,33 +58,36 @@ const MainDrawer = props => {
       open={props.open}
       onRequestChange={props.handleChange}
     >
-      <MenuItem onTouchTap={() => cp(NEW_FACTURA_PAGE)} leftIcon={<Add />}>
+      <MenuItem
+        onTouchTap={() => redirectAndClose('/factura/edit/new')}
+        leftIcon={<Add />}
+      >
         Factura
       </MenuItem>
       <MenuItem
-        onTouchTap={() => cp(NEW_FACTURA_EXAMEN_PAGE)}
+        onTouchTap={() => redirectAndClose('/factura_examen/edit/new')}
         leftIcon={<Add />}
       >
         Factura Examen
       </MenuItem>
       <Divider />
       <MenuItem
-        onTouchTap={() => cp(CLIENTE_LIST_PAGE)}
+        onTouchTap={() => redirectAndClose('/clientes')}
         leftIcon={<ViewList />}
       >
         Clientes
       </MenuItem>
       <MenuItem
-        onTouchTap={() => cp(FACTURA_LIST_PAGE)}
-        leftIcon={<ViewList />}
-      >
-        Facturas
-      </MenuItem>
-      <MenuItem
-        onTouchTap={() => cp(PRODUCTO_LIST_PAGE)}
+        onTouchTap={() => redirectAndClose('/productos')}
         leftIcon={<ViewList />}
       >
         Productos
+      </MenuItem>
+      <MenuItem
+        onTouchTap={() => redirectAndClose('/facturas')}
+        leftIcon={<ViewList />}
+      >
+        Facturas
       </MenuItem>
       <Divider />
       {appSettings.empresas.map((empresaName, index) => {
@@ -125,54 +103,42 @@ const MainDrawer = props => {
       })}
     </Drawer>
   );
+});
+
+MainDrawer.propTypes = {
+  handleChange: React.PropTypes.func.isRequired
 };
 
 class MainSnackbar extends React.Component {
-  shouldComponentUpdate(nextProps) {
-    if (this.props.data !== nextProps.data) return true;
-    return false;
-  }
-
-  getDataFromProps = props => {
-    const data = props.data;
-    let action, message, open, onActionTouchTap, duration;
-    if (data) {
-      open = true;
-      message = data.message;
-      if (data.link) {
-        action = (
-          <a rel={'noopener'} target={'_blank'} href={data.link}>
-            ABRIR
-          </a>
-        );
-      }
-      if (data.duration) duration = data.duration;
-    } else {
-      open = false;
-      message = '';
-    }
-
-    return { action, message, open, onActionTouchTap, duration };
-  };
-
   render() {
-    const { action, message, open, duration } = this.getDataFromProps(
-      this.props
+    const { message, link, cerrarSnackbar } = this.props;
+
+    const action = link && (
+      <a rel={'noopener'} target={'_blank'} href={link}>
+        ABRIR
+      </a>
     );
 
     return (
       <Snackbar
-        open={open}
-        message={message}
+        open={!!message}
+        message={message || ''}
         action={action}
-        autoHideDuration={duration || 12000}
+        autoHideDuration={12000}
+        onRequestClose={cerrarSnackbar}
       />
     );
   }
 }
 
+MainSnackbar.propTypes = {
+  message: React.PropTypes.string,
+  link: React.PropTypes.string,
+  cerrarSnackbar: React.PropTypes.func.isRequired
+};
+
 class MainToolbar extends Component {
-  getIconStyles(props, context) {
+  getIconStyles = context => {
     const {
       appBar,
       toolbar,
@@ -198,7 +164,7 @@ class MainToolbar extends Component {
     };
 
     return styles;
-  }
+  };
 
   static contextTypes = {
     muiTheme: PropTypes.object.isRequired
@@ -206,11 +172,10 @@ class MainToolbar extends Component {
 
   render() {
     const { iconButtonStyle, iconButtonIconStyle } = this.getIconStyles(
-      this.props,
       this.context
     );
 
-    const { mostrarDialog, title, onLeftButtonClicked } = this.props;
+    const { mostrarNuevoItemDialog, title, onMenuButtonClicked } = this.props;
 
     const appBar = this.context.muiTheme.appBar;
 
@@ -220,7 +185,7 @@ class MainToolbar extends Component {
           <IconButton
             style={iconButtonStyle}
             iconStyle={iconButtonIconStyle}
-            onTouchTap={onLeftButtonClicked}
+            onTouchTap={onMenuButtonClicked}
           >
             <NavigationMenu />
           </IconButton>
@@ -243,15 +208,15 @@ class MainToolbar extends Component {
           >
             <MenuItem
               primaryText="Nuevo Producto"
-              onTouchTap={() => mostrarDialog(PRODUCTO_DIALOG)}
+              onTouchTap={() => mostrarNuevoItemDialog(ProductoForm)}
             />
             <MenuItem
               primaryText="Nuevo Cliente"
-              onTouchTap={() => mostrarDialog(CLIENTE_DIALOG)}
+              onTouchTap={() => mostrarNuevoItemDialog(ClienteForm)}
             />
             <MenuItem
               primaryText="Nuevo Medico"
-              onTouchTap={() => mostrarDialog(MEDICO_DIALOG)}
+              onTouchTap={() => mostrarNuevoItemDialog(MedicoForm)}
             />
           </IconMenu>
           <IconMenu
@@ -267,18 +232,15 @@ class MainToolbar extends Component {
             targetOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           >
-            <MenuItem
-              primaryText="TecoGram S.A."
-              onTouchTap={() => {
-                redirectEmpresa(true);
-              }}
-            />
-            <MenuItem
-              primaryText="Biocled"
-              onTouchTap={() => {
-                redirectEmpresa(false);
-              }}
-            />
+            {appSettings.empresas.map((empresaName, index) => {
+              return (
+                <MenuItem
+                  key={index}
+                  primaryText={empresaName}
+                  onTouchTap={() => redirectEmpresa(index === 0)}
+                />
+              );
+            })}
           </IconMenu>
         </ToolbarGroup>
       </Toolbar>
@@ -286,144 +248,11 @@ class MainToolbar extends Component {
   }
 }
 
-const SelectedPage = props => {
-  const {
-    abrirLinkConSnackbar,
-    clearFacturaEditorOk,
-    mostrarErrorConSnackbar,
-    ajustes,
-    page,
-    editarCliente,
-    editarProducto,
-    editarFactura,
-    editarFacturaExamen,
-    abrirPagos
-  } = props;
-
-  const commonProps = {
-    ajustes
-  };
-
-  const pageProps = { ...commonProps, ...page.props };
-
-  const facturaEditorProps = {
-    abrirLinkConSnackbar,
-    mostrarErrorConSnackbar,
-    editarFactura,
-    editarFacturaExamen,
-    clearFacturaEditorOk,
-    abrirPagos,
-    ...pageProps
-  };
-
-  switch (page.type) {
-    case NEW_FACTURA_PAGE:
-      return <NuevaFacturaPage {...facturaEditorProps} />;
-    case EDITAR_FACTURA_PAGE:
-      return <EditarFacturaPage {...facturaEditorProps} />;
-    case NEW_FACTURA_EXAMEN_PAGE:
-      return <NuevaFacturaExamenPage {...facturaEditorProps} />;
-    case EDITAR_FACTURA_EXAMEN_PAGE:
-      return <EditarFacturaExamenPage {...facturaEditorProps} />;
-    case FACTURA_LIST_PAGE:
-      return (
-        <FacturasListView
-          editarFactura={editarFactura}
-          editarFacturaExamen={editarFacturaExamen}
-          {...pageProps}
-        />
-      );
-    case CLIENTE_LIST_PAGE:
-      return (
-        <ClientesListView
-          mostrarErrorConSnackbar={mostrarErrorConSnackbar}
-          editarCliente={editarCliente}
-          {...pageProps}
-        />
-      );
-    case PRODUCTO_LIST_PAGE:
-      return (
-        <ProductosListView
-          mostrarErrorConSnackbar={mostrarErrorConSnackbar}
-          editarProducto={editarProducto}
-          {...pageProps}
-        />
-      );
-    default:
-      return null;
-  }
+MainToolbar.propTypes = {
+  title: React.PropTypes.string.isRequired,
+  mostrarNuevoItemDialog: React.PropTypes.func.isRequired,
+  onMenuButtonClicked: React.PropTypes.func.isRequired
 };
-
-class Main extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      drawerOpen: false
-    };
-  }
-
-  handleDrawerChange = value => {
-    this.setState({
-      drawerOpen: value
-    });
-  };
-
-  onPageSelected = newPage => {
-    this.setState({
-      drawerOpen: false
-    });
-    this.props.cambiarPagina(newPage, {});
-  };
-
-  render() {
-    const {
-      abrirLinkConSnackbar,
-      clearFacturaEditorOk,
-      mostrarErrorConSnackbar,
-      editarCliente,
-      editarProducto,
-      editarFactura,
-      editarFacturaExamen,
-      mostrarDialog,
-      cerrarDialogConMsg,
-      dialog,
-      ajustes,
-      snackbar,
-      page
-    } = this.props;
-    const abrirPagos = extras => mostrarDialog(PAGOS_DIALOG, extras);
-    const dialogProps = { ...dialog, cerrarDialog: cerrarDialogConMsg };
-
-    return (
-      <div style={{ backgroundColor: '#ededed', height: 'inherit' }}>
-        <MainToolbar
-          mostrarDialog={mostrarDialog}
-          title={ajustes.empresa}
-          onLeftButtonClicked={() => this.handleDrawerChange(true)}
-        />
-        <SelectedPage
-          ajustes={ajustes}
-          page={page}
-          editarCliente={editarCliente}
-          editarProducto={editarProducto}
-          editarFactura={editarFactura}
-          editarFacturaExamen={editarFacturaExamen}
-          abrirLinkConSnackbar={abrirLinkConSnackbar}
-          mostrarErrorConSnackbar={mostrarErrorConSnackbar}
-          clearFacturaEditorOk={clearFacturaEditorOk}
-          abrirPagos={abrirPagos}
-        />
-        <MainDrawer
-          open={this.state.drawerOpen}
-          handleChange={this.handleDrawerChange}
-          onPageSelected={this.onPageSelected}
-        />
-        <MainDialog {...dialogProps} />
-        <MainSnackbar data={snackbar} />
-      </div>
-    );
-  }
-}
 /**
  * This component is meant to be the root container of your app. You should
  * render it in a div that is the only child of the body tag. That div should
@@ -434,18 +263,152 @@ class Main extends Component {
  * all  height available it won't render properly.
  */
 export default class MainNavigationView extends Component {
-  render() {
-    const MainComponent = connect(
-      mapStateToProps,
-      mapDispatchToProps
-    )(Main);
-    const muiTheme = CustomStyle.getEmpresaTheme(appSettings.main);
+  constructor(props) {
+    super(props);
+    this.createReducer = createReducer;
+    this.state = getDefaultState();
+  }
+
+  toggleDrawerMenu = drawerOpen => {
+    updateState(this, { type: Actions.toggleDrawerMenu, drawerOpen });
+  };
+
+  mostrarNuevoItemDialog = Component => {
+    updateState(this, { type: Actions.mostrarInputDialog, Component });
+  };
+
+  cerrarInputDialog = message => {
+    updateState(this, { type: Actions.cerrarInputDialog, message });
+  };
+
+  abrirPagos = params => {
+    updateState(this, { type: Actions.mostrarInputDialog, ...params });
+  };
+
+  mostrarSnackbar = (message, link) => {
+    updateState(this, { type: Actions.mostrarSnackbar, message, link });
+  };
+
+  cerrarSnackbar = () => {
+    updateState(this, { type: Actions.cerrarSnackbar });
+  };
+
+  editarCliente = editar => {
+    updateState(this, {
+      type: Actions.mostrarInputDialog,
+      Component: ClienteForm,
+      editar
+    });
+  };
+
+  editarProducto = editar => {
+    updateState(this, {
+      type: Actions.mostrarInputDialog,
+      Component: ProductoForm,
+      editar
+    });
+  };
+
+  redirectToNewFactura = () => <Redirect to={'/factura/edit/new'} />;
+
+  clientesList = routeProps => {
     return (
-      <Provider store={store}>
-        <MuiThemeProvider muiTheme={muiTheme}>
-          <MainComponent />
-        </MuiThemeProvider>
-      </Provider>
+      <ClientesListView
+        editarCliente={this.editarCliente}
+        mostrarErrorConSnackbar={this.mostrarSnackbar}
+      />
+    );
+  };
+
+  productosList = routeProps => {
+    return (
+      <ProductosListView
+        editarProducto={this.editarProducto}
+        mostrarErrorConSnackbar={this.mostrarErrorConSnackbar}
+      />
+    );
+  };
+
+  facturasList = routeProps => {
+    const redirect = path => routeProps.history.push(path);
+    const editarFactura = id => redirect('/factura/edit/' + id);
+    const editarFacturaExamen = id => redirect('/factura_examen/edit/' + id);
+    return (
+      <FacturasListView
+        editarFacturaExamen={editarFacturaExamen}
+        editarFactura={editarFactura}
+      />
+    );
+  };
+
+  facturaEditor = routeProps => {
+    const { match, history } = routeProps;
+    const { id } = match.params;
+    const isExamen = match.path.startsWith('/factura_examen/edit');
+
+    const redirect = path => history.push(path);
+    const editarFactura = id => redirect('/factura/edit/' + id);
+    const editarFacturaExamen = id => redirect('/factura_examen/edit/' + id);
+
+    const clearFacturaEditorOk = (message, link) => {
+      this.mostrarSnackbar(message, link);
+      if (isExamen) redirect('/factura_examen/edit/new');
+      else redirect('/factura/edit/new');
+    };
+
+    return (
+      <FacturaEditorView
+        clearFacturaEditorOk={clearFacturaEditorOk}
+        editarFactura={editarFactura}
+        editarFacturaExamen={editarFacturaExamen}
+        abrirPagos={this.abrirPagos}
+        mostrarErrorConSnackbar={this.mostrarSnackbar}
+        isExamen={isExamen}
+        ventaId={id}
+        key={id}
+      />
+    );
+  };
+
+  render() {
+    const muiTheme = CustomStyle.getEmpresaTheme(appSettings.main);
+    const { drawerOpen, dialog, snackbar } = this.state;
+
+    return (
+      <MuiThemeProvider muiTheme={muiTheme}>
+        <div style={{ backgroundColor: '#ededed', height: 'inherit' }}>
+          <MainToolbar
+            mostrarNuevoItemDialog={this.mostrarNuevoItemDialog}
+            title={appSettings.empresa}
+            onMenuButtonClicked={() => this.toggleDrawerMenu(true)}
+          />
+          <Router basename="/app">
+            <div>
+              <Switch>
+                <Route
+                  path="/factura_examen/edit/:id"
+                  component={this.facturaEditor}
+                />
+                <Route
+                  path="/factura/edit/:id"
+                  component={this.facturaEditor}
+                />
+                <Route path="/productos" exact component={this.productosList} />
+                <Route path="/clientes" exact component={this.clientesList} />
+                <Route path="/facturas" exact component={this.facturasList} />
+
+                <Route component={this.redirectToNewFactura} />
+              </Switch>
+              <MainDrawer
+                open={drawerOpen}
+                handleChange={this.toggleDrawerMenu}
+              />
+            </div>
+          </Router>
+          <MainDialog {...dialog} cerrarDialog={this.cerrarInputDialog} />
+          <MainSnackbar {...snackbar} cerrarSnackbar={this.cerrarSnackbar} />
+        </div>
+      </MuiThemeProvider>
     );
   }
 }

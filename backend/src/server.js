@@ -44,7 +44,7 @@ app.get('/', (req, res) => {
 app.use('/', Express.static(path.join(__dirname, '../../frontend/build')));
 app.use(bodyParser.json()); // for parsing application/json
 
-app.get('/app', serveApp);
+app.get('/app*', serveApp);
 
 app.post('/cliente/new', validarCliente, (req, res) => {
   db.insertarCliente(req.safeData).then(

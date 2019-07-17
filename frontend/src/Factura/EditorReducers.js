@@ -236,8 +236,8 @@ const setMedico = ({ medicoRow }) => state => ({ ...state, medicoRow });
 
 const abortInsert = state => ({ ...state, emitiendo: false });
 
-const getVenta = ventaKey => {
-  return API.verVenta(ventaKey)
+const getVenta = ventaId => {
+  return API.verVenta(ventaId)
     .then(res => {
       return {
         type: Actions.editarFactura,
@@ -250,10 +250,10 @@ const getVenta = ventaKey => {
 };
 
 const getFacturaExistente = params => state => {
-  const { ventaKey } = params;
-  if (!ventaKey) return state;
+  const { ventaId } = params;
+  if (ventaId === 'new') return state;
 
-  return [state, getVenta(ventaKey)];
+  return [state, getVenta(ventaId)];
 };
 
 const mostrarComprobanteDialog = ({ ventaId }) => state => {

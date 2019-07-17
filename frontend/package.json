@@ -14,10 +14,8 @@
     "material-ui": "^0.18.7",
     "react": "15.4.2",
     "react-dom": "15.4.2",
-    "react-redux": "^5.0.5",
-    "react-router": "^2.8.1",
+    "react-router-dom": "^5.0.1",
     "react-tap-event-plugin": "2.0.1",
-    "redux": "^3.7.2",
     "typeface-roboto": "0.0.22"
   },
   "scripts": {

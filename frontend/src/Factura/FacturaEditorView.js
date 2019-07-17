@@ -10,6 +10,7 @@ import * as Actions from './EditorActions.js';
 import { createReducer, getDefaultState } from './EditorReducers.js';
 import { updateState } from '../Arch.js';
 import { calcularValoresFacturables } from 'facturacion_common/src/Math.js';
+import appSettings from '../Ajustes';
 
 const getDatilURL = id => `https://app.datil.co/ver/${id}/pdf`;
 
@@ -50,9 +51,9 @@ export default class FacturaEditorView extends Component {
       : 'La factura se guardó exitosamente';
 
   onGenerarFacturaClick = () => {
-    const { empresa, iva } = this.props.ajustes;
-    const { isExamen, ventaKey } = this.props;
-    const editar = !!ventaKey;
+    const { empresa, iva } = appSettings;
+    const { isExamen, ventaId } = this.props;
+    const editar = ventaId !== 'new';
 
     const config = { empresa, iva, isExamen, editar };
     const callback = ({ success, ...extras }) => {
@@ -75,10 +76,10 @@ export default class FacturaEditorView extends Component {
   };
 
   componentDidMount() {
-    const { ventaKey, isExamen } = this.props;
+    const { ventaId, isExamen } = this.props;
     updateState(this, {
       type: Actions.getFacturaExistente,
-      ventaKey,
+      ventaId,
       isExamen
     });
   }
@@ -112,10 +113,10 @@ export default class FacturaEditorView extends Component {
     Promise.resolve().then(() => this.props.clearFacturaEditorOk(msg, pdfLink));
   };
 
-  editarFactura = ventaId => {
-    const { ventaKey, isExamen } = this.props;
-    if (ventaId === ventaKey)
-      return updateState(this, { type: Actions.cerrarComprobanteDialog });
+  editarFacturaActual = id => {
+    const { ventaId, isExamen } = this.props;
+    if (ventaId === id)
+      updateState(this, { type: Actions.cerrarComprobanteDialog });
 
     const editarFn = isExamen
       ? this.props.editarFacturaExamen
@@ -134,7 +135,7 @@ export default class FacturaEditorView extends Component {
       guardando
     } = this.state;
 
-    const { isExamen, ventaKey, ajustes } = this.props;
+    const { isExamen, ventaId } = this.props;
 
     // se permite usar string vacio como 0 asi que
     // hay que sanitizar
@@ -143,7 +144,7 @@ export default class FacturaEditorView extends Component {
 
     const errorUnidades = errors && errors.unidades;
     const detallado = inputs.detallado;
-    const iva = isExamen ? 0 : ajustes.iva;
+    const iva = isExamen ? 0 : appSettings.iva;
     const { subtotal, rebaja, impuestos, total } = calcularValoresFacturables({
       unidades,
       descuento,
@@ -169,7 +170,7 @@ export default class FacturaEditorView extends Component {
               pagos={pagos}
               updatePagos={this.updatePagos}
               onDataChanged={this.onFacturaInputChanged}
-              ventaKey={ventaKey}
+              ventaId={ventaId}
               onNewMedico={this.onNewMedico}
               onNewCliente={this.onNewCliente}
               onNewProduct={this.onNewProductFromKeyboard}
@@ -190,18 +191,18 @@ export default class FacturaEditorView extends Component {
               total={total}
               porcentajeIVA={iva}
               contable={inputs.contable}
-              contableDisabled={!ajustes.main || inputs.contableDisabled}
+              contableDisabled={!appSettings.main || inputs.contableDisabled}
               guardando={guardando}
               detallado={detallado}
               onGuardarClick={this.onGenerarFacturaClick}
               onFacturaDataChanged={this.onFacturaInputChanged}
-              nuevo={!ventaKey}
+              nuevo={!ventaId}
               guardarButtonDisabled={false}
               isExamen={isExamen}
             />
             <ComprobanteDialog
               ventaId={this.state.emitiendo ? this.state.emitiendo.ventaId : 0}
-              editarFactura={this.editarFactura}
+              editarFactura={this.editarFacturaActual}
               cerrarConMsg={this.resetearConMsg}
             />
           </div>
@@ -218,7 +219,7 @@ FacturaEditorView.propTypes = {
   editarFactura: React.PropTypes.func.isRequired,
   editarFacturaExamen: React.PropTypes.func.isRequired,
   isExamen: React.PropTypes.bool,
-  ventaKey: React.PropTypes.number
+  ventaId: React.PropTypes.string
 };
 
 FacturaEditorView.defaultProps = {
