@@ -8,24 +8,54 @@ import ComprobanteDialog from './ComprobanteDialog';
 import { getFacturaURL } from 'facturacion_common/src/api';
 import * as Actions from './EditorActions.js';
 import { createReducer, getDefaultState } from './EditorReducers.js';
+import { recoverDraft, saveDraft, deleteDraft } from './Draft.js';
 import { updateState } from '../Arch.js';
 import { calcularValoresFacturables } from 'facturacion_common/src/Math.js';
 import appSettings from '../Ajustes';
 
 const getDatilURL = id => `https://app.datil.co/ver/${id}/pdf`;
 
+const getInsertOkMsg = editar =>
+  editar
+    ? 'La factura se editó exitosamente'
+    : 'La factura se guardó exitosamente';
+
 export default class FacturaEditorView extends Component {
+  static createKey(isExamen, id) {
+    return isExamen ? 'examen_' + id : 'productos_' + id;
+  }
+
   constructor(props) {
     super(props);
     this.createReducer = createReducer;
+
+    // buscar si hay un draft que podemos recuperar
+    const { ventaId, isExamen } = props;
+    const draft = recoverDraft(this.constructor.createKey(isExamen, ventaId));
+    if (draft) {
+      this.state = draft;
+      return;
+    }
+
+    // No tiene draft, usar default state y ver si hay que editar
+    // una factura del servidor
     this.state = getDefaultState();
+    Promise.resolve().then(() => {
+      updateState(this, {
+        type: Actions.getFacturaExistente,
+        ventaId,
+        isExamen
+      });
+    });
   }
 
   onFacturaInputChanged = (key, value) => {
+    this.shouldSave = true;
     updateState(this, { type: Actions.updateFacturaInput, key, value });
   };
 
   onFacturableChanged = (index, key, value) => {
+    this.shouldSave = true;
     updateState(this, { type: Actions.updateUnidadInput, index, key, value });
   };
 
@@ -34,21 +64,31 @@ export default class FacturaEditorView extends Component {
   };
 
   onNewCliente = clienteRow => {
+    this.shouldSave = true;
     updateState(this, { type: Actions.setCliente, clienteRow });
   };
 
   onNewMedico = medicoRow => {
+    this.shouldSave = true;
     updateState(this, { type: Actions.setMedico, medicoRow });
   };
 
   onNewProductFromKeyboard = productoRow => {
+    this.shouldSave = true;
     updateState(this, { type: Actions.agregarProducto, productoRow });
   };
 
-  getInsertOkMsg = editar =>
-    editar
-      ? 'La factura se editó exitosamente'
-      : 'La factura se guardó exitosamente';
+  updatePagos = pagos => {
+    this.shouldSave = true;
+    updateState(this, { type: Actions.updatePagos, pagos });
+  };
+
+  clearFacturaEditorOk = (msg, link) => {
+    const { isExamen, ventaId } = this.props;
+    this.shouldSave = false;
+    deleteDraft(this.constructor.createKey(isExamen, ventaId));
+    this.props.clearFacturaEditorOk(msg, link);
+  };
 
   onGenerarFacturaClick = () => {
     const { empresa, iva } = appSettings;
@@ -64,8 +104,8 @@ export default class FacturaEditorView extends Component {
 
       const pdfLink = getFacturaURL(extras.rowid);
       window.open(pdfLink);
-      const msg = this.getInsertOkMsg(editar);
-      this.props.clearFacturaEditorOk(msg, pdfLink);
+      const msg = getInsertOkMsg(editar);
+      this.clearFacturaEditorOk(msg, pdfLink);
     };
 
     updateState(this, {
@@ -74,21 +114,6 @@ export default class FacturaEditorView extends Component {
       callback
     });
   };
-
-  componentDidMount() {
-    const { ventaId, isExamen } = this.props;
-    updateState(this, {
-      type: Actions.getFacturaExistente,
-      ventaId,
-      isExamen
-    });
-  }
-
-  updatePagos = pagos =>
-    updateState(this, {
-      type: Actions.updatePagos,
-      pagos
-    });
 
   abrirPagosForUpdate = total => {
     if (total === 0)
@@ -110,7 +135,7 @@ export default class FacturaEditorView extends Component {
     updateState(this, { type: Actions.getDefaultState });
     const pdfLink = getDatilURL(id);
     window.open(pdfLink);
-    Promise.resolve().then(() => this.props.clearFacturaEditorOk(msg, pdfLink));
+    Promise.resolve().then(() => this.clearFacturaEditorOk(msg, pdfLink));
   };
 
   editarFacturaActual = id => {
@@ -123,6 +148,12 @@ export default class FacturaEditorView extends Component {
       : this.props.editarFactura;
     editarFn(ventaId);
   };
+
+  componentWillUnmount() {
+    const { isExamen, ventaId } = this.props;
+    if (this.shouldSave)
+      saveDraft(this.constructor.createKey(isExamen, ventaId), this.state);
+  }
 
   render() {
     const {
@@ -218,10 +249,6 @@ FacturaEditorView.propTypes = {
   clearFacturaEditorOk: React.PropTypes.func.isRequired,
   editarFactura: React.PropTypes.func.isRequired,
   editarFacturaExamen: React.PropTypes.func.isRequired,
-  isExamen: React.PropTypes.bool,
-  ventaId: React.PropTypes.string
-};
-
-FacturaEditorView.defaultProps = {
-  isExamen: false
+  isExamen: React.PropTypes.bool.isRequired,
+  ventaId: React.PropTypes.string.isRequired
 };

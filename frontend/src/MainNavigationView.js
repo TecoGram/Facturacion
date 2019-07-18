@@ -110,6 +110,10 @@ MainDrawer.propTypes = {
 };
 
 class MainSnackbar extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    return nextProps.message !== this.props.message;
+  }
+
   render() {
     const { message, link, cerrarSnackbar } = this.props;
 
@@ -273,8 +277,8 @@ export default class MainNavigationView extends Component {
     updateState(this, { type: Actions.toggleDrawerMenu, drawerOpen });
   };
 
-  mostrarNuevoItemDialog = Component => {
-    updateState(this, { type: Actions.mostrarInputDialog, Component });
+  mostrarNuevoItemDialog = Content => {
+    updateState(this, { type: Actions.mostrarInputDialog, Content });
   };
 
   cerrarInputDialog = message => {
@@ -296,7 +300,7 @@ export default class MainNavigationView extends Component {
   editarCliente = editar => {
     updateState(this, {
       type: Actions.mostrarInputDialog,
-      Component: ClienteForm,
+      Content: ClienteForm,
       editar
     });
   };
@@ -304,7 +308,7 @@ export default class MainNavigationView extends Component {
   editarProducto = editar => {
     updateState(this, {
       type: Actions.mostrarInputDialog,
-      Component: ProductoForm,
+      Content: ProductoForm,
       editar
     });
   };
@@ -324,7 +328,7 @@ export default class MainNavigationView extends Component {
     return (
       <ProductosListView
         editarProducto={this.editarProducto}
-        mostrarErrorConSnackbar={this.mostrarErrorConSnackbar}
+        mostrarErrorConSnackbar={this.mostrarSnackbar}
       />
     );
   };
@@ -365,7 +369,7 @@ export default class MainNavigationView extends Component {
         mostrarErrorConSnackbar={this.mostrarSnackbar}
         isExamen={isExamen}
         ventaId={id}
-        key={id}
+        key={FacturaEditorView.createKey(isExamen, id)}
       />
     );
   };

@@ -249,38 +249,32 @@ const buscarEnTabla = (tabla, columna, queryString, limit) => {
 };
 
 const findProductos = ({ pagaIva, queryString, limit }) => {
+  const baseQuery = knex
+    .select([
+      'rowid',
+      'nombre',
+      'marca',
+      'precioVenta',
+      'precioDist',
+      'codigo',
+      'pagaIva'
+    ])
+    .from('productos')
+    .join('productosFts', { 'productos.ftsid': 'productosFts.rowid' })
+    .limit(limit);
+
   if (queryString) {
-    const baseQuery = knex
-      .select([
-        'rowid',
-        'nombre',
-        'marca',
-        'precioVenta',
-        'precioDist',
-        'codigo',
-        'pagaIva'
-      ])
-      .from('productos')
-      .join('productosFts', { 'productos.ftsid': 'productosFts.rowid' })
-      .where('productosFts.nombre', 'MATCH', queryString + '*')
-      .limit(limit);
+    if (typeof pagaIva === 'number')
+      return baseQuery
+        .where('productosFts.nombre', 'MATCH', queryString + '*')
+        .where({ pagaIva });
 
-    if (typeof pagaIva === 'number') return baseQuery.where({ pagaIva });
-
-    return baseQuery;
+    return baseQuery.where('productosFts.nombre', 'MATCH', queryString + '*');
   }
 
-  if (typeof pagaIva === 'number')
-    return knex
-      .select('*')
-      .from('productos')
-      .where({ pagaIva })
-      .limit(limit);
+  if (typeof pagaIva === 'number') return baseQuery.where({ pagaIva });
 
-  return knex
-    .select('*')
-    .from('productos')
-    .limit(limit);
+  return baseQuery;
 };
 
 const updateCliente = row => {
