@@ -305,7 +305,7 @@ const generarNuevoComprobante = async ventaId => {
 
   await db.colocarComprobante({ ventaId, id, clave_acceso });
 
-  return { status: 200, resp: { rowid: ventaId } };
+  return { status: 200, resp: { rowid: ventaId, id } };
 };
 
 app.post(

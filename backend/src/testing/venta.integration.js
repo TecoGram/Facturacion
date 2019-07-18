@@ -78,6 +78,7 @@ const insertarNuevaFacturaContable = async ventaRow => {
 
   const res2 = await api.emitirComprobante(res1.body.rowid);
   expect(res2.status).toBe(200);
+  expect(res2.body).toEqual({ rowid: expect.any(Number), id: '__datil_id__' });
 
   expect(HTTPClient.postRequest).toHaveBeenCalledTimes(1);
 
