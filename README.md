@@ -1,6 +1,6 @@
 [![CircleCI](:https://circleci.com/gh/GAumala/Facturacion.svg?style=svg)](https://circleci.com/gh/GAumala/Facturacion) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-Sistema de facturación web sencillo escrito con React, Node.js y SQLite 3.
+Sistema de facturación web sencillo escrito con React, Node.js y SQLite 3. Emite comprobantes electrónicos usando [Dátil](https://datil.co).
 
 Se recomienda usar versiones actuales de Google Chrome (>=56) o Firefox (>= 54) para el cliente.
 
@@ -16,39 +16,81 @@ Este sistema solo ha sido probado en Linux, debería de funcionar en cualquier s
 
 ## Setup
 
-Primero, clona este repositorio, instala todos los paquetes linkeando `common` con `yarn`.
+1. Clona este repositorio linkea el paquete `common` antes de instalar los demás paquetes.
 
 ```bash
 git clone https://github.com/GAumala/Facturacion
 cd Facturacion/common
-yarn --frozen-lockfile
-yarn link
-
-cd ../frontend
-yarn link facturacion_common
-yarn --frozen-lockfile
+yarn 
+yarn link 
 
 cd ../backend
 yarn link facturacion_common
-yarn --frozen-lockfile
+yarn
+
+cd ../frontend
+yarn link facturacion_common
+yarn
 ```
-
-
-Segundo, crea el build de producción del React App. 
+2. Crea el build de producción del React App. 
 
 ```bash
 cd frontend
 yarn build
 ```
 
-Tercero, crea la base de datos.
+3. Crea la base de datos.
 
 ```bash
 cd backend
 yarn init-db
 ```
 
-Ahora solo falta levantar el servidor
+4. Crea los archivos de configuración `datil.config.js` y `system.config.js` en la raíz del proyecto:
+
+``` JavaScript
+// datil.config.js
+// Aquí se configuran varios datos que se envían a Dátil para emitir
+// comprobantes como se especifica en https://datil.dev/#facturas
+const emision = {
+  ambiente: 1, // pruebas
+  moneda: 'USD',
+  tipo_emision: 1, // normal
+  emisor: {
+    ruc: '__MI_RUC__',
+    razon_social: '__MI_RAZON_SOCIAL__',
+    nombre_comercial: '__MI_NOMBRE_COMERCIAL__',
+    direccion: '__MI_DIRECCION__',
+    contribuyente_especial: '',
+    obligado_contabilidad: true,
+    establecimiento: {
+      codigo: '001',
+      punto_emision: '001',
+      direccion: '__MI_DIRECCION__',
+    }
+  }
+};
+
+const apiKey = '__MI_API_KEY__';
+const password = '__MI_PASSWORD__';
+const codigoIVA = '2' // 12%
+
+module.exports = {
+  emision, apiKey, password, codigoIVA
+};
+```
+
+``` JavaScript
+// system.config.js
+// En este archivo se pueden configurar varias empresas para facturar con cada 
+// una. Sólo la primera puede emitir comprobantes con datil, y esta debe tener
+// el mismo nombre indicado en `razon_social` en `datil.config.js`.
+module.exports = {
+  empresas: [ '__MI_RAZON_SOCIAL__', 'Otra empresa' ]
+}
+```
+
+Ahora solo falta levantar el servidor:
 
 ```bash
 yarn server
