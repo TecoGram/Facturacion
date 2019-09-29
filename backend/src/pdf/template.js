@@ -41,10 +41,10 @@ const unitPriceColumnWidth = 65;
 const unitPriceColumnSeparator =
   descriptionColumnSeparator + unitPriceColumnWidth;
 
-const paymentAgreementString =
+const paymentAgreementString = empresaName =>
   'Declaro expresamente haver recibido la mercadería' +
   ' y/o servicio detallado en esta factura y me comprometo a pagar integramente' +
-  ' el valor total de la misma a TECO-GRAM S.A., en el plazo establecido en caso' +
+  ` el valor total de la misma a ${empresaName}, en el plazo establecido en caso` +
   ' de mora en el pago de la factura me comprometo a pagar el interés legal por' +
   ' mora y comisiones por cobranza, desde el vencimiento hasta el mismo día de' +
   ' pago. Para toda acción legal, renuncio a domicilio y me someto a los jueces' +
@@ -224,11 +224,11 @@ const drawPaymentMethodColumn = (doc, boxHeight, methodName, totalPayed) => {
   doc.x = doc.x + boxWidth + 3;
 };
 
-const drawPaymentAgreement = (doc, boxHeight) => {
+const drawPaymentAgreement = (doc, boxHeight, empresaName) => {
   const textY = paymentMethodValueBoxY + boxHeight + 5;
   doc
     .fontSize(8)
-    .text(paymentAgreementString, BOX2_POS.x, textY, {
+    .text(paymentAgreementString(empresaName), BOX2_POS.x, textY, {
       width: BOX2_SIZE.x
     })
     .fontSize(12);
@@ -241,7 +241,7 @@ const drawPaymentMethodSubtitle = doc => {
   doc.x = doc.x + doc.widthOfString('FORMA DE PAGO:') + 3;
 };
 
-const drawPaymentMethodFooter = (doc, pagos) => {
+const drawPaymentMethodFooter = (doc, pagos, empresaName) => {
   const startX = BOX2_POS.x;
   const valueBoxHeight = doc.currentLineHeight() + 4;
   const paymentMethods = generarDetalleOpcionesDePago(pagos);
@@ -254,7 +254,7 @@ const drawPaymentMethodFooter = (doc, pagos) => {
   paymentMethods.forEach(args => {
     drawPaymentMethodColumn(doc, valueBoxHeight, ...args);
   });
-  drawPaymentAgreement(doc, valueBoxHeight);
+  drawPaymentAgreement(doc, valueBoxHeight, empresaName);
 
   doc.fontSize(12); //restore default
 };
@@ -268,6 +268,7 @@ module.exports = ({ ventaRow, unidades, pagos, clienteRow }) => {
       ventaRow.iva,
       ventaRow.descuento
     );
+    const empresaName = ventaRow.empresa.toUpperCase();
 
     drawInvoiceInfoContents(doc, { ventaRow, clienteRow, unidades });
     const remainingFacturablesIndex = drawFacturablesDetails(
@@ -277,7 +278,7 @@ module.exports = ({ ventaRow, unidades, pagos, clienteRow }) => {
     );
     drawTotalPalabras(doc, 'SON: ' + valorPalabras(Money.print(total)));
     drawTotalValues(doc, ventaRow);
-    drawPaymentMethodFooter(doc, pagos);
+    drawPaymentMethodFooter(doc, pagos, empresaName);
 
     if (remainingFacturablesIndex) {
       drawRemainingFacturablesOnNextPage(
