@@ -4,7 +4,7 @@ Sistema de facturación web sencillo escrito con React, Node.js y SQLite 3. Emit
 
 Se recomienda usar versiones actuales de Google Chrome (>=56) o Firefox (>= 54) para el cliente.
 
-![screenshot1](https://cloud.githubusercontent.com/assets/5729175/24410708/5fa3bcaa-1399-11e7-9cf7-378244afe11d.png)
+![Screenshot_2020-07-19 Facturación](https://user-images.githubusercontent.com/5729175/87880910-27155c00-c9bb-11ea-8858-a468b9c65aab.png)
 
 ## Dependencias
 
