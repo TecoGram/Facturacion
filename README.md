@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/GAumala/Facturacion.svg?style=svg)](https://circleci.com/gh/GAumala/Facturacion) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![CircleCI](https://circleci.com/gh/GAumala/Facturacion.svg?style=svg)](https://circleci.com/gh/TecoGram/Facturacion) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
 Sistema de facturación web sencillo escrito con React, Node.js y SQLite 3. Emite comprobantes electrónicos usando [Dátil](https://datil.co).
 
