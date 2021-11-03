@@ -10,7 +10,7 @@
     "deep-freeze": "^0.0.1",
     "fecha": "2.3.1",
     "superagent": "^5.0.5",
-    "validator": "6.3.0"
+    "validator": "13.7.0"
   },
   "scripts": {
     "test": "criptext-js-tools test",
