@@ -8,7 +8,7 @@
   "private": true,
   "dependencies": {
     "body-parser": "^1.18.3",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "knex": "https://github.com/GAumala/knex/releases/download/0.19.5-fix1/knex.tgz",
     "normalize-for-search": "^2.0.1",
     "pdfkit": "^0.8.3",
